@@ -49,7 +49,7 @@ MSEPythonImporterTest >> testInitOfClass [
 	importer := MSEPythonSmaccImporterVisitor new.
 	importer accept: pyDoc. 
 	
-	self assert: importer functions size equals: 1.
+	self assert: importer functions size equals: 5.
 	
 ]
 
