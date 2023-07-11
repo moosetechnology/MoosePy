@@ -42,7 +42,6 @@ MSEPythonImporterTest >> testClassesImportedTwiceAreOnlyImportedOnce [
 
 { #category : #tests }
 MSEPythonImporterTest >> testInitOfClass [
-	<skip>
 
 	| pyDoc importer |
 	pyDoc := self parserClass parse: PythonParserTests new sourceBig2.
@@ -54,8 +53,8 @@ MSEPythonImporterTest >> testInitOfClass [
 ]
 
 { #category : #tests }
-MSEPythonImporterTest >> testParseClass [
-
+MSEPythonImporterTest >> testParseClassFindsClasses [
+	"a not so eciting tests but we should start somewhere"
 
 	| pyDoc importer |
 	pyDoc := self parserClass parse: PythonParserTests new sourceBig2.
