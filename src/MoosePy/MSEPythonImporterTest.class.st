@@ -28,28 +28,22 @@ MSEPythonImporterTest >> importer [
 	^ MSEPythonToFamixImporterVisitor new
 ]
 
-{ #category : #accessing }
-MSEPythonImporterTest >> parserClass [
-
-	^ PythonParser
-]
-
 { #category : #running }
 MSEPythonImporterTest >> setUp [
 
-	pyDoc := self sourceBig2.
-	importer := self importer.
 	fileSystem := FileSystem memory.
 	file := fileSystem workingDirectory / 'sprite_collect_blocks.py'.
 	file writeStreamDo:  [ :stream | stream nextPutAll: PythonParserTests new sourceBig2 ].
+	pyDoc := self sourceBig2.
+	importer := self importer.
 
 	
 ]
 
 { #category : #accessing }
 MSEPythonImporterTest >> sourceBig2 [
-
-	^ self parserClass parse: PythonParserTests new sourceBig2
+	
+	^ PythonParser parseFileWithErrors: (fileSystem / 'sprite_collect_blocks.py') 
 ]
 
 { #category : #'tests - classes' }
