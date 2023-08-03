@@ -39,7 +39,7 @@ MSEPythonToFamixImporterVisitor >> createClass: aClass [
 	
 	| class name  |
 	name := (aClass cname value).
-	class := classes at: name put: FamixPythonClass  new.
+	class := classes at: name put: model newClass.
 	class name: (aClass cname value).
 	class stub: true.
 	^ class
@@ -138,6 +138,11 @@ MSEPythonToFamixImporterVisitor >> methods [
 ]
 
 { #category : #accessing }
+MSEPythonToFamixImporterVisitor >> model [
+	^ model
+]
+
+{ #category : #accessing }
 MSEPythonToFamixImporterVisitor >> moduleNamed: aString [ 
 	^ modules at: aString ifAbsent: [ nil ]
 ]
@@ -146,13 +151,13 @@ MSEPythonToFamixImporterVisitor >> moduleNamed: aString [
 MSEPythonToFamixImporterVisitor >> visitClassdef: aClassDef [
 
 	self ensureClass:  aClassDef.
-	super visitClassdef: aClassDef
+	^ super visitClassdef: aClassDef
 ]
 
 { #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitFileInput: aFileInput [
 	self ensureModule: aFileInput. 
-	^ self visitRoot: aFileInput
+	^ super visitFileInput: aFileInput 
 ]
 
 { #category : #visiting }
@@ -162,7 +167,7 @@ MSEPythonToFamixImporterVisitor >> visitFuncdef: aFuncdef [
 		ifTrue: [ self ensureMethod: aFuncdef ]
 		ifFalse: [ self ensureFunction: aFuncdef ].
 
-	super visitClassdef: aFuncdef
+	^ super visitFuncdef: aFuncdef
 ]
 
 { #category : #visiting }
@@ -180,5 +185,5 @@ MSEPythonToFamixImporterVisitor >> visitImport: anImport [
 	import manualImportingEntity: module.
 	module manualAddImport: import.
 	
-	super visitImport: anImport
+	^ super visitImport: anImport
 ]

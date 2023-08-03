@@ -46,6 +46,15 @@ MSEPythonImporterTest >> sourceBig2 [
 	^ self parserClass parse: PythonParserTests new sourceBig2
 ]
 
+{ #category : #'tests - classes' }
+MSEPythonImporterTest >> testClassIsInModel [
+	
+	| firstClass | 
+	importer accept: pyDoc.
+	firstClass := importer classNamed: 'Ball'.
+	self assert: importer model numberOfClasses equals: 3.
+]
+
 { #category : #tests }
 MSEPythonImporterTest >> testClasses [
 	
