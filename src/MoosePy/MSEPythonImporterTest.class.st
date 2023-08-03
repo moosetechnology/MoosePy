@@ -1,8 +1,18 @@
 Class {
 	#name : #MSEPythonImporterTest,
 	#superclass : #TestCase,
+	#instVars : [
+		'pyDoc',
+		'importer'
+	],
 	#category : #MoosePy
 }
+
+{ #category : #tests }
+MSEPythonImporterTest >> importer [
+
+	^ MSEPythonToFamixImporterVisitor new
+]
 
 { #category : #accessing }
 MSEPythonImporterTest >> parserClass [
@@ -11,56 +21,56 @@ MSEPythonImporterTest >> parserClass [
 ]
 
 { #category : #tests }
-MSEPythonImporterTest >> testClasses [
+MSEPythonImporterTest >> setUp [
 
-
-	| pyDoc importer |
-	pyDoc := self parserClass parse: PythonParserTests new sourceBig2.
-	importer := MSEPythonSmaccImporterVisitor new.
-	importer accept: pyDoc. 
+	pyDoc := self sourceBig2.
+	importer := self importer.
 	
-	self assert: importer classes size equals: 3.
-	 
+]
+
+{ #category : #tests }
+MSEPythonImporterTest >> sourceBig2 [
+
+	^ self parserClass parse: PythonParserTests new sourceBig2
+]
+
+{ #category : #tests }
+MSEPythonImporterTest >> testClasses [
+	
+	importer accept: pyDoc.
+	self assert: importer classes size equals: 3
 ]
 
 { #category : #tests }
 MSEPythonImporterTest >> testClassesImportedTwiceAreOnlyImportedOnce [
 
+	importer accept: pyDoc.
+	self assert: importer classes size equals: 3.
 
-	| pyDoc importer |
-	pyDoc := self parserClass parse: PythonParserTests new sourceBig2.
-	importer := MSEPythonSmaccImporterVisitor new. 
-	
-	importer accept: pyDoc. 
-	
-	self assert: importer classes size equals: 3.
-	
-	importer accept: pyDoc. 
-	
-	self assert: importer classes size equals: 3.
+	importer accept: pyDoc.
+
+	self assert: importer classes size equals: 3
+]
+
+{ #category : #tests }
+MSEPythonImporterTest >> testImportFamixClass [
+
+	importer accept: pyDoc.
+
+	self assert: importer classes size equals: 3
 ]
 
 { #category : #tests }
 MSEPythonImporterTest >> testImportFunctions [
 
-	| pyDoc importer |
-	pyDoc := self parserClass parse: PythonParserTests new sourceBig2.
-	importer := MSEPythonSmaccImporterVisitor new.
-	importer accept: pyDoc. 
-	
-	self assert: importer functions size equals: 5.
-	
+
+	importer accept: pyDoc.
+	self assert: importer functions size equals: 5
 ]
 
 { #category : #tests }
 MSEPythonImporterTest >> testParseClassFindsClasses [
-	"a not so eciting tests but we should start somewhere"
 
-	| pyDoc importer |
-	pyDoc := self parserClass parse: PythonParserTests new sourceBig2.
-	importer := MSEPythonSmaccImporterVisitor new.
-	importer accept: pyDoc.  
-	
-	self assert: importer classes size equals: 3.
-	
+	importer accept: pyDoc.
+	self assert: importer classes size equals: 3
 ]

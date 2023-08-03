@@ -14,5 +14,10 @@ BaselineOfMoosePy >> baseline: spec [
 			spec repository: 'github://j-brant/SmaCC';
 			loads: #('SmaCC_Python' 'SmaCC_Python_Tests') ].
 	
-	spec package: 'MoosePy' with: [ spec requires: 'PythonParser' ]
+	spec 
+		baseline: 'FamixPythonImporter' 
+		with: [ 
+			spec repository: 'github://Ducasse/famixPythonImporter'].
+		
+	spec package: 'MoosePy' with: [ spec requires: #('PythonParser' 'FamixPythonImporter') ]
 ]

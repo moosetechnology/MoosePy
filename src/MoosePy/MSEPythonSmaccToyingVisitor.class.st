@@ -1,5 +1,5 @@
 Class {
-	#name : #MSEPythonSmaccImporterVisitor,
+	#name : #MSEPythonSmaccToyingVisitor,
 	#superclass : #PyRootNodeVisitor,
 	#instVars : [
 		'classes',
@@ -9,29 +9,29 @@ Class {
 }
 
 { #category : #accessing }
-MSEPythonSmaccImporterVisitor >> classes [
+MSEPythonSmaccToyingVisitor >> classes [
 	^ classes
 ]
 
 { #category : #accessing }
-MSEPythonSmaccImporterVisitor >> ensureClass: aClass [
+MSEPythonSmaccToyingVisitor >> ensureClass: aClass [
 
 	^ classes at: aClass cname value ifAbsentPut: [ aClass ]
 ]
 
 { #category : #accessing }
-MSEPythonSmaccImporterVisitor >> ensureFunction: aFunction [
+MSEPythonSmaccToyingVisitor >> ensureFunction: aFunction [
 	
 	^ functions at: aFunction parent cname value, '.' , aFunction fname value ifAbsentPut: [ aFunction ]
 ]
 
 { #category : #accessing }
-MSEPythonSmaccImporterVisitor >> functions [
+MSEPythonSmaccToyingVisitor >> functions [
 	^ functions
 ]
 
 { #category : #initialization }
-MSEPythonSmaccImporterVisitor >> initialize [
+MSEPythonSmaccToyingVisitor >> initialize [
 
 	super initialize.
 	classes := Dictionary new.
@@ -39,14 +39,14 @@ MSEPythonSmaccImporterVisitor >> initialize [
 ]
 
 { #category : #generated }
-MSEPythonSmaccImporterVisitor >> visitClassdef: aClassDef [
+MSEPythonSmaccToyingVisitor >> visitClassdef: aClassDef [
 
 	self ensureClass:  aClassDef.
 	super visitClassdef: aClassDef
 ]
 
 { #category : #generated }
-MSEPythonSmaccImporterVisitor >> visitFuncdef: aFuncdef [
+MSEPythonSmaccToyingVisitor >> visitFuncdef: aFuncdef [
 
 	self ensureFunction:  aFuncdef.
 	super visitClassdef: aFuncdef
