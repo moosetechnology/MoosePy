@@ -53,7 +53,7 @@ MSEPythonImporterTest >> testClassesImportedTwiceAreOnlyImportedOnce [
 	self assert: importer classes size equals: 3
 ]
 
-{ #category : #'tests - famix classes' }
+{ #category : #'tests - classes' }
 MSEPythonImporterTest >> testImportClassKnowsItsMethods [
 	
 	| cl | 
@@ -65,7 +65,7 @@ MSEPythonImporterTest >> testImportClassKnowsItsMethods [
 	
 ]
 
-{ #category : #'tests - famix classes' }
+{ #category : #'tests - classes' }
 MSEPythonImporterTest >> testImportFamixClass [
 	
 	| firstClass | 
@@ -76,7 +76,7 @@ MSEPythonImporterTest >> testImportFamixClass [
 	self assert: firstClass isStub
 ]
 
-{ #category : #'tests - famix classes' }
+{ #category : #'tests - classes' }
 MSEPythonImporterTest >> testImportFamixMethod [
 	
 	| mth | 
@@ -88,7 +88,7 @@ MSEPythonImporterTest >> testImportFamixMethod [
 
 ]
 
-{ #category : #'tests - famix classes' }
+{ #category : #'tests - classes' }
 MSEPythonImporterTest >> testImportFamixMethodKnowsItsClass [
 	
 	| mth cl | 
@@ -105,4 +105,26 @@ MSEPythonImporterTest >> testImportFunctions [
 	importer accept: pyDoc.
 	self assert: importer methods size equals: 5.
 	self assert: importer methods keys equals: #('Wall.__init__' 'Ball.update' 'Player.update' 'Player.__init__' 'Ball.__init__')
+]
+
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testImportImport [
+	
+	| import | 
+	importer accept: pyDoc.
+	import := importer importNamed: 'pygame'.
+	self assert: import class equals: FamixPythonImport.
+	self assert: import entityName equals: 'pygame'.
+
+]
+
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testImportModule [
+	
+	| module | 
+	importer accept: pyDoc.
+	module := importer moduleNamed: 'MainModule'.
+	self assert: module class equals: FamixPythonModule.
+	self assert: module name equals: 'MainModule'.
+
 ]

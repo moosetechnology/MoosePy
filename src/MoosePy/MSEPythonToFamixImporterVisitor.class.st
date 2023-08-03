@@ -5,7 +5,9 @@ Class {
 		'classes',
 		'functions',
 		'methods',
-		'model'
+		'model',
+		'imports',
+		'modules'
 	],
 	#category : #MoosePy
 }
@@ -88,6 +90,11 @@ MSEPythonToFamixImporterVisitor >> functions [
 	^ functions
 ]
 
+{ #category : #accessing }
+MSEPythonToFamixImporterVisitor >> importNamed: aString [ 
+	^ imports at: aString ifAbsent: [ nil ]
+]
+
 { #category : #initialization }
 MSEPythonToFamixImporterVisitor >> initialize [
 
@@ -95,6 +102,8 @@ MSEPythonToFamixImporterVisitor >> initialize [
 	classes := Dictionary new.
 	functions := Dictionary new.
 	methods := Dictionary new.
+	imports := Dictionary new.
+	modules := Dictionary new.
 	model := FamixPythonModel new name: 'PythonModel-', 100 atRandom asString.
 	
 ]
@@ -104,9 +113,14 @@ MSEPythonToFamixImporterVisitor >> methodNamed: aString [
 	^ methods at: aString ifAbsent: [ nil ]
 ]
 
-{ #category : #accessing }
+{ #category : #'accessing - methods' }
 MSEPythonToFamixImporterVisitor >> methods [
 	^ methods
+]
+
+{ #category : #accessing }
+MSEPythonToFamixImporterVisitor >> moduleNamed: aString [ 
+	^ modules at: aString ifAbsent: [ nil ]
 ]
 
 { #category : #visiting }
@@ -114,6 +128,13 @@ MSEPythonToFamixImporterVisitor >> visitClassdef: aClassDef [
 
 	self ensureClass:  aClassDef.
 	super visitClassdef: aClassDef
+]
+
+{ #category : #generated }
+MSEPythonToFamixImporterVisitor >> visitFileInput: aFileInput [
+
+	"self halt."
+	^ self visitRoot: aFileInput
 ]
 
 { #category : #visiting }
@@ -124,4 +145,18 @@ MSEPythonToFamixImporterVisitor >> visitFuncdef: aFuncdef [
 		ifFalse: [ self ensureFunction: aFuncdef ].
 
 	super visitClassdef: aFuncdef
+]
+
+{ #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitImport: anImport [
+
+	| import  name |
+	name := (anImport names first names first value).
+	"this will not work when we have 
+		import pygame.foo
+		an import node should provide fullname which would return pygame.foo"
+		
+	import := FamixPythonImport new entityName: name.
+	imports at: name put: import.
+	super visitImport: anImport
 ]
