@@ -9,10 +9,10 @@ BaselineOfMoosePy >> baseline: spec [
 	<baseline>
 	
 	spec 
-		baseline: 'SmaCCRuntime' 
+		baseline: 'PythonParser' 
 		with: [ 
 			spec repository: 'github://j-brant/SmaCC';
 			loads: #('SmaCC_Python_Tests') ].
 	
-	spec package: 'MoosePy' with: [ spec requires: 'SmaCCRuntime' ]
+	spec package: 'MoosePy' with: [ spec requires: 'PythonParser' ]
 ]
