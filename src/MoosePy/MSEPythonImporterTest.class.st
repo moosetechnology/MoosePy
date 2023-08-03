@@ -10,18 +10,6 @@ Class {
 	#category : #MoosePy
 }
 
-{ #category : #'tests - module' }
-MSEPythonImporterTest >> atestModuleKnowsItsImport [
-	
-	| module | 
-	importer accept: pyDoc.
-	module := importer moduleNamed: 'Main Module'.
-	self assert: module manualIncomingImports size equals: 2.
-	"does not work probably because of the bidirectional slots 
-		self assert: module incomingImports size equals: 2."
-
-]
-
 { #category : #accessing }
 MSEPythonImporterTest >> importer [
 
@@ -29,10 +17,22 @@ MSEPythonImporterTest >> importer [
 ]
 
 { #category : #running }
+MSEPythonImporterTest >> moduleName [
+	^ 'sprite_collect_blocks'
+
+
+]
+
+{ #category : #running }
 MSEPythonImporterTest >> setUp [
 
 	fileSystem := FileSystem memory.
-	file := fileSystem workingDirectory / 'sprite_collect_blocks.py'.
+	file := fileSystem workingDirectory / (self moduleName, '.py').
+	file writeStreamDo:  [ :stream | stream nextPutAll: PythonParserTests new sourceBig2 ].
+	pyDoc := self sourceBig2.
+	importer := self importer.
+
+	
 	file writeStreamDo:  [ :stream | stream nextPutAll: PythonParserTests new sourceBig2 ].
 	pyDoc := self sourceBig2.
 	importer := self importer.
@@ -43,7 +43,7 @@ MSEPythonImporterTest >> setUp [
 { #category : #accessing }
 MSEPythonImporterTest >> sourceBig2 [
 	
-	^ PythonParser parseFileWithErrors: (fileSystem / 'sprite_collect_blocks.py') 
+	^ PythonParser parseFileWithErrors: (fileSystem / (self moduleName, '.py')) 
 ]
 
 { #category : #'tests - classes' }
@@ -74,7 +74,7 @@ MSEPythonImporterTest >> testClassesImportedTwiceAreOnlyImportedOnce [
 
 { #category : #'tests - files' }
 MSEPythonImporterTest >> testFileIsOk [
-	self assert: (fileSystem / 'sprite_collect_blocks.py') contents size equals:  7586
+	self assert: (fileSystem / (self moduleName, '.py')) contents size equals: 7586
 	
 ]
 
@@ -158,7 +158,7 @@ MSEPythonImporterTest >> testImportKnowsItsModule [
 	| import module | 
 	importer accept: pyDoc.
 	import := importer importNamed: 'pygame'.
-	module := importer moduleNamed: 'Main Module'.
+	module := importer moduleNamed: self moduleName.
 	self assert: import manualImportingEntity equals: module.
 
 ]
@@ -168,9 +168,9 @@ MSEPythonImporterTest >> testImportModule [
 	
 	| module | 
 	importer accept: pyDoc.
-	module := importer moduleNamed: 'Main Module'.
+	module := importer moduleNamed: self moduleName.
 	self assert: module class equals: FamixPythonModule.
-	self assert: module name equals: 'Main Module'.
+	self assert: module name equals: self moduleName.
 
 ]
 
@@ -193,7 +193,7 @@ MSEPythonImporterTest >> testModuleKnowsItsImport [
 	
 	| module | 
 	importer accept: pyDoc.
-	module := importer moduleNamed: 'Main Module'.
+	module := importer moduleNamed: self moduleName.
 	self assert: module manualIncomingImports size equals: 2.
 	"does not work probably because of the bidirectional slots 
 		self assert: module incomingImports size equals: 2."
@@ -216,7 +216,7 @@ MSEPythonImporterTest >> testTwoSiblingImportsHaveTheSameModule [
 	importer accept: pyDoc.
 	import := importer importNamed: 'pygame'.
 	import2 := importer importNamed: 'random'.
-	module := importer moduleNamed: 'Main Module'.
+	module := importer moduleNamed: self moduleName.
 	self assert: import manualImportingEntity equals: module.
 	self assert: import2 manualImportingEntity equals: module.
 	self assert: import manualImportingEntity == import2 manualImportingEntity  

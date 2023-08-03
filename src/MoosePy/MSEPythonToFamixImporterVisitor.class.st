@@ -85,8 +85,7 @@ MSEPythonToFamixImporterVisitor >> createModule: aModuleNode [
 
 	| module |
 	module := model newModule.
-	module name: 'Main Module'. "The parser does not handle the file so we will have to do it. 
-	For this we should create a memory file system."
+	module name: (self moduleNameStringOf: aModuleNode).
 	modules at: module name put: module.	
 	
 ]
@@ -115,9 +114,9 @@ MSEPythonToFamixImporterVisitor >> ensureMethod: aFunctionNode [
 
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> ensureModule: aModuleNode [
-	
+		
 	^ modules 
-		at: 'Main Module' "yes we need to manage module name!!!"
+		at:  (self moduleNameStringOf: aModuleNode)
 		ifAbsent: [ self createModule: aModuleNode ]
 ]
 
@@ -157,6 +156,16 @@ MSEPythonToFamixImporterVisitor >> methods [
 { #category : #accessing }
 MSEPythonToFamixImporterVisitor >> model [
 	^ model
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> moduleNameStringOf: aModuleNode [
+	"should push that to the PyInputFileNode"
+	
+	^ aModuleNode filename 
+		ifNil: [ 'Main Module'] 
+		ifNotNil: [:s | s basenameWithoutExtension ]		
+	
 ]
 
 { #category : #accessing }
