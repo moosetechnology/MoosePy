@@ -41,7 +41,7 @@ MSEPythonImporterTest >> testClassesImportedTwiceAreOnlyImportedOnce [
 ]
 
 { #category : #tests }
-MSEPythonImporterTest >> testInitOfClass [
+MSEPythonImporterTest >> testImportFunctions [
 
 	| pyDoc importer |
 	pyDoc := self parserClass parse: PythonParserTests new sourceBig2.
