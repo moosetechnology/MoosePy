@@ -64,25 +64,44 @@ MSEPythonToFamixImporterVisitor >> createMethod: aMethodNode [
 ]
 
 { #category : #'private-entity-creation' }
-MSEPythonToFamixImporterVisitor >> ensureClass: aClass [
+MSEPythonToFamixImporterVisitor >> createModule: aModuleNode [ 
 
-	^ classes at: aClass cname value ifAbsent: [ self createClass: aClass ]
+	| module |
+	module := FamixPythonModule new.
+	module name: 'Main Module'. "The parser does not handle the file so we will have to do it. 
+	For this we should create a memory file system."
+	modules at: module name put: module.	
+	
 ]
 
 { #category : #'private-entity-creation' }
-MSEPythonToFamixImporterVisitor >> ensureFunction: aFunction [
+MSEPythonToFamixImporterVisitor >> ensureClass: aClassNode [
+
+	^ classes at: aClassNode cname value ifAbsent: [ self createClass: aClassNode ]
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> ensureFunction: aFunctionNode [
 	
 	^ functions 
-		at: aFunction parent cname value, '.' , aFunction fname value 
-		ifAbsent: [ self createFunction: aFunction ]
+		at: aFunctionNode parent cname value, '.' , aFunctionNode fname value 
+		ifAbsent: [ self createFunction: aFunctionNode ]
 ]
 
 { #category : #'private-entity-creation' }
-MSEPythonToFamixImporterVisitor >> ensureMethod: aFunction [
+MSEPythonToFamixImporterVisitor >> ensureMethod: aFunctionNode [
 	
 	^ methods 
-		at: aFunction parent cname value, '.' , aFunction fname value 
-		ifAbsent: [ self createMethod: aFunction ]
+		at: aFunctionNode parent cname value, '.' , aFunctionNode fname value 
+		ifAbsent: [ self createMethod: aFunctionNode ]
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> ensureModule: aModuleNode [
+	
+	^ modules 
+		at: 'Main Module' "yes we need to manage module name!!!"
+		ifAbsent: [ self createModule: aModuleNode ]
 ]
 
 { #category : #'accessing - methods' }
@@ -130,10 +149,9 @@ MSEPythonToFamixImporterVisitor >> visitClassdef: aClassDef [
 	super visitClassdef: aClassDef
 ]
 
-{ #category : #generated }
+{ #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitFileInput: aFileInput [
-
-	"self halt."
+	self ensureModule: aFileInput. 
 	^ self visitRoot: aFileInput
 ]
 
@@ -150,7 +168,7 @@ MSEPythonToFamixImporterVisitor >> visitFuncdef: aFuncdef [
 { #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitImport: anImport [
 
-	| import  name |
+	| import  name module |
 	name := (anImport names first names first value).
 	"this will not work when we have 
 		import pygame.foo
@@ -158,5 +176,9 @@ MSEPythonToFamixImporterVisitor >> visitImport: anImport [
 		
 	import := FamixPythonImport new entityName: name.
 	imports at: name put: import.
+	module :=  (self ensureModule: anImport parent parent).
+	import manualImportingEntity: module.
+	module manualAddImport: import.
+	
 	super visitImport: anImport
 ]

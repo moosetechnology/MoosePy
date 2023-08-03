@@ -8,6 +8,18 @@ Class {
 	#category : #MoosePy
 }
 
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> atestModuleKnowsItsImport [
+	
+	| module | 
+	importer accept: pyDoc.
+	module := importer moduleNamed: 'Main Module'.
+	self assert: module manualIncomingImports size equals: 2.
+	"does not work probably because of the bidirectional slots 
+		self assert: module incomingImports size equals: 2."
+
+]
+
 { #category : #accessing }
 MSEPythonImporterTest >> importer [
 
@@ -119,12 +131,49 @@ MSEPythonImporterTest >> testImportImport [
 ]
 
 { #category : #'tests - module' }
+MSEPythonImporterTest >> testImportKnowsItsModule [
+	
+	| import module | 
+	importer accept: pyDoc.
+	import := importer importNamed: 'pygame'.
+	module := importer moduleNamed: 'Main Module'.
+	self assert: import manualImportingEntity equals: module.
+
+]
+
+{ #category : #'tests - module' }
 MSEPythonImporterTest >> testImportModule [
 	
 	| module | 
 	importer accept: pyDoc.
-	module := importer moduleNamed: 'MainModule'.
+	module := importer moduleNamed: 'Main Module'.
 	self assert: module class equals: FamixPythonModule.
-	self assert: module name equals: 'MainModule'.
+	self assert: module name equals: 'Main Module'.
+
+]
+
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testModuleKnowsItsImport [
+	
+	| module | 
+	importer accept: pyDoc.
+	module := importer moduleNamed: 'Main Module'.
+	self assert: module manualIncomingImports size equals: 2.
+	"does not work probably because of the bidirectional slots 
+		self assert: module incomingImports size equals: 2."
+
+]
+
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testTwoSiblingImportsHaveTheSameModule [
+	
+	| import module import2 | 
+	importer accept: pyDoc.
+	import := importer importNamed: 'pygame'.
+	import2 := importer importNamed: 'random'.
+	module := importer moduleNamed: 'Main Module'.
+	self assert: import manualImportingEntity equals: module.
+	self assert: import2 manualImportingEntity equals: module.
+	self assert: import manualImportingEntity == import2 manualImportingEntity  
 
 ]
