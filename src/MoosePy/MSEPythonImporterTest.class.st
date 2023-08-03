@@ -20,7 +20,7 @@ MSEPythonImporterTest >> testClasses [
 	importer accept: pyDoc. 
 	
 	self assert: importer classes size equals: 3.
-	
+	 
 ]
 
 { #category : #tests }
@@ -29,7 +29,7 @@ MSEPythonImporterTest >> testClassesImportedTwiceAreOnlyImportedOnce [
 
 	| pyDoc importer |
 	pyDoc := self parserClass parse: PythonParserTests new sourceBig2.
-	importer := MSEPythonSmaccImporterVisitor new.
+	importer := MSEPythonSmaccImporterVisitor new. 
 	
 	importer accept: pyDoc. 
 	
@@ -59,7 +59,7 @@ MSEPythonImporterTest >> testParseClassFindsClasses [
 	| pyDoc importer |
 	pyDoc := self parserClass parse: PythonParserTests new sourceBig2.
 	importer := MSEPythonSmaccImporterVisitor new.
-	importer accept: pyDoc. 
+	importer accept: pyDoc.  
 	
 	self assert: importer classes size equals: 3.
 	

@@ -3,7 +3,6 @@ Class {
 	#superclass : #PyRootNodeVisitor,
 	#instVars : [
 		'classes',
-		'methods',
 		'functions'
 	],
 	#category : #MoosePy
@@ -26,17 +25,17 @@ MSEPythonSmaccImporterVisitor >> ensureFunction: aFunction [
 	^ functions at: aFunction cname value ifAbsentPut: [ aFunction ]
 ]
 
+{ #category : #accessing }
+MSEPythonSmaccImporterVisitor >> functions [
+	^ functions
+]
+
 { #category : #initialization }
 MSEPythonSmaccImporterVisitor >> initialize [
 
 	super initialize.
 	classes := Dictionary new.
 	functions := Dictionary new.
-]
-
-{ #category : #accessing }
-MSEPythonSmaccImporterVisitor >> methods [
-	^ methods
 ]
 
 { #category : #generated }
