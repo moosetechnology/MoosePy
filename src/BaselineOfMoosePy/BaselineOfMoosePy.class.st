@@ -9,7 +9,7 @@ BaselineOfMoosePy >> baseline: spec [
 	<baseline>
 	
 	spec 
-		baseline: 'SmaCC_Python' 
+		baseline: 'SmaCCRuntime' 
 		with: [ 
 			spec repository: 'github://j-brant/SmaCC';
 			loads: #('SmaCC_Python_Tests') ].
