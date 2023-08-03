@@ -60,6 +60,7 @@ MSEPythonImporterTest >> testImportClassKnowsItsMethods [
 	importer accept: pyDoc.
 	cl := importer classNamed: 'Player'.
 	self assert: cl methods first name equals: '__init__'.
+	self assert: cl methods first signature equals: 'self, x, y, joystick_no'.
 	self assert: cl methods second name equals: 'update'.
 	
 ]
@@ -83,6 +84,7 @@ MSEPythonImporterTest >> testImportFamixMethod [
 	mth := importer methodNamed: 'Player.__init__'.
 	self assert: mth class equals: FamixPythonMethod.
 	self assert: mth name equals: '__init__'.
+	self assert: mth signature equals: 'self, x, y, joystick_no'
 
 ]
 

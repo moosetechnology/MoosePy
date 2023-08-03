@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'classes',
 		'functions',
-		'methods'
+		'methods',
+		'model'
 	],
 	#category : #MoosePy
 }
@@ -94,6 +95,8 @@ MSEPythonToFamixImporterVisitor >> initialize [
 	classes := Dictionary new.
 	functions := Dictionary new.
 	methods := Dictionary new.
+	model := FamixPythonModel new name: 'PythonModel-', 100 atRandom asString.
+	
 ]
 
 { #category : #'accessing - methods' }
