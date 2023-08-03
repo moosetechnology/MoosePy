@@ -3,7 +3,9 @@ Class {
 	#superclass : #TestCase,
 	#instVars : [
 		'pyDoc',
-		'importer'
+		'importer',
+		'fileSystem',
+		'file'
 	],
 	#category : #MoosePy
 }
@@ -37,6 +39,10 @@ MSEPythonImporterTest >> setUp [
 
 	pyDoc := self sourceBig2.
 	importer := self importer.
+	fileSystem := FileSystem memory.
+	file := fileSystem workingDirectory / 'sprite_collect_blocks.py'.
+	file writeStreamDo:  [ :stream | stream nextPutAll: PythonParserTests new sourceBig2 ].
+
 	
 ]
 
@@ -70,6 +76,12 @@ MSEPythonImporterTest >> testClassesImportedTwiceAreOnlyImportedOnce [
 	importer accept: pyDoc.
 
 	self assert: importer classes size equals: 3
+]
+
+{ #category : #'tests - files' }
+MSEPythonImporterTest >> testFileIsOk [
+	self assert: (fileSystem / 'sprite_collect_blocks.py') contents size equals:  7586
+	
 ]
 
 { #category : #'tests - classes' }
@@ -192,6 +204,15 @@ MSEPythonImporterTest >> testModuleKnowsItsImport [
 	"does not work probably because of the bidirectional slots 
 		self assert: module incomingImports size equals: 2."
 
+]
+
+{ #category : #'tests - files' }
+MSEPythonImporterTest >> testParseWithFile [
+
+
+	| doc |
+	doc := PythonParser parseFileWithErrors: (fileSystem / 'sprite_collect_blocks.py').
+	self assert: doc filename basename equals: 'sprite_collect_blocks.py'
 ]
 
 { #category : #'tests - module' }
