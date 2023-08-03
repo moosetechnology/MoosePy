@@ -8,7 +8,7 @@ Class {
 	#category : #MoosePy
 }
 
-{ #category : #tests }
+{ #category : #accessing }
 MSEPythonImporterTest >> importer [
 
 	^ MSEPythonToFamixImporterVisitor new
@@ -20,7 +20,7 @@ MSEPythonImporterTest >> parserClass [
 	^ PythonParser
 ]
 
-{ #category : #tests }
+{ #category : #running }
 MSEPythonImporterTest >> setUp [
 
 	pyDoc := self sourceBig2.
@@ -28,7 +28,7 @@ MSEPythonImporterTest >> setUp [
 	
 ]
 
-{ #category : #tests }
+{ #category : #accessing }
 MSEPythonImporterTest >> sourceBig2 [
 
 	^ self parserClass parse: PythonParserTests new sourceBig2
@@ -64,10 +64,21 @@ MSEPythonImporterTest >> testImportFamixClass [
 	self assert: firstClass isStub
 ]
 
+{ #category : #'tests - famix classes' }
+MSEPythonImporterTest >> testImportFamixMethod [
+	
+	| mth | 
+	importer accept: pyDoc.
+	mth := importer methodNamed: 'Player.__init__'.
+	self assert: mth class equals: FamixPythonMethod.
+	self assert: mth name equals: '__init__'.
+
+]
+
 { #category : #tests }
 MSEPythonImporterTest >> testImportFunctions [
 
-
 	importer accept: pyDoc.
-	self assert: importer functions size equals: 5
+	self assert: importer functions size equals: 5.
+	self assert: importer functions keys equals: #('Wall.__init__' 'Ball.update' 'Player.update' 'Player.__init__' 'Ball.__init__')
 ]
