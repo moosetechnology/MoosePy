@@ -15,7 +15,7 @@ Class {
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> basicCreateMethod: aSelector withSignature: aSignature [
 	| method |
-	method := FamixPythonMethod new.
+	method := model newMethod.
 	method name: aSelector.
 	method isStub: true.
 	method signature: aSignature.
@@ -51,6 +51,23 @@ MSEPythonToFamixImporterVisitor >> createFunction: aMethodNode [
 	self halt.
 ]
 
+{ #category : #visiting }
+MSEPythonToFamixImporterVisitor >> createImport: anImport [
+
+	| name import module |
+	name := anImport names first names first value.
+	"this will not work when we have 
+		import pygame.foo
+		an import node should provide fullname which would return pygame.foo"
+
+	import := FamixPythonImport new entityName: name.
+	imports at: name put: import.
+	module := self ensureModule: anImport parent parent.
+	import manualImportingEntity: module.
+	module manualAddImport: import.
+
+]
+
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> createMethod: aMethodNode [
 
@@ -67,7 +84,7 @@ MSEPythonToFamixImporterVisitor >> createMethod: aMethodNode [
 MSEPythonToFamixImporterVisitor >> createModule: aModuleNode [ 
 
 	| module |
-	module := FamixPythonModule new.
+	module := model newModule.
 	module name: 'Main Module'. "The parser does not handle the file so we will have to do it. 
 	For this we should create a memory file system."
 	modules at: module name put: module.	
@@ -173,17 +190,7 @@ MSEPythonToFamixImporterVisitor >> visitFuncdef: aFuncdef [
 { #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitImport: anImport [
 
-	| import  name module |
-	name := (anImport names first names first value).
-	"this will not work when we have 
-		import pygame.foo
-		an import node should provide fullname which would return pygame.foo"
-		
-	import := FamixPythonImport new entityName: name.
-	imports at: name put: import.
-	module :=  (self ensureModule: anImport parent parent).
-	import manualImportingEntity: module.
-	module manualAddImport: import.
 	
+	self createImport: anImport.
 	^ super visitImport: anImport
 ]

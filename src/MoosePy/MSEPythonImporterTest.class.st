@@ -49,9 +49,7 @@ MSEPythonImporterTest >> sourceBig2 [
 { #category : #'tests - classes' }
 MSEPythonImporterTest >> testClassIsInModel [
 	
-	| firstClass | 
 	importer accept: pyDoc.
-	firstClass := importer classNamed: 'Ball'.
 	self assert: importer model numberOfClasses equals: 3.
 ]
 
@@ -140,6 +138,15 @@ MSEPythonImporterTest >> testImportImport [
 ]
 
 { #category : #'tests - module' }
+MSEPythonImporterTest >> testImportIsModel [
+	
+	importer accept: pyDoc.
+	importer model entityNamed: 'pygame'.
+	"Yes mom this is smoke test"
+	
+]
+
+{ #category : #'tests - module' }
 MSEPythonImporterTest >> testImportKnowsItsModule [
 	
 	| import module | 
@@ -159,6 +166,20 @@ MSEPythonImporterTest >> testImportModule [
 	self assert: module class equals: FamixPythonModule.
 	self assert: module name equals: 'Main Module'.
 
+]
+
+{ #category : #'tests - classes' }
+MSEPythonImporterTest >> testMethodIsInModel [
+	importer accept: pyDoc.
+	self assert: importer model numberOfMethods equals: 5.
+]
+
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testModuleIsModel [
+	
+	importer accept: pyDoc.
+	importer model entityNamed: 'Main Module'.
+	
 ]
 
 { #category : #'tests - module' }
