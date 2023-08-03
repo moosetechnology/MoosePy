@@ -53,6 +53,7 @@ MSEPythonToFamixImporterVisitor >> createMethod: aMethodNode [
 
 	| method thisClass |
 	method := self basicCreateMethod: aMethodNode fname value withSignature: aMethodNode parameters signatureString.
+	"unclear that we want to have a key based on the name."
 	methods at: aMethodNode parent cname value, '.', aMethodNode fname value put: method.
 	thisClass := aMethodNode parent.
 	method parentType: (self ensureClass: thisClass).
@@ -98,6 +99,11 @@ MSEPythonToFamixImporterVisitor >> initialize [
 { #category : #'accessing - methods' }
 MSEPythonToFamixImporterVisitor >> methodNamed: aString [ 
 	^ methods at: aString ifAbsent: [ nil ]
+]
+
+{ #category : #accessing }
+MSEPythonToFamixImporterVisitor >> methods [
+	^ methods
 ]
 
 { #category : #visiting }

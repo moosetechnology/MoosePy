@@ -54,6 +54,17 @@ MSEPythonImporterTest >> testClassesImportedTwiceAreOnlyImportedOnce [
 ]
 
 { #category : #'tests - famix classes' }
+MSEPythonImporterTest >> testImportClassKnowsItsMethods [
+	
+	| cl | 
+	importer accept: pyDoc.
+	cl := importer classNamed: 'Player'.
+	self assert: cl methods first name equals: '__init__'.
+	self assert: cl methods second name equals: 'update'.
+	
+]
+
+{ #category : #'tests - famix classes' }
 MSEPythonImporterTest >> testImportFamixClass [
 	
 	| firstClass | 
@@ -75,10 +86,21 @@ MSEPythonImporterTest >> testImportFamixMethod [
 
 ]
 
+{ #category : #'tests - famix classes' }
+MSEPythonImporterTest >> testImportFamixMethodKnowsItsClass [
+	
+	| mth cl | 
+	importer accept: pyDoc.
+	mth := importer methodNamed: 'Player.__init__'.
+	cl := importer classNamed: 'Player'.
+	self assert: mth parentType equals: cl.
+	
+]
+
 { #category : #tests }
 MSEPythonImporterTest >> testImportFunctions [
 
 	importer accept: pyDoc.
-	self assert: importer functions size equals: 5.
-	self assert: importer functions keys equals: #('Wall.__init__' 'Ball.update' 'Player.update' 'Player.__init__' 'Ball.__init__')
+	self assert: importer methods size equals: 5.
+	self assert: importer methods keys equals: #('Wall.__init__' 'Ball.update' 'Player.update' 'Player.__init__' 'Ball.__init__')
 ]
