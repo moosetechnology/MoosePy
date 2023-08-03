@@ -9,14 +9,31 @@ Class {
 }
 
 { #category : #accessing }
+MSEPythonToFamixImporterVisitor >> classNamed: aName [
+
+	^ classes at: aName ifAbsent: [ nil ]
+]
+
+{ #category : #accessing }
 MSEPythonToFamixImporterVisitor >> classes [
 	^ classes
 ]
 
 { #category : #accessing }
+MSEPythonToFamixImporterVisitor >> createClass: aClass [
+	
+	| class name  |
+	name := (aClass cname value).
+	class := classes at: name put: FamixPythonClass  new.
+	class name: (aClass cname value).
+	class stub: true.
+	^ class
+]
+
+{ #category : #accessing }
 MSEPythonToFamixImporterVisitor >> ensureClass: aClass [
 
-	^ classes at: aClass cname value ifAbsentPut: [ aClass ]
+	^ classes at: aClass cname value ifAbsent: [ self createClass: aClass ]
 ]
 
 { #category : #accessing }

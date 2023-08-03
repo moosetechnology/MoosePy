@@ -38,7 +38,8 @@ MSEPythonImporterTest >> sourceBig2 [
 MSEPythonImporterTest >> testClasses [
 	
 	importer accept: pyDoc.
-	self assert: importer classes size equals: 3
+	self assert: importer classes size equals: 3.
+	self assert: (importer classes keys includesAll:  #('Ball' 'Wall' 'Player'))
 ]
 
 { #category : #tests }
@@ -52,12 +53,15 @@ MSEPythonImporterTest >> testClassesImportedTwiceAreOnlyImportedOnce [
 	self assert: importer classes size equals: 3
 ]
 
-{ #category : #tests }
+{ #category : #'tests - famix classes' }
 MSEPythonImporterTest >> testImportFamixClass [
-
+	
+	| firstClass | 
 	importer accept: pyDoc.
-
-	self assert: importer classes size equals: 3
+	firstClass := importer classNamed: 'Ball'.
+	self assert: firstClass class equals: FamixPythonClass.
+	self assert: firstClass name equals: 'Ball'.
+	self assert: firstClass isStub
 ]
 
 { #category : #tests }
@@ -66,11 +70,4 @@ MSEPythonImporterTest >> testImportFunctions [
 
 	importer accept: pyDoc.
 	self assert: importer functions size equals: 5
-]
-
-{ #category : #tests }
-MSEPythonImporterTest >> testParseClassFindsClasses [
-
-	importer accept: pyDoc.
-	self assert: importer classes size equals: 3
 ]
