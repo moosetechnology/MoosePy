@@ -20,18 +20,18 @@ MSEPythonToFamixImporterVisitor >> basicCreateMethod: aSelector withSignature: a
 	
 ]
 
-{ #category : #accessing }
+{ #category : #'accessing - classes' }
 MSEPythonToFamixImporterVisitor >> classNamed: aName [
 
 	^ classes at: aName ifAbsent: [ nil ]
 ]
 
-{ #category : #accessing }
+{ #category : #'accessing - classes' }
 MSEPythonToFamixImporterVisitor >> classes [
 	^ classes
 ]
 
-{ #category : #accessing }
+{ #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> createClass: aClass [
 	
 	| class name  |
@@ -42,13 +42,13 @@ MSEPythonToFamixImporterVisitor >> createClass: aClass [
 	^ class
 ]
 
-{ #category : #accessing }
+{ #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> createFunction: aMethodNode [
 
 	self halt.
 ]
 
-{ #category : #accessing }
+{ #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> createMethod: aMethodNode [
 
 	| method thisClass |
@@ -59,13 +59,13 @@ MSEPythonToFamixImporterVisitor >> createMethod: aMethodNode [
 	
 ]
 
-{ #category : #accessing }
+{ #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> ensureClass: aClass [
 
 	^ classes at: aClass cname value ifAbsent: [ self createClass: aClass ]
 ]
 
-{ #category : #accessing }
+{ #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> ensureFunction: aFunction [
 	
 	^ functions 
@@ -73,7 +73,7 @@ MSEPythonToFamixImporterVisitor >> ensureFunction: aFunction [
 		ifAbsent: [ self createFunction: aFunction ]
 ]
 
-{ #category : #accessing }
+{ #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> ensureMethod: aFunction [
 	
 	^ methods 
@@ -81,7 +81,7 @@ MSEPythonToFamixImporterVisitor >> ensureMethod: aFunction [
 		ifAbsent: [ self createMethod: aFunction ]
 ]
 
-{ #category : #accessing }
+{ #category : #'accessing - methods' }
 MSEPythonToFamixImporterVisitor >> functions [
 	^ functions
 ]
@@ -100,14 +100,14 @@ MSEPythonToFamixImporterVisitor >> methodNamed: aString [
 	^ methods at: aString ifAbsent: [ nil ]
 ]
 
-{ #category : #generated }
+{ #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitClassdef: aClassDef [
 
 	self ensureClass:  aClassDef.
 	super visitClassdef: aClassDef
 ]
 
-{ #category : #generated }
+{ #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitFuncdef: aFuncdef [
 	"the parser does not make a difference between function and method, but a method is defined in a class and its first parameter is self."
 	aFuncdef isMethod

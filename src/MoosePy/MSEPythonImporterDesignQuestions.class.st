@@ -9,9 +9,5 @@ Here is a bunch of questions that were raised during the development.
 Class {
 	#name : #MSEPythonImporterDesignQuestions,
 	#superclass : #Object,
-	#instVars : [
-		'classes',
-		'functions'
-	],
 	#category : #MoosePy
 }
