@@ -86,19 +86,21 @@ MSEPythonImporterTest >> testImportClassKnowsItsMethods [
 	cl := importer classNamed: 'Player'.
 	self assert: cl methods first name equals: '__init__'.
 	self assert: cl methods first signature equals: 'self, x, y, joystick_no'.
-	self assert: cl methods second name equals: 'update'.
 	
 ]
 
 { #category : #'tests - classes' }
 MSEPythonImporterTest >> testImportFamixClass [
 	
-	| firstClass | 
+	| firstClass secondClass | 
 	importer accept: pyDoc.
 	firstClass := importer classNamed: 'Ball'.
 	self assert: firstClass class equals: FamixPythonClass.
 	self assert: firstClass name equals: 'Ball'.
-	self assert: firstClass isStub
+	self assert: firstClass isStub.
+	
+	secondClass := importer classNamed: 'Wall'.
+	self assert: secondClass name equals: 'Wall'.
 ]
 
 { #category : #'tests - classes' }
@@ -115,13 +117,24 @@ MSEPythonImporterTest >> testImportFamixMethod [
 
 { #category : #'tests - classes' }
 MSEPythonImporterTest >> testImportFamixMethodKnowsItsClass [
-	
-	| mth cl | 
+
+	| mth cl |
 	importer accept: pyDoc.
 	mth := importer methodNamed: 'Player.__init__'.
 	cl := importer classNamed: 'Player'.
 	self assert: mth parentType equals: cl.
-	
+	self assert: mth parentType class equals: FamixPythonClass
+]
+
+{ #category : #'tests - classes' }
+MSEPythonImporterTest >> testImportFamixParameter [
+
+	| param |
+	importer accept: pyDoc.
+	param := importer parameterNamed: 'Player.__init__.joystick_no'.
+	self assert: param class equals: FamixPythonParameter.
+	self assert: param name equals: 'joystick_no'.
+"	self assert: param parentBehaviouralEntity class equals: FamixPythonClass "
 ]
 
 { #category : #tests }

@@ -7,7 +7,8 @@ Class {
 		'methods',
 		'model',
 		'imports',
-		'modules'
+		'modules',
+		'parameters'
 	],
 	#category : #MoosePy
 }
@@ -64,20 +65,27 @@ MSEPythonToFamixImporterVisitor >> createImport: anImport [
 	imports at: name put: import.
 	module := self ensureModule: anImport parent parent.
 	import manualImportingEntity: module.
-	module manualAddImport: import.
-
+	module manualAddImport: import
 ]
 
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> createMethod: aMethodNode [
 
-	| method thisClass |
-	method := self basicCreateMethod: aMethodNode fname value withSignature: aMethodNode parameters signatureString.
+	| method thisClass methodPath |
+	method := self
+		          basicCreateMethod: aMethodNode fname value
+		          withSignature: aMethodNode parameters signatureString.
+
+	self
+		ensureParameters: aMethodNode parameters
+		inMethodName: aMethodNode.
+
 	"unclear that we want to have a key based on the name."
-	methods at: aMethodNode parent cname value, '.', aMethodNode fname value put: method.
+	methods
+		at: aMethodNode parent cname value , '.' , aMethodNode fname value
+		put: method.
 	thisClass := aMethodNode parent.
-	method parentType: (self ensureClass: thisClass).
-	
+	method parentType: (self ensureClass: thisClass)
 ]
 
 { #category : #'private-entity-creation' }
@@ -88,6 +96,20 @@ MSEPythonToFamixImporterVisitor >> createModule: aModuleNode [
 	module name: (self moduleNameStringOf: aModuleNode).
 	modules at: module name put: module.	
 	
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> createParameter: aParameter withMethodName: aMethodNode [
+
+	| parameterName parameter |
+	parameterName := aParameter nameToken value.
+	parameter := (FamixPythonParameter new name: parameterName).
+	
+	parameters
+		at: (self methodPath: aMethodNode) , '.' , parameterName
+		put: parameter.
+
+	"parameter parentBehaviouralEntity: (self ensureMethod: aMethodNode)"
 ]
 
 { #category : #'private-entity-creation' }
@@ -120,6 +142,17 @@ MSEPythonToFamixImporterVisitor >> ensureModule: aModuleNode [
 		ifAbsent: [ self createModule: aModuleNode ]
 ]
 
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> ensureParameters: theParameters inMethodName: aMethodNode [
+
+	
+	^ theParameters args collect: [ :parameter |
+		  parameters
+			  at: (self methodPath: aMethodNode) , '.' , parameter nameToken value 
+			  ifAbsent: [
+			  self createParameter: parameter withMethodName: aMethodNode ] ]
+]
+
 { #category : #'accessing - methods' }
 MSEPythonToFamixImporterVisitor >> functions [
 	^ functions
@@ -139,13 +172,20 @@ MSEPythonToFamixImporterVisitor >> initialize [
 	methods := Dictionary new.
 	imports := Dictionary new.
 	modules := Dictionary new.
-	model := FamixPythonModel new name: 'PythonModel-', 100 atRandom asString.
-	
+	parameters := Dictionary new.
+	model := FamixPythonModel new name:
+		         'PythonModel-' , 100 atRandom asString
 ]
 
 { #category : #'accessing - methods' }
 MSEPythonToFamixImporterVisitor >> methodNamed: aString [ 
 	^ methods at: aString ifAbsent: [ nil ]
+]
+
+{ #category : #'accessing - methods' }
+MSEPythonToFamixImporterVisitor >> methodPath: aMethodNode [
+	^ 	aMethodNode parent cname value , '.'
+	              , aMethodNode fname value.
 ]
 
 { #category : #'accessing - methods' }
@@ -171,6 +211,17 @@ MSEPythonToFamixImporterVisitor >> moduleNameStringOf: aModuleNode [
 { #category : #accessing }
 MSEPythonToFamixImporterVisitor >> moduleNamed: aString [ 
 	^ modules at: aString ifAbsent: [ nil ]
+]
+
+{ #category : #'accessing - classes' }
+MSEPythonToFamixImporterVisitor >> parameterNamed: pName [
+
+	^ parameters at: pName ifAbsent: [ nil ]
+]
+
+{ #category : #'accessing - methods' }
+MSEPythonToFamixImporterVisitor >> parameters [
+	^ parameters 
 ]
 
 { #category : #visiting }
