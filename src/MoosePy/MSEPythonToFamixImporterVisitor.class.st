@@ -14,6 +14,17 @@ Class {
 }
 
 { #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> basicCreateFunction: aSelector withSignature: aSignature [
+	| function |
+	function := model newFunction.
+	function name: aSelector.
+	function isStub: true.
+	function signature: aSignature.
+	^ function
+	
+]
+
+{ #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> basicCreateMethod: aSelector withSignature: aSignature [
 	| method |
 	method := model newMethod.
@@ -47,9 +58,25 @@ MSEPythonToFamixImporterVisitor >> createClass: aClass [
 ]
 
 { #category : #'private-entity-creation' }
-MSEPythonToFamixImporterVisitor >> createFunction: aMethodNode [
+MSEPythonToFamixImporterVisitor >> createFunction: aFunctionNode [
 
-	self halt.
+	| function signature thisModule thisModuleName |
+	signature := aFunctionNode parameters ifNotNil: [
+		             aFunctionNode parameters signatureString ].
+	function := self
+		            basicCreateFunction: aFunctionNode fname value
+		            withSignature: signature.
+
+	self
+		ensureParameters: aFunctionNode parameters
+		inFunctionName: aFunctionNode.
+
+
+	functions at: (self functionPath: aFunctionNode) put: function.
+
+	thisModuleName := (self moduleNameFromFonction: aFunctionNode) asSymbol.
+	thisModule := (self ensureModule: thisModuleName).
+  function functionOwner: thisModule
 ]
 
 { #category : #visiting }
@@ -71,7 +98,7 @@ MSEPythonToFamixImporterVisitor >> createImport: anImport [
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> createMethod: aMethodNode [
 
-	| method thisClass methodPath |
+	| method thisClass |
 	method := self
 		          basicCreateMethod: aMethodNode fname value
 		          withSignature: aMethodNode parameters signatureString.
@@ -82,7 +109,7 @@ MSEPythonToFamixImporterVisitor >> createMethod: aMethodNode [
 
 	"unclear that we want to have a key based on the name."
 	methods
-		at: aMethodNode parent cname value , '.' , aMethodNode fname value
+		at: (self methodPath: aMethodNode)
 		put: method.
 	thisClass := aMethodNode parent.
 	method parentType: (self ensureClass: thisClass)
@@ -96,6 +123,20 @@ MSEPythonToFamixImporterVisitor >> createModule: aModuleNode [
 	module name: (self moduleNameStringOf: aModuleNode).
 	modules at: module name put: module.	
 	
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> createParameter: aParameter withFunctionName: aMethodNode [
+
+	| parameterName parameter |
+	parameterName := aParameter nameToken value.
+	parameter := (FamixPythonParameter new name: parameterName).
+	
+	parameters
+		at: (self functionPath: aMethodNode) , '.' , parameterName
+		put: parameter.
+
+	"parameter parentBehaviouralEntity: (self ensureMethod: aMethodNode)"
 ]
 
 { #category : #'private-entity-creation' }
@@ -120,18 +161,20 @@ MSEPythonToFamixImporterVisitor >> ensureClass: aClassNode [
 
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> ensureFunction: aFunctionNode [
-	
-	^ functions 
-		at: aFunctionNode parent cname value, '.' , aFunctionNode fname value 
-		ifAbsent: [ self createFunction: aFunctionNode ]
+
+	| filename |
+	filename :=  self functionPath: aFunctionNode.
+	^ functions
+		  at: filename , '.' , aFunctionNode fname value
+		  ifAbsent: [ self createFunction: aFunctionNode ]
 ]
 
 { #category : #'private-entity-creation' }
-MSEPythonToFamixImporterVisitor >> ensureMethod: aFunctionNode [
+MSEPythonToFamixImporterVisitor >> ensureMethod: aMethodNode [
 	
 	^ methods 
-		at: aFunctionNode parent cname value, '.' , aFunctionNode fname value 
-		ifAbsent: [ self createMethod: aFunctionNode ]
+		at: (self methodPath: aMethodNode) 
+		ifAbsent: [ self createMethod: aMethodNode ]
 ]
 
 { #category : #'private-entity-creation' }
@@ -143,14 +186,39 @@ MSEPythonToFamixImporterVisitor >> ensureModule: aModuleNode [
 ]
 
 { #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> ensureParameters: theParameters inFunctionName: aFunctionNode [
+
+	^ theParameters ifNotNil: [
+		  theParameters args collect: [ :parameter |
+			  parameters
+				  at:
+				  (self functionPath: aFunctionNode) , '.'
+				  , parameter nameToken value
+				  ifAbsent: [
+				  self createParameter: parameter withFunctionName: aFunctionNode ] ] ]
+]
+
+{ #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> ensureParameters: theParameters inMethodName: aMethodNode [
 
-	
-	^ theParameters args collect: [ :parameter |
-		  parameters
-			  at: (self methodPath: aMethodNode) , '.' , parameter nameToken value 
-			  ifAbsent: [
-			  self createParameter: parameter withMethodName: aMethodNode ] ]
+	^ theParameters ifNotNil: [
+		  theParameters args collect: [ :parameter |
+			  parameters
+				  at:
+				  (self methodPath: aMethodNode) , '.' , parameter nameToken value
+				  ifAbsent: [
+				  self createParameter: parameter withMethodName: aMethodNode ] ] ]
+]
+
+{ #category : #'accessing - methods' }
+MSEPythonToFamixImporterVisitor >> functionNamed: aString [ 
+	^ functions at: aString ifAbsent: [ nil ]
+]
+
+{ #category : #'accessing - methods' }
+MSEPythonToFamixImporterVisitor >> functionPath: aFunctionNode [
+	^ 	(self moduleNameFromFonction: aFunctionNode ) , '.'
+	              , aFunctionNode fname value.
 ]
 
 { #category : #'accessing - methods' }
@@ -199,13 +267,22 @@ MSEPythonToFamixImporterVisitor >> model [
 ]
 
 { #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> moduleNameFromFonction: aFunctionNode [
+
+	^((aFunctionNode parent attributes array first value
+		            fullName) removePrefix: '/') removeSuffix: '.py'.
+]
+
+{ #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> moduleNameStringOf: aModuleNode [
 	"should push that to the PyInputFileNode"
-	
-	^ aModuleNode filename 
-		ifNil: [ 'Main Module'] 
-		ifNotNil: [:s | s basenameWithoutExtension ]		
-	
+
+	^(aModuleNode isString
+		ifTrue: [  aModuleNode ]
+		ifFalse: [
+			 aModuleNode filename
+				  ifNil: [ 'Main Module' ]
+				  ifNotNil: [ :s | s basenameWithoutExtension ] ] )value
 ]
 
 { #category : #accessing }

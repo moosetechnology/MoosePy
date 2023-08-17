@@ -5,10 +5,18 @@ Class {
 		'pyDoc',
 		'importer',
 		'fileSystem',
-		'file'
+		'file',
+		'pyDoc2',
+		'file2'
 	],
 	#category : #MoosePy
 }
+
+{ #category : #accessing }
+MSEPythonImporterTest >> codeBig1 [
+	
+	^ PythonParser parseFileWithErrors: (fileSystem / (self moduleName2 , '.py')) 
+]
 
 { #category : #accessing }
 MSEPythonImporterTest >> importer [
@@ -24,18 +32,32 @@ MSEPythonImporterTest >> moduleName [
 ]
 
 { #category : #running }
+MSEPythonImporterTest >> moduleName2 [
+	^ 'sprite_collect_blocks_2'
+
+
+]
+
+{ #category : #running }
 MSEPythonImporterTest >> setUp [
 
 	fileSystem := FileSystem memory.
+	
+	"load sourceBug2"
 	file := fileSystem workingDirectory / (self moduleName, '.py').
 	file writeStreamDo:  [ :stream | stream nextPutAll: PythonParserTests new sourceBig2 ].
 	pyDoc := self sourceBig2.
-	importer := self importer.
-
 	
-	file writeStreamDo:  [ :stream | stream nextPutAll: PythonParserTests new sourceBig2 ].
-	pyDoc := self sourceBig2.
+	
+	"load codeBig1"
+	file2 := fileSystem workingDirectory / (self moduleName2, '.py').
+	file2 writeStreamDo:  [ :stream | stream nextPutAll: PythonParserTests new codeBig1 ].
+	pyDoc2 := self codeBig1.
+
 	importer := self importer.
+	"file writeStreamDo:  [ :stream | stream nextPutAll: PythonParserTests new sourceBig2 ].
+	pyDoc := self sourceBig2.
+	importer := self importer."
 
 	
 ]
@@ -74,7 +96,8 @@ MSEPythonImporterTest >> testClassesImportedTwiceAreOnlyImportedOnce [
 
 { #category : #'tests - files' }
 MSEPythonImporterTest >> testFileIsOk [
-	self assert: (fileSystem / (self moduleName, '.py')) contents size equals: 7586
+	self assert: (fileSystem / (self moduleName, '.py')) contents size equals: 7586.
+	self assert: (fileSystem / (self moduleName2, '.py')) contents size equals: 3259
 	
 ]
 
@@ -101,6 +124,29 @@ MSEPythonImporterTest >> testImportFamixClass [
 	
 	secondClass := importer classNamed: 'Wall'.
 	self assert: secondClass name equals: 'Wall'.
+]
+
+{ #category : #'tests - classes' }
+MSEPythonImporterTest >> testImportFamixFunction [
+	
+	| func | 
+	importer accept: pyDoc2.
+	func := importer functionNamed: 'sprite_collect_blocks_2.tryToPlaceWord'.
+	self assert: func class equals: FamixPythonFunction.
+	self assert: func name equals: 'tryToPlaceWord'.
+	self assert: func signature equals: 'grid, word'
+
+]
+
+{ #category : #'tests - classes' }
+MSEPythonImporterTest >> testImportFamixFunctionKnowsItsModule [
+
+	| func module |
+	importer accept: pyDoc2.
+	func := importer functionNamed: 'sprite_collect_blocks_2.tryToPlaceWord'.
+	module := importer moduleNamed: 'sprite_collect_blocks_2'.
+	self assert: func functionOwner equals: module.
+	self assert: func functionOwner class equals: FamixPythonModule
 ]
 
 { #category : #'tests - classes' }
@@ -134,15 +180,20 @@ MSEPythonImporterTest >> testImportFamixParameter [
 	param := importer parameterNamed: 'Player.__init__.joystick_no'.
 	self assert: param class equals: FamixPythonParameter.
 	self assert: param name equals: 'joystick_no'.
-"	self assert: param parentBehaviouralEntity class equals: FamixPythonClass "
+	
+	importer accept: pyDoc2.
+	param := importer parameterNamed: 'sprite_collect_blocks_2.tryToPlaceWord.word'.
+	self assert: param class equals: FamixPythonParameter.
+	self assert: param name equals: 'word'.
 ]
 
 { #category : #tests }
 MSEPythonImporterTest >> testImportFunctions [
 
-	importer accept: pyDoc.
-	self assert: importer methods size equals: 5.
-	self assert: importer methods keys equals: #('Wall.__init__' 'Ball.update' 'Player.update' 'Player.__init__' 'Ball.__init__')
+	importer accept: pyDoc2.
+	self assert: importer functions size equals: 4.
+	self assert: importer functions keys equals: #('sprite_collect_blocks_2.tryToPlaceWord' 'sprite_collect_blocks_2.placeWord'
+'sprite_collect_blocks_2.printGrid' 'sprite_collect_blocks_2.createGrid')
 ]
 
 { #category : #'tests - module' }
@@ -174,6 +225,14 @@ MSEPythonImporterTest >> testImportKnowsItsModule [
 	module := importer moduleNamed: self moduleName.
 	self assert: import manualImportingEntity equals: module.
 
+]
+
+{ #category : #tests }
+MSEPythonImporterTest >> testImportMethods [
+
+	importer accept: pyDoc.
+	self assert: importer methods size equals: 5.
+	self assert: importer methods keys equals: #('Wall.__init__' 'Ball.update' 'Player.update' 'Player.__init__' 'Ball.__init__')
 ]
 
 { #category : #'tests - module' }
