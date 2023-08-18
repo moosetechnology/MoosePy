@@ -38,6 +38,18 @@ MSEPythonImporterTest >> moduleName2 [
 
 ]
 
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> parseCode: aString [
+	
+	^ (PythonParser parseWithErrors: aString)
+		ifNotNil: [ :each | 
+			(each isKindOf: SmaCCParseNode)
+				ifTrue: [ each completeSource: aString.
+					each filename: 'fileForTest.py' asFileReference  ].
+			each ]
+
+]
+
 { #category : #running }
 MSEPythonImporterTest >> setUp [
 
@@ -205,6 +217,40 @@ MSEPythonImporterTest >> testImportImport [
 	self assert: import class equals: FamixPythonImport.
 	self assert: import entityName equals: 'pygame'.
 
+]
+
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testImportInvocation [
+
+	importer accept: (self parseCode: '
+grid[row].append(".")
+').
+	self assert: importer invocations size equals: 1.
+	self assert: importer invocations anyOne class equals: PyPowerNode 
+]
+
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testImportInvocationInLoop [
+
+	importer accept: (self parseCode: '
+for row in array:
+	grid[row].append(".")
+').
+	self assert: importer invocations size equals: 1.
+	self assert: importer invocations anyOne class equals: PyPowerNode
+]
+
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testImportInvocationInNestedLoop [
+
+	importer accept: (self parseCode: '
+for row in array:
+	test()
+	for column in array:
+		grid[row].append(".")
+').
+	self assert: importer invocations size equals: 2.
+	self assert: importer invocations anyOne class equals: PyPowerNode
 ]
 
 { #category : #'tests - module' }

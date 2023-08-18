@@ -46,7 +46,12 @@ LittleInterp >> visit: aNode [
 ]
 
 { #category : #visiting }
-LittleInterp >> visitExprStmt: aPyExprStmtNode [
+LittleInterp >> visitFileInput: aPyFileInputNode [ 
+		^ (aPyFileInputNode children collect: [ :each | each acceptVisitor: self ]) last
+]
+
+{ #category : #visiting }
+LittleInterp >> visitFuncdef: aPyExprStmtNode [
 		
  	^ aPyExprStmtNode assigns 
 		ifNotEmpty: [ 
@@ -54,17 +59,6 @@ LittleInterp >> visitExprStmt: aPyExprStmtNode [
 			at: aPyExprStmtNode testlist atom nameToken value 
 			put: (aPyExprStmtNode tos first acceptVisitor: self) ]
 		ifEmpty: [ aPyExprStmtNode testlist acceptVisitor: self ]
-]
-
-{ #category : #visiting }
-LittleInterp >> visitFileInput: aPyFileInputNode [ 
-		^ (aPyFileInputNode children collect: [ :each | each acceptVisitor: self ]) last
-]
-
-{ #category : #visiting }
-LittleInterp >> visitFuncdef: aPyFuncdefNode [ 
-	function := aPyFuncdefNode.
-	
 ]
 
 { #category : #generated }

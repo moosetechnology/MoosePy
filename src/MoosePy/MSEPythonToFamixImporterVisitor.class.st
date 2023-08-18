@@ -8,7 +8,8 @@ Class {
 		'model',
 		'imports',
 		'modules',
-		'parameters'
+		'parameters',
+		'invocations'
 	],
 	#category : #MoosePy
 }
@@ -93,6 +94,18 @@ MSEPythonToFamixImporterVisitor >> createImport: anImport [
 	module := self ensureModule: anImport parent parent.
 	import manualImportingEntity: module.
 	module manualAddImport: import
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> createInvocation: aInvocationNode [ 
+
+	| invocation |
+	invocation := model newInvocation.
+	
+"	invocation  receiver: 'receiver' selector: 'candidate' arguments: 'arg' .
+	invocation sender: 'sender'."
+	invocations at: ('sender.receiver.canditate.position.', 100 atRandom asString) put: aInvocationNode.	
+	
 ]
 
 { #category : #'private-entity-creation' }
@@ -241,8 +254,19 @@ MSEPythonToFamixImporterVisitor >> initialize [
 	imports := Dictionary new.
 	modules := Dictionary new.
 	parameters := Dictionary new.
+	invocations := Dictionary new.
 	model := FamixPythonModel new name:
 		         'PythonModel-' , 100 atRandom asString
+]
+
+{ #category : #accessing }
+MSEPythonToFamixImporterVisitor >> invocationNamed: aString [ 
+	^ invocations at: aString ifAbsent: [ nil ]
+]
+
+{ #category : #'accessing - methods' }
+MSEPythonToFamixImporterVisitor >> invocations [
+	^ invocations
 ]
 
 { #category : #'accessing - methods' }
@@ -315,13 +339,15 @@ MSEPythonToFamixImporterVisitor >> visitFileInput: aFileInput [
 ]
 
 { #category : #visiting }
-MSEPythonToFamixImporterVisitor >> visitFuncdef: aFuncdef [
-	"the parser does not make a difference between function and method, but a method is defined in a class and its first parameter is self."
-	aFuncdef isMethod
-		ifTrue: [ self ensureMethod: aFuncdef ]
-		ifFalse: [ self ensureFunction: aFuncdef ].
+MSEPythonToFamixImporterVisitor >> visitFor: anIForNode [
 
-	^ super visitFuncdef: aFuncdef
+	^ super visitFor: anIForNode 
+]
+
+{ #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitIf: anIfiNode [
+
+	^ super visitIf: anIfiNode
 ]
 
 { #category : #visiting }
@@ -330,4 +356,20 @@ MSEPythonToFamixImporterVisitor >> visitImport: anImport [
 	
 	self createImport: anImport.
 	^ super visitImport: anImport
+]
+
+{ #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitPower: anInvocation [
+
+	anInvocation trailers ifNotEmpty: [
+		self createInvocation: anInvocation ].
+
+	^ super visitPower: anInvocation
+]
+
+{ #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitSimpleStmt: anSimpleStmtNode [
+
+	
+	^ super visitSimpleStmt: anSimpleStmtNode
 ]
