@@ -345,6 +345,17 @@ MSEPythonToFamixImporterVisitor >> visitFor: anIForNode [
 ]
 
 { #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitFuncdef: aFuncdef [
+	"the parser does not make a difference between function and method, but a method is defined in a class and its first parameter is self."
+
+	aFuncdef isMethod
+		ifTrue: [ self ensureMethod: aFuncdef ]
+		ifFalse: [ self ensureFunction: aFuncdef ].
+
+	^ super visitFuncdef: aFuncdef
+]
+
+{ #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitIf: anIfiNode [
 
 	^ super visitIf: anIfiNode
