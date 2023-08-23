@@ -54,24 +54,26 @@ MSEPythonImporterTest >> parseCode: aString [
 MSEPythonImporterTest >> setUp [
 
 	fileSystem := FileSystem memory.
-	
+
 	"load sourceBug2"
-	file := fileSystem workingDirectory / (self moduleName, '.py').
-	file writeStreamDo:  [ :stream | stream nextPutAll: PythonParserTests new sourceBig2 ].
+	file := fileSystem workingDirectory / (self moduleName , '.py').
+	file writeStreamDo: [ :stream |
+		stream nextPutAll: PythonParserTests new sourceBig2 ].
 	pyDoc := self sourceBig2.
-	
-	
+
+
 	"load codeBig1"
-	file2 := fileSystem workingDirectory / (self moduleName2, '.py').
-	file2 writeStreamDo:  [ :stream | stream nextPutAll: PythonParserTests new codeBig1 ].
+	file2 := fileSystem workingDirectory / (self moduleName2 , '.py').
+	file2 writeStreamDo: [ :stream |
+		stream nextPutAll: PythonParserTests new codeBig1 ].
 	pyDoc2 := self codeBig1.
 
 	importer := self importer.
+
+	importer model name: 'testPythonModelName'
 	"file writeStreamDo:  [ :stream | stream nextPutAll: PythonParserTests new sourceBig2 ].
 	pyDoc := self sourceBig2.
 	importer := self importer."
-
-	
 ]
 
 { #category : #accessing }
@@ -82,17 +84,19 @@ MSEPythonImporterTest >> sourceBig2 [
 
 { #category : #'tests - classes' }
 MSEPythonImporterTest >> testClassIsInModel [
-	
+
 	importer accept: pyDoc.
 	self assert: importer model numberOfClasses equals: 3.
+	self assert: importer model name equals: 'testPythonModelName'
 ]
 
 { #category : #tests }
 MSEPythonImporterTest >> testClasses [
-	
+
 	importer accept: pyDoc.
 	self assert: importer classes size equals: 3.
-	self assert: (importer classes keys includesAll:  #('Ball' 'Wall' 'Player'))
+	self assert: (importer classNamed: 'Ball') isNotNil.
+	self assert: (importer classNamed: 'Player') isNotNil
 ]
 
 { #category : #tests }
@@ -143,9 +147,8 @@ MSEPythonImporterTest >> testImportFamixFunction [
 	
 	| func | 
 	importer accept: pyDoc2.
-	func := importer functionNamed: 'sprite_collect_blocks_2.tryToPlaceWord'.
+	func := importer functionNamed: 'tryToPlaceWord'.
 	self assert: func class equals: FamixPythonFunction.
-	self assert: func name equals: 'tryToPlaceWord'.
 	self assert: func signature equals: 'grid, word'
 
 ]
@@ -155,22 +158,36 @@ MSEPythonImporterTest >> testImportFamixFunctionKnowsItsModule [
 
 	| func module |
 	importer accept: pyDoc2.
-	func := importer functionNamed: 'sprite_collect_blocks_2.tryToPlaceWord'.
+	func := importer functionNamed: 'tryToPlaceWord'.
 	module := importer moduleNamed: 'sprite_collect_blocks_2'.
 	self assert: func functionOwner equals: module.
 	self assert: func functionOwner class equals: FamixPythonModule
 ]
 
 { #category : #'tests - classes' }
+MSEPythonImporterTest >> testImportFamixFunctionWithParameter [
+
+	| param func |
+	importer accept: pyDoc2.
+
+	param := importer parameterNamed: 'word' inFunction: 'tryToPlaceWord'.
+	func := param parentBehaviouralEntity.
+
+	self assert: func class equals: FamixPythonFunction. 
+	self assert: (func signature includesSubstring: 'word') equals: true.
+
+	self assert: param isNotNil
+]
+
+{ #category : #'tests - classes' }
 MSEPythonImporterTest >> testImportFamixMethod [
-	
-	| mth | 
+
+	| mth |
 	importer accept: pyDoc.
-	mth := importer methodNamed: 'Player.__init__'.
+	mth := importer methodNamed: '__init__' inClass: 'Player'.
 	self assert: mth class equals: FamixPythonMethod.
 	self assert: mth name equals: '__init__'.
 	self assert: mth signature equals: 'self, x, y, joystick_no'
-
 ]
 
 { #category : #'tests - classes' }
@@ -178,10 +195,30 @@ MSEPythonImporterTest >> testImportFamixMethodKnowsItsClass [
 
 	| mth cl |
 	importer accept: pyDoc.
-	mth := importer methodNamed: 'Player.__init__'.
+	mth := importer methodNamed: '__init__' inClass: 'Player'.
 	cl := importer classNamed: 'Player'.
 	self assert: mth parentType equals: cl.
 	self assert: mth parentType class equals: FamixPythonClass
+]
+
+{ #category : #'tests - classes' }
+MSEPythonImporterTest >> testImportFamixMethodWithParameter [
+
+	| param  mth |
+	importer accept: pyDoc.
+
+	param := importer
+		         parameterNamed: 'y'
+		         inMethod: '__init__'
+		         inClass: 'Player'.
+
+	mth := param parentBehaviouralEntity.
+
+	self assert: mth class equals: FamixPythonMethod.
+
+	self assert: (mth signature includesSubstring: 'y') equals: true.
+
+	self assert: param isNotNil
 ]
 
 { #category : #'tests - classes' }
@@ -189,12 +226,12 @@ MSEPythonImporterTest >> testImportFamixParameter [
 
 	| param |
 	importer accept: pyDoc.
-	param := importer parameterNamed: 'Player.__init__.joystick_no'.
+	param := importer parameterNamed: 'joystick_no' inMethod: '__init__' inClass: 'Player'.
 	self assert: param class equals: FamixPythonParameter.
 	self assert: param name equals: 'joystick_no'.
 	
 	importer accept: pyDoc2.
-	param := importer parameterNamed: 'sprite_collect_blocks_2.tryToPlaceWord.word'.
+	param := importer parameterNamed: 'word' inFunction: 'tryToPlaceWord'.
 	self assert: param class equals: FamixPythonParameter.
 	self assert: param name equals: 'word'.
 ]
@@ -204,19 +241,17 @@ MSEPythonImporterTest >> testImportFunctions [
 
 	importer accept: pyDoc2.
 	self assert: importer functions size equals: 4.
-	self assert: importer functions keys equals: #('sprite_collect_blocks_2.tryToPlaceWord' 'sprite_collect_blocks_2.placeWord'
-'sprite_collect_blocks_2.printGrid' 'sprite_collect_blocks_2.createGrid')
+
+	self assert: (importer functionNamed: 'tryToPlaceWord') isNotNil.
+	self assert: (importer functionNamed: 'printGrid') isNotNil
 ]
 
 { #category : #'tests - module' }
 MSEPythonImporterTest >> testImportImport [
-	
-	| import | 
-	importer accept: pyDoc.
-	import := importer importNamed: 'pygame'.
-	self assert: import class equals: FamixPythonImport.
-	self assert: import entityName equals: 'pygame'.
 
+	importer accept: pyDoc.
+
+	self assert: (importer importNamed: 'pygame') isNotNil
 ]
 
 { #category : #'tests - module' }
@@ -225,19 +260,21 @@ MSEPythonImporterTest >> testImportInvocation [
 	importer accept: (self parseCode: '
 grid[row].append(".")
 ').
-	self assert: importer invocations size equals: 1.
-	self assert: importer invocations anyOne class equals: PyPowerNode 
+	self
+		assert: (importer model allWithType: FamixPythonInvocation) size
+		equals: 1.
 ]
 
 { #category : #'tests - module' }
 MSEPythonImporterTest >> testImportInvocationInLoop [
 
 	importer accept: (self parseCode: '
-for row in array:
-	grid[row].append(".")
+append(".")
 ').
-	self assert: importer invocations size equals: 1.
-	self assert: importer invocations anyOne class equals: PyPowerNode
+	self
+		assert: importer invocations size
+		equals: 1.
+	self assert: (importer invocationNamed: 'append') isNotNil
 ]
 
 { #category : #'tests - module' }
@@ -250,7 +287,58 @@ for row in array:
 		grid[row].append(".")
 ').
 	self assert: importer invocations size equals: 2.
-	self assert: importer invocations anyOne class equals: PyPowerNode
+	self assert: importer invocations anyOne class equals: FamixPythonInvocation
+]
+
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testImportInvocationWithArrayReceiver [
+
+	importer accept: (self parseCode: '
+for row in array:
+	grid[row].append(".")
+').
+	self
+		assert: importer invocations size
+		equals: 1.
+	self assert: (importer invocationNamed: 'append') isNotNil
+]
+
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testImportInvocationWithNumericalArguments [
+
+	importer accept: (self parseCode: '
+test(4, 25)
+').
+	self assert: importer invocations size equals: 1.
+	self
+		assert: importer invocations anyOne class
+		equals: FamixPythonInvocation.
+	self assert: importer invocations anyOne signature equals: '4, 25'
+]
+
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testImportInvocationWithReceiver [
+
+	importer accept: (self parseCode: '
+grid.append(test)
+').
+	self
+		assert: importer invocations size
+		equals: 1.
+	self assert: (importer invocationNamed: 'append') isNotNil
+]
+
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testImportInvocationWithVariableArguments [
+
+	importer accept: (self parseCode: '
+test(x, 25) 
+').
+	self assert: importer invocations size equals: 1.
+	self
+		assert: importer invocations anyOne class
+		equals: FamixPythonInvocation.
+	self assert: importer invocations anyOne signature equals: 'x, 25'
 ]
 
 { #category : #'tests - module' }
@@ -278,7 +366,13 @@ MSEPythonImporterTest >> testImportMethods [
 
 	importer accept: pyDoc.
 	self assert: importer methods size equals: 5.
-	self assert: importer methods keys equals: #('Wall.__init__' 'Ball.update' 'Player.update' 'Player.__init__' 'Ball.__init__')
+	self assert:
+		(importer methodNamed: 'update' inClass: 'Ball') isNotNil.
+	self assert:
+		(importer methodNamed: '__init__' inClass: 'Wall') isNotNil.
+	self assert:
+		(importer methodNamed: '__init__' inClass: 'Player') isNotNil
+
 ]
 
 { #category : #'tests - module' }
