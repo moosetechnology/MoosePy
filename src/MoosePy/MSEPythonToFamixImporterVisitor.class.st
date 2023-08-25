@@ -58,20 +58,17 @@ MSEPythonToFamixImporterVisitor >> createClass: aClass [
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> createEntity: anEntity withType: aType [
 
-	| entity |
-	entity := aType = 'module' ifTrue: [ self createModule: anEntity ].
-	entity := aType = 'import' ifTrue: [ self createImport: anEntity ].
-	entity := aType = 'class' ifTrue: [ self createClass: anEntity ].
-	entity := aType = 'method' ifTrue: [ self createMethod: anEntity ].
-	entity := aType = 'function' ifTrue: [ self createFunction: anEntity ].
-	entity := aType = 'invocation' ifTrue: [
-		          self createInvocation: anEntity ].
-
+	| entity selector |
+	aType ifNotNil: [
+		selector := 'create' , aType capitalized , ':'.
+		entity := self perform: selector asSymbol with: anEntity ].
 
 	entity sourceAnchor: (FamixPythonIndexedFileAnchor new
 			 startPos: anEntity startPosition;
 			 endPos: anEntity stopPosition;
-			 yourself)
+			 yourself).
+
+	^ entity
 ]
 
 { #category : #'private-entity-creation' }
@@ -99,41 +96,58 @@ MSEPythonToFamixImporterVisitor >> createFunction: aFunctionNode [
 ]
 
 { #category : #visiting }
-MSEPythonToFamixImporterVisitor >> createImport: anImport [
+MSEPythonToFamixImporterVisitor >> createImport: anImport ofName: aName [
 
-	| name import module |
-	name := anImport names first names first value.
-	"this will not work when we have 
+	| import module |
+	(self ensureImport: anImport hasName: aName) ifTrue: [ "this will not work when we have 
 		import pygame.foo
 		an import node should provide fullname which would return pygame.foo"
+		import := FamixPythonImport new.
+		import entityName: aName.
+		anImport renames ifNotEmpty: [
+			import asName: (anImport renames at: 1) value asString ].
 
-	import := FamixPythonImport new.
-	import entityName: name.
-	import mooseModel: model.
-	module := self ensureModule: anImport parent parent.
-	import manualImportingEntity: module.
-	module manualAddImport: import
+		anImport from ifNotNil: [
+			import fromName: (self importFromName: anImport from) ].
+
+		import mooseModel: model.
+		module := self ensureModule: anImport parent parent.
+		import manualImportingEntity: module.
+		module manualAddImport: import ].
+	
+		import sourceAnchor: (FamixPythonIndexedFileAnchor new
+			 startPos: anImport startPosition;
+			 endPos: anImport stopPosition;
+			 yourself).
+	^ import
 ]
 
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> createInvocation: anInvocationNode [
 
-	| invocation canditate receiver args |
+	| invocation canditate receiver args tSize |
 	invocation := model newInvocation.
-	canditate := anInvocationNode atom nameToken value.
-	receiver := nil.
-	args := (anInvocationNode trailers at: 1) arguments.
+	tSize := anInvocationNode trailers size.
 
+	tSize > 1
+		ifTrue: [
+			canditate := (anInvocationNode trailers at: tSize - 1) nameToken
+				             value.
+			receiver := self invocationReceiverName: anInvocationNode.
+			args := anInvocationNode trailers last arguments ]
+		ifFalse: [
+			canditate := anInvocationNode atom nameToken value.
+			receiver := nil.
+			args := (anInvocationNode trailers at: 1) arguments ].
 
 	invocation sender: sender top.
 	invocation attributeAt: 'canditateName' put: canditate.
+	invocation attributeAt: 'args' put: args.
+	invocation attributeAt: 'receiverName' put: receiver.
 	invocation signature:
 		(self signatureFromInvocation: anInvocationNode).
 
-	invocation sourceAnchor: (FamixPythonIndexedFileAnchor new
-			 startPos: anInvocationNode startPosition;
-			 endPos: anInvocationNode stopPosition;
-			 yourself)
+	^ invocation
 ]
 
 { #category : #'private-entity-creation' }
@@ -189,15 +203,44 @@ MSEPythonToFamixImporterVisitor >> createParameter: aParameter in: aContainerNod
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> ensureClass: aClassNode [
 
-	^ (self classNamed: aClassNode cname value )
-		  ifNil: [ self createClass: aClassNode ]
+	^ (self classNamed: aClassNode cname value) ifNil: [
+		  self createEntity: aClassNode withType: 'class']
 ]
 
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> ensureFunction: aFunctionNode [
 
-^ (self functionNamed: aFunctionNode fname value)
-		  ifNil: [ self createFunction: aFunctionNode ]
+	^ (self functionNamed: aFunctionNode fname value) ifNil: [
+		  self createEntity: aFunctionNode withType: 'function' ]
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> ensureImport: aImportNode [
+
+	| importNames |
+	importNames := self importNames: aImportNode.
+
+	importNames do: [ :importName |
+		(self importNamed: importName) ifNil: [
+			self createImport: aImportNode ofName: importName ] ]
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> ensureImport: aImportNode hasName: name [
+
+	| importNames |
+	importNames := self importNames: aImportNode.
+
+	^ importNames includes: name
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> ensureInvocation: aInvocationNode [
+	"TODO : add invocation method"
+
+	^ (self invocationNamed: aInvocationNode atom nameToken value)
+		  ifNil: [
+		  self createEntity: aInvocationNode withType: 'invocation' ]
 ]
 
 { #category : #'private-entity-creation' }
@@ -206,14 +249,14 @@ MSEPythonToFamixImporterVisitor >> ensureMethod: aMethodNode [
 	^ (self
 		   methodNamed: aMethodNode fname value
 		   inClass: aMethodNode parent cname value) ifNil: [
-		  self createMethod: aMethodNode ]
+		  self createEntity: aMethodNode withType: 'method' ]
 ]
 
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> ensureModule: aModuleNode [
 
 	^ (self moduleNamed: (self moduleNameStringOf: aModuleNode)) ifNil: [
-		  self createModule: aModuleNode ]
+		  self createEntity: aModuleNode withType: 'module' ]
 ]
 
 { #category : #'private-entity-creation' }
@@ -256,11 +299,30 @@ MSEPythonToFamixImporterVisitor >> functions [
 ]
 
 { #category : #'private - testing' }
+MSEPythonToFamixImporterVisitor >> importFromName: anImportFromNode [
+
+	| result |
+	result := self visitDotoptDottedName: anImportFromNode name.
+
+	^ result
+]
+
+{ #category : #'private - testing' }
 MSEPythonToFamixImporterVisitor >> importNamed: aString [
 
 	^ (self model allWithType: FamixPythonImport)
 		  detect: [ :e | e entityName = aString ]
 		  ifNone: [ nil ]
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> importNames: anImportNode [
+
+	| result |
+	result := anImportNode names collect: [ :name |
+		          self visitDotoptDottedName: name ].
+
+	^ result
 ]
 
 { #category : #'accessing - methods' }
@@ -274,15 +336,38 @@ MSEPythonToFamixImporterVisitor >> initialize [
 
 	super initialize.
 	sender := Stack new.
-	model := FamixPythonModel new name: 'defaultPythonModelName'
+	model := FamixPythonModel new name: 'default Python Model'
 ]
 
 { #category : #'private - testing' }
 MSEPythonToFamixImporterVisitor >> invocationNamed: aString [
 
 	^ (self model allWithType: FamixPythonInvocation)
-		  detect: [ :e | e entityAttributes first value = aString ]
+		  detect: [ :e |
+		  (e entityAttributes at: 1) value value asString = aString ]
 		  ifNone: [ nil ]
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> invocationReceiverName: anInvocationNode [
+
+	| receiver signature startPos endPos array |
+	signature := anInvocationNode asString.
+
+
+	startPos := signature indexOf: $(.
+	endPos := signature indexOf: $( startingAt: startPos + 1.
+
+	endPos := endPos > startPos ifTrue: [
+		          array := ((signature copyFrom: startPos + 1 to: endPos - 1)
+			                    substrings: '.') asOrderedCollection.
+
+		          receiver := '' join:
+			                      (array
+				                       collect: [ :a | a ]
+				                       from: 1
+				                       to: array size - 1) ].
+	^ receiver
 ]
 
 { #category : #'accessing - methods' }
@@ -314,7 +399,7 @@ MSEPythonToFamixImporterVisitor >> model [
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> moduleNameFromFonction: aFunctionNode [
 
-	^((aFunctionNode parent attributes array first value
+	^((aFunctionNode parent attributes array sixth value
 		            fullName) removePrefix: '/') removeSuffix: '.py'.
 ]
 
@@ -392,6 +477,28 @@ MSEPythonToFamixImporterVisitor >> visitClassdef: aClassDef [
 ]
 
 { #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitDotoptDottedName: anDotoptDottedNode [
+
+
+	(anDotoptDottedNode isKindOf: PyDottedNameNode) ifTrue: [
+		^ '.' join: (anDotoptDottedNode names collect: [ :name |
+				         (name isKindOf: PyDottedNameNode) ifTrue: [
+					         self visitDottedName: name ].
+				         name value ]).
+		 ].
+
+
+
+	^ anDotoptDottedNode value
+]
+
+{ #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitDottedName: anDottedNameNode [
+
+	^ anDottedNameNode value
+]
+
+{ #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitFileInput: aFileInput [
 
 	| module |
@@ -428,16 +535,17 @@ MSEPythonToFamixImporterVisitor >> visitIf: anIfiNode [
 
 { #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitImport: anImport [
-
-	self createImport: anImport.
+		self ensureImport: anImport.
 	^ super visitImport: anImport
+
+	
 ]
 
 { #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitPower: anInvocation [
 
 	anInvocation trailers ifNotEmpty: [
-		self createInvocation: anInvocation ].
+		self ensureInvocation: anInvocation ].
 
 	^ super visitPower: anInvocation
 ]

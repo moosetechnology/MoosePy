@@ -249,9 +249,96 @@ MSEPythonImporterTest >> testImportFunctions [
 { #category : #'tests - module' }
 MSEPythonImporterTest >> testImportImport [
 
-	importer accept: pyDoc.
+	importer accept: (self parseCode: '
+import pygame
+import random
+').
 
-	self assert: (importer importNamed: 'pygame') isNotNil
+	self assert: (importer importNamed: 'pygame') isNotNil.
+	self assert: (importer importNamed: 'random') isNotNil
+]
+
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testImportImportClassFromModule [
+
+	importer accept: (self parseCode: '
+from keras.layers import Input
+').
+
+	self assert: (importer importNamed: 'Input') isNotNil.
+	self
+		assert: (importer importNamed: 'Input') fromName
+		equals: 'keras.layers'
+]
+
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testImportImportFunction [
+
+	importer accept: (self parseCode: '
+import matplotlib.pyplot
+').
+
+	self assert: (importer importNamed: 'matplotlib.pyplot') isNotNil
+]
+
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testImportImportFunctionFromModule [
+
+	importer accept: (self parseCode: '
+from random import randint
+').
+
+	self assert: (importer importNamed: 'randint') isNotNil.
+	self
+		assert: (importer importNamed: 'randint') fromName
+		equals: 'random'
+]
+
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testImportImportModuleWithAlias [
+
+	importer accept: (self parseCode: '
+import math as m
+import matplotlib.pyplot as plt
+').
+
+	self assert: (importer importNamed: 'math') isNotNil.
+	self
+		assert: (importer importNamed: 'math') asName
+		equals: 'm'.
+		
+	self assert: (importer importNamed: 'matplotlib.pyplot') isNotNil.
+	self
+		assert: (importer importNamed: 'matplotlib.pyplot') asName
+		equals: 'plt'
+]
+
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testImportImportMultiClassesFromModule [
+
+	importer accept: (self parseCode: '
+from keras.layers import Flatten, Activation, AveragePooling2D, BatchNormalization
+').
+
+	self assert: (importer importNamed: 'Flatten') isNotNil.
+	self assert: (importer importNamed: 'AveragePooling2D') isNotNil.
+		self
+		assert: (importer importNamed: 'Activation') fromName
+		equals: 'keras.layers'
+]
+
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testImportImportMultiFunctionsFromModule [
+
+	importer accept: (self parseCode: '
+from maths import add, subtract
+').
+
+	self assert: (importer importNamed: 'add') isNotNil.
+	self assert: (importer importNamed: 'subtract') isNotNil.
+	self
+		assert: (importer importNamed: 'add') fromName
+		equals: 'maths'
 ]
 
 { #category : #'tests - module' }
