@@ -9,7 +9,7 @@ Class {
 		'pyDoc2',
 		'file2'
 	],
-	#category : #MoosePy
+	#category : #'MoosePy-Tests'
 }
 
 { #category : #accessing }
@@ -344,12 +344,18 @@ from maths import add, subtract
 { #category : #'tests - module' }
 MSEPythonImporterTest >> testImportInvocation [
 
+	| invocations invocation |
 	importer accept: (self parseCode: '
 grid[row].append(".")
 ').
-	self
-		assert: (importer model allWithType: FamixPythonInvocation) size
-		equals: 1.
+
+	invocations := importer model allWithType: FamixPythonInvocation.
+	self assert: invocations size equals: 1.
+
+	invocation := importer invocationCandidate: 'append'.
+	self assert: invocation isNotNil.
+	self assert: (importer invocationReceiver: 'grid[row]') isNotNil.
+	self assert: invocation signature equals: '.' 
 ]
 
 { #category : #'tests - module' }
@@ -358,10 +364,8 @@ MSEPythonImporterTest >> testImportInvocationInLoop [
 	importer accept: (self parseCode: '
 append(".")
 ').
-	self
-		assert: importer invocations size
-		equals: 1.
-	self assert: (importer invocationNamed: 'append') isNotNil
+	self assert: importer invocations size equals: 1.
+	self assert: (importer invocationCandidate: 'append') isNotNil
 ]
 
 { #category : #'tests - module' }
@@ -384,10 +388,8 @@ MSEPythonImporterTest >> testImportInvocationWithArrayReceiver [
 for row in array:
 	grid[row].append(".")
 ').
-	self
-		assert: importer invocations size
-		equals: 1.
-	self assert: (importer invocationNamed: 'append') isNotNil
+	self assert: importer invocations size equals: 1.
+	self assert: (importer invocationCandidate: 'append') isNotNil
 ]
 
 { #category : #'tests - module' }
@@ -400,7 +402,10 @@ test(4, 25)
 	self
 		assert: importer invocations anyOne class
 		equals: FamixPythonInvocation.
-	self assert: importer invocations anyOne signature equals: '4, 25'
+
+	self
+		assert: importer invocations anyOne signature
+		equals:  '4, 25'
 ]
 
 { #category : #'tests - module' }
@@ -409,15 +414,24 @@ MSEPythonImporterTest >> testImportInvocationWithReceiver [
 	importer accept: (self parseCode: '
 grid.append(test)
 ').
-	self
-		assert: importer invocations size
-		equals: 1.
-	self assert: (importer invocationNamed: 'append') isNotNil
+	self assert: importer invocations size equals: 1.
+	self assert: (importer invocationCandidate: 'append') isNotNil
+]
+
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testImportInvocationWithStringReceiver [
+
+	importer accept: (self parseCode: '
+"CNN_Model_Rebuilt/logs/{}".format(NAME)
+').
+	self assert: importer invocations size equals: 1.
+	self assert: (importer invocationCandidate: 'format') isNotNil
 ]
 
 { #category : #'tests - module' }
 MSEPythonImporterTest >> testImportInvocationWithVariableArguments [
 
+	| invocation |
 	importer accept: (self parseCode: '
 test(x, 25) 
 ').
@@ -425,7 +439,19 @@ test(x, 25)
 	self
 		assert: importer invocations anyOne class
 		equals: FamixPythonInvocation.
-	self assert: importer invocations anyOne signature equals: 'x, 25'
+	self assert: importer invocations anyOne signature equals: 'x, 25'.
+
+	invocation := importer invocationCandidate: 'test'.
+
+	self
+		assert:
+		((invocation cacheAt: 'args' ifAbsent: [ false ]) first at: 'value')
+		equals: 'x'.
+		
+		self
+		assert:
+		((invocation cacheAt: 'args' ifAbsent: [ false ]) second at: 'value')
+		equals: '25'
 ]
 
 { #category : #'tests - module' }

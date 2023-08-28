@@ -6,7 +6,7 @@ Class {
 		'function',
 		'environment'
 	],
-	#category : #MoosePy
+	#category : #'MoosePy-Interpreters'
 }
 
 { #category : #initialization }

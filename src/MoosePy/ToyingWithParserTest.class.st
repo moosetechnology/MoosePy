@@ -1,7 +1,7 @@
 Class {
 	#name : #ToyingWithParserTest,
 	#superclass : #TestCase,
-	#category : #MoosePy
+	#category : #'MoosePy-Tests'
 }
 
 { #category : #tests }

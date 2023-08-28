@@ -5,7 +5,7 @@ Class {
 		'classes',
 		'functions'
 	],
-	#category : #MoosePy
+	#category : #'MoosePy-Visitors'
 }
 
 { #category : #accessing }
