@@ -349,13 +349,14 @@ MSEPythonImporterTest >> testImportInvocation [
 grid[row].append(".")
 ').
 
+
 	invocations := importer model allWithType: FamixPythonInvocation.
 	self assert: invocations size equals: 1.
 
 	invocation := importer invocationCandidate: 'append'.
 	self assert: invocation isNotNil.
 	self assert: (importer invocationReceiver: 'grid[row]') isNotNil.
-	self assert: invocation signature equals: '.' 
+	self assert: invocation signature equals: '.'
 ]
 
 { #category : #'tests - module' }
