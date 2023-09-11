@@ -104,5 +104,5 @@ LittleInterp >> visitSimpleStmt: aPySimpleStmtNode [
 
 { #category : #visiting }
 LittleInterp >> visitSymbol: aPySymbolNode [ 
-	^ environment at: aPySymbolNode nameToken value 
+	^ environment at: (aPySymbolNode nameToken value )
 ]
