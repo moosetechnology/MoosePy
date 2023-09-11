@@ -154,10 +154,8 @@ MSEPythonToFamixImporterVisitor >> createModule: aModuleNode [
 	| module |
 	module := model newModule.
 	module name: (self moduleNameStringOf: aModuleNode).
-	
-	^ self setSourceAnchor: module from: aModuleNode
 
-	
+	^ self setSourceAnchor: module from: aModuleNode
 ]
 
 { #category : #'private-entity-creation' }
@@ -365,6 +363,14 @@ MSEPythonToFamixImporterVisitor >> functionNamed: aString [
 MSEPythonToFamixImporterVisitor >> functions [
 
 	^ self model allWithType: FamixPythonFunction
+]
+
+{ #category : #'private - testing' }
+MSEPythonToFamixImporterVisitor >> getFileContent: aPath [
+	"Example of path : '/Users/aurelikama/Documents/Projet/These/parserPythonToJson/sample_design_smell/layers_formation/gh_non_dominating_dow_sampling.py'
+		          asFileReference contents."
+
+	^ aPath asFileReference contents
 ]
 
 { #category : #'private-entity-creation' }
