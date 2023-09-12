@@ -19,5 +19,12 @@ BaselineOfMoosePy >> baseline: spec [
 
 	spec
 		package: 'MoosePy'
-		with: [ spec requires: #( 'PythonParser' 'FamixPythonImporter' ) ]
+		with: [ spec requires: #( 'PythonParser' 'FamixPythonImporter' ) ].
+		
+		spec
+		package: 'CNN-Famix-Entities';
+		package: 'DL-Python' with: [
+			spec requires:
+					#( 'CNN-Famix-Entities' 'PythonParser' 'FamixPythonImporter'
+					   'MoosePy' ) ]
 ]
