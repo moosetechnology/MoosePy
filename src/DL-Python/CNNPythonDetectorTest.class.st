@@ -26,16 +26,6 @@ CNNPythonDetectorTest >> createFamixModel: aPythonCode [
 	^ pyFamixVisior model.
 ]
 
-{ #category : #accessing }
-CNNPythonDetectorTest >> createFamixModelFromFile: aPath [
-
-	| pyFamixVisior |
-	pyFamixVisior := MSEPythonToFamixImporterVisitor new.
-	(PythonParser parseWithErrors: (pyFamixVisior getFileContent: aPath))
-		acceptVisitor: pyFamixVisior.
-	^ pyFamixVisior model
-]
-
 { #category : #tests }
 CNNPythonDetectorTest >> setUp [
 
@@ -553,19 +543,4 @@ model.add(Flatten())
 			(designSmellDetector layersWithUselessDropout: cnnModelLayers)
 				first sourceAnchor endPos
 		equals: 390.
-]
-
-{ #category : #tests }
-CNNPythonDetectorTest >> testParseThenModelingFromFile [
-
-	| famixModel cnnModel |
-	famixModel := self createFamixModelFromFile:
-		              '/Users/aurelikama/Documents/Projet/These/parserPythonToJson/sample_design_smell/layers_formation/gh_non_dominating_dow_sampling.py'.
-
-	cnnModel := self createCNNModel: famixModel.
-	
-	self
-		assert:
-		(designSmellDetector hasBiasWithBatchNormalization: cnnModel)
-		equals: true
 ]
