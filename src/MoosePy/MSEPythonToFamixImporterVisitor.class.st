@@ -667,6 +667,12 @@ MSEPythonToFamixImporterVisitor >> visitImport: anImport [
 ]
 
 { #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitInterpolatedString: anInterpolatedString [
+
+	^(anInterpolatedString topParent completeSource copyFrom: anInterpolatedString startPosition to: anInterpolatedString stopPosition) asString
+]
+
+{ #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitPower: anInvocation [
 
 	anInvocation trailers ifNotEmpty: [
@@ -691,5 +697,5 @@ MSEPythonToFamixImporterVisitor >> visitString: aStringNode [
 { #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitStrings: aStringsNode [
 
-	^ aStringsNode strings collect:[:each| self visitString: each]
+	^ aStringsNode strings collect: [:each| self acceptNode: each]
 ]
