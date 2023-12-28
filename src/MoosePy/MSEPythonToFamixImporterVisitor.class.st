@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'model',
 		'sender',
-		'layer'
+		'layer',
+		'rootFilePath'
 	],
 	#category : #'MoosePy-Visitors'
 }
@@ -399,7 +400,7 @@ MSEPythonToFamixImporterVisitor >> getReceiverFromSmaccInvocationNode: anInvocat
 MSEPythonToFamixImporterVisitor >> importFromName: anImportFromNode [
 
 	| result |
-	result := self visitDotoptDottedName: anImportFromNode name.
+	result := self visitDotOptDottedName: anImportFromNode.
 
 	^ result
 ]
@@ -417,7 +418,7 @@ MSEPythonToFamixImporterVisitor >> importNames: anImportNode [
 
 	| result |
 	result := anImportNode names collect: [ :name |
-		          self visitDotoptDottedName: name ].
+		          self visitDotOptDottedName: name ].
 
 	^ result
 ]
@@ -601,19 +602,19 @@ MSEPythonToFamixImporterVisitor >> visitClassdef: aClassDef [
 ]
 
 { #category : #visiting }
-MSEPythonToFamixImporterVisitor >> visitDotoptDottedName: anDotoptDottedNode [
+MSEPythonToFamixImporterVisitor >> visitDotOptDottedName: aDotOptDottedNode [
 
 
-	(anDotoptDottedNode isKindOf: PyDottedNameNode) ifTrue: [
-		^ '.' join: (anDotoptDottedNode names collect: [ :name |
-				         (name isKindOf: PyDottedNameNode) ifTrue: [
-					         self visitDottedName: name ].
-				         name value ]).
-		 ].
+	(aDotOptDottedNode isKindOf: PyDottedNameNode) ifFalse: [ ^ aDotOptDottedNode value ].
+
+	^'.' join: (aDotOptDottedNode names collect: [ :name |
+		(name isKindOf: PyDottedNameNode)
+			ifTrue: [ self visitDottedName: name ].
+		name value
+	])
 
 
-
-	^ anDotoptDottedNode value
+	
 ]
 
 { #category : #visiting }
