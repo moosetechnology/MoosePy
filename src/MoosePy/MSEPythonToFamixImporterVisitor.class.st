@@ -540,8 +540,11 @@ MSEPythonToFamixImporterVisitor >> parameterNamed: pName inMethod: fName inClass
 
 	^ (self model allWithType: FamixPythonParameter)
 		  detect: [ :e |
-			  (e name = pName and: [ e parentBehaviouralEntity name = fName and: [ e parentBehaviouralEntity parentType name = cName ]])
-				   ]
+			  ((e name = pName) and:
+				[ (e parentBehaviouralEntity name = fName) and:
+				[ (e parentBehaviouralEntity isMethod) and:
+				[e parentBehaviouralEntity parentType name = cName] ] ] )
+			]
 		  ifNone: [ nil ]
 ]
 
