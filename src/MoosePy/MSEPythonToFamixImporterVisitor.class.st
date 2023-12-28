@@ -150,11 +150,11 @@ MSEPythonToFamixImporterVisitor >> createMethod: aMethodNode [
 ]
 
 { #category : #'private-entity-creation' }
-MSEPythonToFamixImporterVisitor >> createModule: aModuleNode [
+MSEPythonToFamixImporterVisitor >> createModule: aModuleNode named: aName [
 
 	| module |
 	module := model newModule.
-	module name: (self moduleNameStringOf: aModuleNode).
+	module name: aName.
 
 	^ self setSourceAnchor: module from: aModuleNode
 ]
@@ -224,8 +224,9 @@ MSEPythonToFamixImporterVisitor >> ensureMethod: aMethodNode [
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> ensureModule: aModuleNode [
 
-	^ (self moduleNamed: (self moduleNameStringOf: aModuleNode)) ifNil: [
-		  self createModule: aModuleNode ]
+	| moduleName |
+	moduleName := self moduleNameStringOf: aModuleNode.
+	^ (self moduleNamed: moduleName) ifNil: [ self createModule: aModuleNode named: moduleName ]
 ]
 
 { #category : #'private-entity-creation' }
