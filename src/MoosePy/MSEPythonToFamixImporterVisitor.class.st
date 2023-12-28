@@ -504,8 +504,12 @@ MSEPythonToFamixImporterVisitor >> model [
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> moduleNameFromFonction: aFunctionNode [
 
-	^((aFunctionNode parent attributes array sixth value
-		            fullName) removePrefix: '/') removeSuffix: '.py'.
+	| parentFileName |
+	parentFileName := (self parentFileForNode: aFunctionNode) attributes at: #filename.
+	
+	rootFilePath ifNil: [	^(parentFileName fullName removePrefix: '/') removeSuffix: '.py'].
+
+	^(parentFileName relativeTo: rootFilePath asPath) pathString removeSuffix: '.py'
 ]
 
 { #category : #'private-entity-creation' }
@@ -552,6 +556,26 @@ MSEPythonToFamixImporterVisitor >> parameterNamed: pName inMethod: fName inClass
 MSEPythonToFamixImporterVisitor >> parameters [
 
 	^ self model allWithType: FamixPythonParameter 
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> parentFileForNode: aPyNode [ 
+
+	aPyNode ifNil: [ ^nil ].
+	(aPyNode parent isKindOf: PyFileInputNode) ifTrue: [ ^aPyNode parent ].
+	^self parentFileForNode: aPyNode parent
+]
+
+{ #category : #accessing }
+MSEPythonToFamixImporterVisitor >> rootFilePath [
+
+	^ rootFilePath
+]
+
+{ #category : #accessing }
+MSEPythonToFamixImporterVisitor >> rootFilePath: anObject [
+
+	rootFilePath := anObject
 ]
 
 { #category : #'accessing - methods' }
