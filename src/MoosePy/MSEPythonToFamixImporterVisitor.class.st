@@ -53,7 +53,6 @@ MSEPythonToFamixImporterVisitor >> createClass: aClass [
 	name := aClass cname value.
 	class := model newClass.
 	class name: aClass cname value.
-	class stub: true.
 	
 	^ self setSourceAnchor: class from: aClass
 	
@@ -595,6 +594,9 @@ MSEPythonToFamixImporterVisitor >> setSourceAnchor: aFamixEntity from: aSmaccNod
 			 startPos: aSmaccNode startPosition;
 			 endPos: aSmaccNode stopPosition;
 			 yourself).
+
+	aFamixEntity stub: false.
+
 	^ aFamixEntity
 ]
 
