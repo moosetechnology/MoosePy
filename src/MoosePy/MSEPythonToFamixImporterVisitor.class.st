@@ -62,16 +62,14 @@ MSEPythonToFamixImporterVisitor >> createClass: aClass [
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> createFunction: aFunctionNode [
 
-	| function signature thisModule thisModuleName |
+	| function signature thisModule |
 	signature := aFunctionNode parameters ifNotNil: [
 		             aFunctionNode parameters signatureString ].
 	function := self
 		            basicCreateFunction: aFunctionNode fname value
 		            withSignature: signature.
 
-	thisModuleName := (self moduleNameFromFonction: aFunctionNode)
-		                  asSymbol.
-	thisModule := self ensureModule: thisModuleName.
+	thisModule := self ensureModule: (self moduleFromFonction: aFunctionNode).
 
 	function functionOwner: thisModule.
 
@@ -502,6 +500,12 @@ MSEPythonToFamixImporterVisitor >> model [
 ]
 
 { #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> moduleFromFonction: aFunctionNode [
+
+	^(self parentFileForNode: aFunctionNode)
+]
+
+{ #category : #TOREMOVE }
 MSEPythonToFamixImporterVisitor >> moduleNameFromFonction: aFunctionNode [
 
 	| parentFileName |
