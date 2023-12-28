@@ -20,9 +20,9 @@ BaselineOfMoosePy >> baseline: spec [
 { #category : #baselines }
 BaselineOfMoosePy >> dependencies: spec [
 
-	spec baseline: 'SmaCC-Python' with: [
+	spec baseline: 'PythonParser' with: [
 		spec
-			repository: 'github://j-brant/SmaCC';
+			repository: 'github://j-brant/SmaCC:master/src';
 			loads: #( 'SmaCC_Python' 'SmaCC_Python_Tests' ) ].
 
 	spec
@@ -45,5 +45,5 @@ BaselineOfMoosePy >> packages: spec [
 
 		package: 'Famix-Python-Entities' with: [ spec requires: #( Famix ) ] ;
 		package: 'Famix-Python-Generator' with: [ spec requires: #( Famix ) ] ;
-		package: 'MoosePy' with: [ spec requires: #( 'Famix-Python-Entities' 'SmaCC-Python') ]
+		package: 'MoosePy' with: [ spec requires: #( 'Famix-Python-Entities' 'PythonParser') ]
 ]
