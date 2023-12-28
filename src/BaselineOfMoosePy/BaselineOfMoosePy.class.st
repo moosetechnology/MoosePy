@@ -45,5 +45,5 @@ BaselineOfMoosePy >> packages: spec [
 
 		package: 'Famix-Python-Entities' with: [ spec requires: #( Famix ) ] ;
 		package: 'Famix-Python-Generator' with: [ spec requires: #( Famix ) ] ;
-		package: 'MoosePy' with: [ spec requires: #( 'Famix-Python-Entities' 'SmaCC_Python') ]
+		package: 'MoosePy' with: [ spec requires: #( 'Famix-Python-Entities' 'SmaCC-Python') ]
 ]
