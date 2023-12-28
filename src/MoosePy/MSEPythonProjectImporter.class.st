@@ -1,3 +1,13 @@
+"
+An importer for Python projects
+
+API:
+```St
+MSEPythonProjectImporter import: 'python/project/root/directory'
+```
+
+will return a `FamixPythonModel`
+"
 Class {
 	#name : #MSEPythonProjectImporter,
 	#superclass : #Object,
@@ -16,10 +26,15 @@ MSEPythonProjectImporter class >> import: aFileName [
 
 { #category : #api }
 MSEPythonProjectImporter >> import: aFileName [
+
+	| fileReference |
 	visitor := MSEPythonToFamixImporterVisitor new.
 	visitor rootFilePath: aFileName.
 
-	self importFileReference: aFileName asFileReference.
+	fileReference := aFileName asFileReference.
+	visitor model name: fileReference basename.
+
+	self importFileReference: fileReference.
 
 	^visitor model
 ]
