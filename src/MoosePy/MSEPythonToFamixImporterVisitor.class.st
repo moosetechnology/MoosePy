@@ -511,12 +511,11 @@ MSEPythonToFamixImporterVisitor >> moduleNameFromFonction: aFunctionNode [
 MSEPythonToFamixImporterVisitor >> moduleNameStringOf: aModuleNode [
 	"should push that to the PyInputFileNode"
 
-	^(aModuleNode isString
-		ifTrue: [  aModuleNode ]
-		ifFalse: [
-			 aModuleNode filename
-				  ifNil: [ 'Main Module' ]
-				  ifNotNil: [ :s | s basenameWithoutExtension ] ] )value
+	aModuleNode isString ifTrue: [ ^aModuleNode ].
+
+	aModuleNode 	filename ifNil: [ ^'Main Module' ].
+
+	^aModuleNode filename basenameWithoutExtension
 ]
 
 { #category : #'private - testing' }
