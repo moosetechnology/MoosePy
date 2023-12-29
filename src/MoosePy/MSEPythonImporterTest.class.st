@@ -520,6 +520,8 @@ MSEPythonImporterTest >> testModule [
 	| module | 
 	importer accept: pyDoc.
 	module := importer moduleNamed: self moduleName.
+
+	self assert: module isNotNil.
 	self assert: module class equals: FamixPythonModule.
 	self assert: module name equals: self moduleName.
 
@@ -556,6 +558,6 @@ MSEPythonImporterTest >> testTwoSiblingImportsHaveTheSameModule [
 	module := importer moduleNamed: self moduleName.
 	self assert: import manualImportingEntity equals: module.
 	self assert: import2 manualImportingEntity equals: module.
-	self assert: import manualImportingEntity == import2 manualImportingEntity  
+	self assert: import manualImportingEntity equals: import2 manualImportingEntity  
 
 ]
