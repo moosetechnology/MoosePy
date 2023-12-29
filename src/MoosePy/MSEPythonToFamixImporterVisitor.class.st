@@ -594,12 +594,6 @@ MSEPythonToFamixImporterVisitor >> signatureFromInvocation: anInvocationNode [
 ]
 
 { #category : #visiting }
-MSEPythonToFamixImporterVisitor >> visitArgument: anArgumentNode [
-
-	^ super visitArgument: anArgumentNode
-]
-
-{ #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitClassdef: aClassDef [
 
 	self ensureClass:  aClassDef.
@@ -622,12 +616,6 @@ MSEPythonToFamixImporterVisitor >> visitFileInput: aFileInput [
 ]
 
 { #category : #visiting }
-MSEPythonToFamixImporterVisitor >> visitFor: anIForNode [
-
-	^ super visitFor: anIForNode 
-]
-
-{ #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitFuncdef: aFuncdef [
 	"the parser does not make a difference between function and method, but a method is defined in a class and its first parameter is self."
 
@@ -639,12 +627,6 @@ MSEPythonToFamixImporterVisitor >> visitFuncdef: aFuncdef [
 	result := super visitFuncdef: aFuncdef.
 	sender pop.
 	^ result
-]
-
-{ #category : #visiting }
-MSEPythonToFamixImporterVisitor >> visitIf: anIfiNode [
-
-	^ super visitIf: anIfiNode
 ]
 
 { #category : #visiting }
@@ -675,13 +657,6 @@ MSEPythonToFamixImporterVisitor >> visitPower: anInvocation [
 		self createInvocation: anInvocation ].
 
 	^ super visitPower: anInvocation
-]
-
-{ #category : #visiting }
-MSEPythonToFamixImporterVisitor >> visitSimpleStmt: anSimpleStmtNode [
-
-	
-	^ super visitSimpleStmt: anSimpleStmtNode
 ]
 
 { #category : #visiting }
