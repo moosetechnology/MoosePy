@@ -403,16 +403,6 @@ MSEPythonToFamixImporterVisitor >> importNamed: aString [
 		  ifNone: [ nil ]
 ]
 
-{ #category : #'private-entity-creation' }
-MSEPythonToFamixImporterVisitor >> importNames: anImportNode [
-
-	| result |
-	result := anImportNode names collect: [ :name |
-		          self visitDotOptDottedName: name ].
-
-	^ result
-]
-
 { #category : #'accessing - methods' }
 MSEPythonToFamixImporterVisitor >> imports [
 
