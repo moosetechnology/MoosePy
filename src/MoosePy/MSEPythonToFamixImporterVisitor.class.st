@@ -89,27 +89,23 @@ MSEPythonToFamixImporterVisitor >> createFunction: aFunctionNode [
 
 ]
 
-{ #category : #visiting }
-MSEPythonToFamixImporterVisitor >> createImport: anImport ofName: aName [
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> createImport: anImport ofName: aName from: fromName alias: alias [
 
 	| import module |
-	(self ensureImport: anImport hasName: aName) ifTrue: [ "this will not work when we have 
-		import pygame.foo
-		an import node should provide fullname which would return pygame.foo"
-		import := FamixPythonImport new.
-		import entityName: aName.
-		anImport renames ifNotEmpty: [
-			import asName: (anImport renames at: 1) value asString ].
+	import := model newImport
+		entityName: aName ;
+		asName: alias ;
+		fromName: fromName ;
+		yourself.
 
-		anImport from ifNotNil: [
-			import fromName: (self importFromName: anImport from) ].
+	self setSourceAnchor: import from: anImport.
 
-		import mooseModel: model.
-		module := self ensureModule: anImport parent parent.
-		import manualImportingEntity: module.
-		module manualAddImport: import ].
+	module := self ensureModule: anImport parent parent.
+	import manualImportingEntity: module.
+	module manualAddImport: import.
 
-	^ self setSourceAnchor: import from: anImport
+	^import
 ]
 
 { #category : #'private-entity-creation' }
@@ -198,23 +194,16 @@ MSEPythonToFamixImporterVisitor >> ensureFunction: aFunctionNode [
 ]
 
 { #category : #'private-entity-creation' }
-MSEPythonToFamixImporterVisitor >> ensureImport: aImportNode [
+MSEPythonToFamixImporterVisitor >> ensureImport: anImportNode of: importedNames from: aName aliases: aliasNames [
 
-	| importNames |
-	importNames := self importNames: aImportNode.
-
-	importNames do: [ :importName |
-		(self importNamed: importName) ifNil: [
-			self createImport: aImportNode ofName: importName ] ]
-]
-
-{ #category : #'private-entity-creation' }
-MSEPythonToFamixImporterVisitor >> ensureImport: aImportNode hasName: name [
-
-	| importNames |
-	importNames := self importNames: aImportNode.
-
-	^ importNames includes: name
+	importedNames withIndexDo: [ :importName :i |
+		(self importNamed: importName) ifNil: [ | alias |
+			aliasNames
+				ifEmpty: [ alias := nil ]
+				ifNotEmpty: [ alias := aliasNames at: i ].
+			self createImport: anImportNode ofName: importName from: aName alias: alias
+		]
+	]
 ]
 
 { #category : #'private-entity-creation' }
@@ -701,10 +690,12 @@ MSEPythonToFamixImporterVisitor >> visitIf: anIfiNode [
 
 { #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitImport: anImport [
-		self ensureImport: anImport.
-	^ super visitImport: anImport
 
-	
+	^self
+		ensureImport: anImport
+		of: (anImport names collect: [ :name | self acceptNode: name ])
+		from: (self acceptNode: anImport from)
+		aliases: (anImport renames collect: [ :alias | self acceptNode: alias ])
 ]
 
 { #category : #visiting }
