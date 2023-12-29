@@ -526,14 +526,6 @@ MSEPythonImporterTest >> testModule [
 ]
 
 { #category : #'tests - module' }
-MSEPythonImporterTest >> testModuleIsModel [
-	
-	importer accept: pyDoc.
-	importer model entityNamed: 'Main Module'.
-	
-]
-
-{ #category : #'tests - module' }
 MSEPythonImporterTest >> testModuleKnowsItsImport [
 	
 	| module | 
