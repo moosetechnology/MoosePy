@@ -4,27 +4,46 @@ Class {
 	#category : #BaselineOfMoosePy
 }
 
-{ #category : #accessing }
+{ #category : #baselines }
 BaselineOfMoosePy >> baseline: spec [
 
 	<baseline>
+
+	spec for: #common do: [
+		spec description: 'MoosePy'.
+		self dependencies: spec.
+		self packages: spec.
+		self groups: spec
+	]
+]
+
+{ #category : #baselines }
+BaselineOfMoosePy >> dependencies: spec [
+
 	spec baseline: 'PythonParser' with: [
 		spec
-			repository: 'github://j-brant/SmaCC';
+			repository: 'github://j-brant/SmaCC:master/src';
 			loads: #( 'SmaCC_Python' 'SmaCC_Python_Tests' ) ].
 
 	spec
-		baseline: 'FamixPythonImporter'
-		with: [ spec repository: 'github://aurpur/famixPythonImporter' ].
+		baseline: 'Famix'
+		with: [ spec repository: 'github://moosetechnology/Famix:development/src' ]
+]
+
+{ #category : #baselines }
+BaselineOfMoosePy >> groups: spec [
+
+	^ spec
+		  group: 'Core' with: #( 'Famix-Python-Entities' 'MoosePy' ) ;
+		  group: 'Generator' with: #( 'Core' 'Famix-Python-Generator' )
+]
+
+{ #category : #baselines }
+BaselineOfMoosePy >> packages: spec [
 
 	spec
-		package: 'MoosePy'
-		with: [ spec requires: #( 'PythonParser' 'FamixPythonImporter' ) ].
-		
-		spec
-		package: 'CNN-Famix-Entities';
-		package: 'DL-Python' with: [
-			spec requires:
-					#( 'CNN-Famix-Entities' 'PythonParser' 'FamixPythonImporter'
-					   'MoosePy' ) ]
+
+		package: 'Famix-Python-Entities' with: [ spec requires: #( Famix ) ] ;
+		package: 'Famix-Python-Generator' with: [ spec requires: #( Famix ) ] ;
+		package: 'MoosePy' with: [ spec requires: #( 'Famix-Python-Entities' 'PythonParser') ]
 ]

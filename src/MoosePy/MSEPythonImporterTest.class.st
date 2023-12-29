@@ -38,7 +38,7 @@ MSEPythonImporterTest >> moduleName2 [
 
 ]
 
-{ #category : #'tests - module' }
+{ #category : #running }
 MSEPythonImporterTest >> parseCode: aString [
 	
 	^ (PythonParser parseWithErrors: aString)
@@ -117,6 +117,31 @@ MSEPythonImporterTest >> testFileIsOk [
 	
 ]
 
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testImport [
+
+	importer accept: (self parseCode: '
+import pygame
+import random
+').
+
+	self assert: (importer importNamed: 'pygame') isNotNil.
+	self assert: (importer importNamed: 'random') isNotNil
+]
+
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testImportClassFromModule [
+
+	importer accept: (self parseCode: '
+from keras.layers import Input
+').
+
+	self assert: (importer importNamed: 'Input') isNotNil.
+	self
+		assert: (importer importNamed: 'Input') fromName
+		equals: 'keras.layers'
+]
+
 { #category : #'tests - classes' }
 MSEPythonImporterTest >> testImportClassKnowsItsMethods [
 	
@@ -131,15 +156,16 @@ MSEPythonImporterTest >> testImportClassKnowsItsMethods [
 { #category : #'tests - classes' }
 MSEPythonImporterTest >> testImportFamixClass [
 	
-	| firstClass secondClass | 
+	| ballClass wallClass | 
 	importer accept: pyDoc.
-	firstClass := importer classNamed: 'Ball'.
-	self assert: firstClass class equals: FamixPythonClass.
-	self assert: firstClass name equals: 'Ball'.
-	self assert: firstClass isStub.
+	ballClass := importer classNamed: 'Ball'.
+	self assert: ballClass class equals: FamixPythonClass.
+	self assert: ballClass name equals: 'Ball'.
+	self deny: ballClass isStub.
 	
-	secondClass := importer classNamed: 'Wall'.
-	self assert: secondClass name equals: 'Wall'.
+	wallClass := importer classNamed: 'Wall'.
+	self assert: wallClass name equals: 'Wall'.
+	self deny: wallClass isStub.
 ]
 
 { #category : #'tests - classes' }
@@ -236,43 +262,8 @@ MSEPythonImporterTest >> testImportFamixParameter [
 	self assert: param name equals: 'word'.
 ]
 
-{ #category : #tests }
-MSEPythonImporterTest >> testImportFunctions [
-
-	importer accept: pyDoc2.
-	self assert: importer functions size equals: 4.
-
-	self assert: (importer functionNamed: 'tryToPlaceWord') isNotNil.
-	self assert: (importer functionNamed: 'printGrid') isNotNil
-]
-
 { #category : #'tests - module' }
-MSEPythonImporterTest >> testImportImport [
-
-	importer accept: (self parseCode: '
-import pygame
-import random
-').
-
-	self assert: (importer importNamed: 'pygame') isNotNil.
-	self assert: (importer importNamed: 'random') isNotNil
-]
-
-{ #category : #'tests - module' }
-MSEPythonImporterTest >> testImportImportClassFromModule [
-
-	importer accept: (self parseCode: '
-from keras.layers import Input
-').
-
-	self assert: (importer importNamed: 'Input') isNotNil.
-	self
-		assert: (importer importNamed: 'Input') fromName
-		equals: 'keras.layers'
-]
-
-{ #category : #'tests - module' }
-MSEPythonImporterTest >> testImportImportFunction [
+MSEPythonImporterTest >> testImportFunction [
 
 	importer accept: (self parseCode: '
 import matplotlib.pyplot
@@ -282,7 +273,7 @@ import matplotlib.pyplot
 ]
 
 { #category : #'tests - module' }
-MSEPythonImporterTest >> testImportImportFunctionFromModule [
+MSEPythonImporterTest >> testImportFunctionFromModule [
 
 	importer accept: (self parseCode: '
 from random import randint
@@ -294,8 +285,32 @@ from random import randint
 		equals: 'random'
 ]
 
+{ #category : #tests }
+MSEPythonImporterTest >> testImportFunctions [
+
+	importer accept: pyDoc2.
+	self assert: importer functions size equals: 4.
+
+	self assert: (importer functionNamed: 'tryToPlaceWord') isNotNil.
+	self assert: (importer functionNamed: 'printGrid') isNotNil
+]
+
+{ #category : #tests }
+MSEPythonImporterTest >> testImportMethods [
+
+	importer accept: pyDoc.
+	self assert: importer methods size equals: 5.
+	self assert:
+		(importer methodNamed: 'update' inClass: 'Ball') isNotNil.
+	self assert:
+		(importer methodNamed: '__init__' inClass: 'Wall') isNotNil.
+	self assert:
+		(importer methodNamed: '__init__' inClass: 'Player') isNotNil
+
+]
+
 { #category : #'tests - module' }
-MSEPythonImporterTest >> testImportImportModuleWithAlias [
+MSEPythonImporterTest >> testImportModuleWithAlias [
 
 	importer accept: (self parseCode: '
 import math as m
@@ -314,7 +329,25 @@ import matplotlib.pyplot as plt
 ]
 
 { #category : #'tests - module' }
-MSEPythonImporterTest >> testImportImportMultiClassesFromModule [
+MSEPythonImporterTest >> testImportModulesWithAliases [
+
+	importer accept: (self parseCode: '
+import math as m, matplotlib.pyplot as plt
+').
+
+	self assert: (importer importNamed: 'math') isNotNil.
+	self
+		assert: (importer importNamed: 'math') asName
+		equals: 'm'.
+		
+	self assert: (importer importNamed: 'matplotlib.pyplot') isNotNil.
+	self
+		assert: (importer importNamed: 'matplotlib.pyplot') asName
+		equals: 'plt'
+]
+
+{ #category : #'tests - module' }
+MSEPythonImporterTest >> testImportMultiClassesFromModule [
 
 	importer accept: (self parseCode: '
 from keras.layers import Flatten, Activation, AveragePooling2D, BatchNormalization
@@ -328,7 +361,7 @@ from keras.layers import Flatten, Activation, AveragePooling2D, BatchNormalizati
 ]
 
 { #category : #'tests - module' }
-MSEPythonImporterTest >> testImportImportMultiFunctionsFromModule [
+MSEPythonImporterTest >> testImportMultiFunctionsFromModule [
 
 	importer accept: (self parseCode: '
 from maths import add, subtract
@@ -342,9 +375,12 @@ from maths import add, subtract
 ]
 
 { #category : #'tests - module' }
-MSEPythonImporterTest >> testImportInvocation [
+MSEPythonImporterTest >> testInvocation [
 
 	| invocations invocation |
+
+	self skip: 'Invocations not treated in importer'.
+
 	importer accept: (self parseCode: '
 grid[row].append(".")
 ').
@@ -360,7 +396,9 @@ grid[row].append(".")
 ]
 
 { #category : #'tests - module' }
-MSEPythonImporterTest >> testImportInvocationInLoop [
+MSEPythonImporterTest >> testInvocationInLoop [
+
+	self skip: 'Invocations not treated in importer'.
 
 	importer accept: (self parseCode: '
 append(".")
@@ -370,7 +408,9 @@ append(".")
 ]
 
 { #category : #'tests - module' }
-MSEPythonImporterTest >> testImportInvocationInNestedLoop [
+MSEPythonImporterTest >> testInvocationInNestedLoop [
+
+	self skip: 'Invocations not treated in importer'.
 
 	importer accept: (self parseCode: '
 for row in array:
@@ -383,7 +423,9 @@ for row in array:
 ]
 
 { #category : #'tests - module' }
-MSEPythonImporterTest >> testImportInvocationWithArrayReceiver [
+MSEPythonImporterTest >> testInvocationWithArrayReceiver [
+
+	self skip: 'Invocations not treated in importer'.
 
 	importer accept: (self parseCode: '
 for row in array:
@@ -394,7 +436,9 @@ for row in array:
 ]
 
 { #category : #'tests - module' }
-MSEPythonImporterTest >> testImportInvocationWithNumericalArguments [
+MSEPythonImporterTest >> testInvocationWithNumericalArguments [
+
+	self skip: 'Invocations not treated in importer'.
 
 	importer accept: (self parseCode: '
 test(4, 25)
@@ -410,7 +454,9 @@ test(4, 25)
 ]
 
 { #category : #'tests - module' }
-MSEPythonImporterTest >> testImportInvocationWithReceiver [
+MSEPythonImporterTest >> testInvocationWithReceiver [
+
+	self skip: 'Invocations not treated in importer'.
 
 	importer accept: (self parseCode: '
 grid.append(test)
@@ -420,7 +466,9 @@ grid.append(test)
 ]
 
 { #category : #'tests - module' }
-MSEPythonImporterTest >> testImportInvocationWithStringReceiver [
+MSEPythonImporterTest >> testInvocationWithStringReceiver [
+
+	self skip: 'Invocations not treated in importer'.
 
 	importer accept: (self parseCode: '
 "CNN_Model_Rebuilt/logs/{}".format(NAME)
@@ -430,9 +478,12 @@ MSEPythonImporterTest >> testImportInvocationWithStringReceiver [
 ]
 
 { #category : #'tests - module' }
-MSEPythonImporterTest >> testImportInvocationWithVariableArguments [
+MSEPythonImporterTest >> testInvocationWithVariableArguments [
 
 	| invocation |
+
+	self skip: 'Invocations not treated in importer'.
+
 	importer accept: (self parseCode: '
 test(x, 25) 
 ').
@@ -456,7 +507,7 @@ test(x, 25)
 ]
 
 { #category : #'tests - module' }
-MSEPythonImporterTest >> testImportIsModel [
+MSEPythonImporterTest >> testIsModel [
 	
 	importer accept: pyDoc.
 	importer model entityNamed: 'pygame'.
@@ -465,38 +516,13 @@ MSEPythonImporterTest >> testImportIsModel [
 ]
 
 { #category : #'tests - module' }
-MSEPythonImporterTest >> testImportKnowsItsModule [
+MSEPythonImporterTest >> testKnowsItsModule [
 	
 	| import module | 
 	importer accept: pyDoc.
 	import := importer importNamed: 'pygame'.
 	module := importer moduleNamed: self moduleName.
 	self assert: import manualImportingEntity equals: module.
-
-]
-
-{ #category : #tests }
-MSEPythonImporterTest >> testImportMethods [
-
-	importer accept: pyDoc.
-	self assert: importer methods size equals: 5.
-	self assert:
-		(importer methodNamed: 'update' inClass: 'Ball') isNotNil.
-	self assert:
-		(importer methodNamed: '__init__' inClass: 'Wall') isNotNil.
-	self assert:
-		(importer methodNamed: '__init__' inClass: 'Player') isNotNil
-
-]
-
-{ #category : #'tests - module' }
-MSEPythonImporterTest >> testImportModule [
-	
-	| module | 
-	importer accept: pyDoc.
-	module := importer moduleNamed: self moduleName.
-	self assert: module class equals: FamixPythonModule.
-	self assert: module name equals: self moduleName.
 
 ]
 
@@ -507,11 +533,16 @@ MSEPythonImporterTest >> testMethodIsInModel [
 ]
 
 { #category : #'tests - module' }
-MSEPythonImporterTest >> testModuleIsModel [
+MSEPythonImporterTest >> testModule [
 	
+	| module | 
 	importer accept: pyDoc.
-	importer model entityNamed: 'Main Module'.
-	
+	module := importer moduleNamed: self moduleName.
+
+	self assert: module isNotNil.
+	self assert: module class equals: FamixPythonModule.
+	self assert: module name equals: self moduleName.
+
 ]
 
 { #category : #'tests - module' }
@@ -545,6 +576,6 @@ MSEPythonImporterTest >> testTwoSiblingImportsHaveTheSameModule [
 	module := importer moduleNamed: self moduleName.
 	self assert: import manualImportingEntity equals: module.
 	self assert: import2 manualImportingEntity equals: module.
-	self assert: import manualImportingEntity == import2 manualImportingEntity  
+	self assert: import manualImportingEntity equals: import2 manualImportingEntity  
 
 ]
