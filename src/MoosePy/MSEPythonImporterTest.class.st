@@ -38,7 +38,7 @@ MSEPythonImporterTest >> moduleName2 [
 
 ]
 
-{ #category : #'tests - module' }
+{ #category : #running }
 MSEPythonImporterTest >> parseCode: aString [
 	
 	^ (PythonParser parseWithErrors: aString)
