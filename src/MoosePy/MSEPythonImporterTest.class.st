@@ -329,6 +329,24 @@ import matplotlib.pyplot as plt
 ]
 
 { #category : #'tests - module' }
+MSEPythonImporterTest >> testImportModulesWithAliases [
+
+	importer accept: (self parseCode: '
+import math as m, matplotlib.pyplot as plt
+').
+
+	self assert: (importer importNamed: 'math') isNotNil.
+	self
+		assert: (importer importNamed: 'math') asName
+		equals: 'm'.
+		
+	self assert: (importer importNamed: 'matplotlib.pyplot') isNotNil.
+	self
+		assert: (importer importNamed: 'matplotlib.pyplot') asName
+		equals: 'plt'
+]
+
+{ #category : #'tests - module' }
 MSEPythonImporterTest >> testImportMultiClassesFromModule [
 
 	importer accept: (self parseCode: '
