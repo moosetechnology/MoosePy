@@ -607,22 +607,6 @@ MSEPythonToFamixImporterVisitor >> visitClassdef: aClassDef [
 ]
 
 { #category : #visiting }
-MSEPythonToFamixImporterVisitor >> visitDotOptDottedName: aDotOptDottedNode [
-
-
-	(aDotOptDottedNode isKindOf: PyDottedNameNode) ifFalse: [ ^ aDotOptDottedNode value ].
-
-	^'.' join: (aDotOptDottedNode names collect: [ :name |
-		(name isKindOf: PyDottedNameNode)
-			ifTrue: [ self visitDottedName: name ].
-		name value
-	])
-
-
-	
-]
-
-{ #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitDottedName: anDottedNameNode [
 
 	^$. join: (anDottedNameNode names collect: [:name | self acceptNode: name])
