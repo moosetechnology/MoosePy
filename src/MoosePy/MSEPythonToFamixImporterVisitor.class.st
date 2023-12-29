@@ -10,6 +10,14 @@ Class {
 	#category : #'MoosePy-Visitors'
 }
 
+{ #category : #visiting }
+MSEPythonToFamixImporterVisitor >> SmaCCToken: aSmaCCToken [
+	"introducing this additional visit method regularity of treatment
+	 see also extension method to SmaCCToken"
+
+	^aSmaCCToken value
+]
+
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> basicCreateFunction: aSelector withSignature: aSignature [
 
@@ -653,7 +661,7 @@ MSEPythonToFamixImporterVisitor >> visitDotOptDottedName: aDotOptDottedNode [
 { #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitDottedName: anDottedNameNode [
 
-	^ anDottedNameNode value
+	^$. join: (anDottedNameNode names collect: [:name | self acceptNode: name])
 ]
 
 { #category : #visiting }
@@ -706,6 +714,11 @@ MSEPythonToFamixImporterVisitor >> visitInterpolatedString: anInterpolatedString
 ]
 
 { #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitName: aName [
+	^self acceptNode: aName name
+]
+
+{ #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitPower: anInvocation [
 
 	anInvocation trailers ifNotEmpty: [
@@ -719,6 +732,14 @@ MSEPythonToFamixImporterVisitor >> visitSimpleStmt: anSimpleStmtNode [
 
 	
 	^ super visitSimpleStmt: anSimpleStmtNode
+]
+
+{ #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitSmaCCToken: aSmaCCToken [
+	"introducing this additional visit method regularity of treatment
+	 see also extension method to SmaCCToken"
+
+	^aSmaCCToken value
 ]
 
 { #category : #visiting }
