@@ -117,12 +117,7 @@ MSEPythonToFamixImporterVisitor >> createInvocation: anInvocationNode [
 
 	invocDict := self extractInvocationInformation: anInvocationNode.
 
-
-	self updateLayer:(invocDict at: 'canditate').
-
-
 	invocation sender: sender top.
-	invocation cacheAt: 'layer' put: layer.
 	invocation cacheAt: 'canditate' put: (invocDict at: 'canditate').
 	invocation cacheAt: 'args' put: (invocDict at: 'args').
 	invocation cacheAt: 'receiver' put: (invocDict at: 'receiver').
@@ -606,16 +601,6 @@ MSEPythonToFamixImporterVisitor >> signatureFromInvocation: anInvocationNode [
 	startPos := signature indexOf: $( startingAt: startPos + 1.
 	signature := signature copyFrom: startPos + 1 to: signature size - 2.
 	^ signature copyWithoutAll: '"'
-]
-
-{ #category : #'private-entity-creation' }
-MSEPythonToFamixImporterVisitor >> updateLayer: anInvocationCandiateName [
-
-	anInvocationCandiateName ifNotNil: [
-	((anInvocationCandiateName beginsWith: 'Conv')
-	| (anInvocationCandiateName beginsWith: 'Flatten')
-	| (anInvocationCandiateName beginsWith: 'Dense') )ifTrue: [
-		layer := layer + 1 ]]
 ]
 
 { #category : #visiting }
