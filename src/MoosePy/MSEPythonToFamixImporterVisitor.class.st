@@ -642,7 +642,10 @@ MSEPythonToFamixImporterVisitor >> visitImport: anImport [
 { #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitInterpolatedString: anInterpolatedString [
 
-	^(anInterpolatedString topParent completeSource copyFrom: anInterpolatedString startPosition to: anInterpolatedString stopPosition) asString
+	^(anInterpolatedString topParent completeSource
+		copyFrom: anInterpolatedString startPosition
+		to: anInterpolatedString stopPosition)
+		asString
 ]
 
 { #category : #visiting }
