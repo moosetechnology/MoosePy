@@ -689,8 +689,7 @@ MSEPythonToFamixImporterVisitor >> visitFuncdef: aFuncdef [
 		ifFalse: [ self ensureFunction: aFuncdef ].
 	sender push: fmx.
 	result := super visitFuncdef: aFuncdef.
-	sender pop.
-	^ result
+	^sender pop
 ]
 
 { #category : #visiting }
@@ -724,6 +723,13 @@ MSEPythonToFamixImporterVisitor >> visitPower: anInvocation [
 		self createInvocation: anInvocation ].
 
 	^ super visitPower: anInvocation
+]
+
+{ #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitSmaCCParseNode: aSmaCCParseNode [
+	"override to return the result of the visits"
+
+	^self acceptNodes: aSmaCCParseNode sortedChildren
 ]
 
 { #category : #visiting }
