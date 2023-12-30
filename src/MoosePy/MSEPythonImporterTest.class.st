@@ -82,6 +82,20 @@ MSEPythonImporterTest >> sourceBig2 [
 	^ PythonParser parseFileWithErrors: (fileSystem / (self moduleName, '.py')) 
 ]
 
+{ #category : #tests }
+MSEPythonImporterTest >> testAnnotatedFunction [
+
+	| fct |
+	importer accept: (self parseCode: '
+@classmethod
+def greet(name):
+    print ''Hello'', name
+').
+
+	fct := importer .
+	self assert: fct annotationInstances size equals: 1
+]
+
 { #category : #'tests - classes' }
 MSEPythonImporterTest >> testClassIsInModel [
 
