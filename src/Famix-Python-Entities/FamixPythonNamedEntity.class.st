@@ -1,8 +1,8 @@
 Class {
 	#name : #FamixPythonNamedEntity,
 	#superclass : #FamixPythonSourcedEntity,
-	#traits : 'FamixTInvocationsReceiver + FamixTNamedEntity + FamixTWithAnnotationInstances + TEntityMetaLevelDependency',
-	#classTraits : 'FamixTInvocationsReceiver classTrait + FamixTNamedEntity classTrait + FamixTWithAnnotationInstances classTrait + TEntityMetaLevelDependency classTrait',
+	#traits : 'FamixTInvocationsReceiver + FamixTNamedEntity + TEntityMetaLevelDependency',
+	#classTraits : 'FamixTInvocationsReceiver classTrait + FamixTNamedEntity classTrait + TEntityMetaLevelDependency classTrait',
 	#category : #'Famix-Python-Entities-Entities'
 }
 

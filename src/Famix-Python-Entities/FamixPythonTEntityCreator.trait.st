@@ -24,6 +24,20 @@ FamixPythonTEntityCreator >> newAccess [
 ]
 
 { #category : #'entity creation' }
+FamixPythonTEntityCreator >> newAnnotationInstance [
+
+	<generated>
+	^ self add: FamixPythonAnnotationInstance new
+]
+
+{ #category : #'entity creation' }
+FamixPythonTEntityCreator >> newAnnotationType [
+
+	<generated>
+	^ self add: FamixPythonAnnotationType new
+]
+
+{ #category : #'entity creation' }
 FamixPythonTEntityCreator >> newAttribute [
 
 	<generated>

@@ -18,6 +18,22 @@ MSEPythonToFamixImporterVisitor >> SmaCCToken: aSmaCCToken [
 	^aSmaCCToken value
 ]
 
+{ #category : #visiting }
+MSEPythonToFamixImporterVisitor >> acceptNodes: aCollection [
+	"override to return the result of the visits"
+
+	^aCollection collect: [ :each | self acceptNode: each ].
+
+]
+
+{ #category : #accessing }
+MSEPythonToFamixImporterVisitor >> annotationTypeNamed: aString [ 
+
+	^ (self model allWithType: FamixPythonAnnotationType)
+		  detect: [ :e | e name = aString ]
+		  ifNone: [ nil ]
+]
+
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> basicCreateFunction: aSelector withSignature: aSignature [
 
@@ -52,6 +68,22 @@ MSEPythonToFamixImporterVisitor >> classNamed: aName [
 MSEPythonToFamixImporterVisitor >> classes [
 
 	^ self model allWithType: FamixPythonClass
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> createAnnotationInstance: aPyDecoratorNode named: aString [ 
+
+	^model newAnnotationInstance
+		annotationType: (self ensureAnnotationTypeNamed: aString) ;
+		yourself
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> createAnnotationTypeNamed: aString [ 
+
+	^model newAnnotationType
+		name:  aString ;
+		yourself
 ]
 
 { #category : #'private-entity-creation' }
@@ -172,6 +204,13 @@ MSEPythonToFamixImporterVisitor >> createParameter: aParameter in: aContainerNod
 	^ self setSourceAnchor: parameter from: aParameter.
 
 
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> ensureAnnotationTypeNamed: aString [ 
+
+	^ (self annotationTypeNamed: aString) ifNil: [
+		  self createAnnotationTypeNamed: aString ]
 ]
 
 { #category : #'private-entity-creation' }
@@ -487,14 +526,9 @@ MSEPythonToFamixImporterVisitor >> moduleFromFonction: aFunctionNode [
 ]
 
 { #category : #TOREMOVE }
-MSEPythonToFamixImporterVisitor >> moduleNameFromFonction: aFunctionNode [
+MSEPythonToFamixImporterVisitor >> moduleNameFromFonction: aNode [
 
-	| parentFileName |
-	parentFileName := (self parentFileForNode: aFunctionNode) attributes at: #filename.
-	
-	rootFilePath ifNil: [	^(parentFileName fullName removePrefix: '/') removeSuffix: '.py'].
-
-	^(parentFileName relativeTo: rootFilePath asPath) pathString removeSuffix: '.py'
+	^(self relativeFilePath: aNode) removeSuffix: '.py'
 ]
 
 { #category : #'private-entity-creation' }
@@ -547,8 +581,20 @@ MSEPythonToFamixImporterVisitor >> parameters [
 MSEPythonToFamixImporterVisitor >> parentFileForNode: aPyNode [ 
 
 	aPyNode ifNil: [ ^nil ].
-	(aPyNode parent isKindOf: PyFileInputNode) ifTrue: [ ^aPyNode parent ].
+	(aPyNode isKindOf: PyFileInputNode) ifTrue: [ ^aPyNode ].
 	^self parentFileForNode: aPyNode parent
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> relativeFilePath: aNode [
+
+	| parentFileName |
+
+	parentFileName := (self parentFileForNode: aNode) attributes at: #filename.
+	
+	rootFilePath ifNil: [	^(parentFileName fullName removePrefix: '/')].
+
+	^(parentFileName relativeTo: rootFilePath asPath) pathString
 ]
 
 { #category : #accessing }
@@ -558,9 +604,10 @@ MSEPythonToFamixImporterVisitor >> rootFilePath [
 ]
 
 { #category : #accessing }
-MSEPythonToFamixImporterVisitor >> rootFilePath: anObject [
+MSEPythonToFamixImporterVisitor >> rootFilePath: aString [
 
-	rootFilePath := anObject
+	rootFilePath := aString.
+	model rootFolder: aString
 ]
 
 { #category : #'accessing - methods' }
@@ -573,9 +620,10 @@ MSEPythonToFamixImporterVisitor >> sender [
 MSEPythonToFamixImporterVisitor >> setSourceAnchor: aFamixEntity from: aSmaccNode [
 
 	aFamixEntity sourceAnchor: (FamixPythonIndexedFileAnchor new
-			 startPos: aSmaccNode startPosition;
-			 endPos: aSmaccNode stopPosition;
-			 yourself).
+		fileName: (self relativeFilePath: aSmaccNode) ;
+		startPos: aSmaccNode startPosition;
+		endPos: aSmaccNode stopPosition;
+		yourself).
 
 	aFamixEntity stub: false.
 
@@ -594,10 +642,37 @@ MSEPythonToFamixImporterVisitor >> signatureFromInvocation: anInvocationNode [
 ]
 
 { #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitAnnotatedSymbol: anAnnotatedSymbol [
+	^ super visitAnnotatedSymbol: anAnnotatedSymbol
+]
+
+{ #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitClassdef: aClassDef [
 
-	self ensureClass:  aClassDef.
-	^ super visitClassdef: aClassDef
+	| famixClass |
+	famixClass := self ensureClass:  aClassDef.
+	super visitClassdef: aClassDef.
+	^famixClass
+]
+
+{ #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitDecorated: aDecoratedNode [
+
+	| decorations decorated |
+	decorations := self acceptNodes: aDecoratedNode decorators.
+	aDecoratedNode classdef ifNotNil: [ :def | decorated := self acceptNode: def ].
+	aDecoratedNode funcdef ifNotNil: [ :def | decorated := self acceptNode: def ].
+
+	(decorations notEmpty and: [ decorated notNil ])
+	ifTrue: [ decorated annotationInstances: decorations ]
+]
+
+{ #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitDecorator: aDecoratorNode [
+
+	| name |
+	name := self acceptNode: aDecoratorNode dotted_name.
+	^self createAnnotationInstance: aDecoratorNode named: name
 ]
 
 { #category : #visiting }
@@ -625,8 +700,7 @@ MSEPythonToFamixImporterVisitor >> visitFuncdef: aFuncdef [
 		ifFalse: [ self ensureFunction: aFuncdef ].
 	sender push: fmx.
 	result := super visitFuncdef: aFuncdef.
-	sender pop.
-	^ result
+	^sender pop
 ]
 
 { #category : #visiting }
@@ -660,6 +734,13 @@ MSEPythonToFamixImporterVisitor >> visitPower: anInvocation [
 		self createInvocation: anInvocation ].
 
 	^ super visitPower: anInvocation
+]
+
+{ #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitSmaCCParseNode: aSmaCCParseNode [
+	"override to return the result of the visits"
+
+	^self acceptNodes: aSmaCCParseNode sortedChildren
 ]
 
 { #category : #visiting }

@@ -82,6 +82,47 @@ MSEPythonImporterTest >> sourceBig2 [
 	^ PythonParser parseFileWithErrors: (fileSystem / (self moduleName, '.py')) 
 ]
 
+{ #category : #tests }
+MSEPythonImporterTest >> testAnnotatedClass [
+
+	| class anno |
+	importer accept: (self parseCode: '
+@dataclass
+class ValueRange:
+    lo: int
+    hi: int
+').
+
+	class := importer classNamed: 'ValueRange'.
+
+	self assert: class isNotNil.
+	self assert: class annotationInstances size equals: 1.
+
+	anno := class annotationInstances anyOne.
+	self assert: anno annotatedEntity equals: class.
+	self assert: anno annotationType name equals: 'dataclass'
+]
+
+{ #category : #tests }
+MSEPythonImporterTest >> testAnnotatedFunction [
+
+	| fct anno |
+	importer accept: (self parseCode: '
+@classmethod
+def greet(name):
+    print ''Hello'', name
+').
+
+	fct := importer functionNamed: 'greet'.
+
+	self assert: fct isNotNil.
+	self assert: fct annotationInstances size equals: 1.
+
+	anno := fct annotationInstances anyOne.
+	self assert: anno annotatedEntity equals: fct.
+	self assert: anno annotationType name equals: 'classmethod'
+]
+
 { #category : #'tests - classes' }
 MSEPythonImporterTest >> testClassIsInModel [
 
@@ -564,6 +605,24 @@ MSEPythonImporterTest >> testParseWithFile [
 	| doc |
 	doc := PythonParser parseFileWithErrors: (fileSystem / 'sprite_collect_blocks.py').
 	self assert: doc filename basename equals: 'sprite_collect_blocks.py'
+]
+
+{ #category : #tests }
+MSEPythonImporterTest >> testSameAnnotationType [
+
+	importer accept: (self parseCode: '
+@classmethod
+def greet(name):
+    print ''Hello'', name
+@classmethod
+def goodbye(name):
+    print ''Bye-bye'', name
+').
+
+	self assert: (importer model allWithType: FamixPythonAnnotationType) size equals: 1.
+	self
+		assert: (importer functionNamed: 'greet')   annotationInstances anyOne annotationType
+		equals: (importer functionNamed: 'goodbye') annotationInstances anyOne annotationType
 ]
 
 { #category : #'tests - module' }

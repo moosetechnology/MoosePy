@@ -19,7 +19,9 @@ Class {
 		'inheritance',
 		'function',
 		'module',
-		'indexedFileAnchor'
+		'indexedFileAnchor',
+		'annotationInstance',
+		'annotationType'
 	],
 	#category : #'Famix-Python-Generator'
 }
@@ -40,7 +42,10 @@ FamixPythonGenerator class >> prefix [
 FamixPythonGenerator >> defineClasses [
 
 	super defineClasses.
+
 	access := builder newClassNamed: #Access.
+	annotationInstance := builder newClassNamed: #AnnotationInstance.
+	annotationType := builder newClassNamed: #AnnotationType.
 	attribute := builder newClassNamed: #Attribute.
 	class := builder newClassNamed: #Class.
 	containerEntity := builder newAbstractClassNamed: #ContainerEntity.
@@ -64,7 +69,13 @@ FamixPythonGenerator >> defineClasses [
 FamixPythonGenerator >> defineHierarchy [
 
 	super defineHierarchy.
+
 	access --|> #TAccess.
+	
+	annotationInstance --|> #TAnnotationInstance.
+	annotationInstance --|> #TTypedAnnotationInstance.
+	annotationType --|> #TAnnotationType.
+	annotationType --|> namedEntity.
 
 	attribute --|> namedEntity.
 	attribute --|> #TAttribute.
@@ -75,6 +86,7 @@ FamixPythonGenerator >> defineHierarchy [
 	class --|> #TClass.
 	class --|> #TWithImports.
 	class --|> #TImportable.
+	class --|> #TWithAnnotationInstances.
 
 	containerEntity --|> namedEntity.
 	containerEntity --|> #TWithClasses.
@@ -87,6 +99,7 @@ FamixPythonGenerator >> defineHierarchy [
 	function --|> #TWithImplicitVariables.
 	function --|> #TWithInvocations.
 	function --|> #TInvocable.
+	function --|> #TWithAnnotationInstances.
 
 	implicitVariable --|> namedEntity.
 	implicitVariable --|> #TImplicitVariable.
@@ -113,6 +126,7 @@ FamixPythonGenerator >> defineHierarchy [
 	method --|> #TImportable.
 	method --|> #TWithInvocations.
 	method --|> #TInvocable.
+	method --|> #TWithAnnotationInstances.
 
 	module --|> containerEntity.
 	module --|> #TPackageable.
@@ -121,10 +135,9 @@ FamixPythonGenerator >> defineHierarchy [
 	module --|> #TWithFunctions.
 	module --|> #TWithInvocations.
 
-	namedEntity --|> #TInvocationsReceiver.
-	namedEntity --|> #TWithAnnotationInstances.
-	namedEntity --|> #TEntityMetaLevelDependency.
 	namedEntity --|> sourcedEntity.
+	namedEntity --|> #TInvocationsReceiver.
+	namedEntity --|> #TEntityMetaLevelDependency.
 
 	package --|> containerEntity.
 	package --|> #TPackage.
@@ -150,13 +163,8 @@ FamixPythonGenerator >> defineHierarchy [
 FamixPythonGenerator >> defineProperties [
 
 	super defineProperties.
-	(import property: #fromName type: #String) comment: 'from a import b
-	fromName is a'.
 
-	(import property: #entityName type: #String) comment:
-		'from a import b
-	entityName is b'.
-
-	(import property: #asName type: #String) comment: 'import b as c
-	asName is c'.
+	(import property: #fromName type: #String) comment: '"from a import b", fromName is a'.
+	(import property: #entityName type: #String) comment: '"from a import b", entityName is b'.
+	(import property: #asName type: #String) comment: '"import b as c", asName is c'.
 ]
