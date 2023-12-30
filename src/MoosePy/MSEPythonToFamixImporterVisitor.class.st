@@ -18,6 +18,22 @@ MSEPythonToFamixImporterVisitor >> SmaCCToken: aSmaCCToken [
 	^aSmaCCToken value
 ]
 
+{ #category : #visiting }
+MSEPythonToFamixImporterVisitor >> acceptNodes: aCollection [
+	"override to return the result of the visits"
+
+	^aCollection collect: [ :each | self acceptNode: each ].
+
+]
+
+{ #category : #accessing }
+MSEPythonToFamixImporterVisitor >> annotationTypeNamed: aString [ 
+
+	^ (self model allWithType: FamixPythonAnnotationType)
+		  detect: [ :e | e name = aString ]
+		  ifNone: [ nil ]
+]
+
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> basicCreateFunction: aSelector withSignature: aSignature [
 
@@ -52,6 +68,22 @@ MSEPythonToFamixImporterVisitor >> classNamed: aName [
 MSEPythonToFamixImporterVisitor >> classes [
 
 	^ self model allWithType: FamixPythonClass
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> createAnnotationInstance: aPyDecoratorNode named: aString [ 
+
+	^model newAnnotationInstance
+		annotationType: (self ensureAnnotationTypeNamed: aString) ;
+		yourself
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> createAnnotationTypeNamed: aString [ 
+
+	^model newAnnotationType
+		name:  aString ;
+		yourself
 ]
 
 { #category : #'private-entity-creation' }
@@ -172,6 +204,13 @@ MSEPythonToFamixImporterVisitor >> createParameter: aParameter in: aContainerNod
 	^ self setSourceAnchor: parameter from: aParameter.
 
 
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> ensureAnnotationTypeNamed: aString [ 
+
+	^ (self annotationTypeNamed: aString) ifNil: [
+		  self createAnnotationTypeNamed: aString ]
 ]
 
 { #category : #'private-entity-creation' }
@@ -594,10 +633,35 @@ MSEPythonToFamixImporterVisitor >> signatureFromInvocation: anInvocationNode [
 ]
 
 { #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitAnnotatedSymbol: anAnnotatedSymbol [
+	^ super visitAnnotatedSymbol: anAnnotatedSymbol
+]
+
+{ #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitClassdef: aClassDef [
 
 	self ensureClass:  aClassDef.
 	^ super visitClassdef: aClassDef
+]
+
+{ #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitDecorated: aDecorated [
+
+	| decorations decorated |
+	decorations := self acceptNodes: aDecorated decorators.
+	aDecorated classdef ifNotNil: [ :def | decorated := self acceptNode: def ].
+	aDecorated funcdef ifNotNil: [ :def | decorated := self acceptNode: def ].
+
+	(decorations notEmpty and: [ decorated notNil ])
+	ifTrue: [ decorated annotationInstances: decorations ]
+]
+
+{ #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitDecorator: aDecorator [
+
+	| name |
+	name := self acceptNode: aDecorator dotted_name.
+	^self createAnnotationInstance: aDecorator named: name
 ]
 
 { #category : #visiting }
