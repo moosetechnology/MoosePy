@@ -526,14 +526,9 @@ MSEPythonToFamixImporterVisitor >> moduleFromFonction: aFunctionNode [
 ]
 
 { #category : #TOREMOVE }
-MSEPythonToFamixImporterVisitor >> moduleNameFromFonction: aFunctionNode [
+MSEPythonToFamixImporterVisitor >> moduleNameFromFonction: aNode [
 
-	| parentFileName |
-	parentFileName := (self parentFileForNode: aFunctionNode) attributes at: #filename.
-	
-	rootFilePath ifNil: [	^(parentFileName fullName removePrefix: '/') removeSuffix: '.py'].
-
-	^(parentFileName relativeTo: rootFilePath asPath) pathString removeSuffix: '.py'
+	^(self relativeFilePath: aNode) removeSuffix: '.py'
 ]
 
 { #category : #'private-entity-creation' }
@@ -586,8 +581,20 @@ MSEPythonToFamixImporterVisitor >> parameters [
 MSEPythonToFamixImporterVisitor >> parentFileForNode: aPyNode [ 
 
 	aPyNode ifNil: [ ^nil ].
-	(aPyNode parent isKindOf: PyFileInputNode) ifTrue: [ ^aPyNode parent ].
+	(aPyNode isKindOf: PyFileInputNode) ifTrue: [ ^aPyNode ].
 	^self parentFileForNode: aPyNode parent
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> relativeFilePath: aNode [
+
+	| parentFileName |
+
+	parentFileName := (self parentFileForNode: aNode) attributes at: #filename.
+	
+	rootFilePath ifNil: [	^(parentFileName fullName removePrefix: '/')].
+
+	^(parentFileName relativeTo: rootFilePath asPath) pathString
 ]
 
 { #category : #accessing }
@@ -597,9 +604,10 @@ MSEPythonToFamixImporterVisitor >> rootFilePath [
 ]
 
 { #category : #accessing }
-MSEPythonToFamixImporterVisitor >> rootFilePath: anObject [
+MSEPythonToFamixImporterVisitor >> rootFilePath: aString [
 
-	rootFilePath := anObject
+	rootFilePath := aString.
+	model rootFolder: aString
 ]
 
 { #category : #'accessing - methods' }
@@ -612,9 +620,10 @@ MSEPythonToFamixImporterVisitor >> sender [
 MSEPythonToFamixImporterVisitor >> setSourceAnchor: aFamixEntity from: aSmaccNode [
 
 	aFamixEntity sourceAnchor: (FamixPythonIndexedFileAnchor new
-			 startPos: aSmaccNode startPosition;
-			 endPos: aSmaccNode stopPosition;
-			 yourself).
+		fileName: (self relativeFilePath: aSmaccNode) ;
+		startPos: aSmaccNode startPosition;
+		endPos: aSmaccNode stopPosition;
+		yourself).
 
 	aFamixEntity stub: false.
 
