@@ -607,6 +607,24 @@ MSEPythonImporterTest >> testParseWithFile [
 	self assert: doc filename basename equals: 'sprite_collect_blocks.py'
 ]
 
+{ #category : #tests }
+MSEPythonImporterTest >> testSameAnnotationType [
+
+	importer accept: (self parseCode: '
+@classmethod
+def greet(name):
+    print ''Hello'', name
+@classmethod
+def goodbye(name):
+    print ''Bye-bye'', name
+').
+
+	self assert: (importer model allWithType: FamixPythonAnnotationType) size equals: 1.
+	self
+		assert: (importer functionNamed: 'greet')   annotationInstances anyOne annotationType
+		equals: (importer functionNamed: 'goodbye') annotationInstances anyOne annotationType
+]
+
 { #category : #'tests - module' }
 MSEPythonImporterTest >> testTwoSiblingImportsHaveTheSameModule [
 	
