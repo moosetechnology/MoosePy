@@ -1,8 +1,8 @@
 Class {
 	#name : #FamixPythonFunction,
 	#superclass : #FamixPythonContainerEntity,
-	#traits : 'FamixTFunction + FamixTImportable + FamixTInvocable + FamixTWithComments + FamixTWithImplicitVariables + FamixTWithInvocations',
-	#classTraits : 'FamixTFunction classTrait + FamixTImportable classTrait + FamixTInvocable classTrait + FamixTWithComments classTrait + FamixTWithImplicitVariables classTrait + FamixTWithInvocations classTrait',
+	#traits : 'FamixTFunction + FamixTImportable + FamixTInvocable + FamixTWithAnnotationInstances + FamixTWithComments + FamixTWithImplicitVariables + FamixTWithInvocations',
+	#classTraits : 'FamixTFunction classTrait + FamixTImportable classTrait + FamixTInvocable classTrait + FamixTWithAnnotationInstances classTrait + FamixTWithComments classTrait + FamixTWithImplicitVariables classTrait + FamixTWithInvocations classTrait',
 	#category : #'Famix-Python-Entities-Entities'
 }
 

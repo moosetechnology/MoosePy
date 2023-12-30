@@ -1,8 +1,8 @@
 Class {
 	#name : #FamixPythonClass,
 	#superclass : #FamixPythonType,
-	#traits : 'FamixTClass + FamixTImportable + FamixTWithImports',
-	#classTraits : 'FamixTClass classTrait + FamixTImportable classTrait + FamixTWithImports classTrait',
+	#traits : 'FamixTClass + FamixTImportable + FamixTWithAnnotationInstances + FamixTWithImports',
+	#classTraits : 'FamixTClass classTrait + FamixTImportable classTrait + FamixTWithAnnotationInstances classTrait + FamixTWithImports classTrait',
 	#category : #'Famix-Python-Entities-Entities'
 }
 

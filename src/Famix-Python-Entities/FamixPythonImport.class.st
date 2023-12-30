@@ -4,10 +4,9 @@ Class {
 	#traits : 'FamixTImport',
 	#classTraits : 'FamixTImport classTrait',
 	#instVars : [
-		'#asName => FMProperty',
-		'#entityName => FMProperty',
 		'#fromName => FMProperty',
-		'#manualImportingEntity'
+		'#entityName => FMProperty',
+		'#asName => FMProperty'
 	],
 	#category : #'Famix-Python-Entities-Entities'
 }
@@ -26,8 +25,7 @@ FamixPythonImport >> asName [
 
 	<FMProperty: #asName type: #String>
 	<generated>
-	<FMComment: 'import b as c
-	asName is c'>
+	<FMComment: '"import b as c", asName is c'>
 	^ asName
 ]
 
@@ -55,8 +53,7 @@ FamixPythonImport >> entityName [
 
 	<FMProperty: #entityName type: #String>
 	<generated>
-	<FMComment: 'from a import b
-	entityName is b'>
+	<FMComment: '"from a import b", entityName is b'>
 	^ entityName
 ]
 
@@ -71,8 +68,7 @@ FamixPythonImport >> fromName [
 
 	<FMProperty: #fromName type: #String>
 	<generated>
-	<FMComment: 'from a import b
-	fromName is a'>
+	<FMComment: '"from a import b", fromName is a'>
 	^ fromName
 ]
 

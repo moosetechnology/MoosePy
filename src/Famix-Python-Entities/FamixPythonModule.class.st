@@ -3,9 +3,6 @@ Class {
 	#superclass : #FamixPythonContainerEntity,
 	#traits : 'FamixTImportable + FamixTPackageable + FamixTWithComments + FamixTWithFunctions + FamixTWithInvocations',
 	#classTraits : 'FamixTImportable classTrait + FamixTPackageable classTrait + FamixTWithComments classTrait + FamixTWithFunctions classTrait + FamixTWithInvocations classTrait',
-	#instVars : [
-		'#manualImports'
-	],
 	#category : #'Famix-Python-Entities-Entities'
 }
 
