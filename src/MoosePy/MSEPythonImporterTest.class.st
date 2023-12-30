@@ -85,15 +85,21 @@ MSEPythonImporterTest >> sourceBig2 [
 { #category : #tests }
 MSEPythonImporterTest >> testAnnotatedFunction [
 
-	| fct |
+	| fct anno |
 	importer accept: (self parseCode: '
 @classmethod
 def greet(name):
     print ''Hello'', name
 ').
 
-	fct := importer .
-	self assert: fct annotationInstances size equals: 1
+	fct := importer functionNamed: 'greet'.
+
+	self assert: fct isNotNil.
+	self assert: fct annotationInstances size equals: 1.
+
+	anno := fct annotationInstances anyOne.
+	self assert: anno annotatedEntity equals: fct.
+	self assert: anno annotationType name equals: 'classmethod'
 ]
 
 { #category : #'tests - classes' }
