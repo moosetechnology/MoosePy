@@ -640,28 +640,30 @@ MSEPythonToFamixImporterVisitor >> visitAnnotatedSymbol: anAnnotatedSymbol [
 { #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitClassdef: aClassDef [
 
-	self ensureClass:  aClassDef.
-	^ super visitClassdef: aClassDef
+	| famixClass |
+	famixClass := self ensureClass:  aClassDef.
+	super visitClassdef: aClassDef.
+	^famixClass
 ]
 
 { #category : #visiting }
-MSEPythonToFamixImporterVisitor >> visitDecorated: aDecorated [
+MSEPythonToFamixImporterVisitor >> visitDecorated: aDecoratedNode [
 
 	| decorations decorated |
-	decorations := self acceptNodes: aDecorated decorators.
-	aDecorated classdef ifNotNil: [ :def | decorated := self acceptNode: def ].
-	aDecorated funcdef ifNotNil: [ :def | decorated := self acceptNode: def ].
+	decorations := self acceptNodes: aDecoratedNode decorators.
+	aDecoratedNode classdef ifNotNil: [ :def | decorated := self acceptNode: def ].
+	aDecoratedNode funcdef ifNotNil: [ :def | decorated := self acceptNode: def ].
 
 	(decorations notEmpty and: [ decorated notNil ])
 	ifTrue: [ decorated annotationInstances: decorations ]
 ]
 
 { #category : #visiting }
-MSEPythonToFamixImporterVisitor >> visitDecorator: aDecorator [
+MSEPythonToFamixImporterVisitor >> visitDecorator: aDecoratorNode [
 
 	| name |
-	name := self acceptNode: aDecorator dotted_name.
-	^self createAnnotationInstance: aDecorator named: name
+	name := self acceptNode: aDecoratorNode dotted_name.
+	^self createAnnotationInstance: aDecoratorNode named: name
 ]
 
 { #category : #visiting }
