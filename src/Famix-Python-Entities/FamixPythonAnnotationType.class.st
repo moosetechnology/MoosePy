@@ -1,6 +1,6 @@
 Class {
 	#name : #FamixPythonAnnotationType,
-	#superclass : #FamixPythonEntity,
+	#superclass : #FamixPythonNamedEntity,
 	#traits : 'FamixTAnnotationType',
 	#classTraits : 'FamixTAnnotationType classTrait',
 	#category : #'Famix-Python-Entities-Entities'
@@ -9,7 +9,7 @@ Class {
 { #category : #meta }
 FamixPythonAnnotationType class >> annotation [
 
-	<FMClass: #AnnotationType super: #FamixPythonEntity>
+	<FMClass: #AnnotationType super: #FamixPythonNamedEntity>
 	<package: #'Famix-Python-Entities'>
 	<generated>
 	^ self
