@@ -75,6 +75,7 @@ FamixPythonGenerator >> defineHierarchy [
 	annotationInstance --|> #TAnnotationInstance.
 	annotationInstance --|> #TTypedAnnotationInstance.
 	annotationType --|> #TAnnotationType.
+	annotationType --|> namedEntity.
 
 	attribute --|> namedEntity.
 	attribute --|> #TAttribute.
