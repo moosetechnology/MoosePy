@@ -737,6 +737,11 @@ MSEPythonToFamixImporterVisitor >> visitPower: anInvocation [
 ]
 
 { #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitSmaCCError: aSmaCCError [
+	^nil
+]
+
+{ #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitSmaCCParseNode: aSmaCCParseNode [
 	"override to return the result of the visits"
 
