@@ -42,6 +42,7 @@ FamixPythonGenerator class >> prefix [
 FamixPythonGenerator >> defineClasses [
 
 	super defineClasses.
+
 	access := builder newClassNamed: #Access.
 	annotationInstance := builder newClassNamed: #AnnotationInstance.
 	annotationType := builder newClassNamed: #AnnotationType.
@@ -68,6 +69,7 @@ FamixPythonGenerator >> defineClasses [
 FamixPythonGenerator >> defineHierarchy [
 
 	super defineHierarchy.
+
 	access --|> #TAccess.
 	
 	annotationInstance --|> #TAnnotationInstance.
@@ -132,10 +134,9 @@ FamixPythonGenerator >> defineHierarchy [
 	module --|> #TWithFunctions.
 	module --|> #TWithInvocations.
 
-	namedEntity --|> #TInvocationsReceiver.
-	namedEntity --|> #TWithAnnotationInstances.
-	namedEntity --|> #TEntityMetaLevelDependency.
 	namedEntity --|> sourcedEntity.
+	namedEntity --|> #TInvocationsReceiver.
+	namedEntity --|> #TEntityMetaLevelDependency.
 
 	package --|> containerEntity.
 	package --|> #TPackage.
@@ -161,10 +162,8 @@ FamixPythonGenerator >> defineHierarchy [
 FamixPythonGenerator >> defineProperties [
 
 	super defineProperties.
+
 	(import property: #fromName type: #String) comment: '"from a import b", fromName is a'.
-
-	(import property: #entityName type: #String) comment:
-		'"from a import b", entityName is b'.
-
+	(import property: #entityName type: #String) comment: '"from a import b", entityName is b'.
 	(import property: #asName type: #String) comment: '"import b as c", asName is c'.
 ]
