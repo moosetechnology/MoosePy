@@ -77,9 +77,3 @@ FamixPythonImport >> fromName: anObject [
 	<generated>
 	fromName := anObject
 ]
-
-{ #category : #accessing }
-FamixPythonImport >> manualImportingEntity: anObject [
-
-	manualImportingEntity := anObject
-]

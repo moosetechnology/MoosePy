@@ -14,21 +14,3 @@ FamixPythonModule class >> annotation [
 	<generated>
 	^ self
 ]
-
-{ #category : #testing }
-FamixPythonModule >> initialize [ 
-	super initialize.
-	manualImports := OrderedCollection new.
-]
-
-{ #category : #testing }
-FamixPythonModule >> manualAddImport: anFamixImport [
-
-	manualImports add: anFamixImport
-]
-
-{ #category : #testing }
-FamixPythonModule >> manualIncomingImports [
-
-	^ manualImports 
-]
