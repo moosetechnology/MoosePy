@@ -19,7 +19,9 @@ Class {
 		'inheritance',
 		'function',
 		'module',
-		'indexedFileAnchor'
+		'indexedFileAnchor',
+		'annotationInstance',
+		'annotationType'
 	],
 	#category : #'Famix-Python-Generator'
 }
@@ -41,6 +43,8 @@ FamixPythonGenerator >> defineClasses [
 
 	super defineClasses.
 	access := builder newClassNamed: #Access.
+	annotationInstance := builder newClassNamed: #AnnotationInstance.
+	annotationType := builder newClassNamed: #AnnotationType.
 	attribute := builder newClassNamed: #Attribute.
 	class := builder newClassNamed: #Class.
 	containerEntity := builder newAbstractClassNamed: #ContainerEntity.
@@ -65,6 +69,10 @@ FamixPythonGenerator >> defineHierarchy [
 
 	super defineHierarchy.
 	access --|> #TAccess.
+	
+	annotationInstance --|> #TAnnotationInstance.
+	annotationInstance --|> #TTypedAnnotationInstance.
+	annotationType --|> #TAnnotationType.
 
 	attribute --|> namedEntity.
 	attribute --|> #TAttribute.
@@ -75,6 +83,7 @@ FamixPythonGenerator >> defineHierarchy [
 	class --|> #TClass.
 	class --|> #TWithImports.
 	class --|> #TImportable.
+	class --|> #TWithAnnotationInstances.
 
 	containerEntity --|> namedEntity.
 	containerEntity --|> #TWithClasses.
@@ -87,6 +96,7 @@ FamixPythonGenerator >> defineHierarchy [
 	function --|> #TWithImplicitVariables.
 	function --|> #TWithInvocations.
 	function --|> #TInvocable.
+	function --|> #TWithAnnotationInstances.
 
 	implicitVariable --|> namedEntity.
 	implicitVariable --|> #TImplicitVariable.
@@ -113,6 +123,7 @@ FamixPythonGenerator >> defineHierarchy [
 	method --|> #TImportable.
 	method --|> #TWithInvocations.
 	method --|> #TInvocable.
+	method --|> #TWithAnnotationInstances.
 
 	module --|> containerEntity.
 	module --|> #TPackageable.
@@ -150,13 +161,10 @@ FamixPythonGenerator >> defineHierarchy [
 FamixPythonGenerator >> defineProperties [
 
 	super defineProperties.
-	(import property: #fromName type: #String) comment: 'from a import b
-	fromName is a'.
+	(import property: #fromName type: #String) comment: '"from a import b", fromName is a'.
 
 	(import property: #entityName type: #String) comment:
-		'from a import b
-	entityName is b'.
+		'"from a import b", entityName is b'.
 
-	(import property: #asName type: #String) comment: 'import b as c
-	asName is c'.
+	(import property: #asName type: #String) comment: '"import b as c", asName is c'.
 ]
