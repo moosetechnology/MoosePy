@@ -11,14 +11,6 @@ Class {
 }
 
 { #category : #visiting }
-MSEPythonToFamixImporterVisitor >> SmaCCToken: aSmaCCToken [
-	"introducing this additional visit method regularity of treatment
-	 see also extension method to SmaCCToken"
-
-	^aSmaCCToken value
-]
-
-{ #category : #visiting }
 MSEPythonToFamixImporterVisitor >> acceptNodes: aCollection [
 	"override to return the result of the visits"
 
