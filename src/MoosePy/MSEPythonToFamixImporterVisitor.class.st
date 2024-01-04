@@ -93,24 +93,20 @@ MSEPythonToFamixImporterVisitor >> createClass: aClass [
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> createFunction: aFunctionNode [
 
-	| function signature thisModule |
+	| function signature |
 	signature := aFunctionNode parameters ifNotNil: [
 		             aFunctionNode parameters signatureString ].
 	function := self
-		            basicCreateFunction: aFunctionNode fname value
-		            withSignature: signature.
+		basicCreateFunction: aFunctionNode fname value
+		withSignature: signature.
 
-	thisModule := self ensureModule: (self moduleFromFonction: aFunctionNode).
-
-	function functionOwner: thisModule.
-
+	function functionOwner: sender top.
 
 	self
 		ensureParameters: aFunctionNode parameters
 		inFunctionName: aFunctionNode.
 
 	^ self setSourceAnchor: function from: aFunctionNode
-
 ]
 
 { #category : #'private-entity-creation' }
@@ -118,18 +114,18 @@ MSEPythonToFamixImporterVisitor >> createImport: anImport ofName: aName from: fr
 
 	| import module |
 	import := model newImport
-		entityName: aName ;
-		asName: alias ;
-		fromName: fromName ;
+		entityName: aName;
+		asName: alias;
+		fromName: fromName;
 		yourself.
 
 	self setSourceAnchor: import from: anImport.
 
-	module := self ensureModule: anImport parent parent.
+	module := self ensureModuleNamed: fromName fromNode: anImport parent parent.
 	import manualImportingEntity: module.
 	module manualAddImport: import.
 
-	^import
+	^ import
 ]
 
 { #category : #'private-entity-creation' }
@@ -242,10 +238,8 @@ MSEPythonToFamixImporterVisitor >> ensureMethod: aMethodNode [
 ]
 
 { #category : #'private-entity-creation' }
-MSEPythonToFamixImporterVisitor >> ensureModule: aModuleNode [
+MSEPythonToFamixImporterVisitor >> ensureModuleNamed: moduleName fromNode: aModuleNode [
 
-	| moduleName |
-	moduleName := self moduleNameStringOf: aModuleNode.
 	^ (self moduleNamed: moduleName) ifNil: [ self createModule: aModuleNode named: moduleName ]
 ]
 
@@ -674,12 +668,15 @@ MSEPythonToFamixImporterVisitor >> visitDottedName: anDottedNameNode [
 ]
 
 { #category : #visiting }
-MSEPythonToFamixImporterVisitor >> visitFileInput: aFileInput [
+MSEPythonToFamixImporterVisitor >> visitFileInput: aFileInputNode [
 
 	| module |
-	module := self ensureModule: aFileInput.
-		sender push: module.
-	^ super visitFileInput: aFileInput
+	module := self ensureModuleNamed: aFileInputNode filename fromNode: aFileInputNode.
+	sender push: module.
+
+	self acceptNodes: aFileInputNode statements.
+
+	^sender pop
 ]
 
 { #category : #visiting }
