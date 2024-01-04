@@ -121,7 +121,7 @@ MSEPythonToFamixImporterVisitor >> createImport: anImport ofName: aName from: fr
 
 	self setSourceAnchor: import from: anImport.
 
-	module := self ensureModuleNamed: fromName fromNode: anImport parent parent.
+	module := sender top.
 	import manualImportingEntity: module.
 	module manualAddImport: import.
 
@@ -235,6 +235,12 @@ MSEPythonToFamixImporterVisitor >> ensureMethod: aMethodNode [
 		   methodNamed: aMethodNode fname value
 		   inClass: aMethodNode parent cname value) ifNil: [
 		  self createMethod: aMethodNode ]
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> ensureModuleFromFileInputNode: aFileInputNode [
+
+	^self ensureModuleNamed: aFileInputNode filename basename withoutExtension  fromNode: aFileInputNode 
 ]
 
 { #category : #'private-entity-creation' }
@@ -671,7 +677,9 @@ MSEPythonToFamixImporterVisitor >> visitDottedName: anDottedNameNode [
 MSEPythonToFamixImporterVisitor >> visitFileInput: aFileInputNode [
 
 	| module |
-	module := self ensureModuleNamed: aFileInputNode filename fromNode: aFileInputNode.
+	module := self
+		ensureModuleNamed: (self moduleNameStringOf: aFileInputNode)
+		fromNode: aFileInputNode.
 	sender push: module.
 
 	self acceptNodes: aFileInputNode statements.
