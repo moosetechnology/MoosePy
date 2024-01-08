@@ -237,7 +237,9 @@ MSEPythonImporterTest >> testImportFamixFunctionWithParameter [
 	| param func |
 	importer accept: pyDoc2.
 
-	param := importer parameterNamed: 'word' inFunction: 'tryToPlaceWord'.
+	param := importer
+		parameterNamed: 'word'
+		inBehavioural: (importer functionNamed: 'tryToPlaceWord').
 	func := param parentBehaviouralEntity.
 
 	self assert: func class equals: FamixPythonFunction. 
@@ -251,7 +253,7 @@ MSEPythonImporterTest >> testImportFamixMethod [
 
 	| mth |
 	importer accept: pyDoc.
-	mth := importer methodNamed: '__init__' inClass: 'Player'.
+	mth := importer methodNamed: '__init__' inClassNamed: 'Player'.
 	self assert: mth class equals: FamixPythonMethod.
 	self assert: mth name equals: '__init__'.
 	self assert: mth signature equals: 'self, x, y, joystick_no'
@@ -262,7 +264,7 @@ MSEPythonImporterTest >> testImportFamixMethodKnowsItsClass [
 
 	| mth cl |
 	importer accept: pyDoc.
-	mth := importer methodNamed: '__init__' inClass: 'Player'.
+	mth := importer methodNamed: '__init__' inClassNamed: 'Player'.
 	cl := importer classNamed: 'Player'.
 	self assert: mth parentType equals: cl.
 	self assert: mth parentType class equals: FamixPythonClass
@@ -275,9 +277,8 @@ MSEPythonImporterTest >> testImportFamixMethodWithParameter [
 	importer accept: pyDoc.
 
 	param := importer
-		         parameterNamed: 'y'
-		         inMethod: '__init__'
-		         inClass: 'Player'.
+		parameterNamed: 'y'
+		inBehavioural: (importer methodNamed: '__init__' inClassNamed: 'Player').
 
 	mth := param parentBehaviouralEntity.
 
@@ -293,12 +294,17 @@ MSEPythonImporterTest >> testImportFamixParameter [
 
 	| param |
 	importer accept: pyDoc.
-	param := importer parameterNamed: 'joystick_no' inMethod: '__init__' inClass: 'Player'.
+	param := importer
+		parameterNamed: 'joystick_no'
+		inBehavioural: (importer methodNamed: '__init__' inClassNamed: 'Player').
+
 	self assert: param class equals: FamixPythonParameter.
 	self assert: param name equals: 'joystick_no'.
 	
 	importer accept: pyDoc2.
-	param := importer parameterNamed: 'word' inFunction: 'tryToPlaceWord'.
+	param := importer
+		parameterNamed: 'word'
+		inBehavioural: (importer functionNamed: 'tryToPlaceWord').
 	self assert: param class equals: FamixPythonParameter.
 	self assert: param name equals: 'word'.
 ]
@@ -337,16 +343,37 @@ MSEPythonImporterTest >> testImportFunctions [
 ]
 
 { #category : #tests }
+MSEPythonImporterTest >> testImportLambda [
+
+	| famix |
+	importer accept: (self parseCode: '
+def identity:
+    lambda x : x
+').
+
+	self assert: (importer model allWithType: FamixPythonFunction) size equals: 2.
+	
+	famix := importer functionNamed: 'identity'.
+	self assert: famix isNotNil.
+	self assert: famix functions size equals: 1.
+
+	famix := famix functions anyOne.
+	self assert: famix name equals: ''.
+	self assert: famix functionOwner name equals: 'identity'.
+	
+]
+
+{ #category : #tests }
 MSEPythonImporterTest >> testImportMethods [
 
 	importer accept: pyDoc.
 	self assert: importer methods size equals: 5.
 	self assert:
-		(importer methodNamed: 'update' inClass: 'Ball') isNotNil.
+		(importer methodNamed: 'update' inClassNamed: 'Ball') isNotNil.
 	self assert:
-		(importer methodNamed: '__init__' inClass: 'Wall') isNotNil.
+		(importer methodNamed: '__init__' inClassNamed: 'Wall') isNotNil.
 	self assert:
-		(importer methodNamed: '__init__' inClass: 'Player') isNotNil
+		(importer methodNamed: '__init__' inClassNamed: 'Player') isNotNil
 
 ]
 
