@@ -113,8 +113,8 @@ MSEPythonToFamixImporterVisitor >> createClass: aClass [
 MSEPythonToFamixImporterVisitor >> createFunction: aFunctionNode [
 
 	| function signature |
-	signature := aFunctionNode parameters ifNotNil: [
-		             aFunctionNode parameters signatureString ].
+	signature := aFunctionNode parameters ifNotNil: [ :params |
+		params signatureString ].
 	function := self
 		basicCreateFunction: aFunctionNode fname value
 		withSignature: signature.
@@ -183,10 +183,12 @@ MSEPythonToFamixImporterVisitor >> createLambda: aLambdaNode [
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> createMethod: aMethodNode [
 
-	| method |
+	| method signature |
+	signature := aMethodNode parameters ifNotNil: [ :params |
+		params signatureString ].
 	method := self
-		          basicCreateMethod: aMethodNode fname value
-		          withSignature: aMethodNode parameters signatureString.
+		basicCreateMethod: aMethodNode fname value
+		withSignature: signature.
 
 	method parentType: context top.
 
