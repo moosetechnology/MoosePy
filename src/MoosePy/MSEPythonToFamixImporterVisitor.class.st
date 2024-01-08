@@ -423,6 +423,8 @@ MSEPythonToFamixImporterVisitor >> importFromName: anImportFromNode [
 { #category : #'private - testing' }
 MSEPythonToFamixImporterVisitor >> importNamed: aString [
 
+	self flag: 'This is wrong, should also check the importing module: several modules can have similar imports'.
+
 	^ (self model allWithType: FamixPythonImport)
 		  detect: [ :e | e entityName = aString ]
 		  ifNone: [ nil ]
