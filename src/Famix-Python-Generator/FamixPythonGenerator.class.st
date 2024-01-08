@@ -98,6 +98,7 @@ FamixPythonGenerator >> defineHierarchy [
 	function --|> #TImportable.
 	function --|> #TWithImplicitVariables.
 	function --|> #TWithInvocations.
+	function --|> #TWithFunctions.
 	function --|> #TInvocable.
 	function --|> #TWithAnnotationInstances.
 
