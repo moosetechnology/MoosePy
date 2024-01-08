@@ -723,6 +723,12 @@ MSEPythonToFamixImporterVisitor >> visitLambda: aLambdaNode [
 
 	| fmx result |
 
+	"for now only create lambda if we are inside a function/method
+	This is needed because there is a bug in SmaCC"
+
+	({FamixPythonFunction . FamixPythonMethod} includes: context top class) 
+	ifFalse: [ ^nil ].
+
 	fmx := self createLambda: aLambdaNode.
 
 	context push: fmx.
