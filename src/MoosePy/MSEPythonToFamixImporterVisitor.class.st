@@ -186,18 +186,14 @@ MSEPythonToFamixImporterVisitor >> createModule: aModuleNode named: aName [
 ]
 
 { #category : #'private-entity-creation' }
-MSEPythonToFamixImporterVisitor >> createParameter: aParameter in: aContainerNode [
+MSEPythonToFamixImporterVisitor >> createParameter: aParameter inBehavioural: aFamixContainer [
 
-	| parameterName parameter entityContainer |
+	| parameterName parameter |
 	parameterName := aParameter nameToken value.
 	parameter := model newParameter.
 	parameter name: parameterName.
 
-	entityContainer := aContainerNode isMethod
-		                   ifTrue: [ self ensureMethod: aContainerNode ]
-		                   ifFalse: [ self ensureFunction: aContainerNode ].
-
-	parameter parentBehaviouralEntity: entityContainer.
+	parameter parentBehaviouralEntity: aFamixContainer.
 	
 	^ self setSourceAnchor: parameter from: aParameter.
 
@@ -260,26 +256,14 @@ MSEPythonToFamixImporterVisitor >> ensureModuleNamed: moduleName fromNode: aModu
 ]
 
 { #category : #'private-entity-creation' }
-MSEPythonToFamixImporterVisitor >> ensureParameters: theParameters inFunctionName: aFunctionNode [
+MSEPythonToFamixImporterVisitor >> ensureParameters: theParameters inBehavioural: aFamixBehavioural [
 
 	^ theParameters ifNotNil: [
 		  theParameters args collect: [ :parameter |
 			  (self
 				   parameterNamed: parameter nameToken value
-				   inFunction: aFunctionNode fname value) ifNil: [
-				  self createParameter: parameter in: aFunctionNode ] ] ]
-]
-
-{ #category : #'private-entity-creation' }
-MSEPythonToFamixImporterVisitor >> ensureParameters: theParameters inMethodName: aMethodNode [
-
-	^ theParameters ifNotNil: [
-		  theParameters args collect: [ :parameter |
-			  (self
-				   parameterNamed: parameter nameToken value
-				   inMethod: aMethodNode fname value
-				   inClass: aMethodNode parent cname value) ifNil: [
-				  self createParameter: parameter in: aMethodNode ] ] ]
+				   inBehavioural: aFamixBehavioural ) ifNil: [
+				  self createParameter: parameter inBehavioural: aFamixBehavioural ] ] ]
 ]
 
 { #category : #'private-entity-creation' }
@@ -553,23 +537,10 @@ MSEPythonToFamixImporterVisitor >> moduleNamed: aString [
 ]
 
 { #category : #'accessing - classes' }
-MSEPythonToFamixImporterVisitor >> parameterNamed: pName inFunction: fName [
+MSEPythonToFamixImporterVisitor >> parameterNamed: pName inBehavioural: famixBehavioural [
 
-	^ (self model allWithType: FamixPythonParameter)
-		  detect: [ :e | e name = pName and: [ e parentBehaviouralEntity name = fName ] ]
-		  ifNone: [ nil ]
-]
-
-{ #category : #'accessing - classes' }
-MSEPythonToFamixImporterVisitor >> parameterNamed: pName inMethod: fName inClass: cName [
-
-	^ (self model allWithType: FamixPythonParameter)
-		  detect: [ :e |
-			  ((e name = pName) and:
-				[ (e parentBehaviouralEntity name = fName) and:
-				[ (e parentBehaviouralEntity isMethod) and:
-				[e parentBehaviouralEntity parentType name = cName] ] ] )
-			]
+	^ (famixBehavioural parameters)
+		  detect: [ :e | e name = pName ]
 		  ifNone: [ nil ]
 ]
 
@@ -771,4 +742,14 @@ MSEPythonToFamixImporterVisitor >> visitString: aStringNode [
 MSEPythonToFamixImporterVisitor >> visitStrings: aStringsNode [
 
 	^ aStringsNode strings collect: [:each| self acceptNode: each]
+]
+
+{ #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitVarArgList: aVarArgList [
+	"parameters in a function/methoid definition"
+
+	^self
+		ensureParameters: aVarArgList
+		inBehavioural: context top.
+
 ]
