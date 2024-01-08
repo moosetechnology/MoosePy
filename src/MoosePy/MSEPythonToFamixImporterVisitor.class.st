@@ -62,6 +62,25 @@ MSEPythonToFamixImporterVisitor >> classes [
 	^ self model allWithType: FamixPythonClass
 ]
 
+{ #category : #'accessing - methods' }
+MSEPythonToFamixImporterVisitor >> context [
+
+	^ context
+]
+
+{ #category : #accessing }
+MSEPythonToFamixImporterVisitor >> contextModule [
+
+	"rather ugly, but I did not want to add methods in the meta-model for this"
+
+	| top |
+	top := context firstLink.
+	[  top value class = FamixPythonModule ]
+	whileFalse: [ top := top nextLink ].
+
+	^top value
+]
+
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> createAnnotationInstance: aPyDecoratorNode named: aString [ 
 
@@ -100,11 +119,7 @@ MSEPythonToFamixImporterVisitor >> createFunction: aFunctionNode [
 		basicCreateFunction: aFunctionNode fname value
 		withSignature: signature.
 
-	function functionOwner: sender top.
-
-	self
-		ensureParameters: aFunctionNode parameters
-		inFunctionName: aFunctionNode.
+	function functionOwner: context top.
 
 	^ self setSourceAnchor: function from: aFunctionNode
 ]
@@ -121,7 +136,7 @@ MSEPythonToFamixImporterVisitor >> createImport: anImport ofName: aName from: fr
 
 	self setSourceAnchor: import from: anImport.
 
-	module := sender top.
+	module := self contextModule.
 	import manualImportingEntity: module.
 	module manualAddImport: import.
 
@@ -137,7 +152,7 @@ MSEPythonToFamixImporterVisitor >> createInvocation: anInvocationNode [
 
 	invocDict := self extractInvocationInformation: anInvocationNode.
 
-	invocation sender: sender top.
+	invocation sender: context top.
 	invocation cacheAt: 'canditate' put: (invocDict at: 'canditate').
 	invocation cacheAt: 'args' put: (invocDict at: 'args').
 	invocation cacheAt: 'receiver' put: (invocDict at: 'receiver').
@@ -150,17 +165,12 @@ MSEPythonToFamixImporterVisitor >> createInvocation: anInvocationNode [
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> createMethod: aMethodNode [
 
-	| method thisClass |
+	| method |
 	method := self
 		          basicCreateMethod: aMethodNode fname value
 		          withSignature: aMethodNode parameters signatureString.
 
-	thisClass := aMethodNode parent.
-	method parentType: (self ensureClass: thisClass).
-
-	self
-		ensureParameters: aMethodNode parameters
-		inMethodName: aMethodNode.
+	method parentType: context top.
 
 	^ self setSourceAnchor: method from: aMethodNode
 ]
@@ -233,7 +243,7 @@ MSEPythonToFamixImporterVisitor >> ensureMethod: aMethodNode [
 
 	^ (self
 		   methodNamed: aMethodNode fname value
-		   inClass: aMethodNode parent cname value) ifNil: [
+		   inClassNamed: context top name) ifNil: [
 		  self createMethod: aMethodNode ]
 ]
 
@@ -444,7 +454,7 @@ MSEPythonToFamixImporterVisitor >> imports [
 MSEPythonToFamixImporterVisitor >> initialize [
 
 	super initialize.
-	sender := Stack new.
+	context := Stack new.
 	layer := 0.
 	model := FamixPythonModel new name: 'default Python Model'
 ]
@@ -602,12 +612,6 @@ MSEPythonToFamixImporterVisitor >> rootFilePath: aString [
 	model rootFolder: aString
 ]
 
-{ #category : #'accessing - methods' }
-MSEPythonToFamixImporterVisitor >> sender [
-
-	^ sender
-]
-
 { #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> setSourceAnchor: aFamixEntity from: aSmaccNode [
 
@@ -680,11 +684,11 @@ MSEPythonToFamixImporterVisitor >> visitFileInput: aFileInputNode [
 	module := self
 		ensureModuleNamed: (self moduleNameStringOf: aFileInputNode)
 		fromNode: aFileInputNode.
-	sender push: module.
+	context push: module.
 
 	self acceptNodes: aFileInputNode statements.
 
-	^sender pop
+	^context pop
 ]
 
 { #category : #visiting }
@@ -692,12 +696,15 @@ MSEPythonToFamixImporterVisitor >> visitFuncdef: aFuncdef [
 	"the parser does not make a difference between function and method, but a method is defined in a class and its first parameter is self."
 
 	| fmx result |
-	fmx := aFuncdef isMethod
+
+	fmx := context top isClass
 		ifTrue: [  self ensureMethod: aFuncdef ]
 		ifFalse: [ self ensureFunction: aFuncdef ].
-	sender push: fmx.
+	context push: fmx.
+
 	result := super visitFuncdef: aFuncdef.
-	^sender pop
+
+	^context pop
 ]
 
 { #category : #visiting }
