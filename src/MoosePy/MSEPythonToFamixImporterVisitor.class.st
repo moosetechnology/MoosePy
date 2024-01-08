@@ -383,7 +383,7 @@ MSEPythonToFamixImporterVisitor >> extractInvocationInformation: anInvocationNod
 	^ invocationDict
 ]
 
-{ #category : #'accessing - methods' }
+{ #category : #'private - searching' }
 MSEPythonToFamixImporterVisitor >> functionNamed: aString [
 
 	^ (self model allWithType: FamixPythonFunction)
@@ -556,7 +556,7 @@ MSEPythonToFamixImporterVisitor >> moduleNamed: aString [
 		  ifNone: [ nil ]
 ]
 
-{ #category : #'accessing - classes' }
+{ #category : #'private - searching' }
 MSEPythonToFamixImporterVisitor >> parameterNamed: pName inBehavioural: famixBehavioural [
 
 	^ (famixBehavioural parameters)
