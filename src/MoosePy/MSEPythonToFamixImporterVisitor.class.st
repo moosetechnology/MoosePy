@@ -645,10 +645,11 @@ MSEPythonToFamixImporterVisitor >> visitAnnotatedSymbol: anAnnotatedSymbol [
 { #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitClassdef: aClassDef [
 
-	| famixClass |
-	famixClass := self ensureClass:  aClassDef.
+	context push: (self ensureClass:  aClassDef).
+
 	super visitClassdef: aClassDef.
-	^famixClass
+
+	^context pop
 ]
 
 { #category : #visiting }
