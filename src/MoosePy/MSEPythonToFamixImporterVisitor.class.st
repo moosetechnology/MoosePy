@@ -3,9 +3,9 @@ Class {
 	#superclass : #PyRootNodeVisitor,
 	#instVars : [
 		'model',
-		'sender',
 		'layer',
-		'rootFilePath'
+		'rootFilePath',
+		'context'
 	],
 	#category : #'MoosePy-Visitors'
 }
@@ -492,7 +492,7 @@ MSEPythonToFamixImporterVisitor >> invocations [
 ]
 
 { #category : #'private - testing' }
-MSEPythonToFamixImporterVisitor >> methodNamed: aString inClass: aClassName [
+MSEPythonToFamixImporterVisitor >> methodNamed: aString inClassNamed: aClassName [
 
 	^ (self model allWithType: FamixPythonMethod)
 		  detect: [ :e |

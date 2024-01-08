@@ -251,7 +251,7 @@ MSEPythonImporterTest >> testImportFamixMethod [
 
 	| mth |
 	importer accept: pyDoc.
-	mth := importer methodNamed: '__init__' inClass: 'Player'.
+	mth := importer methodNamed: '__init__' inClassNamed: 'Player'.
 	self assert: mth class equals: FamixPythonMethod.
 	self assert: mth name equals: '__init__'.
 	self assert: mth signature equals: 'self, x, y, joystick_no'
@@ -262,7 +262,7 @@ MSEPythonImporterTest >> testImportFamixMethodKnowsItsClass [
 
 	| mth cl |
 	importer accept: pyDoc.
-	mth := importer methodNamed: '__init__' inClass: 'Player'.
+	mth := importer methodNamed: '__init__' inClassNamed: 'Player'.
 	cl := importer classNamed: 'Player'.
 	self assert: mth parentType equals: cl.
 	self assert: mth parentType class equals: FamixPythonClass
@@ -342,11 +342,11 @@ MSEPythonImporterTest >> testImportMethods [
 	importer accept: pyDoc.
 	self assert: importer methods size equals: 5.
 	self assert:
-		(importer methodNamed: 'update' inClass: 'Ball') isNotNil.
+		(importer methodNamed: 'update' inClassNamed: 'Ball') isNotNil.
 	self assert:
-		(importer methodNamed: '__init__' inClass: 'Wall') isNotNil.
+		(importer methodNamed: '__init__' inClassNamed: 'Wall') isNotNil.
 	self assert:
-		(importer methodNamed: '__init__' inClass: 'Player') isNotNil
+		(importer methodNamed: '__init__' inClassNamed: 'Player') isNotNil
 
 ]
 
