@@ -399,7 +399,7 @@ MSEPythonToFamixImporterVisitor >> functions [
 	^ self model allWithType: FamixPythonFunction
 ]
 
-{ #category : #'private - testing' }
+{ #category : #'private - searching' }
 MSEPythonToFamixImporterVisitor >> getFileContent: aPath [
 	"Example of path : '/Users/aurelikama/Documents/Projet/These/parserPythonToJson/sample_design_smell/layers_formation/gh_non_dominating_dow_sampling.py'
 		          asFileReference contents."
@@ -429,7 +429,7 @@ MSEPythonToFamixImporterVisitor >> getReceiverFromSmaccInvocationNode: anInvocat
 	^ receiver
 ]
 
-{ #category : #'private - testing' }
+{ #category : #'private - searching' }
 MSEPythonToFamixImporterVisitor >> importFromName: anImportFromNode [
 
 	| result |
@@ -438,7 +438,7 @@ MSEPythonToFamixImporterVisitor >> importFromName: anImportFromNode [
 	^ result
 ]
 
-{ #category : #'private - testing' }
+{ #category : #'private - searching' }
 MSEPythonToFamixImporterVisitor >> importNamed: aString [
 
 	self flag: 'This is wrong, should also check the importing module: several modules can have similar imports'.
@@ -463,7 +463,7 @@ MSEPythonToFamixImporterVisitor >> initialize [
 	model := FamixPythonModel new name: 'default Python Model'
 ]
 
-{ #category : #'private - testing' }
+{ #category : #'private - searching' }
 MSEPythonToFamixImporterVisitor >> invocationArgs: aString [
 
 	^ (self model allWithType: FamixPythonInvocation)
@@ -475,7 +475,7 @@ MSEPythonToFamixImporterVisitor >> invocationArgs: aString [
 		  ifNone: [ nil ]
 ]
 
-{ #category : #'private - testing' }
+{ #category : #'private - searching' }
 MSEPythonToFamixImporterVisitor >> invocationCandidate: aString [
 
 	^ (self model allWithType: FamixPythonInvocation)
@@ -487,7 +487,7 @@ MSEPythonToFamixImporterVisitor >> invocationCandidate: aString [
 		  ifNone: [ nil ]
 ]
 
-{ #category : #'private - testing' }
+{ #category : #'private - searching' }
 MSEPythonToFamixImporterVisitor >> invocationReceiver: aString [
 
 	^ (self model allWithType: FamixPythonInvocation)
@@ -505,7 +505,7 @@ MSEPythonToFamixImporterVisitor >> invocations [
 	^ self model allWithType: FamixPythonInvocation
 ]
 
-{ #category : #'private - testing' }
+{ #category : #'private - searching' }
 MSEPythonToFamixImporterVisitor >> methodNamed: aString inClassNamed: aClassName [
 
 	^ (self model allWithType: FamixPythonMethod)
@@ -548,7 +548,7 @@ MSEPythonToFamixImporterVisitor >> moduleNameStringOf: aModuleNode [
 	^aModuleNode filename basenameWithoutExtension
 ]
 
-{ #category : #'private - testing' }
+{ #category : #'private - searching' }
 MSEPythonToFamixImporterVisitor >> moduleNamed: aString [
 
 	^ (self model allWithType: FamixPythonModule)
