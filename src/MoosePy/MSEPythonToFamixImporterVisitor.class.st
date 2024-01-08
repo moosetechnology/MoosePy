@@ -163,6 +163,24 @@ MSEPythonToFamixImporterVisitor >> createInvocation: anInvocationNode [
 ]
 
 { #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> createLambda: aLambdaNode [
+
+	| function signature |
+
+	self flag: 'for now creating a lmbda as an unnamed function, but should be a FamixPythonLambda'.
+
+	"signature := aLambdaNode parameters ifNotNil: [
+		             aLambdaNode parameters signatureString ]."
+	function := self
+		basicCreateFunction: ''
+		withSignature: ''.
+
+	function functionOwner: context top.
+
+	^ self setSourceAnchor: function from: aLambdaNode
+]
+
+{ #category : #'private-entity-creation' }
 MSEPythonToFamixImporterVisitor >> createMethod: aMethodNode [
 
 	| method |
@@ -698,6 +716,20 @@ MSEPythonToFamixImporterVisitor >> visitInterpolatedString: anInterpolatedString
 		copyFrom: anInterpolatedString startPosition
 		to: anInterpolatedString stopPosition)
 		asString
+]
+
+{ #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitLambda: aLambdaNode [
+
+	| fmx result |
+
+	fmx := self createLambda: aLambdaNode.
+
+	context push: fmx.
+
+	result := super visitLambda: aLambdaNode.
+
+	^context pop
 ]
 
 { #category : #visiting }
