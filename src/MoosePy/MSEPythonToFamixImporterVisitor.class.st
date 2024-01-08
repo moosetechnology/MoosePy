@@ -266,7 +266,7 @@ MSEPythonToFamixImporterVisitor >> ensureParameters: theParameters inBehavioural
 				  self createParameter: parameter inBehavioural: aFamixBehavioural ] ] ]
 ]
 
-{ #category : #'private-entity-creation' }
+{ #category : #accessing }
 MSEPythonToFamixImporterVisitor >> extractArgumentsInformation: aSignature [
 
 	| arguments argument buffer extractedList tmp res labelCleaned valueCleaned buffer2 mySignature y  |
@@ -337,7 +337,7 @@ MSEPythonToFamixImporterVisitor >> extractArgumentsInformation: aSignature [
 	^ arguments
 ]
 
-{ #category : #'private-entity-creation' }
+{ #category : #accessing }
 MSEPythonToFamixImporterVisitor >> extractInvocationInformation: anInvocationNode [
 
 	| tSize invocationDict |
@@ -389,7 +389,7 @@ MSEPythonToFamixImporterVisitor >> getFileContent: aPath [
 	^ aPath asFileReference contents
 ]
 
-{ #category : #'private-entity-creation' }
+{ #category : #accessing }
 MSEPythonToFamixImporterVisitor >> getReceiverFromSmaccInvocationNode: anInvocationNode [
 
 	| receiver signature startPos endPos array |
@@ -505,7 +505,7 @@ MSEPythonToFamixImporterVisitor >> model [
 	^ model
 ]
 
-{ #category : #'private-entity-creation' }
+{ #category : #accessing }
 MSEPythonToFamixImporterVisitor >> moduleFromFonction: aFunctionNode [
 
 	^(self parentFileForNode: aFunctionNode)
@@ -517,7 +517,7 @@ MSEPythonToFamixImporterVisitor >> moduleNameFromFonction: aNode [
 	^(self relativeFilePath: aNode) removeSuffix: '.py'
 ]
 
-{ #category : #'private-entity-creation' }
+{ #category : #accessing }
 MSEPythonToFamixImporterVisitor >> moduleNameStringOf: aModuleNode [
 	"should push that to the PyInputFileNode"
 
@@ -550,7 +550,7 @@ MSEPythonToFamixImporterVisitor >> parameters [
 	^ self model allWithType: FamixPythonParameter 
 ]
 
-{ #category : #'private-entity-creation' }
+{ #category : #accessing }
 MSEPythonToFamixImporterVisitor >> parentFileForNode: aPyNode [ 
 
 	aPyNode ifNil: [ ^nil ].
@@ -558,7 +558,7 @@ MSEPythonToFamixImporterVisitor >> parentFileForNode: aPyNode [
 	^self parentFileForNode: aPyNode parent
 ]
 
-{ #category : #'private-entity-creation' }
+{ #category : #accessing }
 MSEPythonToFamixImporterVisitor >> relativeFilePath: aNode [
 
 	| parentFileName |
@@ -597,7 +597,7 @@ MSEPythonToFamixImporterVisitor >> setSourceAnchor: aFamixEntity from: aSmaccNod
 	^ aFamixEntity
 ]
 
-{ #category : #'private-entity-creation' }
+{ #category : #'accessing - methods' }
 MSEPythonToFamixImporterVisitor >> signatureFromInvocation: anInvocationNode [
 
 	| signature startPos |
