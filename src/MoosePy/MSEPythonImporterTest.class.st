@@ -82,6 +82,17 @@ MSEPythonImporterTest >> sourceBig2 [
 	^ PythonParser parseFileWithErrors: (fileSystem / (self moduleName, '.py')) 
 ]
 
+{ #category : #'tests - extensions' }
+MSEPythonImporterTest >> testAddEqualIsAssignment [
+
+	| smaccAST |
+	smaccAST := self parseCode: '
+x += 12
+'.
+
+	self assert: smaccAST statements anyOne stmts anyOne isAssignment
+]
+
 { #category : #tests }
 MSEPythonImporterTest >> testAnnotatedClass [
 
@@ -149,6 +160,39 @@ MSEPythonImporterTest >> testClassesImportedTwiceAreOnlyImportedOnce [
 	importer accept: pyDoc.
 
 	self assert: importer classes size equals: 3
+]
+
+{ #category : #'tests - extensions' }
+MSEPythonImporterTest >> testComentIsNotAssignment [
+
+	| smaccAST |
+	smaccAST := self parseCode: '
+"""This is a comment"""
+'.
+
+	self deny: smaccAST statements anyOne stmts anyOne isAssignment
+]
+
+{ #category : #'tests - extensions' }
+MSEPythonImporterTest >> testDottedNamedAssignmentIsAssignment [
+
+	| smaccAST |
+	smaccAST := self parseCode: '
+x.a = 12
+'.
+
+	self assert: smaccAST statements anyOne stmts anyOne isAssignment
+]
+
+{ #category : #'tests - extensions' }
+MSEPythonImporterTest >> testEqualEqualIsAssignment [
+
+	| smaccAST |
+	smaccAST := self parseCode: '
+a = b =3
+'.
+
+	self assert: smaccAST statements anyOne stmts anyOne isAssignment
 ]
 
 { #category : #'tests - files' }
@@ -574,6 +618,17 @@ test(x, 25)
 		equals: '25'
 ]
 
+{ #category : #'tests - extensions' }
+MSEPythonImporterTest >> testIsAssignment [
+
+	| smaccAST |
+	smaccAST := self parseCode: '
+x = 12
+'.
+
+	self assert: smaccAST statements anyOne stmts anyOne isAssignment
+]
+
 { #category : #'tests - module' }
 MSEPythonImporterTest >> testIsModel [
 	
@@ -592,6 +647,17 @@ MSEPythonImporterTest >> testKnowsItsModule [
 	module := importer moduleNamed: self moduleName.
 	self assert: import manualImportingEntity equals: module.
 
+]
+
+{ #category : #'tests - extensions' }
+MSEPythonImporterTest >> testListEqualIsAssignment [
+
+	| smaccAST |
+	smaccAST := self parseCode: '
+a,b = 1,3
+'.
+
+	self assert: smaccAST statements anyOne stmts anyOne isAssignment
 ]
 
 { #category : #'tests - classes' }
@@ -625,6 +691,17 @@ MSEPythonImporterTest >> testModuleKnowsItsImport [
 
 ]
 
+{ #category : #'tests - extensions' }
+MSEPythonImporterTest >> testModuloEqualIsAssignment [
+
+	| smaccAST |
+	smaccAST := self parseCode: '
+x //= 12
+'.
+
+	self assert: smaccAST statements anyOne stmts anyOne isAssignment
+]
+
 { #category : #'tests - files' }
 MSEPythonImporterTest >> testParseWithFile [
 
@@ -650,6 +727,17 @@ def goodbye(name):
 	self
 		assert: (importer functionNamed: 'greet')   annotationInstances anyOne annotationType
 		equals: (importer functionNamed: 'goodbye') annotationInstances anyOne annotationType
+]
+
+{ #category : #'tests - extensions' }
+MSEPythonImporterTest >> testShiftEqualIsAssignment [
+
+	| smaccAST |
+	smaccAST := self parseCode: '
+x >>= 12
+'.
+
+	self assert: smaccAST statements anyOne stmts anyOne isAssignment
 ]
 
 { #category : #'tests - module' }
