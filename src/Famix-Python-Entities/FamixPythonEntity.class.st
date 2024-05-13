@@ -120,6 +120,13 @@ FamixPythonEntity >> isPrimitiveType [
 ]
 
 { #category : #testing }
+FamixPythonEntity >> isQueryable [
+
+	<generated>
+	^ false
+]
+
+{ #category : #testing }
 FamixPythonEntity >> isReference [
 
 	<generated>
