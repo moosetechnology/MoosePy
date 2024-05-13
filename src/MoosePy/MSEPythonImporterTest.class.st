@@ -239,6 +239,20 @@ MSEPythonImporterTest >> testImportClassKnowsItsMethods [
 ]
 
 { #category : #'tests - classes' }
+MSEPythonImporterTest >> testImportFamixAttribute [
+
+	| clazz |
+	importer accept: pyDoc.
+	clazz := importer classNamed: 'Player'.
+	self assert: clazz attributes size equals: 3.
+	clazz attributes do: [ :att |
+		self assert: (#(width height my_joystick) anySatisfy: [:name | name = att name]).
+	].
+
+
+]
+
+{ #category : #'tests - classes' }
 MSEPythonImporterTest >> testImportFamixClass [
 	
 	| ballClass wallClass | 

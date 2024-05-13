@@ -286,6 +286,14 @@ MSEPythonToFamixImporterVisitor >> ensureParameters: theParameters inBehavioural
 				  self createParameter: parameter inBehavioural: aFamixBehavioural ] ] ]
 ]
 
+{ #category : #visiting }
+MSEPythonToFamixImporterVisitor >> ensureVariable: aName localTo: aFamixEntity [
+
+	aFamixEntity dictLocalVariables
+		at: aName
+		ifAbsent: [ aFamixEntity createLocalVariable: aName ]
+]
+
 { #category : #accessing }
 MSEPythonToFamixImporterVisitor >> extractArgumentsInformation: aSignature [
 
@@ -636,6 +644,13 @@ MSEPythonToFamixImporterVisitor >> visitAnnotatedSymbol: anAnnotatedSymbol [
 ]
 
 { #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitAssignmentStmt: anExprStmt [
+
+	(anExprStmt testlist class = PySymbolNode)
+		ifTrue: [ ^self ensureVariable: anExprStmt testlist nameToken value localTo: context top]
+]
+
+{ #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitClassdef: aClassDef [
 
 	context push: (self ensureClass:  aClassDef).
@@ -669,6 +684,11 @@ MSEPythonToFamixImporterVisitor >> visitDecorator: aDecoratorNode [
 MSEPythonToFamixImporterVisitor >> visitDottedName: anDottedNameNode [
 
 	^$. join: (anDottedNameNode names collect: [:name | self acceptNode: name])
+]
+
+{ #category : #visiting }
+MSEPythonToFamixImporterVisitor >> visitExprStmt: anExprStmt [
+	anExprStmt isAssignment ifTrue: [ self visitAssignmentStmt: anExprStmt ]
 ]
 
 { #category : #visiting }
