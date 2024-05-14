@@ -688,7 +688,7 @@ MSEPythonToFamixImporterVisitor >> visitDottedName: anDottedNameNode [
 
 { #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitExprStmt: anExprStmt [
-	anExprStmt isAssignment ifTrue: [ self visitAssignmentStmt: anExprStmt ]
+	anExprStmt isAssignment ifTrue: [ self visitAssignmentStmt: anExprStmt ] ifFalse: [ super visitExprStmt: anExprStmt ]
 ]
 
 { #category : #visiting }
