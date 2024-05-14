@@ -1,7 +1,7 @@
-Extension { #name : #FamixPythonMethod }
+Extension { #name : #FamixPythonFunction }
 
 { #category : #'*MoosePy' }
-FamixPythonMethod >> createLocalVariable: aString [ 
+FamixPythonFunction >> createLocalVariable: aString [ 
 	^mooseModel newLocalVariable
 		name: aString ;
 		parentBehaviouralEntity: self ;

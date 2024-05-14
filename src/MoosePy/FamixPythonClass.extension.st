@@ -7,8 +7,3 @@ FamixPythonClass >> createLocalVariable: aString [
 		parentType: self ;
 		yourself
 ]
-
-{ #category : #'*MoosePy' }
-FamixPythonClass >> dictLocalVariables [
-	^self attributeAt: #dictLocalVariables ifAbsentPut: [ Dictionary new ] 
-]
