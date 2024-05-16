@@ -10,5 +10,7 @@ PyExprStmtNode >> isAssignment [
 PyExprStmtNode >> isLambda [
 	"Checks if this statement node is a lambda."
 
-	^self testlist lambdaToken isNotNil
+	^ (self testlist respondsTo: #lambdaToken)
+		  ifTrue: [ self testlist lambdaToken isNotNil ]
+		  ifFalse: [ false ]
 ]
