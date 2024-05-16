@@ -64,6 +64,13 @@ FamixPythonEntity >> isClass [
 ]
 
 { #category : #testing }
+FamixPythonEntity >> isFileAnchor [
+
+	<generated>
+	^ false
+]
+
+{ #category : #testing }
 FamixPythonEntity >> isFunction [
 
 	<generated>

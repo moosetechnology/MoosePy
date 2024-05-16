@@ -173,6 +173,61 @@ MSEPythonImporterTest >> testComentIsNotAssignment [
 	self deny: smaccAST statements anyOne stmts anyOne isAssignment
 ]
 
+{ #category : #'tests - decorators' }
+MSEPythonImporterTest >> testDecoratorsFunctionSingleDecorator [
+	"https://realpython.com/primer-on-python-decorators/"
+
+	| famix |
+	importer accept: (self parseCode: '
+@decorator
+def say_whee():
+    print("Whee!")
+').
+
+	famix := (importer model allWithType: FamixPythonFunction) first.
+	self assert: famix isNotNil.
+	famix := famix annotationInstances.
+	self assert: famix size equals: 1.
+	famix := famix first.
+	self assert: famix annotatedEntity name equals: 'say_whee'.
+]
+
+{ #category : #'tests - decorators' }
+MSEPythonImporterTest >> testDecoratorsMethodSingleDecorator [
+
+	| famix |
+	importer accept: (self parseCode: '
+class A:
+	@classmethod
+	def foo:
+		pass
+').
+
+	famix := importer classNamed: 'A'.
+	self assert: famix isNotNil.
+	famix := (famix methods first).
+	self assert: famix name equals: 'foo'.
+	famix := famix annotationInstances.
+	self assert: famix size equals: 1.
+	famix := famix first.
+	self assert: famix annotatedEntity name equals: 'foo'.
+]
+
+{ #category : #'tests - decorators' }
+MSEPythonImporterTest >> testDecoratorsSanityCheck [
+
+	importer accept: (self parseCode: '
+class A:
+	@classmethod
+	def foo:
+		pass
+').
+
+	self
+		assert: (importer model allWithType: FamixPythonMethod) size
+		equals: 1
+]
+
 { #category : #'tests - extensions' }
 MSEPythonImporterTest >> testDottedNamedAssignmentIsAssignment [
 
@@ -199,6 +254,44 @@ a = b =3
 MSEPythonImporterTest >> testFileIsOk [
 	self assert: (fileSystem / (self moduleName, '.py')) contents size equals: 7586.
 	self assert: (fileSystem / (self moduleName2, '.py')) contents size equals: 3259
+	
+]
+
+{ #category : #'tests - lambdas' }
+MSEPythonImporterTest >> testFunctionNoLambda [
+
+	| famix |
+	importer accept: (self parseCode: '
+def identity:
+    print("identify")
+').
+
+	self assert: (importer model allWithType: FamixPythonFunction) size equals: 1.
+	
+	famix := importer functionNamed: 'identity'.
+	self assert: famix isNotNil.
+	self assert: famix functions size equals: 0.
+	
+]
+
+{ #category : #'tests - lambdas' }
+MSEPythonImporterTest >> testFunctionSingleLambda [
+
+	| famix |
+	importer accept: (self parseCode: '
+def identity:
+    lambda x : x
+').
+
+	self assert: (importer model allWithType: FamixPythonFunction) size equals: 2.
+	
+	famix := importer functionNamed: 'identity'.
+	self assert: famix isNotNil.
+	self assert: famix functions size equals: 1.
+
+	famix := famix functions anyOne.
+	self assert: famix name equals: ''.
+	self assert: famix functionOwner name equals: 'identity'.
 	
 ]
 
@@ -398,27 +491,6 @@ MSEPythonImporterTest >> testImportFunctions [
 
 	self assert: (importer functionNamed: 'tryToPlaceWord') isNotNil.
 	self assert: (importer functionNamed: 'printGrid') isNotNil
-]
-
-{ #category : #tests }
-MSEPythonImporterTest >> testImportLambda [
-
-	| famix |
-	importer accept: (self parseCode: '
-def identity:
-    lambda x : x
-').
-
-	self assert: (importer model allWithType: FamixPythonFunction) size equals: 2.
-	
-	famix := importer functionNamed: 'identity'.
-	self assert: famix isNotNil.
-	self assert: famix functions size equals: 1.
-
-	famix := famix functions anyOne.
-	self assert: famix name equals: ''.
-	self assert: famix functionOwner name equals: 'identity'.
-	
 ]
 
 { #category : #tests }
@@ -716,6 +788,30 @@ x //= 12
 	self assert: smaccAST statements anyOne stmts anyOne isAssignment
 ]
 
+{ #category : #'tests - lambdas' }
+MSEPythonImporterTest >> testMultiFunctionsMultiLambdas [
+
+	| famix |
+	importer accept: (self parseCode: '
+def identity:
+    lambda x : x
+def identity2:
+    lambda x : x
+    lambda x : x
+').
+
+	self assert: (importer model allWithType: FamixPythonFunction) size equals: 5.
+	
+	famix := importer functionNamed: 'identity'.
+	self assert: famix isNotNil.
+	self assert: famix functions size equals: 1.
+
+	famix := famix functions anyOne.
+	self assert: famix name equals: ''.
+	self assert: famix functionOwner name equals: 'identity'.
+	
+]
+
 { #category : #'tests - files' }
 MSEPythonImporterTest >> testParseWithFile [
 
@@ -723,6 +819,54 @@ MSEPythonImporterTest >> testParseWithFile [
 	| doc |
 	doc := PythonParser parseFileWithErrors: (fileSystem / 'sprite_collect_blocks.py').
 	self assert: doc filename basename equals: 'sprite_collect_blocks.py'
+]
+
+{ #category : #'tests - metaclasses' }
+MSEPythonImporterTest >> testSSingleClassExplicitSuperclass [
+
+	| classS classA |
+	importer accept: (self parseCode: '
+class S:
+	pass
+class A(S):
+	def foo:
+		pass
+').
+
+	self
+		assert: (importer model allWithType: FamixPythonClass) size
+		equals: 3.
+
+	classS := importer classNamed: 'S'.
+	self assert: classS isNotNil.
+	self assert: classS superInheritances size equals: 1.
+
+	classA := importer classNamed: 'A'.
+	self assert: classA isNotNil.
+	self assert: classA superInheritances size equals: 1
+]
+
+{ #category : #'tests - metaclasses' }
+MSEPythonImporterTest >> testSSingleClassingleMetaclass [
+
+	| classA classMeta |
+	importer accept: (self parseCode: '
+class Meta(type):
+	pass
+class A(metaclass=Meta):
+	def foo:
+		pass
+').
+
+	self
+		assert: (importer model allWithType: FamixPythonClass) size
+		equals: 3.
+
+	classA := importer classNamed: 'A'.
+	self assert: classA isNotNil.
+	classMeta := importer classNamed: 'Meta'.
+	self assert: classMeta isNotNil.
+
 ]
 
 { #category : #tests }

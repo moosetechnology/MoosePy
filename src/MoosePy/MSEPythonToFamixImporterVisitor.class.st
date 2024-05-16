@@ -98,15 +98,31 @@ MSEPythonToFamixImporterVisitor >> createAnnotationTypeNamed: aString [
 ]
 
 { #category : #'private-entity-creation' }
-MSEPythonToFamixImporterVisitor >> createClass: aClass [
+MSEPythonToFamixImporterVisitor >> createClass: arg1 [
 
-	| class name |
-	name := aClass cname value.
-	class := model newClass.
-	class name: aClass cname value.
-	
-	^ self setSourceAnchor: class from: aClass
-	
+	| tmp1 tmp2 tmp3 tmp5 |
+	tmp2 := arg1 cname value.
+	tmp1 := model newClass.
+	tmp1 name: arg1 cname value.
+	arg1 superClasses do: [ :arg2 |
+		| tmp6 |
+		tmp6 := model newInheritance.
+		tmp6
+			superclass: (self classNamed: arg2 name);
+			subclass: tmp1 ].
+	tmp3 := arg1 superClasses reject: [ :arg3 |
+		        arg3 class = PyMetaclassNode ].
+	tmp3 ifEmpty: [
+		| tmp7 |
+		tmp5 := model newInheritance.
+		tmp7 := model newClass.
+		tmp7
+			name: 'object';
+			isStub: true.
+		tmp5
+			superclass: tmp7 yourself;
+			subclass: tmp1 ].
+	^ self setSourceAnchor: tmp1 from: arg1
 ]
 
 { #category : #'private-entity-creation' }
@@ -173,7 +189,7 @@ MSEPythonToFamixImporterVisitor >> createLambda: aLambdaNode [
 		             aLambdaNode parameters signatureString ]."
 	function := self
 		basicCreateFunction: ''
-		withSignature: ''.
+		withSignature: '(' , aLambdaNode testlist arguments asString , ') -> ' , aLambdaNode testlist body asString.
 
 	function functionOwner: context top.
 
@@ -688,7 +704,9 @@ MSEPythonToFamixImporterVisitor >> visitDottedName: anDottedNameNode [
 
 { #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitExprStmt: anExprStmt [
-	anExprStmt isAssignment ifTrue: [ self visitAssignmentStmt: anExprStmt ]
+	anExprStmt isAssignment ifTrue: [ ^self visitAssignmentStmt: anExprStmt ].
+	anExprStmt isLambda ifTrue: [ ^self visitLambda: anExprStmt ].
+	super visitExprStmt: anExprStmt.
 ]
 
 { #category : #visiting }
@@ -752,10 +770,7 @@ MSEPythonToFamixImporterVisitor >> visitLambda: aLambdaNode [
 	ifFalse: [ ^nil ].
 
 	fmx := self createLambda: aLambdaNode.
-
 	context push: fmx.
-
-	result := super visitLambda: aLambdaNode.
 
 	^context pop
 ]
