@@ -422,6 +422,30 @@ def identity:
 ]
 
 { #category : #tests }
+MSEPythonImporterTest >> testImportLambda2 [
+
+	| famix |
+	importer accept: (self parseCode: '
+def identity:
+    lambda x : x
+def identity2:
+    lambda x : x
+    lambda x : x
+').
+
+	self assert: (importer model allWithType: FamixPythonFunction) size equals: 5.
+	
+	famix := importer functionNamed: 'identity'.
+	self assert: famix isNotNil.
+	self assert: famix functions size equals: 1.
+
+	famix := famix functions anyOne.
+	self assert: famix name equals: ''.
+	self assert: famix functionOwner name equals: 'identity'.
+	
+]
+
+{ #category : #tests }
 MSEPythonImporterTest >> testImportMethods [
 
 	importer accept: pyDoc.

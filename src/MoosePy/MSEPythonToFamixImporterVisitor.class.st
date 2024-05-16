@@ -173,7 +173,7 @@ MSEPythonToFamixImporterVisitor >> createLambda: aLambdaNode [
 		             aLambdaNode parameters signatureString ]."
 	function := self
 		basicCreateFunction: ''
-		withSignature: ''.
+		withSignature: '(' , aLambdaNode testlist arguments asString , ') -> ' , aLambdaNode testlist body asString.
 
 	function functionOwner: context top.
 
@@ -688,7 +688,9 @@ MSEPythonToFamixImporterVisitor >> visitDottedName: anDottedNameNode [
 
 { #category : #visiting }
 MSEPythonToFamixImporterVisitor >> visitExprStmt: anExprStmt [
-	anExprStmt isAssignment ifTrue: [ self visitAssignmentStmt: anExprStmt ] ifFalse: [ super visitExprStmt: anExprStmt ]
+	anExprStmt isAssignment ifTrue: [ ^self visitAssignmentStmt: anExprStmt ].
+	anExprStmt isLambda ifTrue: [ ^self visitLambda: anExprStmt ].
+	super visitExprStmt: anExprStmt.
 ]
 
 { #category : #visiting }
@@ -752,10 +754,7 @@ MSEPythonToFamixImporterVisitor >> visitLambda: aLambdaNode [
 	ifFalse: [ ^nil ].
 
 	fmx := self createLambda: aLambdaNode.
-
 	context push: fmx.
-
-	result := super visitLambda: aLambdaNode.
 
 	^context pop
 ]
