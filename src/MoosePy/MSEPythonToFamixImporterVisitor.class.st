@@ -98,15 +98,31 @@ MSEPythonToFamixImporterVisitor >> createAnnotationTypeNamed: aString [
 ]
 
 { #category : #'private-entity-creation' }
-MSEPythonToFamixImporterVisitor >> createClass: aClass [
+MSEPythonToFamixImporterVisitor >> createClass: arg1 [
 
-	| class name |
-	name := aClass cname value.
-	class := model newClass.
-	class name: aClass cname value.
-	
-	^ self setSourceAnchor: class from: aClass
-	
+	| tmp1 tmp2 tmp3 tmp5 |
+	tmp2 := arg1 cname value.
+	tmp1 := model newClass.
+	tmp1 name: arg1 cname value.
+	arg1 superClasses do: [ :arg2 |
+		| tmp6 |
+		tmp6 := model newInheritance.
+		tmp6
+			superclass: (self classNamed: arg2 name);
+			subclass: tmp1 ].
+	tmp3 := arg1 superClasses reject: [ :arg3 |
+		        arg3 class = PyMetaclassNode ].
+	tmp3 ifEmpty: [
+		| tmp7 |
+		tmp5 := model newInheritance.
+		tmp7 := model newClass.
+		tmp7
+			name: 'object';
+			isStub: true.
+		tmp5
+			superclass: tmp7 yourself;
+			subclass: tmp1 ].
+	^ self setSourceAnchor: tmp1 from: arg1
 ]
 
 { #category : #'private-entity-creation' }

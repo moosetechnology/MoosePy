@@ -169,4 +169,15 @@ FamixPythonGenerator >> defineProperties [
 	(import property: #fromName type: #String) comment: '"from a import b", fromName is a'.
 	(import property: #entityName type: #String) comment: '"from a import b", entityName is b'.
 	(import property: #asName type: #String) comment: '"import b as c", asName is c'.
+	
+	(class property: #isMetaclass type: #Boolean) comment: 'Whether this class is a metaclass'
+]
+
+{ #category : #definition }
+FamixPythonGenerator >> defineRelations [
+
+	super defineRelations.
+
+	((class property: #metaclass) comment: '')
+	*- ((class property: #instancedClasses) comment: '')
 ]

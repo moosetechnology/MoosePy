@@ -31,6 +31,8 @@
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `annotationInstances` | `FamixTWithAnnotationInstances` | `annotatedEntity` | `FamixTAnnotationInstance` | This property corresponds to the set of annotations associated to the entity|
+| `instancedClasses` | `FamixPythonClass` | `metaclass` | `FamixPythonClass` | |
+| `metaclass` | `FamixPythonClass` | `instancedClasses` | `FamixPythonClass` | |
 | `receivingInvocations` | `FamixTInvocationsReceiver` | `receiver` | `FamixTInvocation` | List of invocations performed on this entity (considered as the receiver)|
 | `sourceAnchor` | `FamixTSourceEntity` | `element` | `FamixTSourceAnchor` | SourceAnchor entity linking to the original source code for this entity|
 | `typedEntities` | `FamixTType` | `declaredType` | `FamixTTypedEntity` | Entities that have this type as declaredType|
@@ -41,6 +43,7 @@
 
 | Name | Type | Default value | Comment |
 |---|
+| `isMetaclass` | `Boolean` | nil | Whether this class is a metaclass|
 | `isStub` | `Boolean` | false | Flag true if the entity attributes are incomplete, either because the entity is missing or not imported.|
 | `name` | `String` | nil | Basic name of the entity, not full reference.|
 
@@ -50,6 +53,11 @@ Class {
 	#superclass : #FamixPythonType,
 	#traits : 'FamixTClass + FamixTImportable + FamixTWithAnnotationInstances + FamixTWithImports',
 	#classTraits : 'FamixTClass classTrait + FamixTImportable classTrait + FamixTWithAnnotationInstances classTrait + FamixTWithImports classTrait',
+	#instVars : [
+		'#isMetaclass => FMProperty',
+		'#metaclass => FMOne type: #FamixPythonClass opposite: #instancedClasses',
+		'#instancedClasses => FMMany type: #FamixPythonClass opposite: #metaclass'
+	],
 	#category : #'Famix-Python-Entities-Entities'
 }
 
@@ -60,4 +68,56 @@ FamixPythonClass class >> annotation [
 	<package: #'Famix-Python-Entities'>
 	<generated>
 	^ self
+]
+
+{ #category : #adding }
+FamixPythonClass >> addInstancedClass: anObject [
+	<generated>
+	^ self instancedClasses add: anObject
+]
+
+{ #category : #accessing }
+FamixPythonClass >> instancedClasses [
+	"Relation named: #instancedClasses type: #FamixPythonClass opposite: #metaclass"
+
+	<generated>
+	<derived>
+	^ instancedClasses
+]
+
+{ #category : #accessing }
+FamixPythonClass >> instancedClasses: anObject [
+
+	<generated>
+	instancedClasses value: anObject
+]
+
+{ #category : #accessing }
+FamixPythonClass >> isMetaclass [
+
+	<FMProperty: #isMetaclass type: #Boolean>
+	<generated>
+	<FMComment: 'Whether this class is a metaclass'>
+	^ isMetaclass
+]
+
+{ #category : #accessing }
+FamixPythonClass >> isMetaclass: anObject [
+	<generated>
+	isMetaclass := anObject
+]
+
+{ #category : #accessing }
+FamixPythonClass >> metaclass [
+	"Relation named: #metaclass type: #FamixPythonClass opposite: #instancedClasses"
+
+	<generated>
+	^ metaclass
+]
+
+{ #category : #accessing }
+FamixPythonClass >> metaclass: anObject [
+
+	<generated>
+	metaclass := anObject
 ]

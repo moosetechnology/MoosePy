@@ -821,6 +821,54 @@ MSEPythonImporterTest >> testParseWithFile [
 	self assert: doc filename basename equals: 'sprite_collect_blocks.py'
 ]
 
+{ #category : #'tests - metaclasses' }
+MSEPythonImporterTest >> testSSingleClassExplicitSuperclass [
+
+	| classS classA |
+	importer accept: (self parseCode: '
+class S:
+	pass
+class A(S):
+	def foo:
+		pass
+').
+
+	self
+		assert: (importer model allWithType: FamixPythonClass) size
+		equals: 3.
+
+	classS := importer classNamed: 'S'.
+	self assert: classS isNotNil.
+	self assert: classS superInheritances size equals: 1.
+
+	classA := importer classNamed: 'A'.
+	self assert: classA isNotNil.
+	self assert: classA superInheritances size equals: 1
+]
+
+{ #category : #'tests - metaclasses' }
+MSEPythonImporterTest >> testSSingleClassingleMetaclass [
+
+	| classA classMeta |
+	importer accept: (self parseCode: '
+class Meta(type):
+	pass
+class A(metaclass=Meta):
+	def foo:
+		pass
+').
+
+	self
+		assert: (importer model allWithType: FamixPythonClass) size
+		equals: 3.
+
+	classA := importer classNamed: 'A'.
+	self assert: classA isNotNil.
+	classMeta := importer classNamed: 'Meta'.
+	self assert: classMeta isNotNil.
+
+]
+
 { #category : #tests }
 MSEPythonImporterTest >> testSameAnnotationType [
 
