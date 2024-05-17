@@ -138,7 +138,7 @@ def greet(name):
 MSEPythonImporterTest >> testClassIsInModel [
 
 	importer accept: pyDoc.
-	self assert: importer model numberOfClasses equals: 3.
+	self assert: importer model numberOfClasses equals: 4.
 	self assert: importer model name equals: 'testPythonModelName'
 ]
 
@@ -146,7 +146,7 @@ MSEPythonImporterTest >> testClassIsInModel [
 MSEPythonImporterTest >> testClasses [
 
 	importer accept: pyDoc.
-	self assert: importer classes size equals: 3.
+	self assert: importer classes size equals: 4.
 	self assert: (importer classNamed: 'Ball') isNotNil.
 	self assert: (importer classNamed: 'Player') isNotNil
 ]
@@ -155,11 +155,11 @@ MSEPythonImporterTest >> testClasses [
 MSEPythonImporterTest >> testClassesImportedTwiceAreOnlyImportedOnce [
 
 	importer accept: pyDoc.
-	self assert: importer classes size equals: 3.
+	self assert: importer classes size equals: 4.
 
 	importer accept: pyDoc.
 
-	self assert: importer classes size equals: 3
+	self assert: importer classes size equals: 4
 ]
 
 { #category : #'tests - extensions' }
@@ -849,7 +849,7 @@ class A(S):
 { #category : #'tests - metaclasses' }
 MSEPythonImporterTest >> testSSingleClassingleMetaclass [
 
-	| classA classMeta |
+	| classA classMeta classAMeta |
 	importer accept: (self parseCode: '
 class Meta(type):
 	pass
@@ -860,13 +860,19 @@ class A(metaclass=Meta):
 
 	self
 		assert: (importer model allWithType: FamixPythonClass) size
-		equals: 3.
+		equals: 4.
 
 	classA := importer classNamed: 'A'.
 	self assert: classA isNotNil.
+	self assert: (classA superInheritances first target name) equals: 'object'.
+
 	classMeta := importer classNamed: 'Meta'.
 	self assert: classMeta isNotNil.
+	self assert: (classMeta superInheritances first target name) equals: 'type'.
 
+	classAMeta := classA metaclass.
+	self assert: classAMeta isNotNil.
+	self assert: classAMeta name equals: 'Meta'
 ]
 
 { #category : #tests }
