@@ -98,31 +98,56 @@ MSEPythonToFamixImporterVisitor >> createAnnotationTypeNamed: aString [
 ]
 
 { #category : #'private-entity-creation' }
-MSEPythonToFamixImporterVisitor >> createClass: arg1 [
+MSEPythonToFamixImporterVisitor >> createClass: smaCCClass [
 
-	| tmp1 tmp2 tmp3 tmp5 |
-	tmp2 := arg1 cname value.
-	tmp1 := model newClass.
-	tmp1 name: arg1 cname value.
-	arg1 superClasses do: [ :arg2 |
-		| tmp6 |
-		tmp6 := model newInheritance.
-		tmp6
-			superclass: (self classNamed: arg2 name);
-			subclass: tmp1 ].
-	tmp3 := arg1 superClasses reject: [ :arg3 |
-		        arg3 class = PyMetaclassNode ].
-	tmp3 ifEmpty: [
-		| tmp7 |
-		tmp5 := model newInheritance.
-		tmp7 := model newClass.
-		tmp7
+	| famixClass superClasses metaClasses |
+	famixClass := model newClass.
+	famixClass name: smaCCClass cname value.
+
+	"Reject all metaclass declarations, keep only superclasses (if any)"
+	"TODO Handle PyTrailersNode"
+	superClasses := smaCCClass superClasses reject: [ :s |
+		                s class = PyMetaclassNode ].
+	superClasses do: [ :s |
+		| superName superObject inheritance |
+		superName := s name.
+		superObject := self classNamed: superName.
+		superObject ifNil: [
+			superObject := model newClass
+				               name: superName;
+				               stub: true ].
+		inheritance := model newInheritance.
+		inheritance
+			superclass: superObject;
+			subclass: famixClass ].
+
+	"Case for object, only if needed!"
+	superClasses ifEmpty: [
+		| inheritance object |
+		inheritance := model newInheritance.
+		object := model newClass.
+		object
 			name: 'object';
 			isStub: true.
-		tmp5
-			superclass: tmp7 yourself;
-			subclass: tmp1 ].
-	^ self setSourceAnchor: tmp1 from: arg1
+		inheritance
+			superclass: object yourself;
+			subclass: famixClass ].
+
+	"Reject all superclass declarations, keep only metaclasses (if any, there should be at most one)."
+	metaClasses := smaCCClass superClasses reject: [ :s |
+		               s class = PySymbolNode or: [
+			               s class = PyTrailersNode ] ].
+	metaClasses do: [ :m |
+		| metaClassName metaClassObject |
+		metaClassName := m superclass name.
+		metaClassObject := self classNamed: metaClassName.
+		metaClassObject ifNil: [
+			metaClassObject := model newClass
+				                   name: metaClassName;
+				                   stub: true ].
+		famixClass metaclass: metaClassObject ].
+
+	^ self setSourceAnchor: famixClass from: smaCCClass
 ]
 
 { #category : #'private-entity-creation' }
