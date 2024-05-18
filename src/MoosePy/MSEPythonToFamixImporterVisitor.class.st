@@ -111,11 +111,7 @@ MSEPythonToFamixImporterVisitor >> createClass: smaCCClass [
 	superClasses do: [ :s |
 		| superName superObject inheritance |
 		superName := s name.
-		superObject := self classNamed: superName.
-		superObject ifNil: [
-			superObject := model newClass
-				               name: superName;
-				               stub: true ].
+		superObject := self ensureClassNamed: superName.
 		inheritance := model newInheritance.
 		inheritance
 			superclass: superObject;
@@ -124,11 +120,9 @@ MSEPythonToFamixImporterVisitor >> createClass: smaCCClass [
 	"Case for object, only if needed!"
 	superClasses ifEmpty: [
 		| inheritance object |
+		object := self ensureClassNamed: 'object'.
+		object isStub: true.
 		inheritance := model newInheritance.
-		object := model newClass.
-		object
-			name: 'object';
-			isStub: true.
 		inheritance
 			superclass: object yourself;
 			subclass: famixClass ].
@@ -273,6 +267,12 @@ MSEPythonToFamixImporterVisitor >> ensureClass: aClassNode [
 
 	^ (self classNamed: aClassNode cname value) ifNil: [
 		  self createClass: aClassNode ]
+]
+
+{ #category : #'private-entity-creation' }
+MSEPythonToFamixImporterVisitor >> ensureClassNamed: aName [
+
+	^ (self classNamed: aName) ifNil: [ model newClass name: aName ]
 ]
 
 { #category : #'private-entity-creation' }
