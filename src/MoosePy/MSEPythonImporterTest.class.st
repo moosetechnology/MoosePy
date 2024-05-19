@@ -134,6 +134,34 @@ def greet(name):
 	self assert: anno annotationType name equals: 'classmethod'
 ]
 
+{ #category : #'tests - attributes' }
+MSEPythonImporterTest >> testClassAttributes [
+
+	| classA classB |
+	importer accept: (self parseCode: '
+class A:
+	a = 1
+	b = 2
+class B:
+	a = 2
+').
+
+	self
+		assert: (importer model allWithType: FamixPythonClass) size
+		equals: 3.
+
+	classA := importer classNamed: 'A'.
+	self assert: classA isNotNil.
+	self assert: classA attributes size equals: 2.
+	self assert: classA attributes first name equals: 'a'.
+	self assert: classA attributes second name equals: 'b'.
+
+	classB := importer classNamed: 'B'.
+	self assert: classB isNotNil.
+	self assert: classB attributes size equals: 1.
+	self assert: classB attributes first name equals: 'a'
+]
+
 { #category : #'tests - classes' }
 MSEPythonImporterTest >> testClassIsInModel [
 
@@ -572,6 +600,42 @@ from maths import add, subtract
 		equals: 'maths'
 ]
 
+{ #category : #'tests - attributes' }
+MSEPythonImporterTest >> testInstanceAttributes [
+
+	| classA classB localVariableA localVariableB |
+	importer accept: (self parseCode: '
+class A:
+	def foo(self):
+		a = 1
+		b = 2
+class B:
+	a = 2
+').
+
+	self
+		assert: (importer model allWithType: FamixPythonClass) size
+		equals: 3.
+
+	classA := importer classNamed: 'A'.
+	self assert: classA isNotNil.
+	self assert: classA attributes size equals: 0.
+	self assert: classA methods first localVariables size equals: 2.
+
+	localVariableA := classA methods first localVariables first.
+	self assert: localVariableA isNotNil.
+	self assert: localVariableA name equals: 'a'.
+
+	localVariableB := classA methods first localVariables second.
+	self assert: localVariableB isNotNil.
+	self assert: localVariableB name equals: 'b'.
+
+	classB := importer classNamed: 'B'.
+	self assert: classB isNotNil.
+	self assert: classB attributes size equals: 1.
+	self assert: classB attributes first name equals: 'a'
+]
+
 { #category : #'tests - module' }
 MSEPythonImporterTest >> testInvocation [
 
@@ -821,60 +885,6 @@ MSEPythonImporterTest >> testParseWithFile [
 	self assert: doc filename basename equals: 'sprite_collect_blocks.py'
 ]
 
-{ #category : #'tests - metaclasses' }
-MSEPythonImporterTest >> testSSingleClassExplicitSuperclass [
-
-	| classS classA |
-	importer accept: (self parseCode: '
-class S:
-	pass
-class A(S):
-	def foo:
-		pass
-').
-
-	self
-		assert: (importer model allWithType: FamixPythonClass) size
-		equals: 3.
-
-	classS := importer classNamed: 'S'.
-	self assert: classS isNotNil.
-	self assert: classS superInheritances size equals: 1.
-
-	classA := importer classNamed: 'A'.
-	self assert: classA isNotNil.
-	self assert: classA superInheritances size equals: 1
-]
-
-{ #category : #'tests - metaclasses' }
-MSEPythonImporterTest >> testSSingleClassingleMetaclass [
-
-	| classA classMeta classAMeta |
-	importer accept: (self parseCode: '
-class Meta(type):
-	pass
-class A(metaclass=Meta):
-	def foo:
-		pass
-').
-
-	self
-		assert: (importer model allWithType: FamixPythonClass) size
-		equals: 4.
-
-	classA := importer classNamed: 'A'.
-	self assert: classA isNotNil.
-	self assert: (classA superInheritances first target name) equals: 'object'.
-
-	classMeta := importer classNamed: 'Meta'.
-	self assert: classMeta isNotNil.
-	self assert: (classMeta superInheritances first target name) equals: 'type'.
-
-	classAMeta := classA metaclass.
-	self assert: classAMeta isNotNil.
-	self assert: classAMeta name equals: 'Meta'
-]
-
 { #category : #tests }
 MSEPythonImporterTest >> testSameAnnotationType [
 
@@ -902,6 +912,123 @@ x >>= 12
 '.
 
 	self assert: smaccAST statements anyOne stmts anyOne isAssignment
+]
+
+{ #category : #'tests - metaclasses' }
+MSEPythonImporterTest >> testSingleClasSingleFQNMetaclass [
+
+	| classA classMeta classAMeta |
+	importer accept: (self parseCode: '
+class Meta(type):
+	pass
+class A(metaclass=pygame.sprite.Sprite):
+	def foo:
+		pass
+').
+
+	self
+		assert: (importer model allWithType: FamixPythonClass) size
+		equals: 5.
+
+	classA := importer classNamed: 'A'.
+	self assert: classA isNotNil.
+	self assert: (classA superInheritances first target name) equals: 'object'.
+
+	classMeta := importer classNamed: 'Meta'.
+	self assert: classMeta isNotNil.
+	self assert: (classMeta superInheritances first target name) equals: 'type'.
+
+	classAMeta := classA metaclass.
+	self assert: classAMeta isNotNil.
+	self assert: classAMeta name equals: 'pygame.sprite.Sprite'
+]
+
+{ #category : #'tests - metaclasses' }
+MSEPythonImporterTest >> testSingleClassExplicitSuperclass [
+
+	| classS classA |
+	importer accept: (self parseCode: '
+class S:
+	pass
+class A(S):
+	def foo:
+		pass
+').
+
+	self
+		assert: (importer model allWithType: FamixPythonClass) size
+		equals: 3.
+
+	classS := importer classNamed: 'S'.
+	self assert: classS isNotNil.
+	self assert: classS superInheritances size equals: 1.
+
+	classA := importer classNamed: 'A'.
+	self assert: classA isNotNil.
+	self assert: classA superInheritances size equals: 1
+]
+
+{ #category : #'tests - metaclasses' }
+MSEPythonImporterTest >> testSingleClassFQNSuperclass [
+
+	| classA classMeta classAMeta |
+	importer accept: (self parseCode: '
+class A(pygame.sprite.Sprite):
+	def foo:
+		pass
+').
+
+	self
+		assert: (importer model allWithType: FamixPythonClass) size
+		equals: 2.
+
+	classA := importer classNamed: 'A'.
+	self assert: classA isNotNil.
+	self assert: (classA superInheritances first target name) equals: 'pygame.sprite.Sprite'.
+]
+
+{ #category : #'tests - metaclasses' }
+MSEPythonImporterTest >> testSingleClassingleMetaclass [
+
+	| classA classMeta classAMeta |
+	importer accept: (self parseCode: '
+class Meta(type):
+	pass
+class A(metaclass=Meta):
+	def foo:
+		pass
+').
+
+	self
+		assert: (importer model allWithType: FamixPythonClass) size
+		equals: 4.
+
+	classA := importer classNamed: 'A'.
+	self assert: classA isNotNil.
+	self assert: (classA superInheritances first target name) equals: 'object'.
+
+	classMeta := importer classNamed: 'Meta'.
+	self assert: classMeta isNotNil.
+	self assert: (classMeta superInheritances first target name) equals: 'type'.
+
+	classAMeta := classA metaclass.
+	self assert: classAMeta isNotNil.
+	self assert: classAMeta name equals: 'Meta'
+]
+
+{ #category : #'tests - metaclasses' }
+MSEPythonImporterTest >> testTwoClassesObjectShouldNotBeDuplicated [
+
+	importer accept: (self parseCode: '
+class A:
+	pass
+class B:
+		pass
+').
+
+	self
+		assert: (importer model allWithType: FamixPythonClass) size
+		equals: 3
 ]
 
 { #category : #'tests - module' }
