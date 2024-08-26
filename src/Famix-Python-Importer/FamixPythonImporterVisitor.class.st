@@ -836,7 +836,10 @@ FamixPythonImporterVisitor >> visitSmaCCToken: aSmaCCToken [
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> visitString: aStringNode [
 
-	^ aStringNode value value copyWithoutAll: '"'
+	(aStringNode parts size ~= 1 or: [ aStringNode expressions isNotEmpty ]) ifTrue: [
+		self error:
+			'Before strings where only one part but the Python tree changed. For now Im managing only the simplest case but reaching this error means that we need to manage more.' ].
+	^ aStringNode parts anyOne value copyWithoutAll: '"'
 ]
 
 { #category : 'visiting' }
