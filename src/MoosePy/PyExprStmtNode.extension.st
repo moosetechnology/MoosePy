@@ -1,12 +1,12 @@
-Extension { #name : #PyExprStmtNode }
+Extension { #name : 'PyExprStmtNode' }
 
-{ #category : #'*MoosePy' }
+{ #category : '*MoosePy' }
 PyExprStmtNode >> isAssignment [
 
 	^self assigns isNotEmpty
 ]
 
-{ #category : #'*MoosePy' }
+{ #category : '*MoosePy' }
 PyExprStmtNode >> isLambda [
 	"Checks if this statement node is a lambda."
 

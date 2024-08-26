@@ -1,18 +1,18 @@
-Extension { #name : #FamixPythonModule }
+Extension { #name : 'FamixPythonModule' }
 
-{ #category : #'*MoosePy' }
+{ #category : '*MoosePy' }
 FamixPythonModule >> createLocalVariable: aString [ 
 	
 ]
 
-{ #category : #'*MoosePy' }
+{ #category : '*MoosePy' }
 FamixPythonModule >> manualAddImport: aFamixImport [
 
 	(self attributeAt: #manualImports ifAbsentPut: OrderedCollection new)
 		add: aFamixImport
 ]
 
-{ #category : #'*MoosePy' }
+{ #category : '*MoosePy' }
 FamixPythonModule >> manualIncomingImports [
 
 	^self attributeAt: #manualImports ifAbsent: OrderedCollection new

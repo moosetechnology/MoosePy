@@ -1,6 +1,6 @@
-Extension { #name : #PySymbolNode }
+Extension { #name : 'PySymbolNode' }
 
-{ #category : #'*MoosePy' }
+{ #category : '*MoosePy' }
 PySymbolNode >> name [
 	^ nameToken value
 ]

@@ -1,6 +1,6 @@
-Extension { #name : #SmaCCToken }
+Extension { #name : 'SmaCCToken' }
 
-{ #category : #'*MoosePy' }
+{ #category : '*MoosePy' }
 SmaCCToken >> acceptVisitor: aSmaCCNodeVisitor [
 	^aSmaCCNodeVisitor visitSmaCCToken: self
 ]

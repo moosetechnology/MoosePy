@@ -1,6 +1,6 @@
-Extension { #name : #PyTrailersNode }
+Extension { #name : 'PyTrailersNode' }
 
-{ #category : #'*MoosePy' }
+{ #category : '*MoosePy' }
 PyTrailersNode >> name [
 
 	^ String streamContents: [ :s |

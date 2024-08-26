@@ -1,6 +1,6 @@
-Extension { #name : #FamixPythonImport }
+Extension { #name : 'FamixPythonImport' }
 
-{ #category : #'*MoosePy' }
+{ #category : '*MoosePy' }
 FamixPythonImport >> displayStringOn: aStream [
 
 	aStream
@@ -13,13 +13,13 @@ FamixPythonImport >> displayStringOn: aStream [
 	aStream nextPutAll: ')'
 ]
 
-{ #category : #'*MoosePy' }
+{ #category : '*MoosePy' }
 FamixPythonImport >> manualImportingEntity [
 
 	^self attributeAt: #manualImportingEntity ifAbsent: [ nil ]
 ]
 
-{ #category : #'*MoosePy' }
+{ #category : '*MoosePy' }
 FamixPythonImport >> manualImportingEntity: anObject [
 
 	self attributeAt: #manualImportingEntity put: anObject

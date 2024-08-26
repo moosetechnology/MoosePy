@@ -1,1 +1,1 @@
-Package { #name : #MoosePy }
+Package { #name : 'MoosePy' }

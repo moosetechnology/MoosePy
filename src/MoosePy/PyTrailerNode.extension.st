@@ -1,6 +1,6 @@
-Extension { #name : #PyTrailerNode }
+Extension { #name : 'PyTrailerNode' }
 
-{ #category : #'*MoosePy' }
+{ #category : '*MoosePy' }
 PyTrailerNode >> name [
 
 	^ self nameToken value

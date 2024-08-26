@@ -9,22 +9,24 @@ MSEPythonProjectImporter import: 'python/project/root/directory'
 will return a `FamixPythonModel`
 "
 Class {
-	#name : #MSEPythonProjectImporter,
-	#superclass : #Object,
+	#name : 'MSEPythonProjectImporter',
+	#superclass : 'Object',
 	#instVars : [
 		'visitor'
 	],
-	#category : #'MoosePy-Importer'
+	#category : 'MoosePy-Importer',
+	#package : 'MoosePy',
+	#tag : 'Importer'
 }
 
-{ #category : #api }
+{ #category : 'api' }
 MSEPythonProjectImporter class >> import: aFileName [
 
 	^self new
 		import: aFileName
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 MSEPythonProjectImporter >> import: aFileName [
 
 	| fileReference |
@@ -39,7 +41,7 @@ MSEPythonProjectImporter >> import: aFileName [
 	^visitor model
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 MSEPythonProjectImporter >> importFileReference: aFileReference [
 
 	aFileReference isDirectory 
@@ -54,7 +56,7 @@ MSEPythonProjectImporter >> importFileReference: aFileReference [
 	self importPythonFile: aFileReference.
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 MSEPythonProjectImporter >> importPythonFile: aFileReference [
 
 	'importing: ' trace.
@@ -63,7 +65,7 @@ MSEPythonProjectImporter >> importPythonFile: aFileReference [
 	(PythonParser parseFileWithErrors: aFileReference) acceptVisitor: visitor
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 MSEPythonProjectImporter >> isPythonExtension: aString [
 
 	^aString = 'py'

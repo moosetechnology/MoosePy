@@ -1,6 +1,6 @@
-Extension { #name : #PyVarArgListNode }
+Extension { #name : 'PyVarArgListNode' }
 
-{ #category : #'*MoosePy' }
+{ #category : '*MoosePy' }
 PyVarArgListNode >> signatureString [
 
 	^ String streamContents: [ :s | args 

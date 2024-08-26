@@ -1,6 +1,6 @@
-Extension { #name : #PyMetaclassNode }
+Extension { #name : 'PyMetaclassNode' }
 
-{ #category : #'*MoosePy' }
+{ #category : '*MoosePy' }
 PyMetaclassNode >> name [
 	^ metaclassToken value
 ]

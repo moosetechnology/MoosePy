@@ -1,6 +1,6 @@
-Extension { #name : #FamixPythonClass }
+Extension { #name : 'FamixPythonClass' }
 
-{ #category : #'*MoosePy' }
+{ #category : '*MoosePy' }
 FamixPythonClass >> createLocalVariable: aString [ 
 	^mooseModel newAttribute
 		name: aString ;

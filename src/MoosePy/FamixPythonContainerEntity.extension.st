@@ -1,6 +1,6 @@
-Extension { #name : #FamixPythonContainerEntity }
+Extension { #name : 'FamixPythonContainerEntity' }
 
-{ #category : #'*MoosePy' }
+{ #category : '*MoosePy' }
 FamixPythonContainerEntity >> dictLocalVariables [
 	^self attributeAt: #dictLocalVariables ifAbsentPut: [ Dictionary new ] 
 ]

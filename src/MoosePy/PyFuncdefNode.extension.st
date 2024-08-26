@@ -1,6 +1,6 @@
-Extension { #name : #PyFuncdefNode }
+Extension { #name : 'PyFuncdefNode' }
 
-{ #category : #'*MoosePy' }
+{ #category : '*MoosePy' }
 PyFuncdefNode >> isMethod [
 
 	^ self parent class = PyClassdefNode
