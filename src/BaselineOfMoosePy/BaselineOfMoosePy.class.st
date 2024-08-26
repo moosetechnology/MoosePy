@@ -39,7 +39,8 @@ BaselineOfMoosePy >> customProjectAttributes [
 BaselineOfMoosePy >> pythonParser: spec [
 
 	spec baseline: 'PythonParser' with: [
+		"For now the up to date version of Smacc is not compatible with the current MoosePy. We need to migrate it"
 		spec
-			repository: 'github://j-brant/SmaCC:master/src';
+			repository: 'github://j-brant/SmaCC:6c3a65cfba8f3293316f57a4456646910d6197d5/src';
 			loads: #( 'SmaCC_Python' 'SmaCC_Python_Tests' ) ]
 ]
