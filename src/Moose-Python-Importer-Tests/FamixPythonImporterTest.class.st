@@ -10,8 +10,7 @@ Class {
 		'file2'
 	],
 	#category : 'Moose-Python-Importer-Tests',
-	#package : 'Moose-Python-Importer',
-	#tag : 'Tests'
+	#package : 'Moose-Python-Importer-Tests'
 }
 
 { #category : 'accessing' }
