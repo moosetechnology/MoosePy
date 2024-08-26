@@ -1,6 +1,6 @@
 Extension { #name : 'PyTrailersNode' }
 
-{ #category : '*Moose-Python-Importer' }
+{ #category : '*Famix-Python-Importer' }
 PyTrailersNode >> name [
 
 	^ String streamContents: [ :s |

@@ -1,6 +1,6 @@
 Extension { #name : 'PyFuncdefNode' }
 
-{ #category : '*Moose-Python-Importer' }
+{ #category : '*Famix-Python-Importer' }
 PyFuncdefNode >> isMethod [
 
 	^ self parent class = PyClassdefNode

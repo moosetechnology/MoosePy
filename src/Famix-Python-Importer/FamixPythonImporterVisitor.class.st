@@ -7,8 +7,8 @@ Class {
 		'rootFilePath',
 		'context'
 	],
-	#category : 'Moose-Python-Importer-Visitors',
-	#package : 'Moose-Python-Importer',
+	#category : 'Famix-Python-Importer-Visitors',
+	#package : 'Famix-Python-Importer',
 	#tag : 'Visitors'
 }
 

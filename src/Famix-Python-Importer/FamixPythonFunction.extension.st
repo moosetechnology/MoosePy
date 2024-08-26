@@ -1,6 +1,6 @@
 Extension { #name : 'FamixPythonFunction' }
 
-{ #category : '*Moose-Python-Importer' }
+{ #category : '*Famix-Python-Importer' }
 FamixPythonFunction >> createLocalVariable: aString [ 
 	^mooseModel newLocalVariable
 		name: aString ;

@@ -14,8 +14,8 @@ Class {
 	#instVars : [
 		'visitor'
 	],
-	#category : 'Moose-Python-Importer-Importer',
-	#package : 'Moose-Python-Importer',
+	#category : 'Famix-Python-Importer-Importer',
+	#package : 'Famix-Python-Importer',
 	#tag : 'Importer'
 }
 

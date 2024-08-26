@@ -9,8 +9,8 @@ Class {
 		'pyDoc2',
 		'file2'
 	],
-	#category : 'Moose-Python-Importer-Tests',
-	#package : 'Moose-Python-Importer-Tests'
+	#category : 'Famix-Python-Importer-Tests',
+	#package : 'Famix-Python-Importer-Tests'
 }
 
 { #category : 'accessing' }

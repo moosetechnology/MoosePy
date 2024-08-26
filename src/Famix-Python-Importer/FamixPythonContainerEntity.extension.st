@@ -1,6 +1,6 @@
 Extension { #name : 'FamixPythonContainerEntity' }
 
-{ #category : '*Moose-Python-Importer' }
+{ #category : '*Famix-Python-Importer' }
 FamixPythonContainerEntity >> dictLocalVariables [
 	^self attributeAt: #dictLocalVariables ifAbsentPut: [ Dictionary new ] 
 ]

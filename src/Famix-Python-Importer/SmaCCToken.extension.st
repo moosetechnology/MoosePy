@@ -1,6 +1,6 @@
 Extension { #name : 'SmaCCToken' }
 
-{ #category : '*Moose-Python-Importer' }
+{ #category : '*Famix-Python-Importer' }
 SmaCCToken >> acceptVisitor: aSmaCCNodeVisitor [
 	^aSmaCCNodeVisitor visitSmaCCToken: self
 ]

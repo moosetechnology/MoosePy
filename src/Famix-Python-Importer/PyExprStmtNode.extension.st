@@ -1,12 +1,12 @@
 Extension { #name : 'PyExprStmtNode' }
 
-{ #category : '*Moose-Python-Importer' }
+{ #category : '*Famix-Python-Importer' }
 PyExprStmtNode >> isAssignment [
 
 	^self assigns isNotEmpty
 ]
 
-{ #category : '*Moose-Python-Importer' }
+{ #category : '*Famix-Python-Importer' }
 PyExprStmtNode >> isLambda [
 	"Checks if this statement node is a lambda."
 
