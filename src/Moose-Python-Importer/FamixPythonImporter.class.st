@@ -9,28 +9,28 @@ MSEPythonProjectImporter import: 'python/project/root/directory'
 will return a `FamixPythonModel`
 "
 Class {
-	#name : 'MSEPythonProjectImporter',
+	#name : 'FamixPythonImporter',
 	#superclass : 'Object',
 	#instVars : [
 		'visitor'
 	],
-	#category : 'MoosePy-Importer',
-	#package : 'MoosePy',
+	#category : 'Moose-Python-Importer-Importer',
+	#package : 'Moose-Python-Importer',
 	#tag : 'Importer'
 }
 
 { #category : 'api' }
-MSEPythonProjectImporter class >> import: aFileName [
+FamixPythonImporter class >> import: aFileName [
 
 	^self new
 		import: aFileName
 ]
 
 { #category : 'api' }
-MSEPythonProjectImporter >> import: aFileName [
+FamixPythonImporter >> import: aFileName [
 
 	| fileReference |
-	visitor := MSEPythonToFamixImporterVisitor new.
+	visitor := FamixPythonImporterVisitor new.
 	visitor rootFilePath: aFileName.
 
 	fileReference := aFileName asFileReference.
@@ -42,7 +42,7 @@ MSEPythonProjectImporter >> import: aFileName [
 ]
 
 { #category : 'api' }
-MSEPythonProjectImporter >> importFileReference: aFileReference [
+FamixPythonImporter >> importFileReference: aFileReference [
 
 	aFileReference isDirectory 
 		ifTrue: [
@@ -57,7 +57,7 @@ MSEPythonProjectImporter >> importFileReference: aFileReference [
 ]
 
 { #category : 'api' }
-MSEPythonProjectImporter >> importPythonFile: aFileReference [
+FamixPythonImporter >> importPythonFile: aFileReference [
 
 	'importing: ' trace.
 	aFileReference fullName traceCr.
@@ -66,7 +66,7 @@ MSEPythonProjectImporter >> importPythonFile: aFileReference [
 ]
 
 { #category : 'testing' }
-MSEPythonProjectImporter >> isPythonExtension: aString [
+FamixPythonImporter >> isPythonExtension: aString [
 
 	^aString = 'py'
 ]

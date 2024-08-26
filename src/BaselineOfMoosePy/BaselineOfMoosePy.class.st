@@ -15,10 +15,10 @@ BaselineOfMoosePy >> baseline: spec [
 		spec
 			package: 'Famix-Python-Entities';
 			package: 'Famix-Python-Generator';
-			package: 'MoosePy' with: [ spec requires: #( 'Famix-Python-Entities' 'PythonParser' ) ].
+			package: 'Moose-Python-Importer' with: [ spec requires: #( 'Famix-Python-Entities' 'PythonParser' ) ].
 
 		spec
-			group: 'Core' with: #( 'Famix-Python-Entities' 'MoosePy' );
+			group: 'Core' with: #( 'Famix-Python-Entities' 'Moose-Python-Importer' );
 			group: 'Generator' with: #( 'Core' 'Famix-Python-Generator' ) ].
 
 	spec for: #NeedsFamix do: [

@@ -1,6 +1,6 @@
 Extension { #name : 'PyVarArgListNode' }
 
-{ #category : '*MoosePy' }
+{ #category : '*Moose-Python-Importer' }
 PyVarArgListNode >> signatureString [
 
 	^ String streamContents: [ :s | args 

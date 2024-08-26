@@ -1,6 +1,6 @@
 Extension { #name : 'PySymbolNode' }
 
-{ #category : '*MoosePy' }
+{ #category : '*Moose-Python-Importer' }
 PySymbolNode >> name [
 	^ nameToken value
 ]

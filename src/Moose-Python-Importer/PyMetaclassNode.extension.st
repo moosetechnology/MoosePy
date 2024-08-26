@@ -1,6 +1,6 @@
 Extension { #name : 'PyMetaclassNode' }
 
-{ #category : '*MoosePy' }
+{ #category : '*Moose-Python-Importer' }
 PyMetaclassNode >> name [
 	^ metaclassToken value
 ]

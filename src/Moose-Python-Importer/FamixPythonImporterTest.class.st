@@ -1,5 +1,5 @@
 Class {
-	#name : 'MSEPythonImporterTest',
+	#name : 'FamixPythonImporterTest',
 	#superclass : 'TestCase',
 	#instVars : [
 		'pyDoc',
@@ -9,39 +9,39 @@ Class {
 		'pyDoc2',
 		'file2'
 	],
-	#category : 'MoosePy-Tests',
-	#package : 'MoosePy',
+	#category : 'Moose-Python-Importer-Tests',
+	#package : 'Moose-Python-Importer',
 	#tag : 'Tests'
 }
 
 { #category : 'accessing' }
-MSEPythonImporterTest >> codeBig1 [
+FamixPythonImporterTest >> codeBig1 [
 	
 	^ PythonParser parseFileWithErrors: (fileSystem / (self moduleName2 , '.py')) 
 ]
 
 { #category : 'accessing' }
-MSEPythonImporterTest >> importer [
+FamixPythonImporterTest >> importer [
 
-	^ MSEPythonToFamixImporterVisitor new
+	^ FamixPythonImporterVisitor new
 ]
 
 { #category : 'running' }
-MSEPythonImporterTest >> moduleName [
+FamixPythonImporterTest >> moduleName [
 	^ 'sprite_collect_blocks'
 
 
 ]
 
 { #category : 'running' }
-MSEPythonImporterTest >> moduleName2 [
+FamixPythonImporterTest >> moduleName2 [
 	^ 'sprite_collect_blocks_2'
 
 
 ]
 
 { #category : 'running' }
-MSEPythonImporterTest >> parseCode: aString [
+FamixPythonImporterTest >> parseCode: aString [
 	
 	^ (PythonParser parseWithErrors: aString)
 		ifNotNil: [ :each | 
@@ -53,7 +53,7 @@ MSEPythonImporterTest >> parseCode: aString [
 ]
 
 { #category : 'running' }
-MSEPythonImporterTest >> setUp [
+FamixPythonImporterTest >> setUp [
 
 	fileSystem := FileSystem memory.
 
@@ -79,13 +79,13 @@ MSEPythonImporterTest >> setUp [
 ]
 
 { #category : 'accessing' }
-MSEPythonImporterTest >> sourceBig2 [
+FamixPythonImporterTest >> sourceBig2 [
 	
 	^ PythonParser parseFileWithErrors: (fileSystem / (self moduleName, '.py')) 
 ]
 
 { #category : 'tests - extensions' }
-MSEPythonImporterTest >> testAddEqualIsAssignment [
+FamixPythonImporterTest >> testAddEqualIsAssignment [
 
 	| smaccAST |
 	smaccAST := self parseCode: '
@@ -96,7 +96,7 @@ x += 12
 ]
 
 { #category : 'tests' }
-MSEPythonImporterTest >> testAnnotatedClass [
+FamixPythonImporterTest >> testAnnotatedClass [
 
 	| class anno |
 	importer accept: (self parseCode: '
@@ -117,7 +117,7 @@ class ValueRange:
 ]
 
 { #category : 'tests' }
-MSEPythonImporterTest >> testAnnotatedFunction [
+FamixPythonImporterTest >> testAnnotatedFunction [
 
 	| fct anno |
 	importer accept: (self parseCode: '
@@ -137,7 +137,7 @@ def greet(name):
 ]
 
 { #category : 'tests - attributes' }
-MSEPythonImporterTest >> testClassAttributes [
+FamixPythonImporterTest >> testClassAttributes [
 
 	| classA classB |
 	importer accept: (self parseCode: '
@@ -165,7 +165,7 @@ class B:
 ]
 
 { #category : 'tests - classes' }
-MSEPythonImporterTest >> testClassIsInModel [
+FamixPythonImporterTest >> testClassIsInModel [
 
 	importer accept: pyDoc.
 	self assert: importer model numberOfClasses equals: 4.
@@ -173,7 +173,7 @@ MSEPythonImporterTest >> testClassIsInModel [
 ]
 
 { #category : 'tests' }
-MSEPythonImporterTest >> testClasses [
+FamixPythonImporterTest >> testClasses [
 
 	importer accept: pyDoc.
 	self assert: importer classes size equals: 4.
@@ -182,7 +182,7 @@ MSEPythonImporterTest >> testClasses [
 ]
 
 { #category : 'tests' }
-MSEPythonImporterTest >> testClassesImportedTwiceAreOnlyImportedOnce [
+FamixPythonImporterTest >> testClassesImportedTwiceAreOnlyImportedOnce [
 
 	importer accept: pyDoc.
 	self assert: importer classes size equals: 4.
@@ -193,7 +193,7 @@ MSEPythonImporterTest >> testClassesImportedTwiceAreOnlyImportedOnce [
 ]
 
 { #category : 'tests - extensions' }
-MSEPythonImporterTest >> testComentIsNotAssignment [
+FamixPythonImporterTest >> testComentIsNotAssignment [
 
 	| smaccAST |
 	smaccAST := self parseCode: '
@@ -204,7 +204,7 @@ MSEPythonImporterTest >> testComentIsNotAssignment [
 ]
 
 { #category : 'tests - decorators' }
-MSEPythonImporterTest >> testDecoratorsFunctionSingleDecorator [
+FamixPythonImporterTest >> testDecoratorsFunctionSingleDecorator [
 	"https://realpython.com/primer-on-python-decorators/"
 
 	| famix |
@@ -223,7 +223,7 @@ def say_whee():
 ]
 
 { #category : 'tests - decorators' }
-MSEPythonImporterTest >> testDecoratorsMethodSingleDecorator [
+FamixPythonImporterTest >> testDecoratorsMethodSingleDecorator [
 
 	| famix |
 	importer accept: (self parseCode: '
@@ -244,7 +244,7 @@ class A:
 ]
 
 { #category : 'tests - decorators' }
-MSEPythonImporterTest >> testDecoratorsSanityCheck [
+FamixPythonImporterTest >> testDecoratorsSanityCheck [
 
 	importer accept: (self parseCode: '
 class A:
@@ -259,7 +259,7 @@ class A:
 ]
 
 { #category : 'tests - extensions' }
-MSEPythonImporterTest >> testDottedNamedAssignmentIsAssignment [
+FamixPythonImporterTest >> testDottedNamedAssignmentIsAssignment [
 
 	| smaccAST |
 	smaccAST := self parseCode: '
@@ -270,7 +270,7 @@ x.a = 12
 ]
 
 { #category : 'tests - extensions' }
-MSEPythonImporterTest >> testEqualEqualIsAssignment [
+FamixPythonImporterTest >> testEqualEqualIsAssignment [
 
 	| smaccAST |
 	smaccAST := self parseCode: '
@@ -281,14 +281,14 @@ a = b =3
 ]
 
 { #category : 'tests - files' }
-MSEPythonImporterTest >> testFileIsOk [
+FamixPythonImporterTest >> testFileIsOk [
 	self assert: (fileSystem / (self moduleName, '.py')) contents size equals: 7586.
 	self assert: (fileSystem / (self moduleName2, '.py')) contents size equals: 3259
 	
 ]
 
 { #category : 'tests - lambdas' }
-MSEPythonImporterTest >> testFunctionNoLambda [
+FamixPythonImporterTest >> testFunctionNoLambda [
 
 	| famix |
 	importer accept: (self parseCode: '
@@ -305,7 +305,7 @@ def identity:
 ]
 
 { #category : 'tests - lambdas' }
-MSEPythonImporterTest >> testFunctionSingleLambda [
+FamixPythonImporterTest >> testFunctionSingleLambda [
 
 	| famix |
 	importer accept: (self parseCode: '
@@ -326,7 +326,7 @@ def identity:
 ]
 
 { #category : 'tests - import' }
-MSEPythonImporterTest >> testImport [
+FamixPythonImporterTest >> testImport [
 
 	importer accept: (self parseCode: '
 import pygame
@@ -338,7 +338,7 @@ import random
 ]
 
 { #category : 'tests - import' }
-MSEPythonImporterTest >> testImportClassFromModule [
+FamixPythonImporterTest >> testImportClassFromModule [
 
 	importer accept: (self parseCode: '
 from keras.layers import Input
@@ -351,7 +351,7 @@ from keras.layers import Input
 ]
 
 { #category : 'tests - classes' }
-MSEPythonImporterTest >> testImportClassKnowsItsMethods [
+FamixPythonImporterTest >> testImportClassKnowsItsMethods [
 	
 	| cl | 
 	importer accept: pyDoc.
@@ -362,7 +362,7 @@ MSEPythonImporterTest >> testImportClassKnowsItsMethods [
 ]
 
 { #category : 'tests - classes' }
-MSEPythonImporterTest >> testImportFamixAttribute [
+FamixPythonImporterTest >> testImportFamixAttribute [
 
 	| clazz |
 	importer accept: pyDoc.
@@ -376,7 +376,7 @@ MSEPythonImporterTest >> testImportFamixAttribute [
 ]
 
 { #category : 'tests - classes' }
-MSEPythonImporterTest >> testImportFamixClass [
+FamixPythonImporterTest >> testImportFamixClass [
 	
 	| ballClass wallClass | 
 	importer accept: pyDoc.
@@ -391,7 +391,7 @@ MSEPythonImporterTest >> testImportFamixClass [
 ]
 
 { #category : 'tests - classes' }
-MSEPythonImporterTest >> testImportFamixFunction [
+FamixPythonImporterTest >> testImportFamixFunction [
 	
 	| func | 
 	importer accept: pyDoc2.
@@ -402,7 +402,7 @@ MSEPythonImporterTest >> testImportFamixFunction [
 ]
 
 { #category : 'tests - classes' }
-MSEPythonImporterTest >> testImportFamixFunctionKnowsItsModule [
+FamixPythonImporterTest >> testImportFamixFunctionKnowsItsModule [
 
 	| func module |
 	importer accept: pyDoc2.
@@ -413,7 +413,7 @@ MSEPythonImporterTest >> testImportFamixFunctionKnowsItsModule [
 ]
 
 { #category : 'tests - classes' }
-MSEPythonImporterTest >> testImportFamixFunctionWithParameter [
+FamixPythonImporterTest >> testImportFamixFunctionWithParameter [
 
 	| param func |
 	importer accept: pyDoc2.
@@ -430,7 +430,7 @@ MSEPythonImporterTest >> testImportFamixFunctionWithParameter [
 ]
 
 { #category : 'tests - classes' }
-MSEPythonImporterTest >> testImportFamixMethod [
+FamixPythonImporterTest >> testImportFamixMethod [
 
 	| mth |
 	importer accept: pyDoc.
@@ -441,7 +441,7 @@ MSEPythonImporterTest >> testImportFamixMethod [
 ]
 
 { #category : 'tests - classes' }
-MSEPythonImporterTest >> testImportFamixMethodKnowsItsClass [
+FamixPythonImporterTest >> testImportFamixMethodKnowsItsClass [
 
 	| mth cl |
 	importer accept: pyDoc.
@@ -452,7 +452,7 @@ MSEPythonImporterTest >> testImportFamixMethodKnowsItsClass [
 ]
 
 { #category : 'tests - classes' }
-MSEPythonImporterTest >> testImportFamixMethodWithParameter [
+FamixPythonImporterTest >> testImportFamixMethodWithParameter [
 
 	| param  mth |
 	importer accept: pyDoc.
@@ -471,7 +471,7 @@ MSEPythonImporterTest >> testImportFamixMethodWithParameter [
 ]
 
 { #category : 'tests - classes' }
-MSEPythonImporterTest >> testImportFamixParameter [
+FamixPythonImporterTest >> testImportFamixParameter [
 
 	| param |
 	importer accept: pyDoc.
@@ -491,7 +491,7 @@ MSEPythonImporterTest >> testImportFamixParameter [
 ]
 
 { #category : 'tests - import' }
-MSEPythonImporterTest >> testImportFunction [
+FamixPythonImporterTest >> testImportFunction [
 
 	importer accept: (self parseCode: '
 import matplotlib.pyplot
@@ -501,7 +501,7 @@ import matplotlib.pyplot
 ]
 
 { #category : 'tests - import' }
-MSEPythonImporterTest >> testImportFunctionFromModule [
+FamixPythonImporterTest >> testImportFunctionFromModule [
 
 	importer accept: (self parseCode: '
 from random import randint
@@ -514,7 +514,7 @@ from random import randint
 ]
 
 { #category : 'tests' }
-MSEPythonImporterTest >> testImportFunctions [
+FamixPythonImporterTest >> testImportFunctions [
 
 	importer accept: pyDoc2.
 	self assert: importer functions size equals: 4.
@@ -524,7 +524,7 @@ MSEPythonImporterTest >> testImportFunctions [
 ]
 
 { #category : 'tests' }
-MSEPythonImporterTest >> testImportMethods [
+FamixPythonImporterTest >> testImportMethods [
 
 	importer accept: pyDoc.
 	self assert: importer methods size equals: 5.
@@ -538,7 +538,7 @@ MSEPythonImporterTest >> testImportMethods [
 ]
 
 { #category : 'tests - import' }
-MSEPythonImporterTest >> testImportModuleWithAlias [
+FamixPythonImporterTest >> testImportModuleWithAlias [
 
 	importer accept: (self parseCode: '
 import math as m
@@ -557,7 +557,7 @@ import matplotlib.pyplot as plt
 ]
 
 { #category : 'tests - import' }
-MSEPythonImporterTest >> testImportModulesWithAliases [
+FamixPythonImporterTest >> testImportModulesWithAliases [
 
 	importer accept: (self parseCode: '
 import math as m, matplotlib.pyplot as plt
@@ -575,7 +575,7 @@ import math as m, matplotlib.pyplot as plt
 ]
 
 { #category : 'tests - import' }
-MSEPythonImporterTest >> testImportMultiClassesFromModule [
+FamixPythonImporterTest >> testImportMultiClassesFromModule [
 
 	importer accept: (self parseCode: '
 from keras.layers import Flatten, Activation, AveragePooling2D, BatchNormalization
@@ -589,7 +589,7 @@ from keras.layers import Flatten, Activation, AveragePooling2D, BatchNormalizati
 ]
 
 { #category : 'tests - import' }
-MSEPythonImporterTest >> testImportMultiFunctionsFromModule [
+FamixPythonImporterTest >> testImportMultiFunctionsFromModule [
 
 	importer accept: (self parseCode: '
 from maths import add, subtract
@@ -603,7 +603,7 @@ from maths import add, subtract
 ]
 
 { #category : 'tests - attributes' }
-MSEPythonImporterTest >> testInstanceAttributes [
+FamixPythonImporterTest >> testInstanceAttributes [
 
 	| classA classB localVariableA localVariableB |
 	importer accept: (self parseCode: '
@@ -639,7 +639,7 @@ class B:
 ]
 
 { #category : 'tests - invocations' }
-MSEPythonImporterTest >> testInvocation [
+FamixPythonImporterTest >> testInvocation [
 
 	| invocations invocation |
 
@@ -660,7 +660,7 @@ grid[row].append(".")
 ]
 
 { #category : 'tests - invocations' }
-MSEPythonImporterTest >> testInvocationInLoop [
+FamixPythonImporterTest >> testInvocationInLoop [
 
 	self skip: 'Invocations not treated in importer'.
 
@@ -672,7 +672,7 @@ append(".")
 ]
 
 { #category : 'tests - invocations' }
-MSEPythonImporterTest >> testInvocationInNestedLoop [
+FamixPythonImporterTest >> testInvocationInNestedLoop [
 
 	self skip: 'Invocations not treated in importer'.
 
@@ -687,7 +687,7 @@ for row in array:
 ]
 
 { #category : 'tests - invocations' }
-MSEPythonImporterTest >> testInvocationWithArrayReceiver [
+FamixPythonImporterTest >> testInvocationWithArrayReceiver [
 
 	self skip: 'Invocations not treated in importer'.
 
@@ -700,7 +700,7 @@ for row in array:
 ]
 
 { #category : 'tests - invocations' }
-MSEPythonImporterTest >> testInvocationWithNumericalArguments [
+FamixPythonImporterTest >> testInvocationWithNumericalArguments [
 
 	self skip: 'Invocations not treated in importer'.
 
@@ -718,7 +718,7 @@ test(4, 25)
 ]
 
 { #category : 'tests - invocations' }
-MSEPythonImporterTest >> testInvocationWithReceiver [
+FamixPythonImporterTest >> testInvocationWithReceiver [
 
 	self skip: 'Invocations not treated in importer'.
 
@@ -730,7 +730,7 @@ grid.append(test)
 ]
 
 { #category : 'tests - invocations' }
-MSEPythonImporterTest >> testInvocationWithStringReceiver [
+FamixPythonImporterTest >> testInvocationWithStringReceiver [
 
 	self skip: 'Invocations not treated in importer'.
 
@@ -742,7 +742,7 @@ MSEPythonImporterTest >> testInvocationWithStringReceiver [
 ]
 
 { #category : 'tests - invocations' }
-MSEPythonImporterTest >> testInvocationWithVariableArguments [
+FamixPythonImporterTest >> testInvocationWithVariableArguments [
 
 	| invocation |
 
@@ -771,7 +771,7 @@ test(x, 25)
 ]
 
 { #category : 'tests - extensions' }
-MSEPythonImporterTest >> testIsAssignment [
+FamixPythonImporterTest >> testIsAssignment [
 
 	| smaccAST |
 	smaccAST := self parseCode: '
@@ -782,7 +782,7 @@ x = 12
 ]
 
 { #category : 'tests' }
-MSEPythonImporterTest >> testIsModel [
+FamixPythonImporterTest >> testIsModel [
 	
 	importer accept: pyDoc.
 	importer model entityNamed: 'pygame'.
@@ -791,7 +791,7 @@ MSEPythonImporterTest >> testIsModel [
 ]
 
 { #category : 'tests - module' }
-MSEPythonImporterTest >> testKnowsItsModule [
+FamixPythonImporterTest >> testKnowsItsModule [
 	
 	| import module | 
 	importer accept: pyDoc.
@@ -802,7 +802,7 @@ MSEPythonImporterTest >> testKnowsItsModule [
 ]
 
 { #category : 'tests - extensions' }
-MSEPythonImporterTest >> testListEqualIsAssignment [
+FamixPythonImporterTest >> testListEqualIsAssignment [
 
 	| smaccAST |
 	smaccAST := self parseCode: '
@@ -813,13 +813,13 @@ a,b = 1,3
 ]
 
 { #category : 'tests - classes' }
-MSEPythonImporterTest >> testMethodIsInModel [
+FamixPythonImporterTest >> testMethodIsInModel [
 	importer accept: pyDoc.
 	self assert: importer model numberOfMethods equals: 5.
 ]
 
 { #category : 'tests - module' }
-MSEPythonImporterTest >> testModule [
+FamixPythonImporterTest >> testModule [
 	
 	| module | 
 	importer accept: pyDoc.
@@ -832,7 +832,7 @@ MSEPythonImporterTest >> testModule [
 ]
 
 { #category : 'tests - module' }
-MSEPythonImporterTest >> testModuleKnowsItsImport [
+FamixPythonImporterTest >> testModuleKnowsItsImport [
 	
 	| module | 
 	importer accept: pyDoc.
@@ -844,7 +844,7 @@ MSEPythonImporterTest >> testModuleKnowsItsImport [
 ]
 
 { #category : 'tests - extensions' }
-MSEPythonImporterTest >> testModuloEqualIsAssignment [
+FamixPythonImporterTest >> testModuloEqualIsAssignment [
 
 	| smaccAST |
 	smaccAST := self parseCode: '
@@ -855,7 +855,7 @@ x //= 12
 ]
 
 { #category : 'tests - lambdas' }
-MSEPythonImporterTest >> testMultiFunctionsMultiLambdas [
+FamixPythonImporterTest >> testMultiFunctionsMultiLambdas [
 
 	| famix |
 	importer accept: (self parseCode: '
@@ -879,7 +879,7 @@ def identity2:
 ]
 
 { #category : 'tests - files' }
-MSEPythonImporterTest >> testParseWithFile [
+FamixPythonImporterTest >> testParseWithFile [
 
 
 	| doc |
@@ -888,7 +888,7 @@ MSEPythonImporterTest >> testParseWithFile [
 ]
 
 { #category : 'tests' }
-MSEPythonImporterTest >> testSameAnnotationType [
+FamixPythonImporterTest >> testSameAnnotationType [
 
 	importer accept: (self parseCode: '
 @classmethod
@@ -906,7 +906,7 @@ def goodbye(name):
 ]
 
 { #category : 'tests - extensions' }
-MSEPythonImporterTest >> testShiftEqualIsAssignment [
+FamixPythonImporterTest >> testShiftEqualIsAssignment [
 
 	| smaccAST |
 	smaccAST := self parseCode: '
@@ -917,7 +917,7 @@ x >>= 12
 ]
 
 { #category : 'tests - metaclasses' }
-MSEPythonImporterTest >> testSingleClasSingleFQNMetaclass [
+FamixPythonImporterTest >> testSingleClasSingleFQNMetaclass [
 
 	| classA classMeta classAMeta |
 	importer accept: (self parseCode: '
@@ -946,7 +946,7 @@ class A(metaclass=pygame.sprite.Sprite):
 ]
 
 { #category : 'tests - metaclasses' }
-MSEPythonImporterTest >> testSingleClassExplicitSuperclass [
+FamixPythonImporterTest >> testSingleClassExplicitSuperclass [
 
 	| classS classA |
 	importer accept: (self parseCode: '
@@ -971,7 +971,7 @@ class A(S):
 ]
 
 { #category : 'tests - metaclasses' }
-MSEPythonImporterTest >> testSingleClassFQNSuperclass [
+FamixPythonImporterTest >> testSingleClassFQNSuperclass [
 
 	| classA classMeta classAMeta |
 	importer accept: (self parseCode: '
@@ -990,7 +990,7 @@ class A(pygame.sprite.Sprite):
 ]
 
 { #category : 'tests - metaclasses' }
-MSEPythonImporterTest >> testSingleClassingleMetaclass [
+FamixPythonImporterTest >> testSingleClassingleMetaclass [
 
 	| classA classMeta classAMeta |
 	importer accept: (self parseCode: '
@@ -1019,7 +1019,7 @@ class A(metaclass=Meta):
 ]
 
 { #category : 'tests - metaclasses' }
-MSEPythonImporterTest >> testTwoClassesObjectShouldNotBeDuplicated [
+FamixPythonImporterTest >> testTwoClassesObjectShouldNotBeDuplicated [
 
 	importer accept: (self parseCode: '
 class A:
@@ -1034,7 +1034,7 @@ class B:
 ]
 
 { #category : 'tests - module' }
-MSEPythonImporterTest >> testTwoSiblingImportsHaveTheSameModule [
+FamixPythonImporterTest >> testTwoSiblingImportsHaveTheSameModule [
 	
 	| import module import2 | 
 	importer accept: pyDoc.

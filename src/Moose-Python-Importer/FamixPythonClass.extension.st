@@ -1,6 +1,6 @@
 Extension { #name : 'FamixPythonClass' }
 
-{ #category : '*MoosePy' }
+{ #category : '*Moose-Python-Importer' }
 FamixPythonClass >> createLocalVariable: aString [ 
 	^mooseModel newAttribute
 		name: aString ;

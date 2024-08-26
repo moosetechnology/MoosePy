@@ -1,6 +1,6 @@
 Extension { #name : 'PyTrailersNode' }
 
-{ #category : '*MoosePy' }
+{ #category : '*Moose-Python-Importer' }
 PyTrailersNode >> name [
 
 	^ String streamContents: [ :s |

@@ -1,6 +1,6 @@
 Extension { #name : 'PyTrailerNode' }
 
-{ #category : '*MoosePy' }
+{ #category : '*Moose-Python-Importer' }
 PyTrailerNode >> name [
 
 	^ self nameToken value
