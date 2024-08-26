@@ -17,14 +17,16 @@
 
 "
 Class {
-	#name : #FamixPythonNamedEntity,
-	#superclass : #FamixPythonSourcedEntity,
+	#name : 'FamixPythonNamedEntity',
+	#superclass : 'FamixPythonSourcedEntity',
 	#traits : 'FamixTInvocationsReceiver + FamixTNamedEntity + TEntityMetaLevelDependency',
 	#classTraits : 'FamixTInvocationsReceiver classTrait + FamixTNamedEntity classTrait + TEntityMetaLevelDependency classTrait',
-	#category : #'Famix-Python-Entities-Entities'
+	#category : 'Famix-Python-Entities-Entities',
+	#package : 'Famix-Python-Entities',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 FamixPythonNamedEntity class >> annotation [
 
 	<FMClass: #NamedEntity super: #FamixPythonSourcedEntity>
@@ -34,9 +36,16 @@ FamixPythonNamedEntity class >> annotation [
 	^ self
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonNamedEntity class >> isAbstract [
 
 	<generated>
 	^ self == FamixPythonNamedEntity
+]
+
+{ #category : 'testing' }
+FamixPythonNamedEntity >> isNamedEntity [
+
+	<generated>
+	^ true
 ]

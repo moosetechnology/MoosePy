@@ -48,14 +48,16 @@
 
 "
 Class {
-	#name : #FamixPythonFunction,
-	#superclass : #FamixPythonContainerEntity,
+	#name : 'FamixPythonFunction',
+	#superclass : 'FamixPythonContainerEntity',
 	#traits : 'FamixTFunction + FamixTImportable + FamixTInvocable + FamixTWithAnnotationInstances + FamixTWithComments + FamixTWithFunctions + FamixTWithImplicitVariables + FamixTWithInvocations',
 	#classTraits : 'FamixTFunction classTrait + FamixTImportable classTrait + FamixTInvocable classTrait + FamixTWithAnnotationInstances classTrait + FamixTWithComments classTrait + FamixTWithFunctions classTrait + FamixTWithImplicitVariables classTrait + FamixTWithInvocations classTrait',
-	#category : #'Famix-Python-Entities-Entities'
+	#category : 'Famix-Python-Entities-Entities',
+	#package : 'Famix-Python-Entities',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 FamixPythonFunction class >> annotation [
 
 	<FMClass: #Function super: #FamixPythonContainerEntity>

@@ -11,14 +11,16 @@
 
 "
 Class {
-	#name : #FamixPythonContainerEntity,
-	#superclass : #FamixPythonNamedEntity,
+	#name : 'FamixPythonContainerEntity',
+	#superclass : 'FamixPythonNamedEntity',
 	#traits : 'FamixTWithClasses',
 	#classTraits : 'FamixTWithClasses classTrait',
-	#category : #'Famix-Python-Entities-Entities'
+	#category : 'Famix-Python-Entities-Entities',
+	#package : 'Famix-Python-Entities',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 FamixPythonContainerEntity class >> annotation [
 
 	<FMClass: #ContainerEntity super: #FamixPythonNamedEntity>
@@ -28,7 +30,7 @@ FamixPythonContainerEntity class >> annotation [
 	^ self
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonContainerEntity class >> isAbstract [
 
 	<generated>

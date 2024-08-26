@@ -34,14 +34,16 @@
 
 "
 Class {
-	#name : #FamixPythonParameter,
-	#superclass : #FamixPythonNamedEntity,
+	#name : 'FamixPythonParameter',
+	#superclass : 'FamixPythonNamedEntity',
 	#traits : 'FamixTParameter + FamixTWithComments',
 	#classTraits : 'FamixTParameter classTrait + FamixTWithComments classTrait',
-	#category : #'Famix-Python-Entities-Entities'
+	#category : 'Famix-Python-Entities-Entities',
+	#package : 'Famix-Python-Entities',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 FamixPythonParameter class >> annotation [
 
 	<FMClass: #Parameter super: #FamixPythonNamedEntity>

@@ -17,14 +17,16 @@
 
 "
 Class {
-	#name : #FamixPythonComment,
-	#superclass : #FamixPythonSourcedEntity,
+	#name : 'FamixPythonComment',
+	#superclass : 'FamixPythonSourcedEntity',
 	#traits : 'FamixTComment',
 	#classTraits : 'FamixTComment classTrait',
-	#category : #'Famix-Python-Entities-Entities'
+	#category : 'Famix-Python-Entities-Entities',
+	#package : 'Famix-Python-Entities',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 FamixPythonComment class >> annotation [
 
 	<FMClass: #Comment super: #FamixPythonSourcedEntity>

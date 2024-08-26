@@ -1,1 +1,1 @@
-Package { #name : #'Famix-Python-Entities' }
+Package { #name : 'Famix-Python-Entities' }

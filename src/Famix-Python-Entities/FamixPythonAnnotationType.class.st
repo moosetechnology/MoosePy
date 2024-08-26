@@ -16,14 +16,16 @@
 
 "
 Class {
-	#name : #FamixPythonAnnotationType,
-	#superclass : #FamixPythonNamedEntity,
+	#name : 'FamixPythonAnnotationType',
+	#superclass : 'FamixPythonNamedEntity',
 	#traits : 'FamixTAnnotationType',
 	#classTraits : 'FamixTAnnotationType classTrait',
-	#category : #'Famix-Python-Entities-Entities'
+	#category : 'Famix-Python-Entities-Entities',
+	#package : 'Famix-Python-Entities',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 FamixPythonAnnotationType class >> annotation [
 
 	<FMClass: #AnnotationType super: #FamixPythonNamedEntity>

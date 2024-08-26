@@ -49,8 +49,8 @@
 
 "
 Class {
-	#name : #FamixPythonClass,
-	#superclass : #FamixPythonType,
+	#name : 'FamixPythonClass',
+	#superclass : 'FamixPythonType',
 	#traits : 'FamixTClass + FamixTImportable + FamixTWithAnnotationInstances + FamixTWithImports',
 	#classTraits : 'FamixTClass classTrait + FamixTImportable classTrait + FamixTWithAnnotationInstances classTrait + FamixTWithImports classTrait',
 	#instVars : [
@@ -58,10 +58,12 @@ Class {
 		'#metaclass => FMOne type: #FamixPythonClass opposite: #instancedClasses',
 		'#instancedClasses => FMMany type: #FamixPythonClass opposite: #metaclass'
 	],
-	#category : #'Famix-Python-Entities-Entities'
+	#category : 'Famix-Python-Entities-Entities',
+	#package : 'Famix-Python-Entities',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 FamixPythonClass class >> annotation [
 
 	<FMClass: #Class super: #FamixPythonType>
@@ -70,13 +72,13 @@ FamixPythonClass class >> annotation [
 	^ self
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 FamixPythonClass >> addInstancedClass: anObject [
 	<generated>
 	^ self instancedClasses add: anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 FamixPythonClass >> instancedClasses [
 	"Relation named: #instancedClasses type: #FamixPythonClass opposite: #metaclass"
 
@@ -85,14 +87,14 @@ FamixPythonClass >> instancedClasses [
 	^ instancedClasses
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 FamixPythonClass >> instancedClasses: anObject [
 
 	<generated>
 	instancedClasses value: anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 FamixPythonClass >> isMetaclass [
 
 	<FMProperty: #isMetaclass type: #Boolean>
@@ -101,13 +103,13 @@ FamixPythonClass >> isMetaclass [
 	^ isMetaclass
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 FamixPythonClass >> isMetaclass: anObject [
 	<generated>
 	isMetaclass := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 FamixPythonClass >> metaclass [
 	"Relation named: #metaclass type: #FamixPythonClass opposite: #instancedClasses"
 
@@ -115,7 +117,7 @@ FamixPythonClass >> metaclass [
 	^ metaclass
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 FamixPythonClass >> metaclass: anObject [
 
 	<generated>

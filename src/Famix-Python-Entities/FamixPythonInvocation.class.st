@@ -31,14 +31,16 @@
 
 "
 Class {
-	#name : #FamixPythonInvocation,
-	#superclass : #FamixPythonEntity,
+	#name : 'FamixPythonInvocation',
+	#superclass : 'FamixPythonEntity',
 	#traits : 'FamixTInvocation',
 	#classTraits : 'FamixTInvocation classTrait',
-	#category : #'Famix-Python-Entities-Entities'
+	#category : 'Famix-Python-Entities-Entities',
+	#package : 'Famix-Python-Entities',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 FamixPythonInvocation class >> annotation [
 
 	<FMClass: #Invocation super: #FamixPythonEntity>

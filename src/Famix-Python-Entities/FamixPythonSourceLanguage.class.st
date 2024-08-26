@@ -11,14 +11,16 @@
 
 "
 Class {
-	#name : #FamixPythonSourceLanguage,
-	#superclass : #FamixPythonEntity,
+	#name : 'FamixPythonSourceLanguage',
+	#superclass : 'FamixPythonEntity',
 	#traits : 'FamixTSourceLanguage',
 	#classTraits : 'FamixTSourceLanguage classTrait',
-	#category : #'Famix-Python-Entities-Entities'
+	#category : 'Famix-Python-Entities-Entities',
+	#package : 'Famix-Python-Entities',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 FamixPythonSourceLanguage class >> annotation [
 
 	<FMClass: #SourceLanguage super: #FamixPythonEntity>

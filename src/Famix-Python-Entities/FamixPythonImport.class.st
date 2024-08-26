@@ -32,8 +32,8 @@
 
 "
 Class {
-	#name : #FamixPythonImport,
-	#superclass : #FamixPythonEntity,
+	#name : 'FamixPythonImport',
+	#superclass : 'FamixPythonEntity',
 	#traits : 'FamixTImport',
 	#classTraits : 'FamixTImport classTrait',
 	#instVars : [
@@ -41,10 +41,12 @@ Class {
 		'#entityName => FMProperty',
 		'#asName => FMProperty'
 	],
-	#category : #'Famix-Python-Entities-Entities'
+	#category : 'Famix-Python-Entities-Entities',
+	#package : 'Famix-Python-Entities',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 FamixPythonImport class >> annotation [
 
 	<FMClass: #Import super: #FamixPythonEntity>
@@ -53,7 +55,7 @@ FamixPythonImport class >> annotation [
 	^ self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 FamixPythonImport >> asName [
 
 	<FMProperty: #asName type: #String>
@@ -62,13 +64,13 @@ FamixPythonImport >> asName [
 	^ asName
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 FamixPythonImport >> asName: anObject [
 	<generated>
 	asName := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 FamixPythonImport >> entityName [
 
 	<FMProperty: #entityName type: #String>
@@ -77,13 +79,13 @@ FamixPythonImport >> entityName [
 	^ entityName
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 FamixPythonImport >> entityName: anObject [
 	<generated>
 	entityName := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 FamixPythonImport >> fromName [
 
 	<FMProperty: #fromName type: #String>
@@ -92,7 +94,7 @@ FamixPythonImport >> fromName [
 	^ fromName
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 FamixPythonImport >> fromName: anObject [
 	<generated>
 	fromName := anObject

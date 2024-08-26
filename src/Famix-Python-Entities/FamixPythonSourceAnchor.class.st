@@ -11,14 +11,16 @@
 
 "
 Class {
-	#name : #FamixPythonSourceAnchor,
-	#superclass : #FamixPythonEntity,
+	#name : 'FamixPythonSourceAnchor',
+	#superclass : 'FamixPythonEntity',
 	#traits : 'FamixTSourceAnchor',
 	#classTraits : 'FamixTSourceAnchor classTrait',
-	#category : #'Famix-Python-Entities-Entities'
+	#category : 'Famix-Python-Entities-Entities',
+	#package : 'Famix-Python-Entities',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 FamixPythonSourceAnchor class >> annotation [
 
 	<FMClass: #SourceAnchor super: #FamixPythonEntity>
@@ -28,7 +30,7 @@ FamixPythonSourceAnchor class >> annotation [
 	^ self
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonSourceAnchor class >> isAbstract [
 
 	<generated>

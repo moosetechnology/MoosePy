@@ -30,14 +30,16 @@
 
 "
 Class {
-	#name : #FamixPythonAccess,
-	#superclass : #FamixPythonEntity,
+	#name : 'FamixPythonAccess',
+	#superclass : 'FamixPythonEntity',
 	#traits : 'FamixTAccess',
 	#classTraits : 'FamixTAccess classTrait',
-	#category : #'Famix-Python-Entities-Entities'
+	#category : 'Famix-Python-Entities-Entities',
+	#package : 'Famix-Python-Entities',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 FamixPythonAccess class >> annotation [
 
 	<FMClass: #Access super: #FamixPythonEntity>

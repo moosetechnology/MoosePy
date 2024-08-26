@@ -30,14 +30,16 @@
 
 "
 Class {
-	#name : #FamixPythonImplicitVariable,
-	#superclass : #FamixPythonNamedEntity,
+	#name : 'FamixPythonImplicitVariable',
+	#superclass : 'FamixPythonNamedEntity',
 	#traits : 'FamixTImplicitVariable + FamixTInvocationsReceiver',
 	#classTraits : 'FamixTImplicitVariable classTrait + FamixTInvocationsReceiver classTrait',
-	#category : #'Famix-Python-Entities-Entities'
+	#category : 'Famix-Python-Entities-Entities',
+	#package : 'Famix-Python-Entities',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 FamixPythonImplicitVariable class >> annotation [
 
 	<FMClass: #ImplicitVariable super: #FamixPythonNamedEntity>

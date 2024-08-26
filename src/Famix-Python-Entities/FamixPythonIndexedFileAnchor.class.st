@@ -12,14 +12,16 @@
 
 "
 Class {
-	#name : #FamixPythonIndexedFileAnchor,
-	#superclass : #FamixPythonSourceAnchor,
+	#name : 'FamixPythonIndexedFileAnchor',
+	#superclass : 'FamixPythonSourceAnchor',
 	#traits : 'FamixTIndexedFileNavigation',
 	#classTraits : 'FamixTIndexedFileNavigation classTrait',
-	#category : #'Famix-Python-Entities-Entities'
+	#category : 'Famix-Python-Entities-Entities',
+	#package : 'Famix-Python-Entities',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 FamixPythonIndexedFileAnchor class >> annotation [
 
 	<FMClass: #IndexedFileAnchor super: #FamixPythonSourceAnchor>

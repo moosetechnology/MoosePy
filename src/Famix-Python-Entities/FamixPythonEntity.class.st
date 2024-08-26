@@ -1,10 +1,12 @@
 Class {
-	#name : #FamixPythonEntity,
-	#superclass : #MooseEntity,
-	#category : #'Famix-Python-Entities-Entities'
+	#name : 'FamixPythonEntity',
+	#superclass : 'MooseEntity',
+	#category : 'Famix-Python-Entities-Entities',
+	#package : 'Famix-Python-Entities',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 FamixPythonEntity class >> annotation [
 
 	<FMClass: #Entity super: #MooseEntity>
@@ -14,140 +16,147 @@ FamixPythonEntity class >> annotation [
 	^ self
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonEntity class >> isAbstract [
 
 	<generated>
 	^ self == FamixPythonEntity
 ]
 
-{ #category : #meta }
+{ #category : 'meta' }
 FamixPythonEntity class >> metamodel [
 
 	<generated>
 	^ FamixPythonModel metamodel
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonEntity >> isAccess [
 
 	<generated>
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonEntity >> isAssociation [
 
 	<generated>
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonEntity >> isAttribute [
 
 	<generated>
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonEntity >> isBehavioural [
 
 	<generated>
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonEntity >> isClass [
 
 	<generated>
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonEntity >> isFileAnchor [
 
 	<generated>
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonEntity >> isFunction [
 
 	<generated>
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonEntity >> isImplicitVariable [
 
 	<generated>
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonEntity >> isInheritance [
 
 	<generated>
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonEntity >> isInvocation [
 
 	<generated>
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonEntity >> isLocalVariable [
 
 	<generated>
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonEntity >> isMethod [
 
 	<generated>
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
+FamixPythonEntity >> isNamedEntity [
+
+	<generated>
+	^ false
+]
+
+{ #category : 'testing' }
 FamixPythonEntity >> isPackage [
 
 	<generated>
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonEntity >> isPrimitiveType [
 
 	<generated>
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonEntity >> isQueryable [
 
 	<generated>
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonEntity >> isReference [
 
 	<generated>
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonEntity >> isStructuralEntity [
 
 	<generated>
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonEntity >> isType [
 
 	<generated>

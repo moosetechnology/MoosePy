@@ -17,14 +17,16 @@
 
 "
 Class {
-	#name : #FamixPythonSourcedEntity,
-	#superclass : #FamixPythonEntity,
+	#name : 'FamixPythonSourcedEntity',
+	#superclass : 'FamixPythonEntity',
 	#traits : 'FamixTSourceEntity',
 	#classTraits : 'FamixTSourceEntity classTrait',
-	#category : #'Famix-Python-Entities-Entities'
+	#category : 'Famix-Python-Entities-Entities',
+	#package : 'Famix-Python-Entities',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 FamixPythonSourcedEntity class >> annotation [
 
 	<FMClass: #SourcedEntity super: #FamixPythonEntity>
@@ -34,7 +36,7 @@ FamixPythonSourcedEntity class >> annotation [
 	^ self
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FamixPythonSourcedEntity class >> isAbstract [
 
 	<generated>

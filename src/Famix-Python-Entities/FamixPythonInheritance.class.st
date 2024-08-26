@@ -29,14 +29,16 @@
 
 "
 Class {
-	#name : #FamixPythonInheritance,
-	#superclass : #FamixPythonEntity,
+	#name : 'FamixPythonInheritance',
+	#superclass : 'FamixPythonEntity',
 	#traits : 'FamixTInheritance',
 	#classTraits : 'FamixTInheritance classTrait',
-	#category : #'Famix-Python-Entities-Entities'
+	#category : 'Famix-Python-Entities-Entities',
+	#package : 'Famix-Python-Entities',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 FamixPythonInheritance class >> annotation [
 
 	<FMClass: #Inheritance super: #FamixPythonEntity>

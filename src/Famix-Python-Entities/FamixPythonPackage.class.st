@@ -34,14 +34,16 @@
 
 "
 Class {
-	#name : #FamixPythonPackage,
-	#superclass : #FamixPythonContainerEntity,
+	#name : 'FamixPythonPackage',
+	#superclass : 'FamixPythonContainerEntity',
 	#traits : 'FamixTImportable + FamixTPackage + FamixTPackageable + FamixTWithComments',
 	#classTraits : 'FamixTImportable classTrait + FamixTPackage classTrait + FamixTPackageable classTrait + FamixTWithComments classTrait',
-	#category : #'Famix-Python-Entities-Entities'
+	#category : 'Famix-Python-Entities-Entities',
+	#package : 'Famix-Python-Entities',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 FamixPythonPackage class >> annotation [
 
 	<FMClass: #Package super: #FamixPythonContainerEntity>

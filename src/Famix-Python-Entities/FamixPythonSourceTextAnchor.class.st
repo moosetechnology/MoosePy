@@ -17,14 +17,16 @@
 
 "
 Class {
-	#name : #FamixPythonSourceTextAnchor,
-	#superclass : #FamixPythonSourceAnchor,
+	#name : 'FamixPythonSourceTextAnchor',
+	#superclass : 'FamixPythonSourceAnchor',
 	#traits : 'FamixTHasImmediateSource',
 	#classTraits : 'FamixTHasImmediateSource classTrait',
-	#category : #'Famix-Python-Entities-Entities'
+	#category : 'Famix-Python-Entities-Entities',
+	#package : 'Famix-Python-Entities',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 FamixPythonSourceTextAnchor class >> annotation [
 
 	<FMClass: #SourceTextAnchor super: #FamixPythonSourceAnchor>
