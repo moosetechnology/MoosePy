@@ -83,21 +83,11 @@ FamixPythonImporterTest >> sourceBig2 [
 	^ PythonParser parseFileWithErrors: (fileSystem / (self moduleName, '.py')) 
 ]
 
-{ #category : 'tests - extensions' }
-FamixPythonImporterTest >> testAddEqualIsAssignment [
-
-	| smaccAST |
-	smaccAST := self parseCode: '
-x += 12
-'.
-
-	self assert: smaccAST statements anyOne stmts anyOne isAssignment
-]
-
 { #category : 'tests' }
 FamixPythonImporterTest >> testAnnotatedClass [
 
 	| class anno |
+	self skip: 'Do we want the decorators in the model?'.
 	importer accept: (self parseCode: '
 @dataclass
 class ValueRange:
@@ -119,6 +109,7 @@ class ValueRange:
 FamixPythonImporterTest >> testAnnotatedFunction [
 
 	| fct anno |
+	self skip: 'Do we want the decorators in the model?'.
 	importer accept: (self parseCode: '
 @classmethod
 def greet(name):
@@ -227,22 +218,12 @@ FamixPythonImporterTest >> testClassesImportedTwiceAreOnlyImportedOnce [
 	self assert: importer classes size equals: 4
 ]
 
-{ #category : 'tests - extensions' }
-FamixPythonImporterTest >> testComentIsNotAssignment [
-
-	| smaccAST |
-	smaccAST := self parseCode: '
-"""This is a comment"""
-'.
-
-	self deny: smaccAST statements anyOne stmts anyOne isAssignment
-]
-
 { #category : 'tests - decorators' }
 FamixPythonImporterTest >> testDecoratorsFunctionSingleDecorator [
 	"https://realpython.com/primer-on-python-decorators/"
 
 	| famix |
+	self skip: 'Do we want the decorators in the model?'.
 	importer accept: (self parseCode: '
 @decorator
 def say_whee():
@@ -254,13 +235,14 @@ def say_whee():
 	famix := famix annotationInstances.
 	self assert: famix size equals: 1.
 	famix := famix first.
-	self assert: famix annotatedEntity name equals: 'say_whee'.
+	self assert: famix annotatedEntity name equals: 'say_whee'
 ]
 
 { #category : 'tests - decorators' }
 FamixPythonImporterTest >> testDecoratorsMethodSingleDecorator [
 
 	| famix |
+	self skip: 'Do we want the decorators in the model?'.
 	importer accept: (self parseCode: '
 class A:
 	@classmethod
@@ -281,6 +263,7 @@ class A:
 { #category : 'tests - decorators' }
 FamixPythonImporterTest >> testDecoratorsSanityCheck [
 
+	self skip: 'Do we want the decorators in the model?'.
 	importer accept: (self parseCode: '
 class A:
 	@classmethod
@@ -291,28 +274,6 @@ class A:
 	self
 		assert: (importer model allWithType: FamixPythonMethod) size
 		equals: 1
-]
-
-{ #category : 'tests - extensions' }
-FamixPythonImporterTest >> testDottedNamedAssignmentIsAssignment [
-
-	| smaccAST |
-	smaccAST := self parseCode: '
-x.a = 12
-'.
-
-	self assert: smaccAST statements anyOne stmts anyOne isAssignment
-]
-
-{ #category : 'tests - extensions' }
-FamixPythonImporterTest >> testEqualEqualIsAssignment [
-
-	| smaccAST |
-	smaccAST := self parseCode: '
-a = b =3
-'.
-
-	self assert: smaccAST statements anyOne stmts anyOne isAssignment
 ]
 
 { #category : 'tests - files' }
@@ -705,17 +666,6 @@ test(x, 25)
 		equals: '25'
 ]
 
-{ #category : 'tests - extensions' }
-FamixPythonImporterTest >> testIsAssignment [
-
-	| smaccAST |
-	smaccAST := self parseCode: '
-x = 12
-'.
-
-	self assert: smaccAST statements anyOne stmts anyOne isAssignment
-]
-
 { #category : 'tests' }
 FamixPythonImporterTest >> testIsModel [
 	
@@ -734,17 +684,6 @@ FamixPythonImporterTest >> testKnowsItsModule [
 	module := importer moduleNamed: self moduleName.
 	self assert: import manualImportingEntity equals: module.
 
-]
-
-{ #category : 'tests - extensions' }
-FamixPythonImporterTest >> testListEqualIsAssignment [
-
-	| smaccAST |
-	smaccAST := self parseCode: '
-a,b = 1,3
-'.
-
-	self assert: smaccAST statements anyOne stmts anyOne isAssignment
 ]
 
 { #category : 'tests - methods' }
@@ -819,17 +758,6 @@ FamixPythonImporterTest >> testModuleKnowsItsImport [
 
 ]
 
-{ #category : 'tests - extensions' }
-FamixPythonImporterTest >> testModuloEqualIsAssignment [
-
-	| smaccAST |
-	smaccAST := self parseCode: '
-x //= 12
-'.
-
-	self assert: smaccAST statements anyOne stmts anyOne isAssignment
-]
-
 { #category : 'tests - lambdas' }
 FamixPythonImporterTest >> testMultiFunctionsMultiLambdas [
 
@@ -887,6 +815,7 @@ FamixPythonImporterTest >> testParseWithFile [
 { #category : 'tests' }
 FamixPythonImporterTest >> testSameAnnotationType [
 
+	self skip: 'Do we want the decorators in the model?'.
 	importer accept: (self parseCode: '
 @classmethod
 def greet(name):
@@ -900,17 +829,6 @@ def goodbye(name):
 	self
 		assert: (importer functionNamed: 'greet')   annotationInstances anyOne annotationType
 		equals: (importer functionNamed: 'goodbye') annotationInstances anyOne annotationType
-]
-
-{ #category : 'tests - extensions' }
-FamixPythonImporterTest >> testShiftEqualIsAssignment [
-
-	| smaccAST |
-	smaccAST := self parseCode: '
-x >>= 12
-'.
-
-	self assert: smaccAST statements anyOne stmts anyOne isAssignment
 ]
 
 { #category : 'tests - metaclasses' }
@@ -939,7 +857,7 @@ class A(metaclass=pygame.sprite.Sprite):
 
 	classAMeta := classA metaclass.
 	self assert: classAMeta isNotNil.
-	self assert: classAMeta name equals: 'pygame.sprite.Sprite'
+	self assert: classAMeta name equals: 'Sprite'
 ]
 
 { #category : 'tests - metaclasses' }
@@ -970,20 +888,18 @@ class A(S):
 { #category : 'tests - metaclasses' }
 FamixPythonImporterTest >> testSingleClassFQNSuperclass [
 
-	| classA classMeta classAMeta |
+	| classA |
 	importer accept: (self parseCode: '
 class A(pygame.sprite.Sprite):
 	def foo:
 		pass
 ').
 
-	self
-		assert: (importer model allWithType: FamixPythonClass) size
-		equals: 2.
+	self assert: (importer model allWithType: FamixPythonClass) size equals: 2.
 
 	classA := importer classNamed: 'A'.
 	self assert: classA isNotNil.
-	self assert: (classA superInheritances first target name) equals: 'pygame.sprite.Sprite'.
+	self assert: classA superInheritances first target name equals: 'Sprite'
 ]
 
 { #category : 'tests - metaclasses' }

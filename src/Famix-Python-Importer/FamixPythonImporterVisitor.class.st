@@ -793,6 +793,19 @@ FamixPythonImporterVisitor >> visitLambda: aLambdaNode [
 ]
 
 { #category : 'visiting' }
+FamixPythonImporterVisitor >> visitMetaclass: aMetaclass [
+
+	| metaClassName metaClassObject |
+	metaClassName := aMetaclass superclass name.
+	metaClassObject := self classNamed: metaClassName.
+	metaClassObject ifNil: [
+		metaClassObject := model newClass
+			                   name: metaClassName;
+			                   stub: true ].
+	context top metaclass: metaClassObject
+]
+
+{ #category : 'visiting' }
 FamixPythonImporterVisitor >> visitName: aName [
 
 	^ aName name
