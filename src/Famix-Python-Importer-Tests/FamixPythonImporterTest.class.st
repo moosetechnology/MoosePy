@@ -171,7 +171,7 @@ FamixPythonImporterTest >> testClassIsInModel [
 	self assert: importer model name equals: 'testPythonModelName'
 ]
 
-{ #category : 'tests' }
+{ #category : 'tests - classes' }
 FamixPythonImporterTest >> testClasses [
 
 	importer accept: pyDoc.
@@ -180,7 +180,7 @@ FamixPythonImporterTest >> testClasses [
 	self assert: (importer classNamed: 'Player') isNotNil
 ]
 
-{ #category : 'tests' }
+{ #category : 'tests - classes' }
 FamixPythonImporterTest >> testClassesImportedTwiceAreOnlyImportedOnce [
 
 	importer accept: pyDoc.

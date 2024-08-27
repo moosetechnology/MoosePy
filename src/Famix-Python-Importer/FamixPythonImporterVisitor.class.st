@@ -100,19 +100,18 @@ FamixPythonImporterVisitor >> createAnnotationTypeNamed: aString [
 ]
 
 { #category : 'private-entity-creation' }
-FamixPythonImporterVisitor >> createClass: smaCCClass [
+FamixPythonImporterVisitor >> createClass: classDefinitionNode [
 
 	| famixClass superClasses metaClasses |
 	famixClass := model newClass.
-	famixClass name: smaCCClass cname value.
+	famixClass name: classDefinitionNode pythonClassName.
 
 	"Reject all metaclass declarations, keep only superclasses (if any)"
 	"TODO Handle PyTrailersNode"
-	superClasses := smaCCClass superClasses reject: [ :s |
-		                s class = PyMetaclassNode ].
-	superClasses do: [ :s |
+	superClasses := classDefinitionNode superClasses reject: [ :s | s class = PyMetaclassNode ].
+	superClasses do: [ :fieldAccessNode |
 		| superName superObject inheritance |
-		superName := s name.
+		superName := fieldAccessNode name.
 		superObject := self ensureClassNamed: superName.
 		inheritance := model newInheritance.
 		inheritance
@@ -130,9 +129,8 @@ FamixPythonImporterVisitor >> createClass: smaCCClass [
 			subclass: famixClass ].
 
 	"Reject all superclass declarations, keep only metaclasses (if any, there should be at most one)."
-	metaClasses := smaCCClass superClasses reject: [ :s |
-		               s class = PySymbolNode or: [
-			               s class = PyTrailersNode ] ].
+	"I don't know why this was used. We need tests hitting this part of the code to fix it."
+	"metaClasses := classDefinitionNode superClasses reject: [ :s | s class = PySymbolNode or: [ s class = PyTrailersNode ] ].
 	metaClasses do: [ :m |
 		| metaClassName metaClassObject |
 		metaClassName := m superclass name.
@@ -141,9 +139,9 @@ FamixPythonImporterVisitor >> createClass: smaCCClass [
 			metaClassObject := model newClass
 				                   name: metaClassName;
 				                   stub: true ].
-		famixClass metaclass: metaClassObject ].
+		famixClass metaclass: metaClassObject ]."
 
-	^ self setSourceAnchor: famixClass from: smaCCClass
+	^ self setSourceAnchor: famixClass from: classDefinitionNode
 ]
 
 { #category : 'private-entity-creation' }
@@ -267,8 +265,7 @@ FamixPythonImporterVisitor >> ensureAnnotationTypeNamed: aString [
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> ensureClass: aClassNode [
 
-	^ (self classNamed: aClassNode cname value) ifNil: [
-		  self createClass: aClassNode ]
+	^ (self classNamed: aClassNode pythonClassName) ifNil: [ self createClass: aClassNode ]
 ]
 
 { #category : 'private-entity-creation' }
@@ -691,11 +688,11 @@ FamixPythonImporterVisitor >> visitAssignmentStmt: anExprStmt [
 ]
 
 { #category : 'visiting' }
-FamixPythonImporterVisitor >> visitClassdef: aClassDef [
+FamixPythonImporterVisitor >> visitClassDefinition: aClassDef [
 
 	context push: (self ensureClass:  aClassDef).
 
-	super visitClassdef: aClassDef.
+	super visitClassDefinition: aClassDef.
 
 	^context pop
 ]
