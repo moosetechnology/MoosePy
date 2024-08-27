@@ -1,7 +1,7 @@
-Extension { #name : 'PyTrailerNode' }
+Extension { #name : 'PyNameNode' }
 
 { #category : '*Famix-Python-Importer' }
-PyTrailerNode >> name [
+PyNameNode >> name [
 
 	^ self nameToken value
 ]

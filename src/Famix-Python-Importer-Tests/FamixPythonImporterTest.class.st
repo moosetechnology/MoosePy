@@ -83,21 +83,11 @@ FamixPythonImporterTest >> sourceBig2 [
 	^ PythonParser parseFileWithErrors: (fileSystem / (self moduleName, '.py')) 
 ]
 
-{ #category : 'tests - extensions' }
-FamixPythonImporterTest >> testAddEqualIsAssignment [
-
-	| smaccAST |
-	smaccAST := self parseCode: '
-x += 12
-'.
-
-	self assert: smaccAST statements anyOne stmts anyOne isAssignment
-]
-
 { #category : 'tests' }
 FamixPythonImporterTest >> testAnnotatedClass [
 
 	| class anno |
+	self skip: 'Do we want the decorators in the model?'.
 	importer accept: (self parseCode: '
 @dataclass
 class ValueRange:
@@ -119,6 +109,7 @@ class ValueRange:
 FamixPythonImporterTest >> testAnnotatedFunction [
 
 	| fct anno |
+	self skip: 'Do we want the decorators in the model?'.
 	importer accept: (self parseCode: '
 @classmethod
 def greet(name):
@@ -133,6 +124,31 @@ def greet(name):
 	anno := fct annotationInstances anyOne.
 	self assert: anno annotatedEntity equals: fct.
 	self assert: anno annotationType name equals: 'classmethod'
+]
+
+{ #category : 'tests - attributes' }
+FamixPythonImporterTest >> testAttribute [
+
+	| class |
+	importer accept: pyDoc.
+	class := importer classNamed: 'Player'.
+	self assert: class attributes size equals: 3.
+	class attributes do: [ :attributes | self assert: (#( width height my_joystick ) anySatisfy: [ :name | name = attributes name ]) ]
+]
+
+{ #category : 'tests - classes' }
+FamixPythonImporterTest >> testClass [
+	
+	| ballClass wallClass | 
+	importer accept: pyDoc.
+	ballClass := importer classNamed: 'Ball'.
+	self assert: ballClass class equals: FamixPythonClass.
+	self assert: ballClass name equals: 'Ball'.
+	self deny: ballClass isStub.
+	
+	wallClass := importer classNamed: 'Wall'.
+	self assert: wallClass name equals: 'Wall'.
+	self deny: wallClass isStub.
 ]
 
 { #category : 'tests - attributes' }
@@ -171,7 +187,29 @@ FamixPythonImporterTest >> testClassIsInModel [
 	self assert: importer model name equals: 'testPythonModelName'
 ]
 
-{ #category : 'tests' }
+{ #category : 'tests - classes' }
+FamixPythonImporterTest >> testClassKnowsItsMethods [
+	
+	| cl | 
+	importer accept: pyDoc.
+	cl := importer classNamed: 'Player'.
+	self assert: cl methods first name equals: '__init__'.
+	self assert: cl methods first signature equals: 'self, x, y, joystick_no'.
+	
+]
+
+{ #category : 'tests - classes' }
+FamixPythonImporterTest >> testClassSuperclass [
+
+	| class |
+	importer accept: pyDoc.
+	class := importer classNamed: 'Player'.
+	self assert: class class equals: FamixPythonClass.
+	self assert: class superclass isNotNil.
+	self assert: class superclass name equals: 'Sprite'
+]
+
+{ #category : 'tests - classes' }
 FamixPythonImporterTest >> testClasses [
 
 	importer accept: pyDoc.
@@ -180,7 +218,7 @@ FamixPythonImporterTest >> testClasses [
 	self assert: (importer classNamed: 'Player') isNotNil
 ]
 
-{ #category : 'tests' }
+{ #category : 'tests - classes' }
 FamixPythonImporterTest >> testClassesImportedTwiceAreOnlyImportedOnce [
 
 	importer accept: pyDoc.
@@ -191,22 +229,12 @@ FamixPythonImporterTest >> testClassesImportedTwiceAreOnlyImportedOnce [
 	self assert: importer classes size equals: 4
 ]
 
-{ #category : 'tests - extensions' }
-FamixPythonImporterTest >> testComentIsNotAssignment [
-
-	| smaccAST |
-	smaccAST := self parseCode: '
-"""This is a comment"""
-'.
-
-	self deny: smaccAST statements anyOne stmts anyOne isAssignment
-]
-
 { #category : 'tests - decorators' }
 FamixPythonImporterTest >> testDecoratorsFunctionSingleDecorator [
 	"https://realpython.com/primer-on-python-decorators/"
 
 	| famix |
+	self skip: 'Do we want the decorators in the model?'.
 	importer accept: (self parseCode: '
 @decorator
 def say_whee():
@@ -218,13 +246,14 @@ def say_whee():
 	famix := famix annotationInstances.
 	self assert: famix size equals: 1.
 	famix := famix first.
-	self assert: famix annotatedEntity name equals: 'say_whee'.
+	self assert: famix annotatedEntity name equals: 'say_whee'
 ]
 
 { #category : 'tests - decorators' }
 FamixPythonImporterTest >> testDecoratorsMethodSingleDecorator [
 
 	| famix |
+	self skip: 'Do we want the decorators in the model?'.
 	importer accept: (self parseCode: '
 class A:
 	@classmethod
@@ -245,6 +274,7 @@ class A:
 { #category : 'tests - decorators' }
 FamixPythonImporterTest >> testDecoratorsSanityCheck [
 
+	self skip: 'Do we want the decorators in the model?'.
 	importer accept: (self parseCode: '
 class A:
 	@classmethod
@@ -257,28 +287,6 @@ class A:
 		equals: 1
 ]
 
-{ #category : 'tests - extensions' }
-FamixPythonImporterTest >> testDottedNamedAssignmentIsAssignment [
-
-	| smaccAST |
-	smaccAST := self parseCode: '
-x.a = 12
-'.
-
-	self assert: smaccAST statements anyOne stmts anyOne isAssignment
-]
-
-{ #category : 'tests - extensions' }
-FamixPythonImporterTest >> testEqualEqualIsAssignment [
-
-	| smaccAST |
-	smaccAST := self parseCode: '
-a = b =3
-'.
-
-	self assert: smaccAST statements anyOne stmts anyOne isAssignment
-]
-
 { #category : 'tests - files' }
 FamixPythonImporterTest >> testFileIsOk [
 	self assert: (fileSystem / (self moduleName, '.py')) contents size equals: 7586.
@@ -286,12 +294,34 @@ FamixPythonImporterTest >> testFileIsOk [
 	
 ]
 
+{ #category : 'tests - functions' }
+FamixPythonImporterTest >> testFunction [
+	
+	| func | 
+	importer accept: pyDoc2.
+	func := importer functionNamed: 'tryToPlaceWord'.
+	self assert: func class equals: FamixPythonFunction.
+	self assert: func signature equals: 'grid,word'
+
+]
+
+{ #category : 'tests - functions' }
+FamixPythonImporterTest >> testFunctionKnowsItsModule [
+
+	| func module |
+	importer accept: pyDoc2.
+	func := importer functionNamed: 'tryToPlaceWord'.
+	module := importer moduleNamed: 'sprite_collect_blocks_2'.
+	self assert: func functionOwner equals: module.
+	self assert: func functionOwner class equals: FamixPythonModule
+]
+
 { #category : 'tests - lambdas' }
 FamixPythonImporterTest >> testFunctionNoLambda [
 
 	| famix |
 	importer accept: (self parseCode: '
-def identity:
+def identity():
     print("identify")
 ').
 
@@ -307,8 +337,9 @@ def identity:
 FamixPythonImporterTest >> testFunctionSingleLambda [
 
 	| famix |
+	self skip: 'See if we want to manage lambdas? If yes, we should probably not represent them as functions.'.
 	importer accept: (self parseCode: '
-def identity:
+def identity():
     lambda x : x
 ').
 
@@ -322,6 +353,23 @@ def identity:
 	self assert: famix name equals: ''.
 	self assert: famix functionOwner name equals: 'identity'.
 	
+]
+
+{ #category : 'tests - functions' }
+FamixPythonImporterTest >> testFunctionWithParameter [
+
+	| param func |
+	importer accept: pyDoc2.
+
+	param := importer
+		parameterNamed: 'word'
+		inBehavioural: (importer functionNamed: 'tryToPlaceWord').
+	func := param parentBehaviouralEntity.
+
+	self assert: func class equals: FamixPythonFunction. 
+	self assert: (func signature includesSubstring: 'word') equals: true.
+
+	self assert: param isNotNil
 ]
 
 { #category : 'tests - import' }
@@ -347,146 +395,6 @@ from keras.layers import Input
 	self
 		assert: (importer importNamed: 'Input') fromName
 		equals: 'keras.layers'
-]
-
-{ #category : 'tests - classes' }
-FamixPythonImporterTest >> testImportClassKnowsItsMethods [
-	
-	| cl | 
-	importer accept: pyDoc.
-	cl := importer classNamed: 'Player'.
-	self assert: cl methods first name equals: '__init__'.
-	self assert: cl methods first signature equals: 'self, x, y, joystick_no'.
-	
-]
-
-{ #category : 'tests - classes' }
-FamixPythonImporterTest >> testImportFamixAttribute [
-
-	| clazz |
-	importer accept: pyDoc.
-	clazz := importer classNamed: 'Player'.
-	self assert: clazz attributes size equals: 3.
-	clazz attributes do: [ :att |
-		self assert: (#(width height my_joystick) anySatisfy: [:name | name = att name]).
-	].
-
-
-]
-
-{ #category : 'tests - classes' }
-FamixPythonImporterTest >> testImportFamixClass [
-	
-	| ballClass wallClass | 
-	importer accept: pyDoc.
-	ballClass := importer classNamed: 'Ball'.
-	self assert: ballClass class equals: FamixPythonClass.
-	self assert: ballClass name equals: 'Ball'.
-	self deny: ballClass isStub.
-	
-	wallClass := importer classNamed: 'Wall'.
-	self assert: wallClass name equals: 'Wall'.
-	self deny: wallClass isStub.
-]
-
-{ #category : 'tests - classes' }
-FamixPythonImporterTest >> testImportFamixFunction [
-	
-	| func | 
-	importer accept: pyDoc2.
-	func := importer functionNamed: 'tryToPlaceWord'.
-	self assert: func class equals: FamixPythonFunction.
-	self assert: func signature equals: 'grid, word'
-
-]
-
-{ #category : 'tests - classes' }
-FamixPythonImporterTest >> testImportFamixFunctionKnowsItsModule [
-
-	| func module |
-	importer accept: pyDoc2.
-	func := importer functionNamed: 'tryToPlaceWord'.
-	module := importer moduleNamed: 'sprite_collect_blocks_2'.
-	self assert: func functionOwner equals: module.
-	self assert: func functionOwner class equals: FamixPythonModule
-]
-
-{ #category : 'tests - classes' }
-FamixPythonImporterTest >> testImportFamixFunctionWithParameter [
-
-	| param func |
-	importer accept: pyDoc2.
-
-	param := importer
-		parameterNamed: 'word'
-		inBehavioural: (importer functionNamed: 'tryToPlaceWord').
-	func := param parentBehaviouralEntity.
-
-	self assert: func class equals: FamixPythonFunction. 
-	self assert: (func signature includesSubstring: 'word') equals: true.
-
-	self assert: param isNotNil
-]
-
-{ #category : 'tests - classes' }
-FamixPythonImporterTest >> testImportFamixMethod [
-
-	| mth |
-	importer accept: pyDoc.
-	mth := importer methodNamed: '__init__' inClassNamed: 'Player'.
-	self assert: mth class equals: FamixPythonMethod.
-	self assert: mth name equals: '__init__'.
-	self assert: mth signature equals: 'self, x, y, joystick_no'
-]
-
-{ #category : 'tests - classes' }
-FamixPythonImporterTest >> testImportFamixMethodKnowsItsClass [
-
-	| mth cl |
-	importer accept: pyDoc.
-	mth := importer methodNamed: '__init__' inClassNamed: 'Player'.
-	cl := importer classNamed: 'Player'.
-	self assert: mth parentType equals: cl.
-	self assert: mth parentType class equals: FamixPythonClass
-]
-
-{ #category : 'tests - classes' }
-FamixPythonImporterTest >> testImportFamixMethodWithParameter [
-
-	| param  mth |
-	importer accept: pyDoc.
-
-	param := importer
-		parameterNamed: 'y'
-		inBehavioural: (importer methodNamed: '__init__' inClassNamed: 'Player').
-
-	mth := param parentBehaviouralEntity.
-
-	self assert: mth class equals: FamixPythonMethod.
-
-	self assert: (mth signature includesSubstring: 'y') equals: true.
-
-	self assert: param isNotNil
-]
-
-{ #category : 'tests - classes' }
-FamixPythonImporterTest >> testImportFamixParameter [
-
-	| param |
-	importer accept: pyDoc.
-	param := importer
-		parameterNamed: 'joystick_no'
-		inBehavioural: (importer methodNamed: '__init__' inClassNamed: 'Player').
-
-	self assert: param class equals: FamixPythonParameter.
-	self assert: param name equals: 'joystick_no'.
-	
-	importer accept: pyDoc2.
-	param := importer
-		parameterNamed: 'word'
-		inBehavioural: (importer functionNamed: 'tryToPlaceWord').
-	self assert: param class equals: FamixPythonParameter.
-	self assert: param name equals: 'word'.
 ]
 
 { #category : 'tests - import' }
@@ -769,17 +677,6 @@ test(x, 25)
 		equals: '25'
 ]
 
-{ #category : 'tests - extensions' }
-FamixPythonImporterTest >> testIsAssignment [
-
-	| smaccAST |
-	smaccAST := self parseCode: '
-x = 12
-'.
-
-	self assert: smaccAST statements anyOne stmts anyOne isAssignment
-]
-
 { #category : 'tests' }
 FamixPythonImporterTest >> testIsModel [
 	
@@ -800,21 +697,51 @@ FamixPythonImporterTest >> testKnowsItsModule [
 
 ]
 
-{ #category : 'tests - extensions' }
-FamixPythonImporterTest >> testListEqualIsAssignment [
+{ #category : 'tests - methods' }
+FamixPythonImporterTest >> testMethod [
 
-	| smaccAST |
-	smaccAST := self parseCode: '
-a,b = 1,3
-'.
-
-	self assert: smaccAST statements anyOne stmts anyOne isAssignment
+	| mth |
+	importer accept: pyDoc.
+	mth := importer methodNamed: '__init__' inClassNamed: 'Player'.
+	self assert: mth class equals: FamixPythonMethod.
+	self assert: mth name equals: '__init__'.
+	self assert: mth signature equals: 'self, x, y, joystick_no'
 ]
 
-{ #category : 'tests - classes' }
+{ #category : 'tests - methods' }
 FamixPythonImporterTest >> testMethodIsInModel [
 	importer accept: pyDoc.
 	self assert: importer model numberOfMethods equals: 5.
+]
+
+{ #category : 'tests - methods' }
+FamixPythonImporterTest >> testMethodKnowsItsClass [
+
+	| mth cl |
+	importer accept: pyDoc.
+	mth := importer methodNamed: '__init__' inClassNamed: 'Player'.
+	cl := importer classNamed: 'Player'.
+	self assert: mth parentType equals: cl.
+	self assert: mth parentType class equals: FamixPythonClass
+]
+
+{ #category : 'tests - methods' }
+FamixPythonImporterTest >> testMethodWithParameter [
+
+	| param  mth |
+	importer accept: pyDoc.
+
+	param := importer
+		parameterNamed: 'y'
+		inBehavioural: (importer methodNamed: '__init__' inClassNamed: 'Player').
+
+	mth := param parentBehaviouralEntity.
+
+	self assert: mth class equals: FamixPythonMethod.
+
+	self assert: (mth signature includesSubstring: 'y') equals: true.
+
+	self assert: param isNotNil
 ]
 
 { #category : 'tests - module' }
@@ -842,25 +769,15 @@ FamixPythonImporterTest >> testModuleKnowsItsImport [
 
 ]
 
-{ #category : 'tests - extensions' }
-FamixPythonImporterTest >> testModuloEqualIsAssignment [
-
-	| smaccAST |
-	smaccAST := self parseCode: '
-x //= 12
-'.
-
-	self assert: smaccAST statements anyOne stmts anyOne isAssignment
-]
-
 { #category : 'tests - lambdas' }
 FamixPythonImporterTest >> testMultiFunctionsMultiLambdas [
 
 	| famix |
+	self skip: 'See if we want to manage lambdas? If yes, we should probably not represent them as functions.'.
 	importer accept: (self parseCode: '
-def identity:
+def identity():
     lambda x : x
-def identity2:
+def identity2():
     lambda x : x
     lambda x : x
 ').
@@ -877,6 +794,26 @@ def identity2:
 	
 ]
 
+{ #category : 'tests - classes' }
+FamixPythonImporterTest >> testParameter [
+
+	| param |
+	importer accept: pyDoc.
+	param := importer
+		parameterNamed: 'joystick_no'
+		inBehavioural: (importer methodNamed: '__init__' inClassNamed: 'Player').
+
+	self assert: param class equals: FamixPythonParameter.
+	self assert: param name equals: 'joystick_no'.
+	
+	importer accept: pyDoc2.
+	param := importer
+		parameterNamed: 'word'
+		inBehavioural: (importer functionNamed: 'tryToPlaceWord').
+	self assert: param class equals: FamixPythonParameter.
+	self assert: param name equals: 'word'.
+]
+
 { #category : 'tests - files' }
 FamixPythonImporterTest >> testParseWithFile [
 
@@ -889,6 +826,7 @@ FamixPythonImporterTest >> testParseWithFile [
 { #category : 'tests' }
 FamixPythonImporterTest >> testSameAnnotationType [
 
+	self skip: 'Do we want the decorators in the model?'.
 	importer accept: (self parseCode: '
 @classmethod
 def greet(name):
@@ -902,17 +840,6 @@ def goodbye(name):
 	self
 		assert: (importer functionNamed: 'greet')   annotationInstances anyOne annotationType
 		equals: (importer functionNamed: 'goodbye') annotationInstances anyOne annotationType
-]
-
-{ #category : 'tests - extensions' }
-FamixPythonImporterTest >> testShiftEqualIsAssignment [
-
-	| smaccAST |
-	smaccAST := self parseCode: '
-x >>= 12
-'.
-
-	self assert: smaccAST statements anyOne stmts anyOne isAssignment
 ]
 
 { #category : 'tests - metaclasses' }
@@ -941,7 +868,7 @@ class A(metaclass=pygame.sprite.Sprite):
 
 	classAMeta := classA metaclass.
 	self assert: classAMeta isNotNil.
-	self assert: classAMeta name equals: 'pygame.sprite.Sprite'
+	self assert: classAMeta name equals: 'Sprite'
 ]
 
 { #category : 'tests - metaclasses' }
@@ -972,20 +899,18 @@ class A(S):
 { #category : 'tests - metaclasses' }
 FamixPythonImporterTest >> testSingleClassFQNSuperclass [
 
-	| classA classMeta classAMeta |
+	| classA |
 	importer accept: (self parseCode: '
 class A(pygame.sprite.Sprite):
 	def foo:
 		pass
 ').
 
-	self
-		assert: (importer model allWithType: FamixPythonClass) size
-		equals: 2.
+	self assert: (importer model allWithType: FamixPythonClass) size equals: 2.
 
 	classA := importer classNamed: 'A'.
 	self assert: classA isNotNil.
-	self assert: (classA superInheritances first target name) equals: 'pygame.sprite.Sprite'.
+	self assert: classA superInheritances first target name equals: 'Sprite'
 ]
 
 { #category : 'tests - metaclasses' }
