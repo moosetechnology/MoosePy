@@ -199,6 +199,17 @@ FamixPythonImporterTest >> testClassKnowsItsMethods [
 ]
 
 { #category : 'tests - classes' }
+FamixPythonImporterTest >> testClassSuperclass [
+
+	| class |
+	importer accept: pyDoc.
+	class := importer classNamed: 'Player'.
+	self assert: class class equals: FamixPythonClass.
+	self assert: class superclass isNotNil.
+	self assert: class superclass name equals: 'Sprite'
+]
+
+{ #category : 'tests - classes' }
 FamixPythonImporterTest >> testClasses [
 
 	importer accept: pyDoc.

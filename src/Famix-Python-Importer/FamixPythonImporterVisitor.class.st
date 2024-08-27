@@ -102,7 +102,7 @@ FamixPythonImporterVisitor >> createAnnotationTypeNamed: aString [
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> createClass: classDefinitionNode [
 
-	| famixClass superClasses metaClasses |
+	| famixClass superClasses |
 	famixClass := model newClass.
 	famixClass name: classDefinitionNode pythonClassName.
 
@@ -127,19 +127,6 @@ FamixPythonImporterVisitor >> createClass: classDefinitionNode [
 		inheritance
 			superclass: object yourself;
 			subclass: famixClass ].
-
-	"Reject all superclass declarations, keep only metaclasses (if any, there should be at most one)."
-	"I don't know why this was used. We need tests hitting this part of the code to fix it."
-	"metaClasses := classDefinitionNode superClasses reject: [ :s | s class = PySymbolNode or: [ s class = PyTrailersNode ] ].
-	metaClasses do: [ :m |
-		| metaClassName metaClassObject |
-		metaClassName := m superclass name.
-		metaClassObject := self classNamed: metaClassName.
-		metaClassObject ifNil: [
-			metaClassObject := model newClass
-				                   name: metaClassName;
-				                   stub: true ].
-		famixClass metaclass: metaClassObject ]."
 
 	^ self setSourceAnchor: famixClass from: classDefinitionNode
 ]
