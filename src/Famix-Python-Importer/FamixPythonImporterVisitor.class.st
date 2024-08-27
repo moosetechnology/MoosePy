@@ -670,10 +670,11 @@ FamixPythonImporterVisitor >> visitAnnotatedSymbol: anAnnotatedSymbol [
 ]
 
 { #category : 'visiting' }
-FamixPythonImporterVisitor >> visitAssignmentStmt: anExprStmt [
+FamixPythonImporterVisitor >> visitAssignmentStatement: anAssignmentStatement [
 
-	(anExprStmt testlist class = PySymbolNode)
-		ifTrue: [ ^self ensureVariable: anExprStmt testlist nameToken value localTo: context top]
+	(anAssignmentStatement lhs isKindOf: PyVariableExpressionNode) ifTrue: [ self ensureVariable: anAssignmentStatement lhs name localTo: context top ].
+
+	^ super visitAssignmentStatement: anAssignmentStatement
 ]
 
 { #category : 'visiting' }

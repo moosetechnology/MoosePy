@@ -135,6 +135,16 @@ def greet(name):
 	self assert: anno annotationType name equals: 'classmethod'
 ]
 
+{ #category : 'tests - attributes' }
+FamixPythonImporterTest >> testAttribute [
+
+	| class |
+	importer accept: pyDoc.
+	class := importer classNamed: 'Player'.
+	self assert: class attributes size equals: 3.
+	class attributes do: [ :attributes | self assert: (#( width height my_joystick ) anySatisfy: [ :name | name = attributes name ]) ]
+]
+
 { #category : 'tests - classes' }
 FamixPythonImporterTest >> testClass [
 	
@@ -387,20 +397,6 @@ FamixPythonImporterTest >> testImportClassKnowsItsMethods [
 ]
 
 { #category : 'tests - classes' }
-FamixPythonImporterTest >> testImportFamixAttribute [
-
-	| clazz |
-	importer accept: pyDoc.
-	clazz := importer classNamed: 'Player'.
-	self assert: clazz attributes size equals: 3.
-	clazz attributes do: [ :att |
-		self assert: (#(width height my_joystick) anySatisfy: [:name | name = att name]).
-	].
-
-
-]
-
-{ #category : 'tests - classes' }
 FamixPythonImporterTest >> testImportFamixFunctionKnowsItsModule [
 
 	| func module |
@@ -437,25 +433,6 @@ FamixPythonImporterTest >> testImportFamixMethodKnowsItsClass [
 	cl := importer classNamed: 'Player'.
 	self assert: mth parentType equals: cl.
 	self assert: mth parentType class equals: FamixPythonClass
-]
-
-{ #category : 'tests - classes' }
-FamixPythonImporterTest >> testImportFamixMethodWithParameter [
-
-	| param  mth |
-	importer accept: pyDoc.
-
-	param := importer
-		parameterNamed: 'y'
-		inBehavioural: (importer methodNamed: '__init__' inClassNamed: 'Player').
-
-	mth := param parentBehaviouralEntity.
-
-	self assert: mth class equals: FamixPythonMethod.
-
-	self assert: (mth signature includesSubstring: 'y') equals: true.
-
-	self assert: param isNotNil
 ]
 
 { #category : 'tests - import' }
@@ -795,6 +772,25 @@ FamixPythonImporterTest >> testMethod [
 FamixPythonImporterTest >> testMethodIsInModel [
 	importer accept: pyDoc.
 	self assert: importer model numberOfMethods equals: 5.
+]
+
+{ #category : 'tests - methods' }
+FamixPythonImporterTest >> testMethodWithParameter [
+
+	| param  mth |
+	importer accept: pyDoc.
+
+	param := importer
+		parameterNamed: 'y'
+		inBehavioural: (importer methodNamed: '__init__' inClassNamed: 'Player').
+
+	mth := param parentBehaviouralEntity.
+
+	self assert: mth class equals: FamixPythonMethod.
+
+	self assert: (mth signature includesSubstring: 'y') equals: true.
+
+	self assert: param isNotNil
 ]
 
 { #category : 'tests - module' }
