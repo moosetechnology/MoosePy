@@ -286,6 +286,17 @@ FamixPythonImporterTest >> testFileIsOk [
 	
 ]
 
+{ #category : 'tests - functions' }
+FamixPythonImporterTest >> testFunction [
+	
+	| func | 
+	importer accept: pyDoc2.
+	func := importer functionNamed: 'tryToPlaceWord'.
+	self assert: func class equals: FamixPythonFunction.
+	self assert: func signature equals: 'grid,word'
+
+]
+
 { #category : 'tests - lambdas' }
 FamixPythonImporterTest >> testFunctionNoLambda [
 
@@ -390,17 +401,6 @@ FamixPythonImporterTest >> testImportFamixClass [
 ]
 
 { #category : 'tests - classes' }
-FamixPythonImporterTest >> testImportFamixFunction [
-	
-	| func | 
-	importer accept: pyDoc2.
-	func := importer functionNamed: 'tryToPlaceWord'.
-	self assert: func class equals: FamixPythonFunction.
-	self assert: func signature equals: 'grid, word'
-
-]
-
-{ #category : 'tests - classes' }
 FamixPythonImporterTest >> testImportFamixFunctionKnowsItsModule [
 
 	| func module |
@@ -428,7 +428,7 @@ FamixPythonImporterTest >> testImportFamixFunctionWithParameter [
 	self assert: param isNotNil
 ]
 
-{ #category : 'tests - classes' }
+{ #category : 'tests - methods' }
 FamixPythonImporterTest >> testImportFamixMethod [
 
 	| mth |

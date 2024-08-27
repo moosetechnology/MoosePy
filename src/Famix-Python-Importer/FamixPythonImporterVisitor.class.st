@@ -148,11 +148,9 @@ FamixPythonImporterVisitor >> createClass: classDefinitionNode [
 FamixPythonImporterVisitor >> createFunction: aFunctionNode [
 
 	| function signature |
-	signature := aFunctionNode parameters ifNotNil: [ :params |
-		params signatureString ].
-	function := self
-		basicCreateFunction: aFunctionNode fname value
-		withSignature: signature.
+	signature := aFunctionNode signatureString.
+
+	function := self basicCreateFunction: aFunctionNode fname value withSignature: signature.
 
 	function functionOwner: context top.
 
@@ -219,11 +217,8 @@ FamixPythonImporterVisitor >> createLambda: aLambdaNode [
 FamixPythonImporterVisitor >> createMethod: aMethodNode [
 
 	| method signature |
-	signature := aMethodNode parameters ifNotNil: [ :params |
-		params signatureString ].
-	method := self
-		basicCreateMethod: aMethodNode fname value
-		withSignature: signature.
+	signature := aMethodNode signatureString.
+	method := self basicCreateMethod: aMethodNode fname value withSignature: signature.
 
 	method parentType: context top.
 
@@ -745,17 +740,17 @@ FamixPythonImporterVisitor >> visitFile: aFileNode [
 ]
 
 { #category : 'visiting' }
-FamixPythonImporterVisitor >> visitFuncdef: aFuncdef [
+FamixPythonImporterVisitor >> visitFunctionDefinition: aFunctionDefinition [
 	"the parser does not make a difference between function and method, but a method is defined in a class and its first parameter is self."
 
 	| fmx result |
 
 	fmx := context top isClass
-		ifTrue: [  self ensureMethod: aFuncdef ]
-		ifFalse: [ self ensureFunction: aFuncdef ].
+		ifTrue: [  self ensureMethod: aFunctionDefinition ]
+		ifFalse: [ self ensureFunction: aFunctionDefinition ].
 	context push: fmx.
 
-	result := super visitFuncdef: aFuncdef.
+	result := super visitFunctionDefinition: aFunctionDefinition.
 
 	^context pop
 ]
