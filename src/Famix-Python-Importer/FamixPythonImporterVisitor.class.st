@@ -239,15 +239,13 @@ FamixPythonImporterVisitor >> createModule: aModuleNode named: aName [
 FamixPythonImporterVisitor >> createParameter: aParameter inBehavioural: aFamixContainer [
 
 	| parameterName parameter |
-	parameterName := aParameter nameToken value.
+	parameterName := aParameter parameterName.
 	parameter := model newParameter.
 	parameter name: parameterName.
 
 	parameter parentBehaviouralEntity: aFamixContainer.
-	
-	^ self setSourceAnchor: parameter from: aParameter.
 
-
+	^ self setSourceAnchor: parameter from: aParameter
 ]
 
 { #category : 'private-entity-creation' }
@@ -314,14 +312,10 @@ FamixPythonImporterVisitor >> ensureModuleNamed: moduleName fromNode: aModuleNod
 ]
 
 { #category : 'private-entity-creation' }
-FamixPythonImporterVisitor >> ensureParameters: theParameters inBehavioural: aFamixBehavioural [
+FamixPythonImporterVisitor >> ensureParameter: parameter inBehavioural: aBehavioralEntity [
 
-	^ theParameters ifNotNil: [
-		  theParameters args collect: [ :parameter |
-			  (self
-				   parameterNamed: parameter nameToken value
-				   inBehavioural: aFamixBehavioural ) ifNil: [
-				  self createParameter: parameter inBehavioural: aFamixBehavioural ] ] ]
+	^ (self parameterNamed:parameter parameterName inBehavioural: aBehavioralEntity)
+		ifNil: [ self createParameter: parameter inBehavioural: aBehavioralEntity ]
 ]
 
 { #category : 'visiting' }
@@ -797,6 +791,13 @@ FamixPythonImporterVisitor >> visitName: aName [
 ]
 
 { #category : 'visiting' }
+FamixPythonImporterVisitor >> visitParameter: aParameter [
+	"parameters in a function/methoid definition"
+
+	^ self ensureParameter: aParameter inBehavioural: context top
+]
+
+{ #category : 'visiting' }
 FamixPythonImporterVisitor >> visitPower: anInvocation [
 
 	anInvocation trailers ifNotEmpty: [
@@ -838,16 +839,6 @@ FamixPythonImporterVisitor >> visitString: aStringNode [
 FamixPythonImporterVisitor >> visitStrings: aStringsNode [
 
 	^ aStringsNode strings collect: [:each| self acceptNode: each]
-]
-
-{ #category : 'visiting' }
-FamixPythonImporterVisitor >> visitVarArgList: aVarArgList [
-	"parameters in a function/methoid definition"
-
-	^self
-		ensureParameters: aVarArgList
-		inBehavioural: context top.
-
 ]
 
 { #category : 'visiting' }

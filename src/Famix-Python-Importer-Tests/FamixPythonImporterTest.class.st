@@ -135,6 +135,21 @@ def greet(name):
 	self assert: anno annotationType name equals: 'classmethod'
 ]
 
+{ #category : 'tests - classes' }
+FamixPythonImporterTest >> testClass [
+	
+	| ballClass wallClass | 
+	importer accept: pyDoc.
+	ballClass := importer classNamed: 'Ball'.
+	self assert: ballClass class equals: FamixPythonClass.
+	self assert: ballClass name equals: 'Ball'.
+	self deny: ballClass isStub.
+	
+	wallClass := importer classNamed: 'Wall'.
+	self assert: wallClass name equals: 'Wall'.
+	self deny: wallClass isStub.
+]
+
 { #category : 'tests - attributes' }
 FamixPythonImporterTest >> testClassAttributes [
 
@@ -386,21 +401,6 @@ FamixPythonImporterTest >> testImportFamixAttribute [
 ]
 
 { #category : 'tests - classes' }
-FamixPythonImporterTest >> testImportFamixClass [
-	
-	| ballClass wallClass | 
-	importer accept: pyDoc.
-	ballClass := importer classNamed: 'Ball'.
-	self assert: ballClass class equals: FamixPythonClass.
-	self assert: ballClass name equals: 'Ball'.
-	self deny: ballClass isStub.
-	
-	wallClass := importer classNamed: 'Wall'.
-	self assert: wallClass name equals: 'Wall'.
-	self deny: wallClass isStub.
-]
-
-{ #category : 'tests - classes' }
 FamixPythonImporterTest >> testImportFamixFunctionKnowsItsModule [
 
 	| func module |
@@ -426,17 +426,6 @@ FamixPythonImporterTest >> testImportFamixFunctionWithParameter [
 	self assert: (func signature includesSubstring: 'word') equals: true.
 
 	self assert: param isNotNil
-]
-
-{ #category : 'tests - methods' }
-FamixPythonImporterTest >> testImportFamixMethod [
-
-	| mth |
-	importer accept: pyDoc.
-	mth := importer methodNamed: '__init__' inClassNamed: 'Player'.
-	self assert: mth class equals: FamixPythonMethod.
-	self assert: mth name equals: '__init__'.
-	self assert: mth signature equals: 'self, x, y, joystick_no'
 ]
 
 { #category : 'tests - classes' }
@@ -467,26 +456,6 @@ FamixPythonImporterTest >> testImportFamixMethodWithParameter [
 	self assert: (mth signature includesSubstring: 'y') equals: true.
 
 	self assert: param isNotNil
-]
-
-{ #category : 'tests - classes' }
-FamixPythonImporterTest >> testImportFamixParameter [
-
-	| param |
-	importer accept: pyDoc.
-	param := importer
-		parameterNamed: 'joystick_no'
-		inBehavioural: (importer methodNamed: '__init__' inClassNamed: 'Player').
-
-	self assert: param class equals: FamixPythonParameter.
-	self assert: param name equals: 'joystick_no'.
-	
-	importer accept: pyDoc2.
-	param := importer
-		parameterNamed: 'word'
-		inBehavioural: (importer functionNamed: 'tryToPlaceWord').
-	self assert: param class equals: FamixPythonParameter.
-	self assert: param name equals: 'word'.
 ]
 
 { #category : 'tests - import' }
@@ -811,6 +780,17 @@ a,b = 1,3
 	self assert: smaccAST statements anyOne stmts anyOne isAssignment
 ]
 
+{ #category : 'tests - methods' }
+FamixPythonImporterTest >> testMethod [
+
+	| mth |
+	importer accept: pyDoc.
+	mth := importer methodNamed: '__init__' inClassNamed: 'Player'.
+	self assert: mth class equals: FamixPythonMethod.
+	self assert: mth name equals: '__init__'.
+	self assert: mth signature equals: 'self, x, y, joystick_no'
+]
+
 { #category : 'tests - classes' }
 FamixPythonImporterTest >> testMethodIsInModel [
 	importer accept: pyDoc.
@@ -875,6 +855,26 @@ def identity2:
 	self assert: famix name equals: ''.
 	self assert: famix functionOwner name equals: 'identity'.
 	
+]
+
+{ #category : 'tests - classes' }
+FamixPythonImporterTest >> testParameter [
+
+	| param |
+	importer accept: pyDoc.
+	param := importer
+		parameterNamed: 'joystick_no'
+		inBehavioural: (importer methodNamed: '__init__' inClassNamed: 'Player').
+
+	self assert: param class equals: FamixPythonParameter.
+	self assert: param name equals: 'joystick_no'.
+	
+	importer accept: pyDoc2.
+	param := importer
+		parameterNamed: 'word'
+		inBehavioural: (importer functionNamed: 'tryToPlaceWord').
+	self assert: param class equals: FamixPythonParameter.
+	self assert: param name equals: 'word'.
 ]
 
 { #category : 'tests - files' }
