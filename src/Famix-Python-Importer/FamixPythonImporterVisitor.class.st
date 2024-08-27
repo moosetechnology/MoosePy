@@ -624,7 +624,7 @@ FamixPythonImporterVisitor >> parameters [
 FamixPythonImporterVisitor >> parentFileForNode: aPyNode [ 
 
 	aPyNode ifNil: [ ^nil ].
-	(aPyNode isKindOf: PyFileInputNode) ifTrue: [ ^aPyNode ].
+	(aPyNode isKindOf: PyFileNode) ifTrue: [ ^aPyNode ].
 	^self parentFileForNode: aPyNode parent
 ]
 
@@ -734,15 +734,15 @@ FamixPythonImporterVisitor >> visitExprStmt: anExprStmt [
 ]
 
 { #category : 'visiting' }
-FamixPythonImporterVisitor >> visitFileInput: aFileInputNode [
+FamixPythonImporterVisitor >> visitFile: aFileNode [
 
 	| module |
 	module := self
-		ensureModuleNamed: (self moduleNameStringOf: aFileInputNode)
-		fromNode: aFileInputNode.
+		ensureModuleNamed: (self moduleNameStringOf: aFileNode)
+		fromNode: aFileNode.
 	context push: module.
 
-	self acceptNodes: aFileInputNode statements.
+	self acceptNodes: aFileNode statements.
 
 	^context pop
 ]
