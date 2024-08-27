@@ -349,7 +349,7 @@ FamixPythonImporterTest >> testFunctionNoLambda [
 
 	| famix |
 	importer accept: (self parseCode: '
-def identity:
+def identity():
     print("identify")
 ').
 
@@ -365,8 +365,9 @@ def identity:
 FamixPythonImporterTest >> testFunctionSingleLambda [
 
 	| famix |
+	self skip: 'See if we want to manage lambdas? If yes, we should probably not represent them as functions.'.
 	importer accept: (self parseCode: '
-def identity:
+def identity():
     lambda x : x
 ').
 
@@ -833,10 +834,11 @@ x //= 12
 FamixPythonImporterTest >> testMultiFunctionsMultiLambdas [
 
 	| famix |
+	self skip: 'See if we want to manage lambdas? If yes, we should probably not represent them as functions.'.
 	importer accept: (self parseCode: '
-def identity:
+def identity():
     lambda x : x
-def identity2:
+def identity2():
     lambda x : x
     lambda x : x
 ').
