@@ -764,13 +764,13 @@ FamixPythonImporterVisitor >> visitFuncdef: aFuncdef [
 ]
 
 { #category : 'visiting' }
-FamixPythonImporterVisitor >> visitImport: anImport [
+FamixPythonImporterVisitor >> visitImportStatement: anImport [
 
-	^self
-		ensureImport: anImport
-		of: (anImport names collect: [ :name | self acceptNode: name ])
-		from: (self acceptNode: anImport from)
-		aliases: (anImport renames collect: [ :alias | self acceptNode: alias ])
+	^ self
+		  ensureImport: anImport
+		  of: (anImport names collect: [ :name | self acceptNode: name ])
+		  from: (self acceptNode: anImport from)
+		  aliases: (anImport renames collect: [ :alias | self acceptNode: alias ])
 ]
 
 { #category : 'visiting' }
@@ -856,4 +856,10 @@ FamixPythonImporterVisitor >> visitVarArgList: aVarArgList [
 		ensureParameters: aVarArgList
 		inBehavioural: context top.
 
+]
+
+{ #category : 'visiting' }
+FamixPythonImporterVisitor >> visitVariableExpression: aVariableExpression [
+
+	^ aVariableExpression name
 ]
