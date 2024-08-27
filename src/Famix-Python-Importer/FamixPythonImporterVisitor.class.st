@@ -720,6 +720,12 @@ FamixPythonImporterVisitor >> visitExprStmt: anExprStmt [
 	super visitExprStmt: anExprStmt.
 ]
 
+{ #category : 'generated' }
+FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression [
+
+	^ aFieldAccessExpression source
+]
+
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> visitFile: aFileNode [
 
@@ -788,7 +794,8 @@ FamixPythonImporterVisitor >> visitLambda: aLambdaNode [
 
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> visitName: aName [
-	^self acceptNode: aName name
+
+	^ aName name
 ]
 
 { #category : 'visiting' }

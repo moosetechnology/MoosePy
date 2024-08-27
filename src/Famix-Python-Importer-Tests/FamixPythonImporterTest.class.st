@@ -197,6 +197,17 @@ FamixPythonImporterTest >> testClassIsInModel [
 ]
 
 { #category : 'tests - classes' }
+FamixPythonImporterTest >> testClassKnowsItsMethods [
+	
+	| cl | 
+	importer accept: pyDoc.
+	cl := importer classNamed: 'Player'.
+	self assert: cl methods first name equals: '__init__'.
+	self assert: cl methods first signature equals: 'self, x, y, joystick_no'.
+	
+]
+
+{ #category : 'tests - classes' }
 FamixPythonImporterTest >> testClasses [
 
 	importer accept: pyDoc.
@@ -322,6 +333,17 @@ FamixPythonImporterTest >> testFunction [
 
 ]
 
+{ #category : 'tests - functions' }
+FamixPythonImporterTest >> testFunctionKnowsItsModule [
+
+	| func module |
+	importer accept: pyDoc2.
+	func := importer functionNamed: 'tryToPlaceWord'.
+	module := importer moduleNamed: 'sprite_collect_blocks_2'.
+	self assert: func functionOwner equals: module.
+	self assert: func functionOwner class equals: FamixPythonModule
+]
+
 { #category : 'tests - lambdas' }
 FamixPythonImporterTest >> testFunctionNoLambda [
 
@@ -360,6 +382,23 @@ def identity:
 	
 ]
 
+{ #category : 'tests - functions' }
+FamixPythonImporterTest >> testFunctionWithParameter [
+
+	| param func |
+	importer accept: pyDoc2.
+
+	param := importer
+		parameterNamed: 'word'
+		inBehavioural: (importer functionNamed: 'tryToPlaceWord').
+	func := param parentBehaviouralEntity.
+
+	self assert: func class equals: FamixPythonFunction. 
+	self assert: (func signature includesSubstring: 'word') equals: true.
+
+	self assert: param isNotNil
+]
+
 { #category : 'tests - import' }
 FamixPythonImporterTest >> testImport [
 
@@ -383,56 +422,6 @@ from keras.layers import Input
 	self
 		assert: (importer importNamed: 'Input') fromName
 		equals: 'keras.layers'
-]
-
-{ #category : 'tests - classes' }
-FamixPythonImporterTest >> testImportClassKnowsItsMethods [
-	
-	| cl | 
-	importer accept: pyDoc.
-	cl := importer classNamed: 'Player'.
-	self assert: cl methods first name equals: '__init__'.
-	self assert: cl methods first signature equals: 'self, x, y, joystick_no'.
-	
-]
-
-{ #category : 'tests - classes' }
-FamixPythonImporterTest >> testImportFamixFunctionKnowsItsModule [
-
-	| func module |
-	importer accept: pyDoc2.
-	func := importer functionNamed: 'tryToPlaceWord'.
-	module := importer moduleNamed: 'sprite_collect_blocks_2'.
-	self assert: func functionOwner equals: module.
-	self assert: func functionOwner class equals: FamixPythonModule
-]
-
-{ #category : 'tests - classes' }
-FamixPythonImporterTest >> testImportFamixFunctionWithParameter [
-
-	| param func |
-	importer accept: pyDoc2.
-
-	param := importer
-		parameterNamed: 'word'
-		inBehavioural: (importer functionNamed: 'tryToPlaceWord').
-	func := param parentBehaviouralEntity.
-
-	self assert: func class equals: FamixPythonFunction. 
-	self assert: (func signature includesSubstring: 'word') equals: true.
-
-	self assert: param isNotNil
-]
-
-{ #category : 'tests - classes' }
-FamixPythonImporterTest >> testImportFamixMethodKnowsItsClass [
-
-	| mth cl |
-	importer accept: pyDoc.
-	mth := importer methodNamed: '__init__' inClassNamed: 'Player'.
-	cl := importer classNamed: 'Player'.
-	self assert: mth parentType equals: cl.
-	self assert: mth parentType class equals: FamixPythonClass
 ]
 
 { #category : 'tests - import' }
@@ -768,10 +757,21 @@ FamixPythonImporterTest >> testMethod [
 	self assert: mth signature equals: 'self, x, y, joystick_no'
 ]
 
-{ #category : 'tests - classes' }
+{ #category : 'tests - methods' }
 FamixPythonImporterTest >> testMethodIsInModel [
 	importer accept: pyDoc.
 	self assert: importer model numberOfMethods equals: 5.
+]
+
+{ #category : 'tests - methods' }
+FamixPythonImporterTest >> testMethodKnowsItsClass [
+
+	| mth cl |
+	importer accept: pyDoc.
+	mth := importer methodNamed: '__init__' inClassNamed: 'Player'.
+	cl := importer classNamed: 'Player'.
+	self assert: mth parentType equals: cl.
+	self assert: mth parentType class equals: FamixPythonClass
 ]
 
 { #category : 'tests - methods' }
