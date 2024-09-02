@@ -6,7 +6,8 @@ Class {
 		'fileSystem',
 		'file',
 		'pyDoc2',
-		'file2'
+		'file2',
+		'importer'
 	],
 	#category : 'Famix-Python-Importer-Tests',
 	#package : 'Famix-Python-Importer-Tests'
@@ -16,13 +17,6 @@ Class {
 FamixPythonImporterTest >> codeBig1 [
 	
 	^ PythonParser parseFileWithErrors: (fileSystem / (self moduleName2 , '.py')) 
-]
-
-{ #category : 'running' }
-FamixPythonImporterTest >> moduleName [
-	^ 'sprite_collect_blocks'
-
-
 ]
 
 { #category : 'running' }
@@ -570,17 +564,6 @@ FamixPythonImporterTest >> testIsModel [
 	
 ]
 
-{ #category : 'tests - module' }
-FamixPythonImporterTest >> testKnowsItsModule [
-	
-	| import module | 
-	importer accept: pyDoc.
-	import := importer importNamed: 'pygame'.
-	module := importer moduleNamed: self moduleName.
-	self assert: import manualImportingEntity equals: module.
-
-]
-
 { #category : 'tests - methods' }
 FamixPythonImporterTest >> testMethod [
 
@@ -626,31 +609,6 @@ FamixPythonImporterTest >> testMethodWithParameter [
 	self assert: (mth signature includesSubstring: 'y') equals: true.
 
 	self assert: param isNotNil
-]
-
-{ #category : 'tests - module' }
-FamixPythonImporterTest >> testModule [
-	
-	| module | 
-	importer accept: pyDoc.
-	module := importer moduleNamed: self moduleName.
-
-	self assert: module isNotNil.
-	self assert: module class equals: FamixPythonModule.
-	self assert: module name equals: self moduleName.
-
-]
-
-{ #category : 'tests - module' }
-FamixPythonImporterTest >> testModuleKnowsItsImport [
-	
-	| module | 
-	importer accept: pyDoc.
-	module := importer moduleNamed: self moduleName.
-	self assert: module manualIncomingImports size equals: 2.
-	"does not work probably because of the bidirectional slots 
-		self assert: module incomingImports size equals: 2."
-
 ]
 
 { #category : 'tests - lambdas' }
@@ -839,18 +797,4 @@ class B:
 	self
 		assert: (importer model allWithType: FamixPythonClass) size
 		equals: 3
-]
-
-{ #category : 'tests - module' }
-FamixPythonImporterTest >> testTwoSiblingImportsHaveTheSameModule [
-	
-	| import module import2 | 
-	importer accept: pyDoc.
-	import := importer importNamed: 'pygame'.
-	import2 := importer importNamed: 'random'.
-	module := importer moduleNamed: self moduleName.
-	self assert: import manualImportingEntity equals: module.
-	self assert: import2 manualImportingEntity equals: module.
-	self assert: import manualImportingEntity equals: import2 manualImportingEntity  
-
 ]

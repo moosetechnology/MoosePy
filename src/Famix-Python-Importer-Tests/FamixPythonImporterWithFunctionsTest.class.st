@@ -11,20 +11,8 @@ FamixPythonImporterWithFunctionsTest class >> resources [
 ]
 
 { #category : 'accessing' }
-FamixPythonImporterWithFunctionsTest >> functionNamed: aName [
-
-	^ self model allFunctions detect: [ :function | function name = aName ]
-]
-
-{ #category : 'accessing' }
 FamixPythonImporterWithFunctionsTest >> model [
 	^ FamixPythonWithFunctionsTestResource current model
-]
-
-{ #category : 'accessing' }
-FamixPythonImporterWithFunctionsTest >> moduleNamed: aName [
-
-	^ self model allModules detect: [ :module | module name = aName ]
 ]
 
 { #category : 'tests - functions' }

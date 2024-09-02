@@ -11,12 +11,6 @@ FamixPythonImporterWithClassesTest class >> resources [
 ]
 
 { #category : 'accessing' }
-FamixPythonImporterWithClassesTest >> classNamed: aName [
-
-	^ self model allClasses detect: [ :class | class name = aName ]
-]
-
-{ #category : 'accessing' }
 FamixPythonImporterWithClassesTest >> model [
 	^ FamixPythonWithClassesTestResource current model
 ]
@@ -62,8 +56,50 @@ FamixPythonImporterWithClassesTest >> testClasses [
 	self assert: (self classNamed: 'Player') isNotNil
 ]
 
+{ #category : 'tests - module' }
+FamixPythonImporterWithClassesTest >> testKnowsItsModule [
+
+	| import module |
+	import := self importNamed: 'pygame'.
+	module := self moduleNamed: self moduleName.
+	self assert: import manualImportingEntity equals: module
+]
+
+{ #category : 'tests - module' }
+FamixPythonImporterWithClassesTest >> testModule [
+
+	| module |
+	module := self moduleNamed: self moduleName.
+
+	self assert: module isNotNil.
+	self assert: module class equals: FamixPythonModule.
+	self assert: module name equals: self moduleName
+]
+
+{ #category : 'tests - module' }
+FamixPythonImporterWithClassesTest >> testModuleKnowsItsImport [
+
+	| module |
+	module := self moduleNamed: self moduleName.
+	self assert: module manualIncomingImports size equals: 2
+	"does not work probably because of the bidirectional slots 
+		self assert: module incomingImports size equals: 2."
+]
+
 { #category : 'tests - classes' }
 FamixPythonImporterWithClassesTest >> testRightNumberOfClasses [
 
 	self assert: self model numberOfClasses equals: 4
+]
+
+{ #category : 'tests - module' }
+FamixPythonImporterWithClassesTest >> testTwoSiblingImportsHaveTheSameModule [
+
+	| import module import2 |
+	import := self importNamed: 'pygame'.
+	import2 := self importNamed: 'random'.
+	module := self moduleNamed: self moduleName.
+	self assert: import manualImportingEntity equals: module.
+	self assert: import2 manualImportingEntity equals: module.
+	self assert: import manualImportingEntity equals: import2 manualImportingEntity
 ]
