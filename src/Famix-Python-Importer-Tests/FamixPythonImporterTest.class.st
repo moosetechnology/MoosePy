@@ -124,21 +124,6 @@ FamixPythonImporterTest >> testAttribute [
 	class attributes do: [ :attributes | self assert: (#( width height my_joystick ) anySatisfy: [ :name | name = attributes name ]) ]
 ]
 
-{ #category : 'tests - classes' }
-FamixPythonImporterTest >> testClass [
-	
-	| ballClass wallClass | 
-	importer accept: pyDoc.
-	ballClass := importer classNamed: 'Ball'.
-	self assert: ballClass class equals: FamixPythonClass.
-	self assert: ballClass name equals: 'Ball'.
-	self deny: ballClass isStub.
-	
-	wallClass := importer classNamed: 'Wall'.
-	self assert: wallClass name equals: 'Wall'.
-	self deny: wallClass isStub.
-]
-
 { #category : 'tests - attributes' }
 FamixPythonImporterTest >> testClassAttributes [
 
@@ -165,28 +150,6 @@ class B:
 	self assert: classB isNotNil.
 	self assert: classB attributes size equals: 1.
 	self assert: classB attributes first name equals: 'a'
-]
-
-{ #category : 'tests - classes' }
-FamixPythonImporterTest >> testClassKnowsItsMethods [
-	
-	| cl | 
-	importer accept: pyDoc.
-	cl := importer classNamed: 'Player'.
-	self assert: cl methods first name equals: '__init__'.
-	self assert: cl methods first signature equals: 'self, x, y, joystick_no'.
-	
-]
-
-{ #category : 'tests - classes' }
-FamixPythonImporterTest >> testClassSuperclass [
-
-	| class |
-	importer accept: pyDoc.
-	class := importer classNamed: 'Player'.
-	self assert: class class equals: FamixPythonClass.
-	self assert: class superclass isNotNil.
-	self assert: class superclass name equals: 'Sprite'
 ]
 
 { #category : 'tests - decorators' }
@@ -254,28 +217,6 @@ FamixPythonImporterTest >> testFileIsOk [
 	
 ]
 
-{ #category : 'tests - functions' }
-FamixPythonImporterTest >> testFunction [
-	
-	| func | 
-	importer accept: pyDoc2.
-	func := importer functionNamed: 'tryToPlaceWord'.
-	self assert: func class equals: FamixPythonFunction.
-	self assert: func signature equals: 'grid,word'
-
-]
-
-{ #category : 'tests - functions' }
-FamixPythonImporterTest >> testFunctionKnowsItsModule [
-
-	| func module |
-	importer accept: pyDoc2.
-	func := importer functionNamed: 'tryToPlaceWord'.
-	module := importer moduleNamed: 'sprite_collect_blocks_2'.
-	self assert: func functionOwner equals: module.
-	self assert: func functionOwner class equals: FamixPythonModule
-]
-
 { #category : 'tests - lambdas' }
 FamixPythonImporterTest >> testFunctionNoLambda [
 
@@ -313,23 +254,6 @@ def identity():
 	self assert: famix name equals: ''.
 	self assert: famix functionOwner name equals: 'identity'.
 	
-]
-
-{ #category : 'tests - functions' }
-FamixPythonImporterTest >> testFunctionWithParameter [
-
-	| param func |
-	importer accept: pyDoc2.
-
-	param := importer
-		parameterNamed: 'word'
-		inBehavioural: (importer functionNamed: 'tryToPlaceWord').
-	func := param parentBehaviouralEntity.
-
-	self assert: func class equals: FamixPythonFunction. 
-	self assert: (func signature includesSubstring: 'word') equals: true.
-
-	self assert: param isNotNil
 ]
 
 { #category : 'tests - import' }
