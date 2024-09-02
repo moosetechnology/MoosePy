@@ -100,19 +100,18 @@ FamixPythonImporterVisitor >> createAnnotationTypeNamed: aString [
 ]
 
 { #category : 'private-entity-creation' }
-FamixPythonImporterVisitor >> createClass: smaCCClass [
+FamixPythonImporterVisitor >> createClass: classDefinitionNode [
 
-	| famixClass superClasses metaClasses |
+	| famixClass superClasses |
 	famixClass := model newClass.
-	famixClass name: smaCCClass cname value.
+	famixClass name: classDefinitionNode pythonClassName.
 
 	"Reject all metaclass declarations, keep only superclasses (if any)"
 	"TODO Handle PyTrailersNode"
-	superClasses := smaCCClass superClasses reject: [ :s |
-		                s class = PyMetaclassNode ].
-	superClasses do: [ :s |
+	superClasses := classDefinitionNode superClasses reject: [ :s | s class = PyMetaclassNode ].
+	superClasses do: [ :fieldAccessNode |
 		| superName superObject inheritance |
-		superName := s name.
+		superName := fieldAccessNode name.
 		superObject := self ensureClassNamed: superName.
 		inheritance := model newInheritance.
 		inheritance
@@ -129,32 +128,16 @@ FamixPythonImporterVisitor >> createClass: smaCCClass [
 			superclass: object yourself;
 			subclass: famixClass ].
 
-	"Reject all superclass declarations, keep only metaclasses (if any, there should be at most one)."
-	metaClasses := smaCCClass superClasses reject: [ :s |
-		               s class = PySymbolNode or: [
-			               s class = PyTrailersNode ] ].
-	metaClasses do: [ :m |
-		| metaClassName metaClassObject |
-		metaClassName := m superclass name.
-		metaClassObject := self classNamed: metaClassName.
-		metaClassObject ifNil: [
-			metaClassObject := model newClass
-				                   name: metaClassName;
-				                   stub: true ].
-		famixClass metaclass: metaClassObject ].
-
-	^ self setSourceAnchor: famixClass from: smaCCClass
+	^ self setSourceAnchor: famixClass from: classDefinitionNode
 ]
 
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> createFunction: aFunctionNode [
 
 	| function signature |
-	signature := aFunctionNode parameters ifNotNil: [ :params |
-		params signatureString ].
-	function := self
-		basicCreateFunction: aFunctionNode fname value
-		withSignature: signature.
+	signature := aFunctionNode signatureString.
+
+	function := self basicCreateFunction: aFunctionNode fname value withSignature: signature.
 
 	function functionOwner: context top.
 
@@ -221,11 +204,8 @@ FamixPythonImporterVisitor >> createLambda: aLambdaNode [
 FamixPythonImporterVisitor >> createMethod: aMethodNode [
 
 	| method signature |
-	signature := aMethodNode parameters ifNotNil: [ :params |
-		params signatureString ].
-	method := self
-		basicCreateMethod: aMethodNode fname value
-		withSignature: signature.
+	signature := aMethodNode signatureString.
+	method := self basicCreateMethod: aMethodNode fname value withSignature: signature.
 
 	method parentType: context top.
 
@@ -246,15 +226,13 @@ FamixPythonImporterVisitor >> createModule: aModuleNode named: aName [
 FamixPythonImporterVisitor >> createParameter: aParameter inBehavioural: aFamixContainer [
 
 	| parameterName parameter |
-	parameterName := aParameter nameToken value.
+	parameterName := aParameter parameterName.
 	parameter := model newParameter.
 	parameter name: parameterName.
 
 	parameter parentBehaviouralEntity: aFamixContainer.
-	
-	^ self setSourceAnchor: parameter from: aParameter.
 
-
+	^ self setSourceAnchor: parameter from: aParameter
 ]
 
 { #category : 'private-entity-creation' }
@@ -267,8 +245,7 @@ FamixPythonImporterVisitor >> ensureAnnotationTypeNamed: aString [
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> ensureClass: aClassNode [
 
-	^ (self classNamed: aClassNode cname value) ifNil: [
-		  self createClass: aClassNode ]
+	^ (self classNamed: aClassNode pythonClassName) ifNil: [ self createClass: aClassNode ]
 ]
 
 { #category : 'private-entity-creation' }
@@ -322,14 +299,10 @@ FamixPythonImporterVisitor >> ensureModuleNamed: moduleName fromNode: aModuleNod
 ]
 
 { #category : 'private-entity-creation' }
-FamixPythonImporterVisitor >> ensureParameters: theParameters inBehavioural: aFamixBehavioural [
+FamixPythonImporterVisitor >> ensureParameter: parameter inBehavioural: aBehavioralEntity [
 
-	^ theParameters ifNotNil: [
-		  theParameters args collect: [ :parameter |
-			  (self
-				   parameterNamed: parameter nameToken value
-				   inBehavioural: aFamixBehavioural ) ifNil: [
-				  self createParameter: parameter inBehavioural: aFamixBehavioural ] ] ]
+	^ (self parameterNamed:parameter parameterName inBehavioural: aBehavioralEntity)
+		ifNil: [ self createParameter: parameter inBehavioural: aBehavioralEntity ]
 ]
 
 { #category : 'visiting' }
@@ -624,7 +597,7 @@ FamixPythonImporterVisitor >> parameters [
 FamixPythonImporterVisitor >> parentFileForNode: aPyNode [ 
 
 	aPyNode ifNil: [ ^nil ].
-	(aPyNode isKindOf: PyFileInputNode) ifTrue: [ ^aPyNode ].
+	(aPyNode isKindOf: PyFileNode) ifTrue: [ ^aPyNode ].
 	^self parentFileForNode: aPyNode parent
 ]
 
@@ -684,18 +657,19 @@ FamixPythonImporterVisitor >> visitAnnotatedSymbol: anAnnotatedSymbol [
 ]
 
 { #category : 'visiting' }
-FamixPythonImporterVisitor >> visitAssignmentStmt: anExprStmt [
+FamixPythonImporterVisitor >> visitAssignmentStatement: anAssignmentStatement [
 
-	(anExprStmt testlist class = PySymbolNode)
-		ifTrue: [ ^self ensureVariable: anExprStmt testlist nameToken value localTo: context top]
+	(anAssignmentStatement lhs isKindOf: PyVariableExpressionNode) ifTrue: [ self ensureVariable: anAssignmentStatement lhs name localTo: context top ].
+
+	^ super visitAssignmentStatement: anAssignmentStatement
 ]
 
 { #category : 'visiting' }
-FamixPythonImporterVisitor >> visitClassdef: aClassDef [
+FamixPythonImporterVisitor >> visitClassDefinition: aClassDef [
 
 	context push: (self ensureClass:  aClassDef).
 
-	super visitClassdef: aClassDef.
+	super visitClassDefinition: aClassDef.
 
 	^context pop
 ]
@@ -733,44 +707,50 @@ FamixPythonImporterVisitor >> visitExprStmt: anExprStmt [
 	super visitExprStmt: anExprStmt.
 ]
 
+{ #category : 'generated' }
+FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression [
+
+	^ aFieldAccessExpression source
+]
+
 { #category : 'visiting' }
-FamixPythonImporterVisitor >> visitFileInput: aFileInputNode [
+FamixPythonImporterVisitor >> visitFile: aFileNode [
 
 	| module |
 	module := self
-		ensureModuleNamed: (self moduleNameStringOf: aFileInputNode)
-		fromNode: aFileInputNode.
+		ensureModuleNamed: (self moduleNameStringOf: aFileNode)
+		fromNode: aFileNode.
 	context push: module.
 
-	self acceptNodes: aFileInputNode statements.
+	self acceptNodes: aFileNode statements.
 
 	^context pop
 ]
 
 { #category : 'visiting' }
-FamixPythonImporterVisitor >> visitFuncdef: aFuncdef [
+FamixPythonImporterVisitor >> visitFunctionDefinition: aFunctionDefinition [
 	"the parser does not make a difference between function and method, but a method is defined in a class and its first parameter is self."
 
 	| fmx result |
 
 	fmx := context top isClass
-		ifTrue: [  self ensureMethod: aFuncdef ]
-		ifFalse: [ self ensureFunction: aFuncdef ].
+		ifTrue: [  self ensureMethod: aFunctionDefinition ]
+		ifFalse: [ self ensureFunction: aFunctionDefinition ].
 	context push: fmx.
 
-	result := super visitFuncdef: aFuncdef.
+	result := super visitFunctionDefinition: aFunctionDefinition.
 
 	^context pop
 ]
 
 { #category : 'visiting' }
-FamixPythonImporterVisitor >> visitImport: anImport [
+FamixPythonImporterVisitor >> visitImportStatement: anImport [
 
-	^self
-		ensureImport: anImport
-		of: (anImport names collect: [ :name | self acceptNode: name ])
-		from: (self acceptNode: anImport from)
-		aliases: (anImport renames collect: [ :alias | self acceptNode: alias ])
+	^ self
+		  ensureImport: anImport
+		  of: (anImport names collect: [ :name | self acceptNode: name ])
+		  from: (self acceptNode: anImport from)
+		  aliases: (anImport renames collect: [ :alias | self acceptNode: alias ])
 ]
 
 { #category : 'visiting' }
@@ -800,8 +780,29 @@ FamixPythonImporterVisitor >> visitLambda: aLambdaNode [
 ]
 
 { #category : 'visiting' }
+FamixPythonImporterVisitor >> visitMetaclass: aMetaclass [
+
+	| metaClassName metaClassObject |
+	metaClassName := aMetaclass superclass name.
+	metaClassObject := self classNamed: metaClassName.
+	metaClassObject ifNil: [
+		metaClassObject := model newClass
+			                   name: metaClassName;
+			                   stub: true ].
+	context top metaclass: metaClassObject
+]
+
+{ #category : 'visiting' }
 FamixPythonImporterVisitor >> visitName: aName [
-	^self acceptNode: aName name
+
+	^ aName name
+]
+
+{ #category : 'visiting' }
+FamixPythonImporterVisitor >> visitParameter: aParameter [
+	"parameters in a function/methoid definition"
+
+	^ self ensureParameter: aParameter inBehavioural: context top
 ]
 
 { #category : 'visiting' }
@@ -836,7 +837,10 @@ FamixPythonImporterVisitor >> visitSmaCCToken: aSmaCCToken [
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> visitString: aStringNode [
 
-	^ aStringNode value value copyWithoutAll: '"'
+	(aStringNode parts size ~= 1 or: [ aStringNode expressions isNotEmpty ]) ifTrue: [
+		self error:
+			'Before strings where only one part but the Python tree changed. For now Im managing only the simplest case but reaching this error means that we need to manage more.' ].
+	^ aStringNode parts anyOne value copyWithoutAll: '"'
 ]
 
 { #category : 'visiting' }
@@ -846,11 +850,7 @@ FamixPythonImporterVisitor >> visitStrings: aStringsNode [
 ]
 
 { #category : 'visiting' }
-FamixPythonImporterVisitor >> visitVarArgList: aVarArgList [
-	"parameters in a function/methoid definition"
+FamixPythonImporterVisitor >> visitVariableExpression: aVariableExpression [
 
-	^self
-		ensureParameters: aVarArgList
-		inBehavioural: context top.
-
+	^ aVariableExpression name
 ]

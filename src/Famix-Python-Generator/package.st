@@ -1,1 +1,1 @@
-Package { #name : #'Famix-Python-Generator' }
+Package { #name : 'Famix-Python-Generator' }

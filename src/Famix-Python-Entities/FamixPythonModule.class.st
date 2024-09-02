@@ -12,6 +12,7 @@
 |---|
 | `comments` | `FamixTWithComments` | `commentedEntity` | `FamixTComment` | List of comments for the entity|
 | `functions` | `FamixTWithFunctions` | `functionOwner` | `FamixTFunction` | Functions defined in the container, if any.|
+| `moduleEntities` | `FamixTModule` | `parentModule` | `FamixTDefinedInModule` | |
 
 ### Outgoing dependencies
 | Relation | Origin | Opposite | Type | Comment |
@@ -29,8 +30,8 @@
 Class {
 	#name : 'FamixPythonModule',
 	#superclass : 'FamixPythonContainerEntity',
-	#traits : 'FamixTImportable + FamixTPackageable + FamixTWithComments + FamixTWithFunctions + FamixTWithInvocations',
-	#classTraits : 'FamixTImportable classTrait + FamixTPackageable classTrait + FamixTWithComments classTrait + FamixTWithFunctions classTrait + FamixTWithInvocations classTrait',
+	#traits : 'FamixTImportable + FamixTModule + FamixTPackageable + FamixTWithComments + FamixTWithFunctions + FamixTWithInvocations',
+	#classTraits : 'FamixTImportable classTrait + FamixTModule classTrait + FamixTPackageable classTrait + FamixTWithComments classTrait + FamixTWithFunctions classTrait + FamixTWithInvocations classTrait',
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',
 	#tag : 'Entities'

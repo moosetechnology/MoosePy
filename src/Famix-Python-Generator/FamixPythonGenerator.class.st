@@ -1,6 +1,6 @@
 Class {
-	#name : #FamixPythonGenerator,
-	#superclass : #FamixBasicInfrastructureGenerator,
+	#name : 'FamixPythonGenerator',
+	#superclass : 'FamixBasicInfrastructureGenerator',
 	#instVars : [
 		'package',
 		'containerEntity',
@@ -23,22 +23,23 @@ Class {
 		'annotationInstance',
 		'annotationType'
 	],
-	#category : #'Famix-Python-Generator'
+	#category : 'Famix-Python-Generator',
+	#package : 'Famix-Python-Generator'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 FamixPythonGenerator class >> packageName [
 
 	^ #'Famix-Python-Entities'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 FamixPythonGenerator class >> prefix [
 
 	^ #FamixPython
 ]
 
-{ #category : #definition }
+{ #category : 'definition' }
 FamixPythonGenerator >> defineClasses [
 
 	super defineClasses.
@@ -65,7 +66,7 @@ FamixPythonGenerator >> defineClasses [
 	type := builder newClassNamed: #Type
 ]
 
-{ #category : #definition }
+{ #category : 'definition' }
 FamixPythonGenerator >> defineHierarchy [
 
 	super defineHierarchy.
@@ -131,6 +132,7 @@ FamixPythonGenerator >> defineHierarchy [
 	method --|> #TWithAnnotationInstances.
 
 	module --|> containerEntity.
+	module --|> #TModule.
 	module --|> #TPackageable.
 	module --|> #TWithComments.
 	module --|> #TImportable.
@@ -161,7 +163,7 @@ FamixPythonGenerator >> defineHierarchy [
 	type --|> #TWithMethods
 ]
 
-{ #category : #definition }
+{ #category : 'definition' }
 FamixPythonGenerator >> defineProperties [
 
 	super defineProperties.
@@ -173,7 +175,7 @@ FamixPythonGenerator >> defineProperties [
 	(class property: #isMetaclass type: #Boolean) comment: 'Whether this class is a metaclass'
 ]
 
-{ #category : #definition }
+{ #category : 'definition' }
 FamixPythonGenerator >> defineRelations [
 
 	super defineRelations.
