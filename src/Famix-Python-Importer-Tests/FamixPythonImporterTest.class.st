@@ -24,13 +24,11 @@ FamixPythonImporterTest >> moduleName2 [
 { #category : 'running' }
 FamixPythonImporterTest >> parseCode: aString [
 	
-	^ (PythonParser parseWithErrors: aString)
-		ifNotNil: [ :each | 
-			(each isKindOf: SmaCCParseNode)
-				ifTrue: [ each completeSource: aString.
-					each filename: 'fileForTest.py' asFileReference  ].
-			each ]
-
+	^ importer accept: ((PythonParser parseWithErrors: aString) ifNotNil: [ :each |
+	(each isKindOf: SmaCCParseNode) ifTrue: [
+		each completeSource: aString.
+		each filename: 'fileForTest.py' asFileReference ].
+	each ])
 ]
 
 { #category : 'running' }
@@ -47,12 +45,12 @@ FamixPythonImporterTest >> testAnnotatedClass [
 
 	| class anno |
 	self skip: 'Do we want the decorators in the model?'.
-	importer accept: (self parseCode: '
+	self parseCode: '
 @dataclass
 class ValueRange:
     lo: int
     hi: int
-').
+'.
 
 	class := importer classNamed: 'ValueRange'.
 
@@ -69,11 +67,11 @@ FamixPythonImporterTest >> testAnnotatedFunction [
 
 	| fct anno |
 	self skip: 'Do we want the decorators in the model?'.
-	importer accept: (self parseCode: '
+	self parseCode: '
 @classmethod
 def greet(name):
     print ''Hello'', name
-').
+'.
 
 	fct := importer functionNamed: 'greet'.
 
@@ -89,13 +87,13 @@ def greet(name):
 FamixPythonImporterTest >> testClassAttributes [
 
 	| classA classB |
-	importer accept: (self parseCode: '
+	self parseCode: '
 class A:
 	a = 1
 	b = 2
 class B:
 	a = 2
-').
+'.
 
 	self assert: (self model allWithType: FamixPythonClass) size equals: 3.
 
@@ -117,11 +115,11 @@ FamixPythonImporterTest >> testDecoratorsFunctionSingleDecorator [
 
 	| famix |
 	self skip: 'Do we want the decorators in the model?'.
-	importer accept: (self parseCode: '
+	self parseCode: '
 @decorator
 def say_whee():
     print("Whee!")
-').
+'.
 
 	famix := (importer model allWithType: FamixPythonFunction) first.
 	self assert: famix isNotNil.
@@ -136,47 +134,45 @@ FamixPythonImporterTest >> testDecoratorsMethodSingleDecorator [
 
 	| famix |
 	self skip: 'Do we want the decorators in the model?'.
-	importer accept: (self parseCode: '
+	self parseCode: '
 class A:
 	@classmethod
 	def foo:
 		pass
-').
+'.
 
 	famix := importer classNamed: 'A'.
 	self assert: famix isNotNil.
-	famix := (famix methods first).
+	famix := famix methods first.
 	self assert: famix name equals: 'foo'.
 	famix := famix annotationInstances.
 	self assert: famix size equals: 1.
 	famix := famix first.
-	self assert: famix annotatedEntity name equals: 'foo'.
+	self assert: famix annotatedEntity name equals: 'foo'
 ]
 
 { #category : 'tests - decorators' }
 FamixPythonImporterTest >> testDecoratorsSanityCheck [
 
 	self skip: 'Do we want the decorators in the model?'.
-	importer accept: (self parseCode: '
+	self parseCode: '
 class A:
 	@classmethod
 	def foo:
 		pass
-').
+'.
 
-	self
-		assert: (importer model allWithType: FamixPythonMethod) size
-		equals: 1
+	self assert: (importer model allWithType: FamixPythonMethod) size equals: 1
 ]
 
 { #category : 'tests - lambdas' }
 FamixPythonImporterTest >> testFunctionNoLambda [
 
 	| famix |
-	importer accept: (self parseCode: '
+	self parseCode: '
 def identity():
     print("identify")
-').
+'.
 
 	self assert: (self model allWithType: FamixPythonFunction) size equals: 1.
 
@@ -190,30 +186,29 @@ FamixPythonImporterTest >> testFunctionSingleLambda [
 
 	| famix |
 	self skip: 'See if we want to manage lambdas? If yes, we should probably not represent them as functions.'.
-	importer accept: (self parseCode: '
+	self parseCode: '
 def identity():
     lambda x : x
-').
+'.
 
 	self assert: (importer model allWithType: FamixPythonFunction) size equals: 2.
-	
+
 	famix := importer functionNamed: 'identity'.
 	self assert: famix isNotNil.
 	self assert: famix functions size equals: 1.
 
 	famix := famix functions anyOne.
 	self assert: famix name equals: ''.
-	self assert: famix functionOwner name equals: 'identity'.
-	
+	self assert: famix functionOwner name equals: 'identity'
 ]
 
 { #category : 'tests - import' }
 FamixPythonImporterTest >> testImport [
 
-	importer accept: (self parseCode: '
+	self parseCode: '
 import pygame
 import random
-').
+'.
 
 	self assert: (self importNamed: 'pygame') isNotNil.
 	self assert: (self importNamed: 'random') isNotNil
@@ -222,9 +217,9 @@ import random
 { #category : 'tests - import' }
 FamixPythonImporterTest >> testImportClassFromModule [
 
-	importer accept: (self parseCode: '
+	self parseCode: '
 from keras.layers import Input
-').
+'.
 
 	self assert: (self importNamed: 'Input') isNotNil.
 	self assert: (self importNamed: 'Input') fromName equals: 'keras.layers'
@@ -233,9 +228,9 @@ from keras.layers import Input
 { #category : 'tests - import' }
 FamixPythonImporterTest >> testImportFunction [
 
-	importer accept: (self parseCode: '
+	self parseCode: '
 import matplotlib.pyplot
-').
+'.
 
 	self assert: (self importNamed: 'matplotlib.pyplot') isNotNil
 ]
@@ -243,9 +238,9 @@ import matplotlib.pyplot
 { #category : 'tests - import' }
 FamixPythonImporterTest >> testImportFunctionFromModule [
 
-	importer accept: (self parseCode: '
+	self parseCode: '
 from random import randint
-').
+'.
 
 	self assert: (self importNamed: 'randint') isNotNil.
 	self assert: (self importNamed: 'randint') fromName equals: 'random'
@@ -254,10 +249,10 @@ from random import randint
 { #category : 'tests - import' }
 FamixPythonImporterTest >> testImportModuleWithAlias [
 
-	importer accept: (self parseCode: '
+	self parseCode: '
 import math as m
 import matplotlib.pyplot as plt
-').
+'.
 
 	self assert: (self importNamed: 'math') isNotNil.
 	self assert: (self importNamed: 'math') asName equals: 'm'.
@@ -269,9 +264,9 @@ import matplotlib.pyplot as plt
 { #category : 'tests - import' }
 FamixPythonImporterTest >> testImportModulesWithAliases [
 
-	importer accept: (self parseCode: '
+	self parseCode: '
 import math as m, matplotlib.pyplot as plt
-').
+'.
 
 	self assert: (self importNamed: 'math') isNotNil.
 	self assert: (self importNamed: 'math') asName equals: 'm'.
@@ -283,9 +278,9 @@ import math as m, matplotlib.pyplot as plt
 { #category : 'tests - import' }
 FamixPythonImporterTest >> testImportMultiClassesFromModule [
 
-	importer accept: (self parseCode: '
+	self parseCode: '
 from keras.layers import Flatten, Activation, AveragePooling2D, BatchNormalization
-').
+'.
 
 	self assert: (self importNamed: 'Flatten') isNotNil.
 	self assert: (self importNamed: 'AveragePooling2D') isNotNil.
@@ -295,9 +290,9 @@ from keras.layers import Flatten, Activation, AveragePooling2D, BatchNormalizati
 { #category : 'tests - import' }
 FamixPythonImporterTest >> testImportMultiFunctionsFromModule [
 
-	importer accept: (self parseCode: '
+	self parseCode: '
 from maths import add, subtract
-').
+'.
 
 	self assert: (self importNamed: 'add') isNotNil.
 	self assert: (self importNamed: 'subtract') isNotNil.
@@ -308,14 +303,14 @@ from maths import add, subtract
 FamixPythonImporterTest >> testInstanceAttributes [
 
 	| classA classB localVariableA localVariableB |
-	importer accept: (self parseCode: '
+	self parseCode: '
 class A:
 	def foo(self):
 		a = 1
 		b = 2
 class B:
 	a = 2
-').
+'.
 
 	self assert: (self model allWithType: FamixPythonClass) size equals: 3.
 
@@ -342,13 +337,11 @@ class B:
 FamixPythonImporterTest >> testInvocation [
 
 	| invocations invocation |
-
 	self skip: 'Invocations not treated in importer'.
 
-	importer accept: (self parseCode: '
+	self parseCode: '
 grid[row].append(".")
-').
-
+'.
 
 	invocations := self model allWithType: FamixPythonInvocation.
 	self assert: invocations size equals: 1.
@@ -364,9 +357,9 @@ FamixPythonImporterTest >> testInvocationInLoop [
 
 	self skip: 'Invocations not treated in importer'.
 
-	importer accept: (self parseCode: '
+	self parseCode: '
 append(".")
-').
+'.
 	self assert: importer invocations size equals: 1.
 	self assert: (importer invocationCandidate: 'append') isNotNil
 ]
@@ -376,12 +369,12 @@ FamixPythonImporterTest >> testInvocationInNestedLoop [
 
 	self skip: 'Invocations not treated in importer'.
 
-	importer accept: (self parseCode: '
+	self parseCode: '
 for row in array:
 	test()
 	for column in array:
 		grid[row].append(".")
-').
+'.
 	self assert: importer invocations size equals: 2.
 	self assert: importer invocations anyOne class equals: FamixPythonInvocation
 ]
@@ -391,10 +384,10 @@ FamixPythonImporterTest >> testInvocationWithArrayReceiver [
 
 	self skip: 'Invocations not treated in importer'.
 
-	importer accept: (self parseCode: '
+	self parseCode: '
 for row in array:
 	grid[row].append(".")
-').
+'.
 	self assert: importer invocations size equals: 1.
 	self assert: (importer invocationCandidate: 'append') isNotNil
 ]
@@ -404,17 +397,13 @@ FamixPythonImporterTest >> testInvocationWithNumericalArguments [
 
 	self skip: 'Invocations not treated in importer'.
 
-	importer accept: (self parseCode: '
+	self parseCode: '
 test(4, 25)
-').
+'.
 	self assert: importer invocations size equals: 1.
-	self
-		assert: importer invocations anyOne class
-		equals: FamixPythonInvocation.
+	self assert: importer invocations anyOne class equals: FamixPythonInvocation.
 
-	self
-		assert: importer invocations anyOne signature
-		equals:  '4, 25'
+	self assert: importer invocations anyOne signature equals: '4, 25'
 ]
 
 { #category : 'tests - invocations' }
@@ -422,9 +411,9 @@ FamixPythonImporterTest >> testInvocationWithReceiver [
 
 	self skip: 'Invocations not treated in importer'.
 
-	importer accept: (self parseCode: '
+	self parseCode: '
 grid.append(test)
-').
+'.
 	self assert: importer invocations size equals: 1.
 	self assert: (importer invocationCandidate: 'append') isNotNil
 ]
@@ -434,9 +423,9 @@ FamixPythonImporterTest >> testInvocationWithStringReceiver [
 
 	self skip: 'Invocations not treated in importer'.
 
-	importer accept: (self parseCode: '
+	self parseCode: '
 "CNN_Model_Rebuilt/logs/{}".format(NAME)
-').
+'.
 	self assert: importer invocations size equals: 1.
 	self assert: (importer invocationCandidate: 'format') isNotNil
 ]
@@ -445,29 +434,20 @@ FamixPythonImporterTest >> testInvocationWithStringReceiver [
 FamixPythonImporterTest >> testInvocationWithVariableArguments [
 
 	| invocation |
-
 	self skip: 'Invocations not treated in importer'.
 
-	importer accept: (self parseCode: '
+	self parseCode: '
 test(x, 25) 
-').
+'.
 	self assert: importer invocations size equals: 1.
-	self
-		assert: importer invocations anyOne class
-		equals: FamixPythonInvocation.
+	self assert: importer invocations anyOne class equals: FamixPythonInvocation.
 	self assert: importer invocations anyOne signature equals: 'x, 25'.
 
 	invocation := importer invocationCandidate: 'test'.
 
-	self
-		assert:
-		((invocation cacheAt: 'args' ifAbsent: [ false ]) first at: 'value')
-		equals: 'x'.
-		
-		self
-		assert:
-		((invocation cacheAt: 'args' ifAbsent: [ false ]) second at: 'value')
-		equals: '25'
+	self assert: ((invocation cacheAt: 'args' ifAbsent: [ false ]) first at: 'value') equals: 'x'.
+
+	self assert: ((invocation cacheAt: 'args' ifAbsent: [ false ]) second at: 'value') equals: '25'
 ]
 
 { #category : 'tests - lambdas' }
@@ -475,42 +455,41 @@ FamixPythonImporterTest >> testMultiFunctionsMultiLambdas [
 
 	| famix |
 	self skip: 'See if we want to manage lambdas? If yes, we should probably not represent them as functions.'.
-	importer accept: (self parseCode: '
+	self parseCode: '
 def identity():
     lambda x : x
 def identity2():
     lambda x : x
     lambda x : x
-').
+'.
 
 	self assert: (importer model allWithType: FamixPythonFunction) size equals: 5.
-	
+
 	famix := importer functionNamed: 'identity'.
 	self assert: famix isNotNil.
 	self assert: famix functions size equals: 1.
 
 	famix := famix functions anyOne.
 	self assert: famix name equals: ''.
-	self assert: famix functionOwner name equals: 'identity'.
-	
+	self assert: famix functionOwner name equals: 'identity'
 ]
 
 { #category : 'tests' }
 FamixPythonImporterTest >> testSameAnnotationType [
 
 	self skip: 'Do we want the decorators in the model?'.
-	importer accept: (self parseCode: '
+	self parseCode: '
 @classmethod
 def greet(name):
     print ''Hello'', name
 @classmethod
 def goodbye(name):
     print ''Bye-bye'', name
-').
+'.
 
 	self assert: (importer model allWithType: FamixPythonAnnotationType) size equals: 1.
 	self
-		assert: (importer functionNamed: 'greet')   annotationInstances anyOne annotationType
+		assert: (importer functionNamed: 'greet') annotationInstances anyOne annotationType
 		equals: (importer functionNamed: 'goodbye') annotationInstances anyOne annotationType
 ]
 
@@ -518,13 +497,13 @@ def goodbye(name):
 FamixPythonImporterTest >> testSingleClasSingleFQNMetaclass [
 
 	| classA classMeta classAMeta |
-	importer accept: (self parseCode: '
+	self parseCode: '
 class Meta(type):
 	pass
 class A(metaclass=pygame.sprite.Sprite):
 	def foo:
 		pass
-').
+'.
 
 	self assert: (self model allWithType: FamixPythonClass) size equals: 5.
 
@@ -545,13 +524,13 @@ class A(metaclass=pygame.sprite.Sprite):
 FamixPythonImporterTest >> testSingleClassExplicitSuperclass [
 
 	| classS classA |
-	importer accept: (self parseCode: '
+	self parseCode: '
 class S:
 	pass
 class A(S):
 	def foo:
 		pass
-').
+'.
 
 	self assert: (self model allWithType: FamixPythonClass) size equals: 3.
 
@@ -568,11 +547,11 @@ class A(S):
 FamixPythonImporterTest >> testSingleClassFQNSuperclass [
 
 	| classA |
-	importer accept: (self parseCode: '
+	self parseCode: '
 class A(pygame.sprite.Sprite):
 	def foo:
 		pass
-').
+'.
 
 	self assert: (self model allWithType: FamixPythonClass) size equals: 2.
 
@@ -585,13 +564,13 @@ class A(pygame.sprite.Sprite):
 FamixPythonImporterTest >> testSingleClassingleMetaclass [
 
 	| classA classMeta classAMeta |
-	importer accept: (self parseCode: '
+	self parseCode: '
 class Meta(type):
 	pass
 class A(metaclass=Meta):
 	def foo:
 		pass
-').
+'.
 
 	self assert: (self model allWithType: FamixPythonClass) size equals: 4.
 
@@ -611,12 +590,12 @@ class A(metaclass=Meta):
 { #category : 'tests - metaclasses' }
 FamixPythonImporterTest >> testTwoClassesObjectShouldNotBeDuplicated [
 
-	importer accept: (self parseCode: '
+	self parseCode: '
 class A:
 	pass
 class B:
 		pass
-').
+'.
 
 	self assert: (self model allWithType: FamixPythonClass) size equals: 3
 ]
