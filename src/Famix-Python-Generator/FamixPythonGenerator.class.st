@@ -136,6 +136,7 @@ FamixPythonGenerator >> defineHierarchy [
 	module --|> #TPackageable.
 	module --|> #TWithComments.
 	module --|> #TImportable.
+	module --|> #TWithImports.
 	module --|> #TWithFunctions.
 	module --|> #TWithInvocations.
 

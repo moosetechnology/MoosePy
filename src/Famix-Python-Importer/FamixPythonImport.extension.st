@@ -12,15 +12,3 @@ FamixPythonImport >> displayStringOn: aStream [
 	self entityName displayStringOn: aStream.
 	aStream nextPutAll: ')'
 ]
-
-{ #category : '*Famix-Python-Importer' }
-FamixPythonImport >> manualImportingEntity [
-
-	^self attributeAt: #manualImportingEntity ifAbsent: [ nil ]
-]
-
-{ #category : '*Famix-Python-Importer' }
-FamixPythonImport >> manualImportingEntity: anObject [
-
-	self attributeAt: #manualImportingEntity put: anObject
-]

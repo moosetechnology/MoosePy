@@ -157,8 +157,8 @@ FamixPythonImporterVisitor >> createImport: anImport ofName: aName from: fromNam
 	self setSourceAnchor: import from: anImport.
 
 	module := self contextModule.
-	import manualImportingEntity: module.
-	module manualAddImport: import.
+	module addIncomingImport: import.
+	import importingEntity: module.
 
 	^ import
 ]

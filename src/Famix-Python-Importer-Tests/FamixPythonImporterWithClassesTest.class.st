@@ -78,7 +78,7 @@ FamixPythonImporterWithClassesTest >> testKnowsItsModule [
 	| import module |
 	import := self importNamed: 'pygame'.
 	module := self moduleNamed: self moduleName.
-	self assert: import manualImportingEntity equals: module
+	self assert: import importingEntity equals: module
 ]
 
 { #category : 'tests - methods' }
@@ -149,7 +149,7 @@ FamixPythonImporterWithClassesTest >> testModuleKnowsItsImport [
 
 	| module |
 	module := self moduleNamed: self moduleName.
-	self assert: module manualIncomingImports size equals: 2
+	self assert: module incomingImports size equals: 2
 	"does not work probably because of the bidirectional slots 
 		self assert: module incomingImports size equals: 2."
 ]
@@ -178,7 +178,7 @@ FamixPythonImporterWithClassesTest >> testTwoSiblingImportsHaveTheSameModule [
 	import := self importNamed: 'pygame'.
 	import2 := self importNamed: 'random'.
 	module := self moduleNamed: self moduleName.
-	self assert: import manualImportingEntity equals: module.
-	self assert: import2 manualImportingEntity equals: module.
-	self assert: import manualImportingEntity equals: import2 manualImportingEntity
+	self assert: import importingEntity equals: module.
+	self assert: import2 importingEntity equals: module.
+	self assert: import importingEntity equals: import2 importingEntity
 ]
