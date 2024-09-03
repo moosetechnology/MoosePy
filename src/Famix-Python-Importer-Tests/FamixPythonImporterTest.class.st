@@ -19,6 +19,12 @@ FamixPythonImporterTest >> codeBig1 [
 	^ PythonParser parseFileWithErrors: (fileSystem / (self moduleName2 , '.py')) 
 ]
 
+{ #category : 'accessing' }
+FamixPythonImporterTest >> model [
+
+	^ importer model
+]
+
 { #category : 'running' }
 FamixPythonImporterTest >> moduleName2 [
 	^ 'sprite_collect_blocks_2'
@@ -109,16 +115,6 @@ def greet(name):
 ]
 
 { #category : 'tests - attributes' }
-FamixPythonImporterTest >> testAttribute [
-
-	| class |
-	importer accept: pyDoc.
-	class := importer classNamed: 'Player'.
-	self assert: class attributes size equals: 3.
-	class attributes do: [ :attributes | self assert: (#( width height my_joystick ) anySatisfy: [ :name | name = attributes name ]) ]
-]
-
-{ #category : 'tests - attributes' }
 FamixPythonImporterTest >> testClassAttributes [
 
 	| classA classB |
@@ -130,17 +126,15 @@ class B:
 	a = 2
 ').
 
-	self
-		assert: (importer model allWithType: FamixPythonClass) size
-		equals: 3.
+	self assert: (self model allWithType: FamixPythonClass) size equals: 3.
 
-	classA := importer classNamed: 'A'.
+	classA := self classNamed: 'A'.
 	self assert: classA isNotNil.
 	self assert: classA attributes size equals: 2.
 	self assert: classA attributes first name equals: 'a'.
 	self assert: classA attributes second name equals: 'b'.
 
-	classB := importer classNamed: 'B'.
+	classB := self classNamed: 'B'.
 	self assert: classB isNotNil.
 	self assert: classB attributes size equals: 1.
 	self assert: classB attributes first name equals: 'a'
@@ -400,11 +394,9 @@ class B:
 	a = 2
 ').
 
-	self
-		assert: (importer model allWithType: FamixPythonClass) size
-		equals: 3.
+	self assert: (self model allWithType: FamixPythonClass) size equals: 3.
 
-	classA := importer classNamed: 'A'.
+	classA := self classNamed: 'A'.
 	self assert: classA isNotNil.
 	self assert: classA attributes size equals: 0.
 	self assert: classA methods first localVariables size equals: 2.
@@ -417,7 +409,7 @@ class B:
 	self assert: localVariableB isNotNil.
 	self assert: localVariableB name equals: 'b'.
 
-	classB := importer classNamed: 'B'.
+	classB := self classNamed: 'B'.
 	self assert: classB isNotNil.
 	self assert: classB attributes size equals: 1.
 	self assert: classB attributes first name equals: 'a'
@@ -562,53 +554,6 @@ FamixPythonImporterTest >> testIsModel [
 	importer model entityNamed: 'pygame'.
 	"Yes mom this is smoke test"
 	
-]
-
-{ #category : 'tests - methods' }
-FamixPythonImporterTest >> testMethod [
-
-	| mth |
-	importer accept: pyDoc.
-	mth := importer methodNamed: '__init__' inClassNamed: 'Player'.
-	self assert: mth class equals: FamixPythonMethod.
-	self assert: mth name equals: '__init__'.
-	self assert: mth signature equals: 'self, x, y, joystick_no'
-]
-
-{ #category : 'tests - methods' }
-FamixPythonImporterTest >> testMethodIsInModel [
-	importer accept: pyDoc.
-	self assert: importer model numberOfMethods equals: 5.
-]
-
-{ #category : 'tests - methods' }
-FamixPythonImporterTest >> testMethodKnowsItsClass [
-
-	| mth cl |
-	importer accept: pyDoc.
-	mth := importer methodNamed: '__init__' inClassNamed: 'Player'.
-	cl := importer classNamed: 'Player'.
-	self assert: mth parentType equals: cl.
-	self assert: mth parentType class equals: FamixPythonClass
-]
-
-{ #category : 'tests - methods' }
-FamixPythonImporterTest >> testMethodWithParameter [
-
-	| param  mth |
-	importer accept: pyDoc.
-
-	param := importer
-		parameterNamed: 'y'
-		inBehavioural: (importer methodNamed: '__init__' inClassNamed: 'Player').
-
-	mth := param parentBehaviouralEntity.
-
-	self assert: mth class equals: FamixPythonMethod.
-
-	self assert: (mth signature includesSubstring: 'y') equals: true.
-
-	self assert: param isNotNil
 ]
 
 { #category : 'tests - lambdas' }

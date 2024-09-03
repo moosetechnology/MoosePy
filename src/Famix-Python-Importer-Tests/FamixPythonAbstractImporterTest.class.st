@@ -24,6 +24,12 @@ FamixPythonAbstractImporterTest >> importNamed: aName [
 ]
 
 { #category : 'accessing' }
+FamixPythonAbstractImporterTest >> methodNamed: aName [
+
+	^ self model allMethods detect: [ :method | method name = aName ]
+]
+
+{ #category : 'accessing' }
 FamixPythonAbstractImporterTest >> model [
 	self subclassResponsibility
 ]
@@ -39,6 +45,12 @@ FamixPythonAbstractImporterTest >> moduleName [
 FamixPythonAbstractImporterTest >> moduleNamed: aName [
 
 	^ self model allModules detect: [ :module | module name = aName ]
+]
+
+{ #category : 'accessing' }
+FamixPythonAbstractImporterTest >> parameterNamed: aName [
+
+	^ self model allParameters detect: [ :parameter | parameter name = aName ]
 ]
 
 { #category : 'running' }

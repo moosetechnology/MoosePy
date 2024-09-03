@@ -15,6 +15,15 @@ FamixPythonImporterWithClassesTest >> model [
 	^ FamixPythonWithClassesTestResource current model
 ]
 
+{ #category : 'tests - attributes' }
+FamixPythonImporterWithClassesTest >> testAttribute [
+
+	| class |
+	class := self classNamed: 'Player'.
+	self assert: class attributes size equals: 3.
+	class attributes do: [ :attributes | self assert: (#( width height my_joystick ) anySatisfy: [ :name | name = attributes name ]) ]
+]
+
 { #category : 'tests' }
 FamixPythonImporterWithClassesTest >> testClass [
 
@@ -63,6 +72,49 @@ FamixPythonImporterWithClassesTest >> testKnowsItsModule [
 	import := self importNamed: 'pygame'.
 	module := self moduleNamed: self moduleName.
 	self assert: import manualImportingEntity equals: module
+]
+
+{ #category : 'tests - methods' }
+FamixPythonImporterWithClassesTest >> testMethod [
+
+	| mth |
+	mth := self methodNamed: '__init__'.
+	self assert: mth class equals: FamixPythonMethod.
+	self assert: mth parents anyOne name equals: 'Player'.
+	self assert: mth name equals: '__init__'.
+	self assert: mth signature equals: 'self, x, y, joystick_no'
+]
+
+{ #category : 'tests - methods' }
+FamixPythonImporterWithClassesTest >> testMethodIsInModel [
+
+	self assert: self model numberOfMethods equals: 5
+]
+
+{ #category : 'tests - methods' }
+FamixPythonImporterWithClassesTest >> testMethodKnowsItsClass [
+
+	| mth cl |
+	mth := self methodNamed: '__init__'.
+	cl := self classNamed: 'Player'.
+	self assert: mth parentType equals: cl.
+	self assert: mth parentType class equals: FamixPythonClass
+]
+
+{ #category : 'tests - methods' }
+FamixPythonImporterWithClassesTest >> testMethodWithParameter [
+
+	| param mth |
+	mth := self methodNamed: '__init__'.
+	param := self parameterNamed: 'y'.
+
+	mth := param parentBehaviouralEntity.
+
+	self assert: mth class equals: FamixPythonMethod.
+
+	self assert: (mth signature includesSubstring: 'y').
+
+	self assert: param isNotNil
 ]
 
 { #category : 'tests - module' }
