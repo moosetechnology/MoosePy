@@ -52,10 +52,3 @@ FamixPythonAbstractImporterTest >> parameterNamed: aName [
 
 	^ self model allParameters detect: [ :parameter | parameter name = aName ]
 ]
-
-{ #category : 'running' }
-FamixPythonAbstractImporterTest >> setUp [
-
-	super setUp.
-
-]

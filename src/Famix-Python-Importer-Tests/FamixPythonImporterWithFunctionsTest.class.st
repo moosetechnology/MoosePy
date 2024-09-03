@@ -46,3 +46,22 @@ FamixPythonImporterWithFunctionsTest >> testFunctionWithParameter [
 
 	self assert: param isNotNil
 ]
+
+{ #category : 'tests - functions' }
+FamixPythonImporterWithFunctionsTest >> testFunctions [
+
+	self assert: self model allFunctions size equals: 4.
+
+	self assert: (self functionNamed: 'tryToPlaceWord') isNotNil.
+	self assert: (self functionNamed: 'printGrid') isNotNil
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonImporterWithFunctionsTest >> testParameter [
+
+	| param |
+	param := self parameterNamed: 'word'.
+	self assert: param class equals: FamixPythonParameter.
+	self assert: param name equals: 'word'.
+	self assert: param parentBehaviouralEntity equals: (self functionNamed: 'tryToPlaceWord')
+]

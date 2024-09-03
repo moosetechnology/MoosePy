@@ -2,22 +2,11 @@ Class {
 	#name : 'FamixPythonImporterTest',
 	#superclass : 'FamixPythonAbstractImporterTest',
 	#instVars : [
-		'pyDoc',
-		'fileSystem',
-		'file',
-		'pyDoc2',
-		'file2',
 		'importer'
 	],
 	#category : 'Famix-Python-Importer-Tests',
 	#package : 'Famix-Python-Importer-Tests'
 }
-
-{ #category : 'accessing' }
-FamixPythonImporterTest >> codeBig1 [
-	
-	^ PythonParser parseFileWithErrors: (fileSystem / (self moduleName2 , '.py')) 
-]
 
 { #category : 'accessing' }
 FamixPythonImporterTest >> model [
@@ -48,27 +37,9 @@ FamixPythonImporterTest >> parseCode: aString [
 FamixPythonImporterTest >> setUp [
 
 	super setUp.
-	fileSystem := FileSystem memory.
-
-	"load sourceBug2"
-	file := fileSystem workingDirectory / (self moduleName , '.py').
-	file writeStreamDo: [ :stream | stream nextPutAll: PythonParserTests new sourceBig2 ].
-	pyDoc := self sourceBig2.
-
-
-	"load codeBig1"
-	file2 := fileSystem workingDirectory / (self moduleName2 , '.py').
-	file2 writeStreamDo: [ :stream | stream nextPutAll: PythonParserTests new codeBig1 ].
-	pyDoc2 := self codeBig1.
 
 	importer := FamixPythonImporterVisitor new.
 	importer model name: 'testPythonModelName'
-]
-
-{ #category : 'accessing' }
-FamixPythonImporterTest >> sourceBig2 [
-	
-	^ PythonParser parseFileWithErrors: (fileSystem / (self moduleName, '.py')) 
 ]
 
 { #category : 'tests' }
@@ -198,13 +169,6 @@ class A:
 		equals: 1
 ]
 
-{ #category : 'tests - files' }
-FamixPythonImporterTest >> testFileIsOk [
-	self assert: (fileSystem / (self moduleName, '.py')) contents size equals: 7586.
-	self assert: (fileSystem / (self moduleName2, '.py')) contents size equals: 3259
-	
-]
-
 { #category : 'tests - lambdas' }
 FamixPythonImporterTest >> testFunctionNoLambda [
 
@@ -214,12 +178,11 @@ def identity():
     print("identify")
 ').
 
-	self assert: (importer model allWithType: FamixPythonFunction) size equals: 1.
-	
-	famix := importer functionNamed: 'identity'.
+	self assert: (self model allWithType: FamixPythonFunction) size equals: 1.
+
+	famix := self functionNamed: 'identity'.
 	self assert: famix isNotNil.
-	self assert: famix functions size equals: 0.
-	
+	self assertEmpty: famix functions
 ]
 
 { #category : 'tests - lambdas' }
@@ -252,8 +215,8 @@ import pygame
 import random
 ').
 
-	self assert: (importer importNamed: 'pygame') isNotNil.
-	self assert: (importer importNamed: 'random') isNotNil
+	self assert: (self importNamed: 'pygame') isNotNil.
+	self assert: (self importNamed: 'random') isNotNil
 ]
 
 { #category : 'tests - import' }
@@ -263,10 +226,8 @@ FamixPythonImporterTest >> testImportClassFromModule [
 from keras.layers import Input
 ').
 
-	self assert: (importer importNamed: 'Input') isNotNil.
-	self
-		assert: (importer importNamed: 'Input') fromName
-		equals: 'keras.layers'
+	self assert: (self importNamed: 'Input') isNotNil.
+	self assert: (self importNamed: 'Input') fromName equals: 'keras.layers'
 ]
 
 { #category : 'tests - import' }
@@ -276,7 +237,7 @@ FamixPythonImporterTest >> testImportFunction [
 import matplotlib.pyplot
 ').
 
-	self assert: (importer importNamed: 'matplotlib.pyplot') isNotNil
+	self assert: (self importNamed: 'matplotlib.pyplot') isNotNil
 ]
 
 { #category : 'tests - import' }
@@ -286,34 +247,8 @@ FamixPythonImporterTest >> testImportFunctionFromModule [
 from random import randint
 ').
 
-	self assert: (importer importNamed: 'randint') isNotNil.
-	self
-		assert: (importer importNamed: 'randint') fromName
-		equals: 'random'
-]
-
-{ #category : 'tests' }
-FamixPythonImporterTest >> testImportFunctions [
-
-	importer accept: pyDoc2.
-	self assert: importer functions size equals: 4.
-
-	self assert: (importer functionNamed: 'tryToPlaceWord') isNotNil.
-	self assert: (importer functionNamed: 'printGrid') isNotNil
-]
-
-{ #category : 'tests' }
-FamixPythonImporterTest >> testImportMethods [
-
-	importer accept: pyDoc.
-	self assert: importer methods size equals: 5.
-	self assert:
-		(importer methodNamed: 'update' inClassNamed: 'Ball') isNotNil.
-	self assert:
-		(importer methodNamed: '__init__' inClassNamed: 'Wall') isNotNil.
-	self assert:
-		(importer methodNamed: '__init__' inClassNamed: 'Player') isNotNil
-
+	self assert: (self importNamed: 'randint') isNotNil.
+	self assert: (self importNamed: 'randint') fromName equals: 'random'
 ]
 
 { #category : 'tests - import' }
@@ -324,15 +259,11 @@ import math as m
 import matplotlib.pyplot as plt
 ').
 
-	self assert: (importer importNamed: 'math') isNotNil.
-	self
-		assert: (importer importNamed: 'math') asName
-		equals: 'm'.
-		
-	self assert: (importer importNamed: 'matplotlib.pyplot') isNotNil.
-	self
-		assert: (importer importNamed: 'matplotlib.pyplot') asName
-		equals: 'plt'
+	self assert: (self importNamed: 'math') isNotNil.
+	self assert: (self importNamed: 'math') asName equals: 'm'.
+
+	self assert: (self importNamed: 'matplotlib.pyplot') isNotNil.
+	self assert: (self importNamed: 'matplotlib.pyplot') asName equals: 'plt'
 ]
 
 { #category : 'tests - import' }
@@ -342,15 +273,11 @@ FamixPythonImporterTest >> testImportModulesWithAliases [
 import math as m, matplotlib.pyplot as plt
 ').
 
-	self assert: (importer importNamed: 'math') isNotNil.
-	self
-		assert: (importer importNamed: 'math') asName
-		equals: 'm'.
-		
-	self assert: (importer importNamed: 'matplotlib.pyplot') isNotNil.
-	self
-		assert: (importer importNamed: 'matplotlib.pyplot') asName
-		equals: 'plt'
+	self assert: (self importNamed: 'math') isNotNil.
+	self assert: (self importNamed: 'math') asName equals: 'm'.
+
+	self assert: (self importNamed: 'matplotlib.pyplot') isNotNil.
+	self assert: (self importNamed: 'matplotlib.pyplot') asName equals: 'plt'
 ]
 
 { #category : 'tests - import' }
@@ -360,11 +287,9 @@ FamixPythonImporterTest >> testImportMultiClassesFromModule [
 from keras.layers import Flatten, Activation, AveragePooling2D, BatchNormalization
 ').
 
-	self assert: (importer importNamed: 'Flatten') isNotNil.
-	self assert: (importer importNamed: 'AveragePooling2D') isNotNil.
-		self
-		assert: (importer importNamed: 'Activation') fromName
-		equals: 'keras.layers'
+	self assert: (self importNamed: 'Flatten') isNotNil.
+	self assert: (self importNamed: 'AveragePooling2D') isNotNil.
+	self assert: (self importNamed: 'Activation') fromName equals: 'keras.layers'
 ]
 
 { #category : 'tests - import' }
@@ -374,11 +299,9 @@ FamixPythonImporterTest >> testImportMultiFunctionsFromModule [
 from maths import add, subtract
 ').
 
-	self assert: (importer importNamed: 'add') isNotNil.
-	self assert: (importer importNamed: 'subtract') isNotNil.
-	self
-		assert: (importer importNamed: 'add') fromName
-		equals: 'maths'
+	self assert: (self importNamed: 'add') isNotNil.
+	self assert: (self importNamed: 'subtract') isNotNil.
+	self assert: (self importNamed: 'add') fromName equals: 'maths'
 ]
 
 { #category : 'tests - attributes' }
@@ -427,7 +350,7 @@ grid[row].append(".")
 ').
 
 
-	invocations := importer model allWithType: FamixPythonInvocation.
+	invocations := self model allWithType: FamixPythonInvocation.
 	self assert: invocations size equals: 1.
 
 	invocation := importer invocationCandidate: 'append'.
@@ -547,15 +470,6 @@ test(x, 25)
 		equals: '25'
 ]
 
-{ #category : 'tests' }
-FamixPythonImporterTest >> testIsModel [
-	
-	importer accept: pyDoc.
-	importer model entityNamed: 'pygame'.
-	"Yes mom this is smoke test"
-	
-]
-
 { #category : 'tests - lambdas' }
 FamixPythonImporterTest >> testMultiFunctionsMultiLambdas [
 
@@ -579,35 +493,6 @@ def identity2():
 	self assert: famix name equals: ''.
 	self assert: famix functionOwner name equals: 'identity'.
 	
-]
-
-{ #category : 'tests - classes' }
-FamixPythonImporterTest >> testParameter [
-
-	| param |
-	importer accept: pyDoc.
-	param := importer
-		parameterNamed: 'joystick_no'
-		inBehavioural: (importer methodNamed: '__init__' inClassNamed: 'Player').
-
-	self assert: param class equals: FamixPythonParameter.
-	self assert: param name equals: 'joystick_no'.
-	
-	importer accept: pyDoc2.
-	param := importer
-		parameterNamed: 'word'
-		inBehavioural: (importer functionNamed: 'tryToPlaceWord').
-	self assert: param class equals: FamixPythonParameter.
-	self assert: param name equals: 'word'.
-]
-
-{ #category : 'tests - files' }
-FamixPythonImporterTest >> testParseWithFile [
-
-
-	| doc |
-	doc := PythonParser parseFileWithErrors: (fileSystem / 'sprite_collect_blocks.py').
-	self assert: doc filename basename equals: 'sprite_collect_blocks.py'
 ]
 
 { #category : 'tests' }
@@ -641,17 +526,15 @@ class A(metaclass=pygame.sprite.Sprite):
 		pass
 ').
 
-	self
-		assert: (importer model allWithType: FamixPythonClass) size
-		equals: 5.
+	self assert: (self model allWithType: FamixPythonClass) size equals: 5.
 
-	classA := importer classNamed: 'A'.
+	classA := self classNamed: 'A'.
 	self assert: classA isNotNil.
-	self assert: (classA superInheritances first target name) equals: 'object'.
+	self assert: classA superInheritances first target name equals: 'object'.
 
-	classMeta := importer classNamed: 'Meta'.
+	classMeta := self classNamed: 'Meta'.
 	self assert: classMeta isNotNil.
-	self assert: (classMeta superInheritances first target name) equals: 'type'.
+	self assert: classMeta superInheritances first target name equals: 'type'.
 
 	classAMeta := classA metaclass.
 	self assert: classAMeta isNotNil.
@@ -670,15 +553,13 @@ class A(S):
 		pass
 ').
 
-	self
-		assert: (importer model allWithType: FamixPythonClass) size
-		equals: 3.
+	self assert: (self model allWithType: FamixPythonClass) size equals: 3.
 
-	classS := importer classNamed: 'S'.
+	classS := self classNamed: 'S'.
 	self assert: classS isNotNil.
 	self assert: classS superInheritances size equals: 1.
 
-	classA := importer classNamed: 'A'.
+	classA := self classNamed: 'A'.
 	self assert: classA isNotNil.
 	self assert: classA superInheritances size equals: 1
 ]
@@ -693,9 +574,9 @@ class A(pygame.sprite.Sprite):
 		pass
 ').
 
-	self assert: (importer model allWithType: FamixPythonClass) size equals: 2.
+	self assert: (self model allWithType: FamixPythonClass) size equals: 2.
 
-	classA := importer classNamed: 'A'.
+	classA := self classNamed: 'A'.
 	self assert: classA isNotNil.
 	self assert: classA superInheritances first target name equals: 'Sprite'
 ]
@@ -712,17 +593,15 @@ class A(metaclass=Meta):
 		pass
 ').
 
-	self
-		assert: (importer model allWithType: FamixPythonClass) size
-		equals: 4.
+	self assert: (self model allWithType: FamixPythonClass) size equals: 4.
 
-	classA := importer classNamed: 'A'.
+	classA := self classNamed: 'A'.
 	self assert: classA isNotNil.
-	self assert: (classA superInheritances first target name) equals: 'object'.
+	self assert: classA superInheritances first target name equals: 'object'.
 
-	classMeta := importer classNamed: 'Meta'.
+	classMeta := self classNamed: 'Meta'.
 	self assert: classMeta isNotNil.
-	self assert: (classMeta superInheritances first target name) equals: 'type'.
+	self assert: classMeta superInheritances first target name equals: 'type'.
 
 	classAMeta := classA metaclass.
 	self assert: classAMeta isNotNil.
@@ -739,7 +618,5 @@ class B:
 		pass
 ').
 
-	self
-		assert: (importer model allWithType: FamixPythonClass) size
-		equals: 3
+	self assert: (self model allWithType: FamixPythonClass) size equals: 3
 ]

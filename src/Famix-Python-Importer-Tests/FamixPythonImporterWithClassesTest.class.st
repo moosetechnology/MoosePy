@@ -65,6 +65,13 @@ FamixPythonImporterWithClassesTest >> testClasses [
 	self assert: (self classNamed: 'Player') isNotNil
 ]
 
+{ #category : 'tests' }
+FamixPythonImporterWithClassesTest >> testIsModel [
+
+	self model entityNamed: 'pygame'
+	"Yes mom this is smoke test"
+]
+
 { #category : 'tests - module' }
 FamixPythonImporterWithClassesTest >> testKnowsItsModule [
 
@@ -117,6 +124,15 @@ FamixPythonImporterWithClassesTest >> testMethodWithParameter [
 	self assert: param isNotNil
 ]
 
+{ #category : 'tests - methods' }
+FamixPythonImporterWithClassesTest >> testMethods [
+
+	self assert: self model allMethods size equals: 5.
+	self assert: ((self classNamed: 'Ball') methods anySatisfy: [ :method | method name = 'update' ]).
+	self assert: ((self classNamed: 'Wall') methods anySatisfy: [ :method | method name = '__init__' ]).
+	self assert: ((self classNamed: 'Player') methods anySatisfy: [ :method | method name = '__init__' ])
+]
+
 { #category : 'tests - module' }
 FamixPythonImporterWithClassesTest >> testModule [
 
@@ -136,6 +152,17 @@ FamixPythonImporterWithClassesTest >> testModuleKnowsItsImport [
 	self assert: module manualIncomingImports size equals: 2
 	"does not work probably because of the bidirectional slots 
 		self assert: module incomingImports size equals: 2."
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonImporterWithClassesTest >> testParameter [
+
+	| param |
+	param := self parameterNamed: 'joystick_no'.
+
+	self assert: param class equals: FamixPythonParameter.
+	self assert: param name equals: 'joystick_no'.
+	self assert: param parentBehaviouralEntity equals: (self methodNamed: '__init__')
 ]
 
 { #category : 'tests - classes' }
