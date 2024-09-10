@@ -299,6 +299,23 @@ from maths import add, subtract
 	self assert: (self importNamed: 'add') fromName equals: 'maths'
 ]
 
+{ #category : 'tests - functions' }
+FamixPythonImporterTest >> testInnerFunctions [
+
+	| outer inner |
+	self parseCode: 'def outer_func():
+	def inner_func():
+		print("Hello, World!")
+	inner_func()'.
+
+	self assert: self model allFunctions size equals: 2.
+	outer := self functionNamed: 'outer_func'.
+	inner := self functionNamed: 'inner_func'.
+
+	self assert: inner functionOwner equals: outer.
+	self assert: outer functionOwner isModule
+]
+
 { #category : 'tests - attributes' }
 FamixPythonImporterTest >> testInstanceAttributes [
 
@@ -448,6 +465,45 @@ test(x, 25)
 	self assert: ((invocation cacheAt: 'args' ifAbsent: [ false ]) first at: 'value') equals: 'x'.
 
 	self assert: ((invocation cacheAt: 'args' ifAbsent: [ false ]) second at: 'value') equals: '25'
+]
+
+{ #category : 'tests - local variables' }
+FamixPythonImporterTest >> testLocalVariablesKnowTheirFunction [
+
+	| temporary1 temporary2 |
+	self parseCode: 'def myFirstFunction():
+	temporary = []
+
+def mySecondFunction():
+	temporary = 3'.
+
+	self assert: (self model allLocalVariables size) equals: 2.
+	temporary1 := self model allLocalVariables first.
+	temporary2 := self model allLocalVariables second.
+	
+	self assert: temporary1 parentBehaviouralEntity name equals: 'myFirstFunction'.
+	self assert: temporary2 parentBehaviouralEntity name equals: 'mySecondFunction'.
+]
+
+{ #category : 'tests - local variables' }
+FamixPythonImporterTest >> testLocalVariablesWithSameName [
+
+	| function1 function2 |
+	self parseCode: 'def myFirstFunction():
+	temporary = []
+
+def mySecondFunction():
+	temporary = 3'.
+
+	self assert: self model allFunctions size equals: 2.
+	self assert: self model allLocalVariables size equals: 2.
+	function1 := self functionNamed: 'myFirstFunction'.
+	function2 := self functionNamed: 'mySecondFunction'.
+
+	self assert: function1 localVariables size equals: 1.
+	self assert: function1 localVariables anyOne name equals: 'temporary'.
+	self assert: function2 localVariables size equals: 1.
+	self assert: function2 localVariables anyOne name equals: 'temporary'
 ]
 
 { #category : 'tests - lambdas' }

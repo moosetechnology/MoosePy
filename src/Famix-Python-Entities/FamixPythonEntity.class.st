@@ -115,6 +115,13 @@ FamixPythonEntity >> isMethod [
 ]
 
 { #category : 'testing' }
+FamixPythonEntity >> isModule [
+
+	<generated>
+	^ false
+]
+
+{ #category : 'testing' }
 FamixPythonEntity >> isNamedEntity [
 
 	<generated>
