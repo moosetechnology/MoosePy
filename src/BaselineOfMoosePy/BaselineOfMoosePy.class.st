@@ -10,16 +10,18 @@ BaselineOfMoosePy >> baseline: spec [
 
 	<baseline>
 	spec for: #common do: [
-		self pythonParser: spec.
+		self
+			gitBridge: spec;
+			pythonParser: spec.
 
 		spec
 			package: 'Famix-Python-Entities';
 			package: 'Famix-Python-Generator';
 			package: 'Famix-Python-Importer' with: [ spec requires: #( 'Famix-Python-Entities' 'PythonParser' ) ];
-			package: 'Famix-Python-Importer-Tests' with: [ spec requires: #( 'Famix-Python-Importer' ) ].
+			package: 'Famix-Python-Importer-Tests' with: [ spec requires: #( 'Famix-Python-Importer' 'GitBridge' ) ].
 
 		spec
-			group: 'Core' with: #( 'Famix-Python-Entities' 'Famix-Python-Importer' 'Famix-Python-Importer-Tests');
+			group: 'Core' with: #( 'Famix-Python-Entities' 'Famix-Python-Importer' 'Famix-Python-Importer-Tests' );
 			group: 'Generator' with: #( 'Core' 'Famix-Python-Generator' ) ].
 
 	spec for: #NeedsFamix do: [
@@ -34,6 +36,12 @@ BaselineOfMoosePy >> customProjectAttributes [
 
 	'BaselineOfFamix' asPackageIfAbsent: [ ^ #( #NeedsFamix ) ].
 	^ #(  )
+]
+
+{ #category : 'baselines' }
+BaselineOfMoosePy >> gitBridge: spec [
+
+	spec baseline: 'GitBridge' with: [ spec repository: 'github://jecisc/GitBridge:v1.x.x/src' ]
 ]
 
 { #category : 'baselines' }
