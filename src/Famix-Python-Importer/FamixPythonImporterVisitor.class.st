@@ -20,14 +20,6 @@ FamixPythonImporterVisitor >> acceptNodes: aCollection [
 
 ]
 
-{ #category : 'accessing' }
-FamixPythonImporterVisitor >> annotationTypeNamed: aString [ 
-
-	^ (self model allWithType: FamixPythonAnnotationType)
-		  detect: [ :e | e name = aString ]
-		  ifNone: [ nil ]
-]
-
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> basicCreateFunction: aSelector withSignature: aSignature [
 
@@ -81,14 +73,6 @@ FamixPythonImporterVisitor >> contextModule [
 	whileFalse: [ top := top nextLink ].
 
 	^top value
-]
-
-{ #category : 'private-entity-creation' }
-FamixPythonImporterVisitor >> createAnnotationInstance: aPyDecoratorNode named: aString [ 
-
-	^model newAnnotationInstance
-		annotationType: (self ensureAnnotationTypeNamed: aString) ;
-		yourself
 ]
 
 { #category : 'private-entity-creation' }
@@ -233,13 +217,6 @@ FamixPythonImporterVisitor >> createParameter: aParameter inBehavioural: aFamixC
 	parameter parentBehaviouralEntity: aFamixContainer.
 
 	^ self setSourceAnchor: parameter from: aParameter
-]
-
-{ #category : 'private-entity-creation' }
-FamixPythonImporterVisitor >> ensureAnnotationTypeNamed: aString [ 
-
-	^ (self annotationTypeNamed: aString) ifNil: [
-		  self createAnnotationTypeNamed: aString ]
 ]
 
 { #category : 'private-entity-creation' }
@@ -684,14 +661,6 @@ FamixPythonImporterVisitor >> visitDecorated: aDecoratedNode [
 
 	(decorations notEmpty and: [ decorated notNil ])
 	ifTrue: [ decorated annotationInstances: decorations ]
-]
-
-{ #category : 'visiting' }
-FamixPythonImporterVisitor >> visitDecorator: aDecoratorNode [
-
-	| name |
-	name := self acceptNode: aDecoratorNode dotted_name.
-	^self createAnnotationInstance: aDecoratorNode named: name
 ]
 
 { #category : 'visiting' }

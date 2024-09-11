@@ -19,9 +19,7 @@ Class {
 		'inheritance',
 		'function',
 		'module',
-		'indexedFileAnchor',
-		'annotationInstance',
-		'annotationType'
+		'indexedFileAnchor'
 	],
 	#category : 'Famix-Python-Generator',
 	#package : 'Famix-Python-Generator'
@@ -45,8 +43,6 @@ FamixPythonGenerator >> defineClasses [
 	super defineClasses.
 
 	access := builder newClassNamed: #Access.
-	annotationInstance := builder newClassNamed: #AnnotationInstance.
-	annotationType := builder newClassNamed: #AnnotationType.
 	attribute := builder newClassNamed: #Attribute.
 	class := builder newClassNamed: #Class.
 	containerEntity := builder newAbstractClassNamed: #ContainerEntity.
@@ -72,11 +68,6 @@ FamixPythonGenerator >> defineHierarchy [
 	super defineHierarchy.
 
 	access --|> #TAccess.
-	
-	annotationInstance --|> #TAnnotationInstance.
-	annotationInstance --|> #TTypedAnnotationInstance.
-	annotationType --|> #TAnnotationType.
-	annotationType --|> namedEntity.
 
 	attribute --|> namedEntity.
 	attribute --|> #TAttribute.

@@ -530,25 +530,6 @@ def identity2():
 	self assert: famix functionOwner name equals: 'identity'
 ]
 
-{ #category : 'tests' }
-FamixPythonImporterTest >> testSameAnnotationType [
-
-	self skip: 'Do we want the decorators in the model?'.
-	self parseCode: '
-@classmethod
-def greet(name):
-    print ''Hello'', name
-@classmethod
-def goodbye(name):
-    print ''Bye-bye'', name
-'.
-
-	self assert: (importer model allWithType: FamixPythonAnnotationType) size equals: 1.
-	self
-		assert: (importer functionNamed: 'greet') annotationInstances anyOne annotationType
-		equals: (importer functionNamed: 'goodbye') annotationInstances anyOne annotationType
-]
-
 { #category : 'tests - metaclasses' }
 FamixPythonImporterTest >> testSingleClasSingleFQNMetaclass [
 
