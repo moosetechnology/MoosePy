@@ -46,6 +46,9 @@ FamixPythonImporter >> importFileReference: aFileReference [
 
 	aFileReference isDirectory 
 		ifTrue: [
+			"I'm not sure we should have this escape but venv is a python interpreter and we are not able to parse it currently. This clause should probably be removed in the future."
+			aFileReference basename = 'venv' ifTrue: [ ^ self  ].
+			
 			aFileReference children do: [ :child | self importFileReference: child ].
 			^self
 		].
@@ -58,9 +61,6 @@ FamixPythonImporter >> importFileReference: aFileReference [
 
 { #category : 'api' }
 FamixPythonImporter >> importPythonFile: aFileReference [
-
-	'importing: ' trace.
-	aFileReference fullName traceCr.
 
 	(PythonParser parseFileWithErrors: aFileReference) acceptVisitor: visitor
 ]

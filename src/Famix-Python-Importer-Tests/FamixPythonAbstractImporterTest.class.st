@@ -48,6 +48,12 @@ FamixPythonAbstractImporterTest >> moduleNamed: aName [
 ]
 
 { #category : 'accessing' }
+FamixPythonAbstractImporterTest >> packageNamed: aName [
+
+	^ self model allPackages detect: [ :package | package name = aName ]
+]
+
+{ #category : 'accessing' }
 FamixPythonAbstractImporterTest >> parameterNamed: aName [
 
 	^ self model allParameters detect: [ :parameter | parameter name = aName ]

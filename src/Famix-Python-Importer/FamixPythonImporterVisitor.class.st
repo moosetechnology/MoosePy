@@ -284,18 +284,18 @@ FamixPythonImporterVisitor >> ensureMethod: aMethodNode [
 ]
 
 { #category : 'private-entity-creation' }
-FamixPythonImporterVisitor >> ensureModuleFromFileInputNode: aFileInputNode [
-
-	^ self 
-		ensureModuleNamed: aFileInputNode filename basename withoutExtension  
-		fromNode: aFileInputNode 
-	
-]
-
-{ #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> ensureModuleNamed: moduleName fromNode: aModuleNode [
 
 	^ (self moduleNamed: moduleName) ifNil: [ self createModule: aModuleNode named: moduleName ]
+]
+
+{ #category : 'private-entity-creation' }
+FamixPythonImporterVisitor >> ensurePackageFromNode: aFileNode [
+
+	| package |
+	package := model newPackageNamed: aFileNode fileReference parent basename.
+
+	^ self setSourceAnchor: package from: aFileNode
 ]
 
 { #category : 'private-entity-creation' }
@@ -716,15 +716,17 @@ FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> visitFile: aFileNode [
 
-	| module |
-	module := self
-		ensureModuleNamed: (self moduleNameStringOf: aFileNode)
-		fromNode: aFileNode.
-	context push: module.
+	| entity |
+	"If the file is name __init__.py this means that we have the declaration of a package. Else we have a module that can be in a package."
+	entity := aFileNode fileReference basename = '__init__.py'
+		          ifTrue: [ self ensurePackageFromNode: aFileNode ]
+		          ifFalse: [ self ensureModuleNamed: (self moduleNameStringOf: aFileNode) fromNode: aFileNode ].
+
+	context push: entity.
 
 	self acceptNodes: aFileNode statements.
 
-	^context pop
+	^ context pop
 ]
 
 { #category : 'visiting' }
