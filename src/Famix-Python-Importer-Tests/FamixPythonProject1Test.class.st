@@ -53,6 +53,18 @@ FamixPythonProject1Test >> testModuleInSubPackage [
 	self assert: module parentPackage equals: (self packageNamed: 'subpackage1')
 ]
 
+{ #category : 'tests - packages' }
+FamixPythonProject1Test >> testPackageSourceAnchor [
+
+	| rootPackage |
+	self denyEmpty: self model allPackages.
+
+	rootPackage := self packageNamed: 'root'.
+
+	self assert: rootPackage sourceAnchor mooseModel equals: self model.
+	self assert: rootPackage sourceAnchor sourceText equals: (FamixPythonBridge parsingExamples / 'project1' / 'root' / '__init__.py') contents
+]
+
 { #category : 'tests - modules' }
 FamixPythonProject1Test >> testRootModule [
 

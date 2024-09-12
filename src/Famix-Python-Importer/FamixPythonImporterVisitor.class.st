@@ -610,6 +610,7 @@ FamixPythonImporterVisitor >> setSourceAnchor: aFamixEntity from: aSmaccNode [
 		fileName: (self relativeFilePath: aSmaccNode) ;
 		startPos: aSmaccNode startPosition;
 		endPos: aSmaccNode stopPosition;
+		mooseModel: self model;
 		yourself).
 
 	aFamixEntity stub: false.
