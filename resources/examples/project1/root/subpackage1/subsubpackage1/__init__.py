@@ -1,0 +1,1 @@
+subSubPackage1Variable = True

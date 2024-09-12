@@ -1,0 +1,1 @@
+moduleInSubpackage1Variable = 10
