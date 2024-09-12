@@ -18,6 +18,34 @@ FamixPythonProject1Test >> model [
 ]
 
 { #category : 'tests - modules' }
+FamixPythonProject1Test >> testModuleInRootPackage [
+
+	| module |
+	self denyEmpty: self model allModules.
+
+	module := self moduleNamed: 'moduleInRootPackage'.
+
+	self assert: module class equals: FamixPythonModule.
+	self assert: module name equals: 'moduleInRootPackage'.
+	self deny: module isRoot.
+	self assert: module parentPackage equals: (self packageNamed: 'root')
+]
+
+{ #category : 'tests - modules' }
+FamixPythonProject1Test >> testModuleInSubPackage [
+
+	| module |
+	self denyEmpty: self model allModules.
+
+	module := self moduleNamed: 'moduleInSubPackage1'.
+
+	self assert: module class equals: FamixPythonModule.
+	self assert: module name equals: 'moduleInSubPackage1'.
+	self deny: module isRoot.
+	self assert: module parentPackage equals: (self packageNamed: 'subpackage1')
+]
+
+{ #category : 'tests - modules' }
 FamixPythonProject1Test >> testRootModule [
 
 	| rootModule |

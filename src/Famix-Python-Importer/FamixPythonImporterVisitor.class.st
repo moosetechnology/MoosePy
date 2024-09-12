@@ -785,15 +785,6 @@ FamixPythonImporterVisitor >> visitParameter: aParameter [
 ]
 
 { #category : 'visiting' }
-FamixPythonImporterVisitor >> visitPower: anInvocation [
-
-	anInvocation trailers ifNotEmpty: [
-		self createInvocation: anInvocation ].
-
-	^ super visitPower: anInvocation
-]
-
-{ #category : 'visiting' }
 FamixPythonImporterVisitor >> visitSmaCCError: aSmaCCError [
 	^nil
 ]
