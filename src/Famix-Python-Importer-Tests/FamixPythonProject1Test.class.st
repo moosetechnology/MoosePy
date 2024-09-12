@@ -42,3 +42,25 @@ FamixPythonProject1Test >> testRootPackage [
 	self assert: rootPackage name equals: 'root'.
 	self assert: rootPackage isRoot
 ]
+
+{ #category : 'tests - packages' }
+FamixPythonProject1Test >> testSubPackage [
+
+	| rootPackage subPackage subSubPackage |
+	self denyEmpty: self model allPackages.
+
+	rootPackage := self packageNamed: 'root'.
+	subPackage := self packageNamed: 'subpackage1'.
+
+	self assert: subPackage class equals: FamixPythonPackage.
+	self assert: subPackage name equals: 'subpackage1'.
+	self deny: subPackage isRoot.
+	self assert: subPackage parentPackage equals: rootPackage.
+
+	subSubPackage := self packageNamed: 'subsubpackage1'.
+
+	self assert: subSubPackage class equals: FamixPythonPackage.
+	self assert: subSubPackage name equals: 'subsubpackage1'.
+	self deny: subSubPackage isRoot.
+	self assert: subSubPackage parentPackage equals: subPackage
+]

@@ -685,17 +685,25 @@ FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> visitFile: aFileNode [
 
-	| entity |
+	| isPackageDeclaration entity |
 	"If the file is name __init__.py this means that we have the declaration of a package. Else we have a module that can be in a package."
-	entity := aFileNode fileReference basename = '__init__.py'
+	isPackageDeclaration := aFileNode fileReference basename = '__init__.py'.
+	entity := isPackageDeclaration
 		          ifTrue: [ self ensurePackageFromNode: aFileNode ]
 		          ifFalse: [ self ensureModuleNamed: (self moduleNameStringOf: aFileNode) fromNode: aFileNode ].
+
+	context ifNotEmpty: [
+		self assert: context top isPackage.
+		entity parentPackage: context top ].
 
 	context push: entity.
 
 	self acceptNodes: aFileNode statements.
 
-	^ context pop
+	"If we are in a package declaration we need to keep the package in the context for the modules in the package. The package will be pop later by the importer."
+	^ isPackageDeclaration
+		  ifTrue: [ context top ]
+		  ifFalse: [ context pop ]
 ]
 
 { #category : 'visiting' }
