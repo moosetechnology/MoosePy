@@ -34,11 +34,14 @@ FamixPythonImporter >> import: aFileName [
 	visitor rootFilePath: aFileName.
 
 	fileReference := aFileName asFileReference.
-	visitor model name: fileReference basename.
+	visitor model
+		name: fileReference basename;
+		rootFolder: aFileName asFileReference.
+
 
 	self importFileReference: fileReference.
 
-	^visitor model
+	^ visitor model
 ]
 
 { #category : 'api' }

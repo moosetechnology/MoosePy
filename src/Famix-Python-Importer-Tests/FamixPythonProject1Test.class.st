@@ -17,6 +17,14 @@ FamixPythonProject1Test >> model [
 	^ FamixPythonProject1TestResource current model
 ]
 
+{ #category : 'tests' }
+FamixPythonProject1Test >> testModel [
+
+	self assert: self model isNotEmpty.
+	self assert: self model name equals: 'project1'.
+	self assert: self model rootFolder equals: FamixPythonBridge parsingExamples / 'project1'
+]
+
 { #category : 'tests - modules' }
 FamixPythonProject1Test >> testModuleInRootPackage [
 
