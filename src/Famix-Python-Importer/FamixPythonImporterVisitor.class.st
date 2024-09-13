@@ -131,18 +131,23 @@ FamixPythonImporterVisitor >> createFunction: aFunctionNode [
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> createImport: anImport ofName: aName from: fromName alias: alias [
 
-	| import module |
+	| import |
 	import := model newImport
-		entityName: aName;
-		asName: alias;
-		fromName: fromName;
-		yourself.
+		          entityName: aName;
+		          asName: alias;
+		          fromName: fromName;
+		          yourself.
 
 	self setSourceAnchor: import from: anImport.
 
-	module := self contextModule.
-	module addIncomingImport: import.
-	import importingEntity: module.
+	context top addOutgoingImport: import.
+
+	"The next line is way too simplistic. We need to manage packages, absolute paths, relative paths, and a lot of things. But it's a start!"
+	self flag: #todo.
+	self model allModules
+		detect: [ :module | module name = aName ]
+		ifFound: [ :module | module addIncomingImport: import ]
+		ifNone: [ self flag: #todo "This will happen while we have only one visitor." ].
 
 	^ import
 ]
@@ -449,8 +454,8 @@ FamixPythonImporterVisitor >> importNamed: aString [
 
 	self flag: 'This is wrong, should also check the importing module: several modules can have similar imports'.
 
-	^ (self model allWithType: FamixPythonImport)
-		  detect: [ :e | e entityName = aString ]
+	^ self model allImports
+		  detect: [ :e | e importedEntity name = aString ]
 		  ifNone: [ nil ]
 ]
 

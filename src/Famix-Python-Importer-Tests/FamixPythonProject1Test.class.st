@@ -53,6 +53,19 @@ FamixPythonProject1Test >> testModuleInSubPackage [
 	self assert: module parentPackage equals: (self packageNamed: 'subpackage1')
 ]
 
+{ #category : 'tests - imports' }
+FamixPythonProject1Test >> testPackageImportModule [
+
+	| rootPackage import |
+	self skip.
+	self denyEmpty: self model allImports.
+	rootPackage := self packageNamed: 'root'.
+	import := rootPackage incomingImports detect: [ :pimport | pimport target name = 'moduleAtRoot' ].
+
+	self assert: import importingEntity equals: rootPackage.
+	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot')
+]
+
 { #category : 'tests - packages' }
 FamixPythonProject1Test >> testPackageSourceAnchor [
 
@@ -77,6 +90,19 @@ FamixPythonProject1Test >> testRootModule [
 	self assert: rootModule name equals: 'moduleAtRoot'.
 	self assert: rootModule isRoot.
 	self assert: rootModule parentPackage isNil
+]
+
+{ #category : 'tests - imports' }
+FamixPythonProject1Test >> testRootModuleImportRootModule [
+
+	| rootModule1 rootModule2 import |
+	self denyEmpty: self model allImports.
+	rootModule1 := self moduleNamed: 'moduleAtRoot'.
+	rootModule2 := self moduleNamed: 'moduleAtRoot2'.
+	import := rootModule2 outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRoot' ].
+
+	self assert: import importingEntity equals: rootModule2.
+	self assert: import importedEntity equals: rootModule1
 ]
 
 { #category : 'tests - packages' }
