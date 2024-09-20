@@ -12,12 +12,13 @@ BaselineOfMoosePy >> baseline: spec [
 	spec for: #common do: [
 		self
 			gitBridge: spec;
-			pythonParser: spec.
+			pythonParser: spec;
+			symbolResolver: spec.
 
 		spec
 			package: 'Famix-Python-Entities';
 			package: 'Famix-Python-Generator';
-			package: 'Famix-Python-Importer' with: [ spec requires: #( 'Famix-Python-Entities' 'PythonParser' ) ];
+			package: 'Famix-Python-Importer' with: [ spec requires: #( 'Famix-Python-Entities' 'PythonParser' 'SymbolResolver') ];
 			package: 'Famix-Python-Importer-Tests' with: [ spec requires: #( 'Famix-Python-Importer' 'GitBridge' ) ].
 
 		spec
@@ -51,4 +52,10 @@ BaselineOfMoosePy >> pythonParser: spec [
 		spec
 			repository: 'github://j-brant/SmaCC:master/src';
 			loads: #( 'SmaCC_Python' 'SmaCC_Python_Tests' ) ]
+]
+
+{ #category : 'baselines' }
+BaselineOfMoosePy >> symbolResolver: spec [
+
+	spec baseline: 'SymbolResolver' with: [ spec repository: 'github://jecisc/SymbolResolver/src' ]
 ]

@@ -40,6 +40,8 @@ FamixPythonImporter >> import: aFileName [
 
 
 	self importFileReference: fileReference.
+	
+	visitor solver resolveUnresolvedReferences.
 
 	^ visitor model
 ]
@@ -58,7 +60,7 @@ FamixPythonImporter >> importFileReference: aFileReference [
 		files do: [ :child | self importFileReference: child ].
 
 		"If the directory is a package, we need to remove it from the context after visiting all files of the package."
-		files first isPythonPackageDeclaration ifTrue: [ visitor context pop ].
+		files first isPythonPackageDeclaration ifTrue: [ visitor popScope ].
 		^ self ].
 
 	(self isPythonExtension: aFileReference extension) ifFalse: [ ^ self ].

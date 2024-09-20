@@ -1,11 +1,11 @@
 Class {
 	#name : 'FamixPythonImporterVisitor',
 	#superclass : 'PyRootNodeVisitor',
+	#traits : 'SRTSolverUserVisitor',
+	#classTraits : 'SRTSolverUserVisitor classTrait',
 	#instVars : [
 		'model',
-		'layer',
-		'rootFilePath',
-		'context'
+		'rootFilePath'
 	],
 	#category : 'Famix-Python-Importer-Visitors',
 	#package : 'Famix-Python-Importer',
@@ -56,25 +56,6 @@ FamixPythonImporterVisitor >> classes [
 	^ self model allWithType: FamixPythonClass
 ]
 
-{ #category : 'accessing - methods' }
-FamixPythonImporterVisitor >> context [
-
-	^ context
-]
-
-{ #category : 'accessing' }
-FamixPythonImporterVisitor >> contextModule [
-
-	"rather ugly, but I did not want to add methods in the meta-model for this"
-
-	| top |
-	top := context firstLink.
-	[  top value class = FamixPythonModule ]
-	whileFalse: [ top := top nextLink ].
-
-	^top value
-]
-
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> createAnnotationTypeNamed: aString [ 
 
@@ -123,7 +104,7 @@ FamixPythonImporterVisitor >> createFunction: aFunctionNode [
 
 	function := self basicCreateFunction: aFunctionNode fname value withSignature: signature.
 
-	function functionOwner: context top.
+	function functionOwner: self currentEntity.
 
 	^ self setSourceAnchor: function from: aFunctionNode
 ]
@@ -140,14 +121,16 @@ FamixPythonImporterVisitor >> createImport: anImport ofName: aName from: fromNam
 
 	self setSourceAnchor: import from: anImport.
 
-	context top addOutgoingImport: import.
+	self currentEntity addOutgoingImport: import.
 
-	"The next line is way too simplistic. We need to manage packages, absolute paths, relative paths, and a lot of things. But it's a start!"
-	self flag: #todo.
-	self model allModules
-		detect: [ :module | module name = aName ]
-		ifFound: [ :module | module addIncomingImport: import ]
-		ifNone: [ self flag: #todo "This will happen while we have only one visitor." ].
+	(self solver
+		 pushResolvableAsScopeBeforeMainEntityScope: (FamixPythonImportResolvable path: aName)
+		 foundAction: [ :entity :currentEntity | entity addIncomingImport: import ]) notFoundReplacementEntity: [ :unresolvedImport :currentEntity |
+		self flag: #todo. "Add infos and check that we do not already have this stub"
+		model newModule
+			isStub: true;
+			addIncomingImport: import;
+			yourself ].
 
 	^ import
 ]
@@ -161,7 +144,7 @@ FamixPythonImporterVisitor >> createInvocation: anInvocationNode [
 
 	invocDict := self extractInvocationInformation: anInvocationNode.
 
-	invocation sender: context top.
+	invocation sender: self currentEntity.
 	invocation cacheAt: 'canditate' put: (invocDict at: 'canditate').
 	invocation cacheAt: 'args' put: (invocDict at: 'args').
 	invocation cacheAt: 'receiver' put: (invocDict at: 'receiver').
@@ -184,7 +167,7 @@ FamixPythonImporterVisitor >> createLambda: aLambdaNode [
 		basicCreateFunction: ''
 		withSignature: '(' , aLambdaNode testlist arguments asString , ') -> ' , aLambdaNode testlist body asString.
 
-	function functionOwner: context top.
+	function functionOwner: self currentEntity.
 
 	^ self setSourceAnchor: function from: aLambdaNode
 ]
@@ -196,7 +179,7 @@ FamixPythonImporterVisitor >> createMethod: aMethodNode [
 	signature := aMethodNode signatureString.
 	method := self basicCreateMethod: aMethodNode fname value withSignature: signature.
 
-	method parentType: context top.
+	method parentType: self currentEntity.
 
 	^ self setSourceAnchor: method from: aMethodNode
 ]
@@ -261,7 +244,7 @@ FamixPythonImporterVisitor >> ensureMethod: aMethodNode [
 
 	^ (self
 		   methodNamed: aMethodNode fname value
-		   inClassNamed: context top name) ifNil: [
+		   inClassNamed: self currentEntity name) ifNil: [
 		  self createMethod: aMethodNode ]
 ]
 
@@ -452,10 +435,12 @@ FamixPythonImporterVisitor >> importFromName: anImportFromNode [
 { #category : 'private - searching' }
 FamixPythonImporterVisitor >> importNamed: aString [
 
-	self flag: 'This is wrong, should also check the importing module: several modules can have similar imports'.
-
+	self flag: #todo. "This is wrong, should also check the importing module: several modules can have similar imports"
+	self flag: #todo. "The ifNil shout not be needed but it's during the development"
 	^ self model allImports
-		  detect: [ :e | e importedEntity name = aString ]
+		  detect: [ :e | (e importedEntity
+	ifNil: [ '' ]
+	ifNotNil: #name) = aString ]
 		  ifNone: [ nil ]
 ]
 
@@ -469,9 +454,8 @@ FamixPythonImporterVisitor >> imports [
 FamixPythonImporterVisitor >> initialize [
 
 	super initialize.
-	context := Stack new.
-	layer := 0.
-	model := FamixPythonModel new name: 'default Python Model'
+	model := FamixPythonModel new name: 'default Python Model'.
+	self initialiseFutureSolver 
 ]
 
 { #category : 'private - searching' }
@@ -642,7 +626,7 @@ FamixPythonImporterVisitor >> visitAnnotatedSymbol: anAnnotatedSymbol [
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> visitAssignmentStatement: anAssignmentStatement [
 
-	(anAssignmentStatement lhs isKindOf: PyVariableExpressionNode) ifTrue: [ self ensureVariable: anAssignmentStatement lhs name localTo: context top ].
+	(anAssignmentStatement lhs isKindOf: PyVariableExpressionNode) ifTrue: [ self ensureVariable: anAssignmentStatement lhs name localTo: self currentEntity ].
 
 	^ super visitAssignmentStatement: anAssignmentStatement
 ]
@@ -650,11 +634,7 @@ FamixPythonImporterVisitor >> visitAssignmentStatement: anAssignmentStatement [
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> visitClassDefinition: aClassDef [
 
-	context push: (self ensureClass:  aClassDef).
-
-	super visitClassDefinition: aClassDef.
-
-	^context pop
+	^ self useCurrentEntity: (self ensureClass: aClassDef) during: [ super visitClassDefinition: aClassDef ]
 ]
 
 { #category : 'visiting' }
@@ -698,18 +678,18 @@ FamixPythonImporterVisitor >> visitFile: aFileNode [
 		          ifTrue: [ self ensurePackageFromNode: aFileNode ]
 		          ifFalse: [ self ensureModuleNamed: (self moduleNameStringOf: aFileNode) fromNode: aFileNode ].
 
-	context ifNotEmpty: [
-		self assert: context top isPackage.
-		entity parentPackage: context top ].
+	self solver scopeIsEmpty ifFalse: [
+		self assert: self currentEntity isPackage.
+		entity parentPackage: self currentEntity ].
 
-	context push: entity.
+	(self currentEntity: entity) isMainEntity: true.
 
 	self acceptNodes: aFileNode statements.
 
 	"If we are in a package declaration we need to keep the package in the context for the modules in the package. The package will be pop later by the importer."
 	^ isPackageDeclaration
-		  ifTrue: [ context top ]
-		  ifFalse: [ context pop ]
+		  ifTrue: [ self currentEntity ]
+		  ifFalse: [ self popScope ]
 ]
 
 { #category : 'visiting' }
@@ -717,15 +697,10 @@ FamixPythonImporterVisitor >> visitFunctionDefinition: aFunctionDefinition [
 	"the parser does not make a difference between function and method, but a method is defined in a class and its first parameter is self."
 
 	| fmx result |
-
-	fmx := context top isClass
-		ifTrue: [  self ensureMethod: aFunctionDefinition ]
-		ifFalse: [ self ensureFunction: aFunctionDefinition ].
-	context push: fmx.
-
-	result := super visitFunctionDefinition: aFunctionDefinition.
-
-	^context pop
+	fmx := self currentEntity isClass
+		       ifTrue: [ self ensureMethod: aFunctionDefinition ]
+		       ifFalse: [ self ensureFunction: aFunctionDefinition ].
+	^ self useCurrentEntity: fmx during: [ result := super visitFunctionDefinition: aFunctionDefinition ]
 ]
 
 { #category : 'visiting' }
@@ -751,17 +726,14 @@ FamixPythonImporterVisitor >> visitInterpolatedString: anInterpolatedString [
 FamixPythonImporterVisitor >> visitLambda: aLambdaNode [
 
 	| fmx result |
-
 	"for now only create lambda if we are inside a function/method
 	This is needed because there is a bug in SmaCC"
-
-	({FamixPythonFunction . FamixPythonMethod} includes: context top class) 
-	ifFalse: [ ^nil ].
+	({
+		 FamixPythonFunction.
+		 FamixPythonMethod } includes: self currentEntity class) ifFalse: [ ^ nil ].
 
 	fmx := self createLambda: aLambdaNode.
-	context push: fmx.
-
-	^context pop
+	^ self useCurrentEntity: fmx during: [  ]
 ]
 
 { #category : 'visiting' }
@@ -774,7 +746,7 @@ FamixPythonImporterVisitor >> visitMetaclass: aMetaclass [
 		metaClassObject := model newClass
 			                   name: metaClassName;
 			                   stub: true ].
-	context top metaclass: metaClassObject
+	self currentEntity metaclass: metaClassObject
 ]
 
 { #category : 'visiting' }
@@ -787,7 +759,7 @@ FamixPythonImporterVisitor >> visitName: aName [
 FamixPythonImporterVisitor >> visitParameter: aParameter [
 	"parameters in a function/methoid definition"
 
-	^ self ensureParameter: aParameter inBehavioural: context top
+	^ self ensureParameter: aParameter inBehavioural: self currentEntity
 ]
 
 { #category : 'visiting' }

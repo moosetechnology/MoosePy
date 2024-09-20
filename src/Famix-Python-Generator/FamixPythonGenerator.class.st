@@ -140,6 +140,7 @@ FamixPythonGenerator >> defineHierarchy [
 	package --|> #TPackageable.
 	package --|> #TWithComments.
 	package --|> #TImportable.
+	package --|> #TWithImports.
 
 	parameter --|> namedEntity.
 	parameter --|> #TParameter.
