@@ -57,5 +57,5 @@ BaselineOfMoosePy >> pythonParser: spec [
 { #category : 'baselines' }
 BaselineOfMoosePy >> symbolResolver: spec [
 
-	spec baseline: 'SymbolResolver' with: [ spec repository: 'github://jecisc/SymbolResolver/src' ]
+	spec baseline: 'SymbolResolver' with: [ spec repository: 'github://jecisc/SymbolResolver:main/src' ]
 ]
