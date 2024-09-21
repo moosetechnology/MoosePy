@@ -13,6 +13,19 @@ Class {
 }
 
 { #category : 'visiting' }
+FamixPythonImporterVisitor >> acceptNode: aNode [
+
+	^ [ super acceptNode: aNode ]
+		  on: Exception
+		  do: [ :exception |
+			  (exception isKindOf: Warning)
+				  ifTrue: [
+					  self errorReport addWarning: exception.
+					  exception resume ]
+				  ifFalse: [ self errorReport addError: exception ] ]
+]
+
+{ #category : 'visiting' }
 FamixPythonImporterVisitor >> acceptNodes: aCollection [
 	"override to return the result of the visits"
 

@@ -12,7 +12,8 @@ Class {
 	#name : 'FamixPythonImporter',
 	#superclass : 'Object',
 	#instVars : [
-		'visitor'
+		'visitor',
+		'errorReport'
 	],
 	#category : 'Famix-Python-Importer-Importer',
 	#package : 'Famix-Python-Importer',
@@ -24,6 +25,12 @@ FamixPythonImporter class >> import: aFileName [
 
 	^self new
 		import: aFileName
+]
+
+{ #category : 'accessing' }
+FamixPythonImporter >> errorReport [
+
+	^ visitor errorReport
 ]
 
 { #category : 'api' }
@@ -42,6 +49,9 @@ FamixPythonImporter >> import: aFileName [
 	self importFileReference: fileReference.
 	
 	visitor solver resolveUnresolvedReferences.
+	
+	self flag: #todo. "We should probably handle it another way in production."
+	self errorReport ifNotEmpty: [ self errorReport inspect ].
 
 	^ visitor model
 ]
