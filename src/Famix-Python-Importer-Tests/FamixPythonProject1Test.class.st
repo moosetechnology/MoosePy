@@ -25,18 +25,6 @@ FamixPythonProject1Test >> testModel [
 	self assert: self model rootFolder equals: FamixPythonBridge parsingExamples / 'project1'
 ]
 
-{ #category : 'tests - imports' }
-FamixPythonProject1Test >> testModuleImportsPackage [
-
-	| moduleAtRoot import |
-	self denyEmpty: self model allImports.
-	moduleAtRoot := self moduleNamed: 'moduleAtRoot'.
-	import := moduleAtRoot outgoingImports detect: [ :pimport | pimport target name = 'root' ].
-
-	self assert: import importingEntity equals: moduleAtRoot.
-	self assert: import importedEntity equals: (self packageNamed: 'root')
-]
-
 { #category : 'tests - modules' }
 FamixPythonProject1Test >> testModuleInRootPackage [
 
@@ -63,18 +51,6 @@ FamixPythonProject1Test >> testModuleInSubPackage [
 	self assert: module name equals: 'moduleInSubPackage1'.
 	self deny: module isRoot.
 	self assert: module parentPackage equals: (self packageNamed: 'subpackage1')
-]
-
-{ #category : 'tests - imports' }
-FamixPythonProject1Test >> testPackageImportModule [
-
-	| rootPackage import |
-	self denyEmpty: self model allImports.
-	rootPackage := self packageNamed: 'root'.
-	import := rootPackage outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRoot' ].
-
-	self assert: import importingEntity equals: rootPackage.
-	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot')
 ]
 
 { #category : 'tests - packages' }
@@ -104,7 +80,7 @@ FamixPythonProject1Test >> testRootModule [
 ]
 
 { #category : 'tests - imports' }
-FamixPythonProject1Test >> testRootModuleImportRootModule [
+FamixPythonProject1Test >> testRootModuleImportsRootModule [
 
 	| rootModule1 rootModule2 import |
 	self denyEmpty: self model allImports.
@@ -114,6 +90,18 @@ FamixPythonProject1Test >> testRootModuleImportRootModule [
 
 	self assert: import importingEntity equals: rootModule2.
 	self assert: import importedEntity equals: rootModule1
+]
+
+{ #category : 'tests - imports' }
+FamixPythonProject1Test >> testRootModuleImportsRootPackage [
+
+	| moduleAtRoot import |
+	self denyEmpty: self model allImports.
+	moduleAtRoot := self moduleNamed: 'moduleAtRoot'.
+	import := moduleAtRoot outgoingImports detect: [ :pimport | pimport target name = 'root' ].
+
+	self assert: import importingEntity equals: moduleAtRoot.
+	self assert: import importedEntity equals: (self packageNamed: 'root')
 ]
 
 { #category : 'tests - packages' }
@@ -126,6 +114,18 @@ FamixPythonProject1Test >> testRootPackage [
 	self assert: rootPackage class equals: FamixPythonPackage.
 	self assert: rootPackage name equals: 'root'.
 	self assert: rootPackage isRoot
+]
+
+{ #category : 'tests - imports' }
+FamixPythonProject1Test >> testRootPackageImportsRootModule [
+
+	| rootPackage import |
+	self denyEmpty: self model allImports.
+	rootPackage := self packageNamed: 'root'.
+	import := rootPackage outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRoot' ].
+
+	self assert: import importingEntity equals: rootPackage.
+	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot')
 ]
 
 { #category : 'tests - packages' }
