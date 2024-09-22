@@ -47,9 +47,9 @@ FamixPythonImporter >> import: aFileName [
 
 
 	self importFileReference: fileReference.
-	
-	visitor solver resolveUnresolvedReferences.
-	
+
+	visitor errorReport catch: Error during: [ visitor solver toResolve do: #resolve ].
+
 	self flag: #todo. "We should probably handle it another way in production."
 	self errorReport ifNotEmpty: [ self errorReport inspect ].
 
