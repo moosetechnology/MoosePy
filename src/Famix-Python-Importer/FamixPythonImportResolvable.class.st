@@ -51,15 +51,28 @@ FamixPythonImportResolvable >> path: anObject [
 ]
 
 { #category : 'resolution' }
+FamixPythonImportResolvable >> resolveAbsolutePathFor: currentEntity [
+
+	| possibleEntities splittedPath |
+	possibleEntities := currentEntity mooseModel rootEntities.
+	splittedPath := path splitOn: $..
+	possibleEntities := possibleEntities select: [ :possibleEntity | possibleEntity name = splittedPath first ].
+	splittedPath removeFirst.
+	[ splittedPath isNotEmpty ] whileTrue: [
+		| childName |
+		childName := splittedPath anyOne.
+		splittedPath removeFirst.
+		possibleEntities := possibleEntities flatCollect: [ :possibleEntity |
+			                    possibleEntity children select: [ :child | (child isPackage or: [ child isModule ]) and: [ child name = childName ] ] ] ].
+	possibleEntities size = 1 ifFalse: [ self error: 'There should be only one possible entity to import.' ].
+	^ possibleEntities anyOne
+]
+
+{ #category : 'resolution' }
 FamixPythonImportResolvable >> resolveInScope: aScope currentEntity: currentEntity [
 	"If we have a dot at first, we have a relative path. Else it's an absolute path"
 
-	(path beginsWith: '.')
-		ifTrue: [ 1 halt ]
-		ifFalse: [
-			| rootEntities splittedPath |
-			rootEntities := currentEntity mooseModel rootEntities.
-			splittedPath := path splitOn: $..
-			splittedPath size > 1 ifTrue: [ 1 halt ].
-			entity := rootEntities detect: [ :entity | entity name = splittedPath first ] ]
+	entity := (path beginsWith: '.')
+		          ifTrue: [ 1 halt ]
+		          ifFalse: [ self resolveAbsolutePathFor: currentEntity ]
 ]

@@ -104,6 +104,18 @@ FamixPythonProject1Test >> testRootModuleImportsRootPackage [
 	self assert: import importedEntity equals: (self packageNamed: 'root')
 ]
 
+{ #category : 'tests - imports' }
+FamixPythonProject1Test >> testRootModuleImportsSubPackage [
+
+	| moduleAtRoot import |
+	self denyEmpty: self model allImports.
+	moduleAtRoot := self moduleNamed: 'moduleAtRoot'.
+	import := moduleAtRoot outgoingImports detect: [ :pimport | pimport target name = 'subpackage1' ].
+
+	self assert: import importingEntity equals: moduleAtRoot.
+	self assert: import importedEntity equals: (self packageNamed: 'subpackage1')
+]
+
 { #category : 'tests - packages' }
 FamixPythonProject1Test >> testRootPackage [
 	| rootPackage |
