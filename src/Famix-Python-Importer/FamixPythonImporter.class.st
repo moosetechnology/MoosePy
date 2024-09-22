@@ -45,10 +45,9 @@ FamixPythonImporter >> import: aFileName [
 		name: fileReference basename;
 		rootFolder: aFileName asFileReference.
 
-
 	self importFileReference: fileReference.
 
-	visitor errorReport catch: Error during: [ visitor solver toResolve do: #resolve ].
+	visitor solver toResolve do: [ :resolvable | visitor errorReport catch: Error during: [ resolvable resolve ] ].
 
 	self flag: #todo. "We should probably handle it another way in production."
 	self errorReport ifNotEmpty: [ self errorReport inspect ].
