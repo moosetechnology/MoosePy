@@ -2,16 +2,8 @@ SmalltalkCISpec {
   #loading : [
     SCIMetacelloLoadSpec {
       #baseline : 'MoosePy',
-      #onConflict : #useIncoming,
-      #onUpgrade : #useIncoming,
-      #ignoreImage : true,
       #directory : 'src',
-      #platforms : [ #pharo ]
+      #registerInIceberg : true   
     }
-  ], 
-  #testing : {
-    #exclude : {
-      #classes : [ #ToyingWithParserTest, #CNNPythonDetectorFromFileTest ]
-    }
-  }
+  ]
 }
