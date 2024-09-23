@@ -1,2 +1,4 @@
 
 resources/examples/project1/.idea/
+
+resources/examples/**/__pycache__/
