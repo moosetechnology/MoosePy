@@ -17,6 +17,18 @@ FamixPythonProject1Test >> model [
 	^ FamixPythonProject1TestResource current model
 ]
 
+{ #category : 'tests - imports' }
+FamixPythonProject1Test >> testImportThatIsNotAtTheRootOfAFile [
+
+	| moduleAtRoot import |
+	self denyEmpty: self model allImports.
+	moduleAtRoot := self moduleNamed: 'moduleAtRoot'.
+	import := moduleAtRoot outgoingImports detect: [ :pimport | pimport target name = 'root2' ].
+
+	self assert: import importingEntity equals: moduleAtRoot.
+	self assert: import importedEntity equals: (self packageNamed: 'root2')
+]
+
 { #category : 'tests' }
 FamixPythonProject1Test >> testModel [
 
