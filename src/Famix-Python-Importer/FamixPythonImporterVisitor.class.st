@@ -135,15 +135,18 @@ FamixPythonImporterVisitor >> createImport: anImport ofName: aName from: fromNam
 	self setSourceAnchor: import from: anImport.
 
 	self currentEntity addOutgoingImport: import.
-
+self flag: #todo. "Check how to manage the push before the main entity and the pops."
 	(self solver
-		 pushResolvableAsScopeBeforeMainEntityScope: (FamixPythonImportResolvable path: aName)
-		 foundAction: [ :entity :currentEntity | entity addIncomingImport: import ]) notFoundReplacementEntity: [ :unresolvedImport :currentEntity |
+		 "pushResolvableAsScopeBeforeMainEntityScope: (FamixPythonImportResolvable path: aName)"
+		resolve:((FamixPythonImportResolvable path: aName)
+	notFoundReplacementEntity: [ :unresolvedImport :currentEntity |
 		self flag: #todo. "Add infos and check that we do not already have this stub"
 		model newModule
 			isStub: true;
 			addIncomingImport: import;
-			yourself ].
+			yourself ];
+	yourself)
+		 foundAction: [ :entity :currentEntity | entity addIncomingImport: import ]) .
 
 	^ import
 ]

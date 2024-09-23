@@ -7,8 +7,8 @@ FamixPythonImport >> displayStringOn: aStream [
 		nextPutAll: 'a ' ;
 		nextPutAll: self class name ;
 		nextPutAll: '('.
-	self fromName displayStringOn: aStream.
+	self source displayStringOn: aStream.
 	aStream nextPutAll: ' -> '.
-	self entityName displayStringOn: aStream.
+	self target displayStringOn: aStream.
 	aStream nextPutAll: ')'
 ]

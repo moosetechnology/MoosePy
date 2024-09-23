@@ -25,6 +25,19 @@ FamixPythonProject1Test >> testModel [
 	self assert: self model rootFolder equals: FamixPythonBridge parsingExamples / 'project1'
 ]
 
+{ #category : 'tests - imports' }
+FamixPythonProject1Test >> testModuleImportsModuleInPackage [
+
+	| importingModule importedModule import |
+	self denyEmpty: self model allImports.
+	importingModule := self moduleNamed: 'moduleInRootPackage2'.
+	importedModule := self moduleNamed: 'moduleInSubPackage1'.
+	import := importingModule outgoingImports detect: [ :pimport | pimport target name = 'moduleInSubPackage1' ].
+
+	self assert: import importingEntity equals: importingModule.
+	self assert: import importedEntity equals: importedModule
+]
+
 { #category : 'tests - modules' }
 FamixPythonProject1Test >> testModuleInRootPackage [
 
