@@ -146,7 +146,7 @@ FamixPythonProject1Test >> testRootPackageImportsRootModule [
 
 	| rootPackage import |
 	self denyEmpty: self model allImports.
-	rootPackage := self packageNamed: 'root'.
+	rootPackage := self packageNamed: 'root2'.
 	import := rootPackage outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRoot' ].
 
 	self assert: import importingEntity equals: rootPackage.
