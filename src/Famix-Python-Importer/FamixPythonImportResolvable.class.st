@@ -64,6 +64,7 @@ FamixPythonImportResolvable >> resolveAbsolutePathFor: currentEntity [
 		splittedPath removeFirst.
 		possibleEntities := possibleEntities flatCollect: [ :possibleEntity |
 			                    possibleEntity children select: [ :child | (child isPackage or: [ child isModule ]) and: [ child name = childName ] ] ] ].
+	possibleEntities ifEmpty: [ NotFound signal ].
 	possibleEntities size = 1 ifFalse: [ self error: 'There should be only one possible entity to import.' ].
 	^ possibleEntities anyOne
 ]

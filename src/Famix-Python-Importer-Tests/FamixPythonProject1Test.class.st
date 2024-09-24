@@ -42,6 +42,30 @@ FamixPythonProject1Test >> testFunctionImportsModule [
 ]
 
 { #category : 'tests - imports' }
+FamixPythonProject1Test >> testImportStubPackages [
+	"For now, if we have a stub at the end of an import we create a package all the time and not a module because we cannot know what kind it is and it is the simplest code."
+
+	| matplotlib pyglot module import |
+	self denyEmpty: self model allImports.
+	module := self moduleNamed: 'moduleWithStubs'.
+	import := module outgoingImports detect: [ :pimport | pimport target name = 'pyplot' ].
+
+	pyglot := self packageNamed: 'pyplot'.
+	matplotlib := pyglot parentPackage.
+
+	self assert: import importingEntity equals: module.
+	self assert: import importedEntity equals: pyglot.
+
+	self assert: pyglot name equals: 'pyplot'.
+	self assert: pyglot class equals: FamixPythonPackage.
+	self assert: pyglot isStub.
+
+	self assert: matplotlib name equals: 'matplotlib'.
+	self assert: matplotlib class equals: FamixPythonPackage.
+	self assert: matplotlib isStub
+]
+
+{ #category : 'tests - imports' }
 FamixPythonProject1Test >> testImportThatIsNotAtTheRootOfAFile [
 
 	| moduleAtRoot import |

@@ -137,18 +137,13 @@ FamixPythonImporterVisitor >> createImport: anImport ofName: aName from: fromNam
 	self setSourceAnchor: import from: anImport.
 
 	self currentEntity addOutgoingImport: import.
-self flag: #todo. "Check how to manage the push before the main entity and the pops."
-	(self solver
-		 "pushResolvableAsScopeBeforeMainEntityScope: (FamixPythonImportResolvable path: aName)"
-		resolve:((FamixPythonImportResolvable path: aName)
-	notFoundReplacementEntity: [ :unresolvedImport :currentEntity |
-		self flag: #todo. "Add infos and check that we do not already have this stub"
-		model newModule
-			isStub: true;
-			addIncomingImport: import;
-			yourself ];
-	yourself)
-		 foundAction: [ :entity :currentEntity | entity addIncomingImport: import ]) .
+	self flag: #todo. "Check how to manage the push before the main entity and the pops."
+	self solver
+		resolve: ((FamixPythonImportResolvable path: aName)
+				 notFoundReplacementEntity: [ :unresolvedImport :currentEntity | self ensureStubPackagesFromPath: unresolvedImport path ];
+				 yourself)
+		foundAction: [ :entity :currentEntity | entity addIncomingImport: import ].
+	"pushResolvableAsScopeBeforeMainEntityScope: (FamixPythonImportResolvable path: aName)"
 
 	^ import
 ]
@@ -275,10 +270,11 @@ FamixPythonImporterVisitor >> ensureModuleNamed: moduleName fromNode: aModuleNod
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> ensurePackageFromNode: aFileNode [
 
-	| package |
-	package := model newPackageNamed: aFileNode fileReference parent basename.
-
-	^ self setSourceAnchor: package from: aFileNode
+	^ (self packageNamed: aFileNode packageName) ifNil: [
+		  | package |
+		  package := model newPackageNamed: aFileNode packageName.
+		  self setSourceAnchor: package from: aFileNode.
+		  package ]
 ]
 
 { #category : 'private-entity-creation' }
@@ -286,6 +282,39 @@ FamixPythonImporterVisitor >> ensureParameter: parameter inBehavioural: aBehavio
 
 	^ (self parameterNamed:parameter parameterName inBehavioural: aBehavioralEntity)
 		ifNil: [ self createParameter: parameter inBehavioural: aBehavioralEntity ]
+]
+
+{ #category : 'private-entity-creation' }
+FamixPythonImporterVisitor >> ensureStubPackageNamed: aString [
+
+	^ (self packageNamed: aString) ifNil: [
+		  (model newPackageNamed: aString)
+			  isStub: true;
+			  yourself ]
+]
+
+{ #category : 'private-entity-creation' }
+FamixPythonImporterVisitor >> ensureStubPackagesFromPath: aPythonImportPath [
+	"This method takes a python import path and should ensure we have a stub entity for each. It should return the stub package for the last element of the path too."
+
+	| splitted package |
+	splitted := aPythonImportPath splitOn: $..
+	package := self model rootEntities
+		           detect: [ :entity | entity isPackage and: [ entity name = splitted first ] ]
+		           ifNone: [ self ensureStubPackageNamed: splitted first ].
+	splitted removeFirst.
+
+	[ splitted isEmpty ] whileFalse: [
+		package := package childEntities
+			           detect: [ :entity | entity isPackage and: [ entity name = splitted first ] ]
+			           ifNone: [
+				           (self ensureStubPackageNamed: splitted first)
+					           parentPackage: package;
+					           yourself ].
+
+		splitted removeFirst ].
+
+	^ package
 ]
 
 { #category : 'visiting' }
@@ -559,6 +588,14 @@ FamixPythonImporterVisitor >> moduleNameStringOf: aModuleNode [
 FamixPythonImporterVisitor >> moduleNamed: aString [
 
 	^ (self model allWithType: FamixPythonModule)
+		  detect: [ :e | e name = aString ]
+		  ifNone: [ nil ]
+]
+
+{ #category : 'private - searching' }
+FamixPythonImporterVisitor >> packageNamed: aString [
+
+	^ self model allPackages
 		  detect: [ :e | e name = aString ]
 		  ifNone: [ nil ]
 ]
