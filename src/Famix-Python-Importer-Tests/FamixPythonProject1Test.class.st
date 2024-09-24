@@ -18,6 +18,18 @@ FamixPythonProject1Test >> model [
 ]
 
 { #category : 'tests - imports' }
+FamixPythonProject1Test >> testClassImportsModule [
+
+	| class import |
+	self denyEmpty: self model allImports.
+	class := self classNamed: 'Person'.
+	import := class outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRoot3' ].
+
+	self assert: import importingEntity equals: class.
+	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot3')
+]
+
+{ #category : 'tests - imports' }
 FamixPythonProject1Test >> testFunctionImportsModule [
 
 	| function import |
@@ -39,6 +51,18 @@ FamixPythonProject1Test >> testImportThatIsNotAtTheRootOfAFile [
 
 	self assert: import importingEntity equals: moduleAtRoot.
 	self assert: import importedEntity equals: (self packageNamed: 'root2')
+]
+
+{ #category : 'tests - imports' }
+FamixPythonProject1Test >> testMethodImportsModule [
+
+	| method import |
+	self denyEmpty: self model allImports.
+	method := self methodNamed: 'printInfos'.
+	import := method outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRoot4' ].
+
+	self assert: import importingEntity equals: method.
+	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot4')
 ]
 
 { #category : 'tests' }
