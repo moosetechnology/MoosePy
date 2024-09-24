@@ -18,6 +18,18 @@ FamixPythonProject1Test >> model [
 ]
 
 { #category : 'tests - imports' }
+FamixPythonProject1Test >> testFunctionImportsModule [
+
+	| function import |
+	self denyEmpty: self model allImports.
+	function := self functionNamed: 'functionWithImport'.
+	import := function outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRoot3' ].
+
+	self assert: import importingEntity equals: function.
+	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot3')
+]
+
+{ #category : 'tests - imports' }
 FamixPythonProject1Test >> testImportThatIsNotAtTheRootOfAFile [
 
 	| moduleAtRoot import |
@@ -159,10 +171,10 @@ FamixPythonProject1Test >> testRootPackageImportsRootModule [
 	| rootPackage import |
 	self denyEmpty: self model allImports.
 	rootPackage := self packageNamed: 'root2'.
-	import := rootPackage outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRoot' ].
+	import := rootPackage outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRoot3' ].
 
 	self assert: import importingEntity equals: rootPackage.
-	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot')
+	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot3')
 ]
 
 { #category : 'tests - imports' }
@@ -187,6 +199,20 @@ FamixPythonProject1Test >> testRootPackageImportsSubSubPackage [
 
 	self assert: import importingEntity equals: rootPackage.
 	self assert: import importedEntity equals: (self packageNamed: 'subsubpackage1')
+]
+
+{ #category : 'tests - functions' }
+FamixPythonProject1Test >> testSimpleFunction [
+
+	| function |
+	self denyEmpty: self model allFunctions.
+
+	function := self functionNamed: 'functionWithImport'.
+
+	self assert: function class equals: FamixPythonFunction.
+	self assert: function name equals: 'functionWithImport'.
+	self assert: function signature equals: ''.
+	self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot')
 ]
 
 { #category : 'tests - packages' }
