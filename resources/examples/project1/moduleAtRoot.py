@@ -6,10 +6,10 @@ moduleAtRootVariable = 12
 print(root.rootPackageVariable)
 print(root.subpackage1.subPackage1Variable)
 
+#============================================================
 # Python program to sort
 # one list using
 # the other list
-
 
 def sort_list(list1, list2):
 
@@ -31,5 +31,14 @@ y = [0, 1, 1, 0, 1, 2, 2, 0, 1]
 
 print(sort_list(x, y))
 
+#============================================================
+
 import root2
 print(root2.rootPackage2Variable)
+
+
+#============================================================
+
+def functionWithImport():
+	import moduleAtRoot3
+	return not moduleAtRoot3.moduleAtRoot3Variable
