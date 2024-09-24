@@ -228,6 +228,20 @@ FamixPythonProject1Test >> testSimpleFunction [
 	self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot')
 ]
 
+{ #category : 'tests - methods' }
+FamixPythonProject1Test >> testSimpleMethod [
+
+	| method |
+	self denyEmpty: self model allMethods.
+
+	method := self methodNamed: 'printInfos'.
+
+	self assert: method class equals: FamixPythonMethod.
+	self assert: method name equals: 'printInfos'.
+	self assert: method signature equals: 'self'.
+	self assert: method parentType equals: (self classNamed: 'Person')
+]
+
 { #category : 'tests - packages' }
 FamixPythonProject1Test >> testSubPackage [
 
