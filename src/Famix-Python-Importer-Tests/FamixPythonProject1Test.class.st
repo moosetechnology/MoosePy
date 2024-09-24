@@ -78,6 +78,26 @@ FamixPythonProject1Test >> testImportThatIsNotAtTheRootOfAFile [
 ]
 
 { #category : 'tests - imports' }
+FamixPythonProject1Test >> testImportTwoStubPackagesOfTheSameName [
+	"If two imports import a stub package of the same name, we should not produce multiple stubs."
+
+	| pyplot numpy |
+	self assert: (self model allPackages select: [ :package | package name = 'matplotlib' ]) size equals: 1.
+	self assert: (self model allPackages select: [ :package | package name = 'pyplot' ]) size equals: 1.
+	self assert: (self model allPackages select: [ :package | package name = 'numpy' ]) size equals: 1.
+
+	pyplot := self packageNamed: 'pyplot'.
+	numpy := self packageNamed: 'numpy'.
+
+	"We ensure that those two are imported by more than 1 module"
+	self assert: ((self moduleNamed: 'moduleAtRoot4') outgoingImports anySatisfy: [ :import | import importedEntity = pyplot ]).
+	self assert: ((self moduleNamed: 'moduleAtRoot4') outgoingImports anySatisfy: [ :import | import importedEntity = numpy ]).
+
+	self assert: ((self moduleNamed: 'moduleWithStubs') outgoingImports anySatisfy: [ :import | import importedEntity = pyplot ]).
+	self assert: ((self moduleNamed: 'moduleWithStubs') outgoingImports anySatisfy: [ :import | import importedEntity = numpy ])
+]
+
+{ #category : 'tests - imports' }
 FamixPythonProject1Test >> testMethodImportsModule [
 
 	| method import |
