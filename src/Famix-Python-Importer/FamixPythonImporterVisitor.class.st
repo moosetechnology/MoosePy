@@ -105,6 +105,8 @@ FamixPythonImporterVisitor >> createClass: classDefinitionNode [
 		inheritance
 			superclass: object yourself;
 			subclass: famixClass ].
+		
+	famixClass typeContainer: self currentEntity.
 
 	^ self setSourceAnchor: famixClass from: classDefinitionNode
 ]

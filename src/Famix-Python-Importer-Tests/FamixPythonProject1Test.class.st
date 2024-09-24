@@ -201,6 +201,19 @@ FamixPythonProject1Test >> testRootPackageImportsSubSubPackage [
 	self assert: import importedEntity equals: (self packageNamed: 'subsubpackage1')
 ]
 
+{ #category : 'tests - classes' }
+FamixPythonProject1Test >> testSimpleClass [
+
+	| class |
+	self denyEmpty: self model allClasses.
+
+	class := self classNamed: 'Person'.
+
+	self assert: class class equals: FamixPythonClass.
+	self assert: class name equals: 'Person'.
+	self assert: class typeContainer equals: (self moduleNamed: 'moduleAtRoot2')
+]
+
 { #category : 'tests - functions' }
 FamixPythonProject1Test >> testSimpleFunction [
 
