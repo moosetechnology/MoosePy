@@ -15,14 +15,7 @@ Class {
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> acceptNode: aNode [
 
-	^ [ super acceptNode: aNode ]
-		  on: Exception
-		  do: [ :exception |
-			  (exception isKindOf: Warning)
-				  ifTrue: [
-					  self errorReport addWarning: exception.
-					  exception resume ]
-				  ifFalse: [ self errorReport addError: exception ] ]
+	^ self errorReport catch: Error during: [ super acceptNode: aNode ]
 ]
 
 { #category : 'visiting' }
@@ -138,11 +131,22 @@ FamixPythonImporterVisitor >> createImport: anImport ofName: aName from: fromNam
 
 	self currentEntity addOutgoingImport: import.
 	self flag: #todo. "Check how to manage the push before the main entity and the pops."
-	self solver
-		resolve: ((FamixPythonImportResolvable path: aName)
-				 notFoundReplacementEntity: [ :unresolvedImport :currentEntity | self ensureStubPackagesFromPath: unresolvedImport path ];
-				 yourself)
-		foundAction: [ :entity :currentEntity | entity addIncomingImport: import ].
+	self flag: #todo. "Clean code about the kind of resolution to do."
+
+	fromName
+		ifNil: [
+			self solver
+				resolve: ((FamixPythonImportResolvable path: aName)
+						 notFoundReplacementEntity: [ :unresolvedImport :currentEntity | self ensureStubPackagesFromPath: unresolvedImport path ];
+						 yourself)
+				foundAction: [ :entity :currentEntity | entity addIncomingImport: import ] ]
+		ifNotNil: [
+			self solver
+				resolve: ((FamixPythonFromImportResolvable path: fromName entityName: aName)
+						 notFoundReplacementEntity: [ :unresolvedImport :currentEntity | self ensureStubPackagesFromPath: unresolvedImport path ];
+						 yourself)
+				foundAction: [ :entity :currentEntity | entity addIncomingImport: import ] ].
+
 	"pushResolvableAsScopeBeforeMainEntityScope: (FamixPythonImportResolvable path: aName)"
 
 	^ import
@@ -681,7 +685,12 @@ FamixPythonImporterVisitor >> visitAnnotatedSymbol: anAnnotatedSymbol [
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> visitAssignmentStatement: anAssignmentStatement [
 
-	(anAssignmentStatement lhs isKindOf: PyVariableExpressionNode) ifTrue: [ self ensureVariable: anAssignmentStatement lhs name localTo: self currentEntity ].
+	(anAssignmentStatement lhs isKindOf: PyVariableExpressionNode) ifTrue: [
+		self currentEntity dictLocalVariables at: anAssignmentStatement lhs name ifAbsent: [
+			| variable |
+			variable := self currentEntity createLocalVariable: anAssignmentStatement lhs name.
+			"We select the lhs node because the source anchor should not be the full assignation."
+			self setSourceAnchor: variable from: anAssignmentStatement lhs ] ].
 
 	^ super visitAssignmentStatement: anAssignmentStatement
 ]

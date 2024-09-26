@@ -44,27 +44,33 @@ FamixPythonProject1Test >> testFunctionImportsModule [
 { #category : 'tests - global variables' }
 FamixPythonProject1Test >> testGlobalVariableInModule [
 
-	| method |
+	| global |
 	self denyEmpty: self model allGlobalVariables.
 
-	method := self globalVariableNamed: 'moduleAtRootVariable'.
+	global := self globalVariableNamed: 'moduleAtRootVariable'.
 
-	self assert: method class equals: FamixPythonGlobalVariable.
-	self assert: method name equals: 'moduleAtRootVariable'.
-	self assert: method parentScope equals: (self moduleNamed: 'moduleAtRoot')
+	self assert: global class equals: FamixPythonGlobalVariable.
+	self assert: global name equals: 'moduleAtRootVariable'.
+	self assert: global parentScope equals: (self moduleNamed: 'moduleAtRoot').
+	
+	self assert: global sourceAnchor isNotNil.
+	self assert: global sourceText equals: 'moduleAtRootVariable'
 ]
 
 { #category : 'tests - global variables' }
 FamixPythonProject1Test >> testGlobalVariableInPackage [
 
-	| method |
+	| global |
 	self denyEmpty: self model allGlobalVariables.
 
-	method := self globalVariableNamed: 'rootPackageVariable'.
+	global := self globalVariableNamed: 'rootPackageVariable'.
 
-	self assert: method class equals: FamixPythonGlobalVariable.
-	self assert: method name equals: 'rootPackageVariable'.
-	self assert: method parentScope equals: (self packageNamed: 'root')
+	self assert: global class equals: FamixPythonGlobalVariable.
+	self assert: global name equals: 'rootPackageVariable'.
+	self assert: global parentScope equals: (self packageNamed: 'root').
+
+	self assert: global sourceAnchor isNotNil.
+	self assert: global sourceText equals: 'rootPackageVariable'
 ]
 
 { #category : 'tests - imports' }
@@ -141,6 +147,19 @@ FamixPythonProject1Test >> testModel [
 	self assert: self model isNotEmpty.
 	self assert: self model name equals: 'project1'.
 	self assert: self model rootFolder equals: FamixPythonBridge parsingExamples / 'project1'
+]
+
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testModuleImportsGlobalVariableFromAPackage [
+
+	| rootModule global import |
+	self denyEmpty: self model allImports.
+	rootModule := self moduleNamed: 'moduleAtRoot5'.
+	global := self globalVariableNamed: 'rootPackageVariable'.
+	import := rootModule outgoingImports detect: [ :pimport | pimport target name = 'rootPackageVariable' ].
+
+	self assert: import importingEntity equals: rootModule.
+	self assert: import importedEntity equals: global
 ]
 
 { #category : 'tests - imports' }
