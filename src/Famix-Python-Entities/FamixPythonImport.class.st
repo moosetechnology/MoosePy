@@ -26,8 +26,6 @@
 | Name | Type | Default value | Comment |
 |---|
 | `asName` | `String` | nil | ""import b as c"", asName is c|
-| `entityName` | `String` | nil | ""from a import b"", entityName is b|
-| `fromName` | `String` | nil | ""from a import b"", fromName is a|
 | `isStub` | `Boolean` | false | Flag true if the entity attributes are incomplete, either because the entity is missing or not imported.|
 
 "
@@ -37,8 +35,6 @@ Class {
 	#traits : 'FamixTImport',
 	#classTraits : 'FamixTImport classTrait',
 	#instVars : [
-		'#fromName => FMProperty',
-		'#entityName => FMProperty',
 		'#asName => FMProperty'
 	],
 	#category : 'Famix-Python-Entities-Entities',
@@ -68,34 +64,4 @@ FamixPythonImport >> asName [
 FamixPythonImport >> asName: anObject [
 	<generated>
 	asName := anObject
-]
-
-{ #category : 'accessing' }
-FamixPythonImport >> entityName [
-
-	<FMProperty: #entityName type: #String>
-	<generated>
-	<FMComment: '"from a import b", entityName is b'>
-	^ entityName
-]
-
-{ #category : 'accessing' }
-FamixPythonImport >> entityName: anObject [
-	<generated>
-	entityName := anObject
-]
-
-{ #category : 'accessing' }
-FamixPythonImport >> fromName [
-
-	<FMProperty: #fromName type: #String>
-	<generated>
-	<FMComment: '"from a import b", fromName is a'>
-	^ fromName
-]
-
-{ #category : 'accessing' }
-FamixPythonImport >> fromName: anObject [
-	<generated>
-	fromName := anObject
 ]
