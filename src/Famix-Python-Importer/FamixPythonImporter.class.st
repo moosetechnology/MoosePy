@@ -89,3 +89,9 @@ FamixPythonImporter >> isPythonExtension: aString [
 
 	^aString = 'py'
 ]
+
+{ #category : 'accessing' }
+FamixPythonImporter >> visitor [
+
+	^ visitor
+]

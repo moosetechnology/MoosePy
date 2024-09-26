@@ -122,9 +122,7 @@ FamixPythonImporterVisitor >> createImport: anImport ofName: aName from: fromNam
 
 	| import |
 	import := model newImport
-		          entityName: aName;
 		          asName: alias;
-		          fromName: fromName;
 		          yourself.
 
 	self setSourceAnchor: import from: anImport.

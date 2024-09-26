@@ -11,7 +11,7 @@ Class {
 { #category : 'accessing' }
 FamixPythonImporterTest >> model [
 
-	^ importer model
+	^ importer visitor model
 ]
 
 { #category : 'running' }
@@ -23,12 +23,11 @@ FamixPythonImporterTest >> moduleName2 [
 
 { #category : 'running' }
 FamixPythonImporterTest >> parseCode: aString [
-	
-	^ importer accept: ((PythonParser parseWithErrors: aString) ifNotNil: [ :each |
-	(each isKindOf: SmaCCParseNode) ifTrue: [
-		each completeSource: aString.
-		each filename: 'fileForTest.py' asFileReference ].
-	each ])
+
+	| file |
+	file := FileSystem memory / 'testPythonModelName.py'.
+	file writeStreamDo: [ :s | s nextPutAll: aString ].
+	^ importer import: file
 ]
 
 { #category : 'running' }
@@ -36,8 +35,7 @@ FamixPythonImporterTest >> setUp [
 
 	super setUp.
 
-	importer := FamixPythonImporterVisitor new.
-	importer model name: 'testPythonModelName'
+	importer := FamixPythonImporter new
 ]
 
 { #category : 'tests' }
@@ -203,52 +201,9 @@ def identity():
 ]
 
 { #category : 'tests - import' }
-FamixPythonImporterTest >> testImport [
-
-	self parseCode: '
-import pygame
-import random
-'.
-
-	self assert: (self importNamed: 'pygame') isNotNil.
-	self assert: (self importNamed: 'random') isNotNil
-]
-
-{ #category : 'tests - import' }
-FamixPythonImporterTest >> testImportClassFromModule [
-
-	self parseCode: '
-from keras.layers import Input
-'.
-
-	self assert: (self importNamed: 'Input') isNotNil.
-	self assert: (self importNamed: 'Input') fromName equals: 'keras.layers'
-]
-
-{ #category : 'tests - import' }
-FamixPythonImporterTest >> testImportFunction [
-
-	self parseCode: '
-import matplotlib.pyplot
-'.
-
-	self assert: (self importNamed: 'matplotlib.pyplot') isNotNil
-]
-
-{ #category : 'tests - import' }
-FamixPythonImporterTest >> testImportFunctionFromModule [
-
-	self parseCode: '
-from random import randint
-'.
-
-	self assert: (self importNamed: 'randint') isNotNil.
-	self assert: (self importNamed: 'randint') fromName equals: 'random'
-]
-
-{ #category : 'tests - import' }
 FamixPythonImporterTest >> testImportModuleWithAlias [
 
+	self skip. "Should be managed in FamixPythonProject1Test"
 	self parseCode: '
 import math as m
 import matplotlib.pyplot as plt
@@ -264,6 +219,7 @@ import matplotlib.pyplot as plt
 { #category : 'tests - import' }
 FamixPythonImporterTest >> testImportModulesWithAliases [
 
+	self skip. "Should be managed in FamixPythonProject1Test"
 	self parseCode: '
 import math as m, matplotlib.pyplot as plt
 '.
@@ -278,6 +234,7 @@ import math as m, matplotlib.pyplot as plt
 { #category : 'tests - import' }
 FamixPythonImporterTest >> testImportMultiClassesFromModule [
 
+	self skip. "Should be managed in FamixPythonProject1Test"
 	self parseCode: '
 from keras.layers import Flatten, Activation, AveragePooling2D, BatchNormalization
 '.
@@ -290,6 +247,7 @@ from keras.layers import Flatten, Activation, AveragePooling2D, BatchNormalizati
 { #category : 'tests - import' }
 FamixPythonImporterTest >> testImportMultiFunctionsFromModule [
 
+	self skip. "Should be managed in FamixPythonProject1Test"
 	self parseCode: '
 from maths import add, subtract
 '.

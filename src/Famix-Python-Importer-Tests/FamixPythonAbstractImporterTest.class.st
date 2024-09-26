@@ -26,7 +26,7 @@ FamixPythonAbstractImporterTest >> globalVariableNamed: aName [
 { #category : 'accessing' }
 FamixPythonAbstractImporterTest >> importNamed: aName [
 
-	^ self model allImports detect: [ :import | import entityName = aName ]
+	^ self model allImports detect: [ :import | import importedEntity name = aName ]
 ]
 
 { #category : 'accessing' }
