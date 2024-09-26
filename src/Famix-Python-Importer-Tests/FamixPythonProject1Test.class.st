@@ -150,6 +150,45 @@ FamixPythonProject1Test >> testModel [
 ]
 
 { #category : 'tests - from-import' }
+FamixPythonProject1Test >> testModuleImportsClassFromAModule [
+
+	| rootModule class import |
+	self denyEmpty: self model allImports.
+	rootModule := self moduleNamed: 'moduleAtRoot5'.
+	class := self classNamed: 'Person'.
+	import := rootModule outgoingImports detect: [ :pimport | pimport target name = 'Person' ].
+
+	self assert: import importingEntity equals: rootModule.
+	self assert: import importedEntity equals: class
+]
+
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testModuleImportsFunctionFromAModule [
+
+	| rootModule function import |
+	self denyEmpty: self model allImports.
+	rootModule := self moduleNamed: 'moduleAtRoot5'.
+	function := self functionNamed: 'sort_list'.
+	import := rootModule outgoingImports detect: [ :pimport | pimport target name = 'sort_list' ].
+
+	self assert: import importingEntity equals: rootModule.
+	self assert: import importedEntity equals: function
+]
+
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testModuleImportsGlobalVariableFromAModule [
+
+	| rootModule global import |
+	self denyEmpty: self model allImports.
+	rootModule := self moduleNamed: 'moduleAtRoot5'.
+	global := self globalVariableNamed: 'moduleAtRootVariable'.
+	import := rootModule outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRootVariable' ].
+
+	self assert: import importingEntity equals: rootModule.
+	self assert: import importedEntity equals: global
+]
+
+{ #category : 'tests - from-import' }
 FamixPythonProject1Test >> testModuleImportsGlobalVariableFromAPackage [
 
 	| rootModule global import |
