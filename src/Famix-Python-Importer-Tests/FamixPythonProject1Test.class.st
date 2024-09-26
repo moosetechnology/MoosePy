@@ -41,6 +41,34 @@ FamixPythonProject1Test >> testFunctionImportsModule [
 	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot3')
 ]
 
+{ #category : 'tests - functions' }
+FamixPythonProject1Test >> testFunctionInAModule [
+
+	| function |
+	self denyEmpty: self model allFunctions.
+
+	function := self functionNamed: 'functionWithImport'.
+
+	self assert: function class equals: FamixPythonFunction.
+	self assert: function name equals: 'functionWithImport'.
+	self assert: function signature equals: ''.
+	self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot')
+]
+
+{ #category : 'tests - functions' }
+FamixPythonProject1Test >> testFunctionInAPackage [
+
+	| function |
+	self denyEmpty: self model allFunctions.
+
+	function := self functionNamed: 'return2'.
+
+	self assert: function class equals: FamixPythonFunction.
+	self assert: function name equals: 'return2'.
+	self assert: function signature equals: ''.
+	self assert: function functionOwner equals: (self packageNamed: 'subsubpackage1')
+]
+
 { #category : 'tests - global variables' }
 FamixPythonProject1Test >> testGlobalVariableInModule [
 
@@ -163,6 +191,19 @@ FamixPythonProject1Test >> testModuleImportsClassFromAModule [
 ]
 
 { #category : 'tests - from-import' }
+FamixPythonProject1Test >> testModuleImportsClassFromAPackage [
+
+	| rootModule class import |
+	self denyEmpty: self model allImports.
+	rootModule := self moduleNamed: 'moduleAtRoot5'.
+	class := self classNamed: 'Room'.
+	import := rootModule outgoingImports detect: [ :pimport | pimport target name = 'Room' ].
+
+	self assert: import importingEntity equals: rootModule.
+	self assert: import importedEntity equals: class
+]
+
+{ #category : 'tests - from-import' }
 FamixPythonProject1Test >> testModuleImportsFunctionFromAModule [
 
 	| rootModule function import |
@@ -170,6 +211,19 @@ FamixPythonProject1Test >> testModuleImportsFunctionFromAModule [
 	rootModule := self moduleNamed: 'moduleAtRoot5'.
 	function := self functionNamed: 'sort_list'.
 	import := rootModule outgoingImports detect: [ :pimport | pimport target name = 'sort_list' ].
+
+	self assert: import importingEntity equals: rootModule.
+	self assert: import importedEntity equals: function
+]
+
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testModuleImportsFunctionFromAPackage [
+
+	| rootModule function import |
+	self denyEmpty: self model allImports.
+	rootModule := self moduleNamed: 'moduleAtRoot5'.
+	function := self functionNamed: 'return2'.
+	import := rootModule outgoingImports detect: [ :pimport | pimport target name = 'return2' ].
 
 	self assert: import importingEntity equals: rootModule.
 	self assert: import importedEntity equals: function
@@ -364,20 +418,6 @@ FamixPythonProject1Test >> testSimpleClass [
 	self assert: class class equals: FamixPythonClass.
 	self assert: class name equals: 'Person'.
 	self assert: class typeContainer equals: (self moduleNamed: 'moduleAtRoot2')
-]
-
-{ #category : 'tests - functions' }
-FamixPythonProject1Test >> testSimpleFunction [
-
-	| function |
-	self denyEmpty: self model allFunctions.
-
-	function := self functionNamed: 'functionWithImport'.
-
-	self assert: function class equals: FamixPythonFunction.
-	self assert: function name equals: 'functionWithImport'.
-	self assert: function signature equals: ''.
-	self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot')
 ]
 
 { #category : 'tests - methods' }
