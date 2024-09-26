@@ -12,6 +12,7 @@
 |---|
 | `comments` | `FamixTWithComments` | `commentedEntity` | `FamixTComment` | List of comments for the entity|
 | `functions` | `FamixTWithFunctions` | `functionOwner` | `FamixTFunction` | Functions defined in the container, if any.|
+| `globalVariables` | `FamixTWithGlobalVariables` | `parentScope` | `FamixTGlobalVariable` | Global variables defined in the scope, if any.|
 | `moduleEntities` | `FamixTModule` | `parentModule` | `FamixTDefinedInModule` | |
 
 ### Outgoing dependencies
@@ -31,8 +32,8 @@
 Class {
 	#name : 'FamixPythonModule',
 	#superclass : 'FamixPythonContainerEntity',
-	#traits : 'FamixTImportable + FamixTModule + FamixTPackageable + FamixTWithComments + FamixTWithFunctions + FamixTWithImports + FamixTWithInvocations',
-	#classTraits : 'FamixTImportable classTrait + FamixTModule classTrait + FamixTPackageable classTrait + FamixTWithComments classTrait + FamixTWithFunctions classTrait + FamixTWithImports classTrait + FamixTWithInvocations classTrait',
+	#traits : 'FamixTImportable + FamixTModule + FamixTPackageable + FamixTWithComments + FamixTWithFunctions + FamixTWithGlobalVariables + FamixTWithImports + FamixTWithInvocations',
+	#classTraits : 'FamixTImportable classTrait + FamixTModule classTrait + FamixTPackageable classTrait + FamixTWithComments classTrait + FamixTWithFunctions classTrait + FamixTWithGlobalVariables classTrait + FamixTWithImports classTrait + FamixTWithInvocations classTrait',
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',
 	#tag : 'Entities'

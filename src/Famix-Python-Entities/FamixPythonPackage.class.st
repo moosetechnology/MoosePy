@@ -12,6 +12,7 @@
 |---|
 | `childEntities` | `FamixTPackage` | `parentPackage` | `FamixTPackageable` | |
 | `comments` | `FamixTWithComments` | `commentedEntity` | `FamixTComment` | List of comments for the entity|
+| `globalVariables` | `FamixTWithGlobalVariables` | `parentScope` | `FamixTGlobalVariable` | Global variables defined in the scope, if any.|
 
 ### Outgoing dependencies
 | Relation | Origin | Opposite | Type | Comment |
@@ -41,8 +42,8 @@
 Class {
 	#name : 'FamixPythonPackage',
 	#superclass : 'FamixPythonContainerEntity',
-	#traits : 'FamixTImportable + FamixTPackage + FamixTPackageable + FamixTWithComments + FamixTWithImports',
-	#classTraits : 'FamixTImportable classTrait + FamixTPackage classTrait + FamixTPackageable classTrait + FamixTWithComments classTrait + FamixTWithImports classTrait',
+	#traits : 'FamixTImportable + FamixTPackage + FamixTPackageable + FamixTWithComments + FamixTWithGlobalVariables + FamixTWithImports',
+	#classTraits : 'FamixTImportable classTrait + FamixTPackage classTrait + FamixTPackageable classTrait + FamixTWithComments classTrait + FamixTWithGlobalVariables classTrait + FamixTWithImports classTrait',
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',
 	#tag : 'Entities'

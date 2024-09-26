@@ -41,6 +41,32 @@ FamixPythonProject1Test >> testFunctionImportsModule [
 	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot3')
 ]
 
+{ #category : 'tests - global variables' }
+FamixPythonProject1Test >> testGlobalVariableInModule [
+
+	| method |
+	self denyEmpty: self model allGlobalVariables.
+
+	method := self globalVariableNamed: 'moduleAtRootVariable'.
+
+	self assert: method class equals: FamixPythonGlobalVariable.
+	self assert: method name equals: 'moduleAtRootVariable'.
+	self assert: method parentScope equals: (self moduleNamed: 'moduleAtRoot')
+]
+
+{ #category : 'tests - global variables' }
+FamixPythonProject1Test >> testGlobalVariableInPackage [
+
+	| method |
+	self denyEmpty: self model allGlobalVariables.
+
+	method := self globalVariableNamed: 'rootPackageVariable'.
+
+	self assert: method class equals: FamixPythonGlobalVariable.
+	self assert: method name equals: 'rootPackageVariable'.
+	self assert: method parentScope equals: (self packageNamed: 'root')
+]
+
 { #category : 'tests - imports' }
 FamixPythonProject1Test >> testImportStubPackages [
 	"For now, if we have a stub at the end of an import we create a package all the time and not a module because we cannot know what kind it is and it is the simplest code."

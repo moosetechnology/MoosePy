@@ -77,6 +77,20 @@ FamixPythonTEntityCreator >> newFunctionNamed: aName [
 ]
 
 { #category : 'entity creation' }
+FamixPythonTEntityCreator >> newGlobalVariable [
+
+	<generated>
+	^ self add: FamixPythonGlobalVariable new
+]
+
+{ #category : 'entity creation' }
+FamixPythonTEntityCreator >> newGlobalVariableNamed: aName [
+
+	<generated>
+	^ self add: (FamixPythonGlobalVariable named: aName)
+]
+
+{ #category : 'entity creation' }
 FamixPythonTEntityCreator >> newImplicitVariable [
 
 	<generated>

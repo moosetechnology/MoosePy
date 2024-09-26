@@ -80,6 +80,13 @@ FamixPythonEntity >> isFunction [
 ]
 
 { #category : 'testing' }
+FamixPythonEntity >> isGlobalVariable [
+
+	<generated>
+	^ false
+]
+
+{ #category : 'testing' }
 FamixPythonEntity >> isImplicitVariable [
 
 	<generated>

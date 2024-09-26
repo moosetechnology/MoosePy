@@ -19,7 +19,8 @@ Class {
 		'inheritance',
 		'function',
 		'module',
-		'indexedFileAnchor'
+		'indexedFileAnchor',
+		'globalVariable'
 	],
 	#category : 'Famix-Python-Generator',
 	#package : 'Famix-Python-Generator'
@@ -59,7 +60,8 @@ FamixPythonGenerator >> defineClasses [
 	parameter := builder newClassNamed: #Parameter.
 	primitiveType := builder newClassNamed: #PrimitiveType.
 	reference := builder newClassNamed: #Reference.
-	type := builder newClassNamed: #Type
+	type := builder newClassNamed: #Type.
+	globalVariable := builder newClassNamed: #GlobalVariable
 ]
 
 { #category : 'definition' }
@@ -94,6 +96,11 @@ FamixPythonGenerator >> defineHierarchy [
 	function --|> #TInvocable.
 	function --|> #TWithAnnotationInstances.
 	function --|> #TWithImports.
+	
+	globalVariable --|> namedEntity.
+	globalVariable --|> #TGlobalVariable.
+	globalVariable --|> #TInvocationsReceiver.
+	globalVariable --|> #TImportable.
 
 	implicitVariable --|> namedEntity.
 	implicitVariable --|> #TImplicitVariable.
@@ -132,6 +139,7 @@ FamixPythonGenerator >> defineHierarchy [
 	module --|> #TWithImports.
 	module --|> #TWithFunctions.
 	module --|> #TWithInvocations.
+	module --|> #TWithGlobalVariables. 
 
 	namedEntity --|> sourcedEntity.
 	namedEntity --|> #TInvocationsReceiver.
@@ -143,6 +151,7 @@ FamixPythonGenerator >> defineHierarchy [
 	package --|> #TWithComments.
 	package --|> #TImportable.
 	package --|> #TWithImports.
+	package --|> #TWithGlobalVariables.
 
 	parameter --|> namedEntity.
 	parameter --|> #TParameter.
