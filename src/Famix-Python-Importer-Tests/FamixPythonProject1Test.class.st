@@ -17,6 +17,84 @@ FamixPythonProject1Test >> model [
 	^ FamixPythonProject1TestResource current model
 ]
 
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testClassImportsClassFromAModule [
+
+	| class class1 import |
+	self denyEmpty: self model allImports.
+	class := self classNamed: 'Employee'.
+	class1 := self classNamed: 'Person'.
+	import := class outgoingImports detect: [ :pimport | pimport target name = 'Person' ].
+
+	self assert: import importingEntity equals: class.
+	self assert: import importedEntity equals: class1
+]
+
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testClassImportsClassFromAPackage [
+
+	| class class1 import |
+	self denyEmpty: self model allImports.
+	class := self classNamed: 'Employee'.
+	class1 := self classNamed: 'Room'.
+	import := class outgoingImports detect: [ :pimport | pimport target name = 'Room' ].
+
+	self assert: import importingEntity equals: class.
+	self assert: import importedEntity equals: class1
+]
+
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testClassImportsFunctionFromAModule [
+
+	| class function import |
+	self denyEmpty: self model allImports.
+	class := self classNamed: 'Employee'.
+	function := self functionNamed: 'sort_list'.
+	import := class outgoingImports detect: [ :pimport | pimport target name = 'sort_list' ].
+
+	self assert: import importingEntity equals: class.
+	self assert: import importedEntity equals: function
+]
+
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testClassImportsFunctionFromAPackage [
+
+	| class function import |
+	self denyEmpty: self model allImports.
+	class := self classNamed: 'Employee'.
+	function := self functionNamed: 'return2'.
+	import := class outgoingImports detect: [ :pimport | pimport target name = 'return2' ].
+
+	self assert: import importingEntity equals: class.
+	self assert: import importedEntity equals: function
+]
+
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testClassImportsGlobalVariableFromAModule [
+
+	| class global import |
+	self denyEmpty: self model allImports.
+	class := self classNamed: 'Employee'.
+	global := self globalVariableNamed: 'moduleAtRootVariable'.
+	import := class outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRootVariable' ].
+
+	self assert: import importingEntity equals: class.
+	self assert: import importedEntity equals: global
+]
+
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testClassImportsGlobalVariableFromAPackage [
+
+	| class global import |
+	self denyEmpty: self model allImports.
+	class := self classNamed: 'Employee'.
+	global := self globalVariableNamed: 'rootPackageVariable'.
+	import := class outgoingImports detect: [ :pimport | pimport target name = 'rootPackageVariable' ].
+
+	self assert: import importingEntity equals: class.
+	self assert: import importedEntity equals: global
+]
+
 { #category : 'tests - imports' }
 FamixPythonProject1Test >> testClassImportsModule [
 
