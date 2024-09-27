@@ -7,11 +7,6 @@
 |---|
 | `typeContainer` | `FamixTType` | `types` | `FamixTWithTypes` | Container entity to which this type belongs. Container is a namespace, not a package (Smalltalk).|
 
-### Children
-| Relation | Origin | Opposite | Type | Comment |
-|---|
-| `methods` | `FamixTWithMethods` | `parentType` | `FamixTMethod` | Methods declared by this type.|
-
 ### Incoming dependencies
 | Relation | Origin | Opposite | Type | Comment |
 |---|
@@ -36,8 +31,8 @@
 Class {
 	#name : 'FamixPythonType',
 	#superclass : 'FamixPythonContainerEntity',
-	#traits : 'FamixTType + FamixTWithMethods',
-	#classTraits : 'FamixTType classTrait + FamixTWithMethods classTrait',
+	#traits : 'FamixTType',
+	#classTraits : 'FamixTType classTrait',
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',
 	#tag : 'Entities'

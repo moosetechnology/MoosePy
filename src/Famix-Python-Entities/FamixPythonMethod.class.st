@@ -20,7 +20,6 @@
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `accesses` | `FamixTWithAccesses` | `accessor` | `FamixTAccess` | Accesses to variables made by this behaviour.|
-| `outgoingImports` | `FamixTWithImports` | `importingEntity` | `FamixTImport` | |
 | `outgoingInvocations` | `FamixTWithInvocations` | `sender` | `FamixTInvocation` | Outgoing invocations sent by this behaviour.|
 | `outgoingReferences` | `FamixTWithReferences` | `referencer` | `FamixTReference` | References from this entity to other entities.|
 
@@ -51,8 +50,8 @@
 Class {
 	#name : 'FamixPythonMethod',
 	#superclass : 'FamixPythonContainerEntity',
-	#traits : 'FamixTImportable + FamixTInvocable + FamixTMethod + FamixTWithAnnotationInstances + FamixTWithComments + FamixTWithFunctions + FamixTWithImports + FamixTWithInvocations',
-	#classTraits : 'FamixTImportable classTrait + FamixTInvocable classTrait + FamixTMethod classTrait + FamixTWithAnnotationInstances classTrait + FamixTWithComments classTrait + FamixTWithFunctions classTrait + FamixTWithImports classTrait + FamixTWithInvocations classTrait',
+	#traits : 'FamixTImportable + FamixTInvocable + FamixTMethod + FamixTWithAnnotationInstances + FamixTWithComments + FamixTWithFunctions + FamixTWithInvocations',
+	#classTraits : 'FamixTImportable classTrait + FamixTInvocable classTrait + FamixTMethod classTrait + FamixTWithAnnotationInstances classTrait + FamixTWithComments classTrait + FamixTWithFunctions classTrait + FamixTWithInvocations classTrait',
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',
 	#tag : 'Entities'

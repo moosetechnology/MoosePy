@@ -84,6 +84,7 @@ FamixPythonGenerator >> defineHierarchy [
 
 	containerEntity --|> namedEntity.
 	containerEntity --|> #TWithClasses.
+	containerEntity --|> #TWithImports.
 
 	function --|> containerEntity.
 	function --|> #TFunction.
@@ -95,8 +96,7 @@ FamixPythonGenerator >> defineHierarchy [
 	function --|> #TWithFunctions.
 	function --|> #TInvocable.
 	function --|> #TWithAnnotationInstances.
-	function --|> #TWithImports.
-	
+
 	globalVariable --|> namedEntity.
 	globalVariable --|> #TGlobalVariable.
 	globalVariable --|> #TInvocationsReceiver.
@@ -129,17 +129,15 @@ FamixPythonGenerator >> defineHierarchy [
 	method --|> #TWithFunctions.
 	method --|> #TInvocable.
 	method --|> #TWithAnnotationInstances.
-	method --|> #TWithImports.
 
 	module --|> containerEntity.
 	module --|> #TModule.
 	module --|> #TPackageable.
 	module --|> #TWithComments.
 	module --|> #TImportable.
-	module --|> #TWithImports.
 	module --|> #TWithFunctions.
 	module --|> #TWithInvocations.
-	module --|> #TWithGlobalVariables. 
+	module --|> #TWithGlobalVariables.
 
 	namedEntity --|> sourcedEntity.
 	namedEntity --|> #TInvocationsReceiver.
@@ -150,7 +148,6 @@ FamixPythonGenerator >> defineHierarchy [
 	package --|> #TPackageable.
 	package --|> #TWithComments.
 	package --|> #TImportable.
-	package --|> #TWithImports.
 	package --|> #TWithGlobalVariables.
 	package --|> #TWithFunctions.
 
@@ -164,8 +161,7 @@ FamixPythonGenerator >> defineHierarchy [
 	reference --|> #TReference.
 
 	type --|> containerEntity.
-	type --|> #TType.
-	type --|> #TWithMethods
+	type --|> #TType
 ]
 
 { #category : 'definition' }

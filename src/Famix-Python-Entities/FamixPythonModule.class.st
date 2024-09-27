@@ -18,7 +18,6 @@
 ### Outgoing dependencies
 | Relation | Origin | Opposite | Type | Comment |
 |---|
-| `outgoingImports` | `FamixTWithImports` | `importingEntity` | `FamixTImport` | |
 | `outgoingInvocations` | `FamixTWithInvocations` | `sender` | `FamixTInvocation` | Outgoing invocations sent by this behaviour.|
 
 ### Incoming dependencies
@@ -32,8 +31,8 @@
 Class {
 	#name : 'FamixPythonModule',
 	#superclass : 'FamixPythonContainerEntity',
-	#traits : 'FamixTImportable + FamixTModule + FamixTPackageable + FamixTWithComments + FamixTWithFunctions + FamixTWithGlobalVariables + FamixTWithImports + FamixTWithInvocations',
-	#classTraits : 'FamixTImportable classTrait + FamixTModule classTrait + FamixTPackageable classTrait + FamixTWithComments classTrait + FamixTWithFunctions classTrait + FamixTWithGlobalVariables classTrait + FamixTWithImports classTrait + FamixTWithInvocations classTrait',
+	#traits : 'FamixTImportable + FamixTModule + FamixTPackageable + FamixTWithComments + FamixTWithFunctions + FamixTWithGlobalVariables + FamixTWithInvocations',
+	#classTraits : 'FamixTImportable classTrait + FamixTModule classTrait + FamixTPackageable classTrait + FamixTWithComments classTrait + FamixTWithFunctions classTrait + FamixTWithGlobalVariables classTrait + FamixTWithInvocations classTrait',
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',
 	#tag : 'Entities'
