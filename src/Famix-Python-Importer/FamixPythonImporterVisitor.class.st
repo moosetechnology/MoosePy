@@ -758,11 +758,11 @@ FamixPythonImporterVisitor >> visitFile: aFileNode [
 FamixPythonImporterVisitor >> visitFunctionDefinition: aFunctionDefinition [
 	"the parser does not make a difference between function and method, but a method is defined in a class and its first parameter is self."
 
-	| fmx result |
+	| fmx |
 	fmx := self currentEntity isClass
 		       ifTrue: [ self ensureMethod: aFunctionDefinition ]
 		       ifFalse: [ self ensureFunction: aFunctionDefinition ].
-	^ self useCurrentEntity: fmx during: [ result := super visitFunctionDefinition: aFunctionDefinition ]
+	^ self useCurrentEntity: fmx during: [ super visitFunctionDefinition: aFunctionDefinition ]
 ]
 
 { #category : 'visiting' }
