@@ -617,7 +617,7 @@ FamixPythonProject1Test >> testPackageSourceAnchor [
 	rootPackage := self packageNamed: 'root'.
 
 	self assert: rootPackage sourceAnchor mooseModel equals: self model.
-	self assert: rootPackage sourceAnchor sourceText equals: (FamixPythonBridge parsingExamples / 'project1' / 'root' / '__init__.py') contents
+	self assert: rootPackage sourceAnchor sourceText equals: (FamixPythonBridge parsingExamples / 'project1' / 'src' / 'root' / '__init__.py') contents
 ]
 
 { #category : 'tests - modules' }

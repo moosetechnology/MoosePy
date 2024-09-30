@@ -58,18 +58,15 @@ FamixPythonImporter >> import: aFileName [
 { #category : 'api' }
 FamixPythonImporter >> importFileReference: aFileReference [
 
-	aFileReference isDirectory ifTrue: [
-		| files |
-		"I'm not sure we should have this escape but venv is a python interpreter and we are not able to parse it currently. This clause should probably be removed in the future."
+	aFileReference isDirectory ifTrue: [ "I'm not sure we should have this escape but venv is a python interpreter and we are not able to parse it currently. This clause should probably be removed in the future."
 		aFileReference basename = 'venv' ifTrue: [ ^ self ].
 
 		"If we have an __init__.py file, this is a package. To have it at the top of the context we need to parse it first so that the sub packages and modules go in it."
-		files := aFileReference children sorted: [ :fileA :fileB | fileA isPythonPackageDeclaration or: [ fileB isPythonPackageDeclaration not ] ].
+		(aFileReference children sorted: [ :fileA :fileB | fileA isPythonPackageDeclaration or: [ fileB isPythonPackageDeclaration not ] ]) ifNotEmpty: [ :files |
+			files do: [ :child | self importFileReference: child ].
 
-		files do: [ :child | self importFileReference: child ].
-
-		"If the directory is a package, we need to remove it from the context after visiting all files of the package."
-		files first isPythonPackageDeclaration ifTrue: [ visitor popScope ].
+			"If the directory is a package, we need to remove it from the context after visiting all files of the package."
+			files first isPythonPackageDeclaration ifTrue: [ visitor popScope ] ].
 		^ self ].
 
 	(self isPythonExtension: aFileReference extension) ifFalse: [ ^ self ].
