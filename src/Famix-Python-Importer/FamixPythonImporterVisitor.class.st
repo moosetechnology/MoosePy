@@ -825,6 +825,12 @@ FamixPythonImporterVisitor >> visitParameter: aParameter [
 ]
 
 { #category : 'visiting' }
+FamixPythonImporterVisitor >> visitRelativeName: aRelativeName [
+
+	^ aRelativeName source
+]
+
+{ #category : 'visiting' }
 FamixPythonImporterVisitor >> visitSmaCCError: aSmaCCError [
 	^nil
 ]

@@ -476,6 +476,19 @@ FamixPythonProject1Test >> testModuleImportsGlobalVariableFromAModule [
 	self assert: import importedEntity equals: global
 ]
 
+{ #category : 'tests - from-import relative' }
+FamixPythonProject1Test >> testModuleImportsGlobalVariableFromAModuleRelatively [
+
+	| module global import |
+	self denyEmpty: self model allImports.
+	module := self moduleNamed: 'moduleInRootPackage3-2'.
+	global := self globalVariableNamed: 'moduleInRoot3Variable'.
+	import := module outgoingImports detect: [ :pimport | pimport target name = 'moduleInRoot3Variable' ].
+
+	self assert: import importingEntity equals: module.
+	self assert: import importedEntity equals: global
+]
+
 { #category : 'tests - from-import' }
 FamixPythonProject1Test >> testModuleImportsGlobalVariableFromAPackage [
 

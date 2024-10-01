@@ -85,6 +85,32 @@ FamixPythonFromImportResolvable >> resolveInScope: aScope currentEntity: current
 	"If we have a dot at first, we have a relative path. Else it's an absolute path"
 
 	entity := (path beginsWith: '.')
-		          ifTrue: [ 1 halt ]
+		          ifTrue: [ self resolveRelativePathFor: currentEntity ]
 		          ifFalse: [ self resolveAbsolutePathFor: currentEntity ]
+]
+
+{ #category : 'resolution' }
+FamixPythonFromImportResolvable >> resolveRelativePathFor: currentEntity [
+
+	| possibleEntities splittedPath |
+	self flag: #todo. "manage ..  And chaining of submodules and also spaces after dots"
+
+	possibleEntities := currentEntity parentPackage children.
+	splittedPath := path allButFirst.
+	splittedPath := splittedPath splitOn: $..
+	possibleEntities := possibleEntities select: [ :possibleEntity | possibleEntity name = splittedPath first ].
+	splittedPath removeFirst.
+	[ splittedPath isNotEmpty ] whileTrue: [
+		| childName |
+		childName := splittedPath anyOne.
+		splittedPath removeFirst.
+		possibleEntities := possibleEntities flatCollect: [ :possibleEntity |
+			                    possibleEntity children select: [ :child | (child isPackage or: [ child isModule ]) and: [ child name = childName ] ] ] ].
+	possibleEntities ifEmpty: [ NotFound signal ].
+
+	possibleEntities size = 1 ifFalse: [ self error: 'There should be only one possible entity to import.' ].
+
+	possibleEntities := possibleEntities anyOne allChildren select: [ :child | child isNamedEntity and: [ child name = entityName ] ].
+	"It is possible that we have multiple entities with the same name and in that case, python select the last one declared. So we sort by source anchor position to find this one."
+	^ possibleEntities detectMax: [ :possibleEntity | possibleEntity sourceAnchor startPos ]
 ]
