@@ -543,6 +543,19 @@ FamixPythonProject1Test >> testModuleInSubPackage [
 	self assert: module parentPackage equals: (self packageNamed: 'subpackage1')
 ]
 
+{ #category : 'tests - from-import relative' }
+FamixPythonProject1Test >> testModuleInSubpackageImportsGlobalVariableFromAModuleRelatively [
+
+	| module global import |
+	self denyEmpty: self model allImports.
+	module := self moduleNamed: 'moduleInSubPackage3-2'.
+	global := self globalVariableNamed: 'moduleInSubpackage31Variable'.
+	import := module outgoingImports detect: [ :pimport | pimport target name = 'moduleInSubpackage31Variable' ].
+
+	self assert: import importingEntity equals: module.
+	self assert: import importedEntity equals: global
+]
+
 { #category : 'tests - from-import' }
 FamixPythonProject1Test >> testPackageImportsClassFromAModule [
 
