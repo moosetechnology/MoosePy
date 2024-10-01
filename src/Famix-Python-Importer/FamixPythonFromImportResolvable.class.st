@@ -93,10 +93,12 @@ FamixPythonFromImportResolvable >> resolveInScope: aScope currentEntity: current
 FamixPythonFromImportResolvable >> resolveRelativePathFor: currentEntity [
 
 	| possibleEntities splittedPath |
-	self flag: #todo. "manage ..  And chaining of submodules and also spaces after dots"
-
-	possibleEntities := currentEntity parentPackage children.
-	splittedPath := path allButFirst.
+	splittedPath := path.
+	possibleEntities := currentEntity.
+	[ splittedPath beginsWith: '.' ] whileTrue: [
+		possibleEntities := possibleEntities parentPackage.
+		splittedPath := splittedPath allButFirst ].
+	possibleEntities := possibleEntities children.
 	splittedPath := splittedPath splitOn: $..
 	possibleEntities := possibleEntities select: [ :possibleEntity | possibleEntity name = splittedPath first ].
 	splittedPath removeFirst.
