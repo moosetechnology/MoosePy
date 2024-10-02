@@ -1,14 +1,12 @@
 Class {
 	#name : 'FamixPythonFromImportResolvable',
-	#superclass : 'SRResolvable',
+	#superclass : 'FamixPythonAbstractImportResolvable',
 	#instVars : [
-		'path',
-		'entityName',
-		'entity'
+		'entityName'
 	],
-	#category : 'Famix-Python-Importer-Visitors',
+	#category : 'Famix-Python-Importer-SymbolResolution',
 	#package : 'Famix-Python-Importer',
-	#tag : 'Visitors'
+	#tag : 'SymbolResolution'
 }
 
 { #category : 'accessing' }
@@ -20,99 +18,34 @@ FamixPythonFromImportResolvable class >> path: aStringPath entityName: anEntityN
 		  yourself
 ]
 
-{ #category : 'hooks' }
-FamixPythonFromImportResolvable >> applyReplacementStrategyWithCurrentEntity: aCurrentEntity [
-
-	self entity: (self notFoundReplacementEntity cull: self cull: aCurrentEntity)
-]
-
-{ #category : 'accessing' }
-FamixPythonFromImportResolvable >> entity [
-	^ entity
-]
-
-{ #category : 'accessing' }
-FamixPythonFromImportResolvable >> entity: anObject [
-
-	entity := anObject
-]
-
 { #category : 'accessing' }
 FamixPythonFromImportResolvable >> entityName: anObject [
 	entityName := anObject
-]
-
-{ #category : 'accessing' }
-FamixPythonFromImportResolvable >> identifier [
-	^ self path
-]
-
-{ #category : 'accessing' }
-FamixPythonFromImportResolvable >> path [
-	^ path
-]
-
-{ #category : 'accessing' }
-FamixPythonFromImportResolvable >> path: anObject [
-	path := anObject
-]
-
-{ #category : 'resolution' }
-FamixPythonFromImportResolvable >> resolveAbsolutePathFor: currentEntity [
-
-	| possibleEntities splittedPath |
-	possibleEntities := currentEntity mooseModel rootEntities.
-	splittedPath := path splitOn: $..
-	possibleEntities := possibleEntities select: [ :possibleEntity | possibleEntity name = splittedPath first ].
-	splittedPath removeFirst.
-	[ splittedPath isNotEmpty ] whileTrue: [
-		| childName |
-		childName := splittedPath anyOne.
-		splittedPath removeFirst.
-		possibleEntities := possibleEntities flatCollect: [ :possibleEntity |
-			                    possibleEntity children select: [ :child | (child isPackage or: [ child isModule ]) and: [ child name = childName ] ] ] ].
-	possibleEntities ifEmpty: [ NotFound signal ].
-
-	possibleEntities size = 1 ifFalse: [ self error: 'There should be only one possible entity to import.' ].
-
-	possibleEntities := possibleEntities anyOne allChildren select: [ :child | child isNamedEntity and: [ child name = entityName ] ].
-	"It is possible that we have multiple entities with the same name and in that case, python select the last one declared. So we sort by source anchor position to find this one."
-	^ possibleEntities detectMax: [ :possibleEntity | possibleEntity sourceAnchor startPos ]
 ]
 
 { #category : 'resolution' }
 FamixPythonFromImportResolvable >> resolveInScope: aScope currentEntity: currentEntity [
 	"If we have a dot at first, we have a relative path. Else it's an absolute path"
 
-	entity := (path beginsWith: '.')
-		          ifTrue: [ self resolveRelativePathFor: currentEntity ]
-		          ifFalse: [ self resolveAbsolutePathFor: currentEntity ]
-]
+	| possibleEntities remainingPath |
+	(path beginsWith: '.')
+		ifTrue: [
+			| currentPackage |
+			"In case of a relative path we need to find the origin package for the resolution"
+			remainingPath := path allButFirst.
+			currentPackage := (currentEntity query ancestors ofType: FamixTPackage) anyOne. "If we have a module, we need to start with its parent package. If we have a package, it starts in itself."
+			[ remainingPath beginsWith: '.' ] whileTrue: [
+				currentPackage := currentPackage parentPackage.
+				remainingPath := remainingPath allButFirst ].
+			possibleEntities := currentPackage children ]
+		ifFalse: [
+			"If we have an absolute path we just start at the root."
+			remainingPath := path.
+			possibleEntities := currentEntity mooseModel rootEntities ].
 
-{ #category : 'resolution' }
-FamixPythonFromImportResolvable >> resolveRelativePathFor: currentEntity [
+	possibleEntities := (self findTargetEntityFor: remainingPath from: possibleEntities) allChildren select: [ :child |
+		                    child isNamedEntity and: [ child name = entityName ] ].
 
-	| possibleEntities splittedPath |
-	splittedPath := path allButFirst.
-	possibleEntities := (currentEntity query ancestors ofType: FamixTPackage) anyOne. "If we have a module, we need to start with its parent package. If we have a package, it starts in itself."
-	[ splittedPath beginsWith: '.' ] whileTrue: [
-		possibleEntities := possibleEntities parentPackage.
-		splittedPath := splittedPath allButFirst ].
-	possibleEntities := possibleEntities children.
-	splittedPath := splittedPath splitOn: $..
-	possibleEntities := possibleEntities select: [ :possibleEntity | possibleEntity name = splittedPath first ].
-	splittedPath removeFirst.
-	[ splittedPath isNotEmpty ] whileTrue: [
-		| childName |
-		childName := splittedPath anyOne.
-		splittedPath removeFirst.
-		possibleEntities := possibleEntities flatCollect: [ :possibleEntity |
-			                    possibleEntity children select: [ :child | (child isPackage or: [ child isModule ]) and: [ child name = childName ] ] ] ].
-	possibleEntities ifEmpty: [ NotFound signal ].
-
-	possibleEntities size = 1 ifFalse: [ self error: 'There should be only one possible entity to import.' ].
-
-	possibleEntities := possibleEntities anyOne allChildren select: [ :child | child isNamedEntity and: [ child name = entityName ] ].
 	"It is possible that we have multiple entities with the same name and in that case, python select the last one declared. So we sort by source anchor position to find this one."
-	^ possibleEntities detectMax: [ :possibleEntity | possibleEntity sourceAnchor startPos ]
+	entity := possibleEntities detectMax: [ :possibleEntity | possibleEntity sourceAnchor startPos ]
 ]

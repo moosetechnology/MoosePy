@@ -1,0 +1,70 @@
+Class {
+	#name : 'FamixPythonAbstractImportResolvable',
+	#superclass : 'SRResolvable',
+	#instVars : [
+		'path',
+		'entity'
+	],
+	#category : 'Famix-Python-Importer-SymbolResolution',
+	#package : 'Famix-Python-Importer',
+	#tag : 'SymbolResolution'
+}
+
+{ #category : 'testing' }
+FamixPythonAbstractImportResolvable class >> isAbstract [
+
+	^ self = FamixPythonAbstractImportResolvable
+]
+
+{ #category : 'hooks' }
+FamixPythonAbstractImportResolvable >> applyReplacementStrategyWithCurrentEntity: aCurrentEntity [
+
+	self entity: (self notFoundReplacementEntity cull: self cull: aCurrentEntity)
+]
+
+{ #category : 'accessing' }
+FamixPythonAbstractImportResolvable >> entity [
+	^ entity
+]
+
+{ #category : 'accessing' }
+FamixPythonAbstractImportResolvable >> entity: anObject [
+
+	entity := anObject
+]
+
+{ #category : 'resolution' }
+FamixPythonAbstractImportResolvable >> findTargetEntityFor: aPath from: startEntities [
+
+	| possibleEntities splittedPath |
+	possibleEntities := startEntities.
+	splittedPath := aPath splitOn: $..
+	possibleEntities := possibleEntities select: [ :possibleEntity | possibleEntity name = splittedPath first ].
+	splittedPath removeFirst.
+	[ splittedPath isNotEmpty ] whileTrue: [
+		| childName |
+		childName := splittedPath anyOne.
+		splittedPath removeFirst.
+		possibleEntities := possibleEntities flatCollect: [ :possibleEntity |
+			                    possibleEntity children select: [ :child | (child isPackage or: [ child isModule ]) and: [ child name = childName ] ] ] ].
+	possibleEntities ifEmpty: [ NotFound signal ].
+
+	possibleEntities size = 1 ifFalse: [ self error: 'There should be only one possible entity to import.' ].
+
+	^ possibleEntities anyOne
+]
+
+{ #category : 'accessing' }
+FamixPythonAbstractImportResolvable >> identifier [
+	^ self path
+]
+
+{ #category : 'accessing' }
+FamixPythonAbstractImportResolvable >> path [
+	^ path
+]
+
+{ #category : 'accessing' }
+FamixPythonAbstractImportResolvable >> path: anObject [
+	path := anObject
+]
