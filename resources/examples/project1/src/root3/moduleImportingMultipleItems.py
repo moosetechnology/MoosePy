@@ -1,0 +1,8 @@
+from .moduleInRootPackage3 import moduleInRoot3Variable, ClassInModuleInRoot3, function_in_module_in_root3
+import moduleAtRoot, moduleAtRoot3
+
+print(moduleInRoot3Variable)
+print(ClassInModuleInRoot3)
+print(function_in_module_in_root3)
+print(moduleAtRoot.moduleAtRootVariable)
+print(moduleAtRoot3.moduleAtRootVariable3)
