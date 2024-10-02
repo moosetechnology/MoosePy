@@ -37,9 +37,9 @@ FamixPythonAbstractImportResolvable >> entity: anObject [
 FamixPythonAbstractImportResolvable >> findTargetEntityFor: aPath from: startEntities [
 
 	| possibleEntities splittedPath |
-	possibleEntities := startEntities.
-	splittedPath := aPath splitOn: $..
-	possibleEntities := possibleEntities select: [ :possibleEntity | possibleEntity name = splittedPath first ].
+	"We need to trim because we can have spaces between the dots."
+	splittedPath := (aPath splitOn: $.) collect: [ :segment | segment trim ].
+	possibleEntities := startEntities select: [ :possibleEntity | possibleEntity name = splittedPath first ].
 	splittedPath removeFirst.
 	[ splittedPath isNotEmpty ] whileTrue: [
 		| childName |

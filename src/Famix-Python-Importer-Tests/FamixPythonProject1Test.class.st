@@ -515,6 +515,19 @@ FamixPythonProject1Test >> testModuleImportsGlobalVariableFromAModuleRelatively 
 	self assert: import importedEntity equals: global
 ]
 
+{ #category : 'tests - from-import relative' }
+FamixPythonProject1Test >> testModuleImportsGlobalVariableFromAModuleRelativelyWithSpacesInPath [
+
+	| module global import |
+	self denyEmpty: self model allImports.
+	module := self moduleNamed: 'moduleInSubSubPackage3'.
+	global := self globalVariableNamed: 'moduleInSubpackage31Variable'.
+	import := module outgoingImports detect: [ :pimport | pimport target name = 'moduleInSubpackage31Variable' ].
+
+	self assert: import importingEntity equals: module.
+	self assert: import importedEntity equals: global
+]
+
 { #category : 'tests - from-import' }
 FamixPythonProject1Test >> testModuleImportsGlobalVariableFromAPackage [
 
@@ -539,6 +552,18 @@ FamixPythonProject1Test >> testModuleImportsModuleInPackage [
 
 	self assert: import importingEntity equals: importingModule.
 	self assert: import importedEntity equals: importedModule
+]
+
+{ #category : 'tests - imports' }
+FamixPythonProject1Test >> testModuleImportsSubPackageWithSpacesInThePath [
+
+	| moduleAtRoot import |
+	self denyEmpty: self model allImports.
+	moduleAtRoot := self moduleNamed: 'moduleWithSpacedImports'.
+	import := moduleAtRoot outgoingImports detect: [ :pimport | pimport target name = 'subsubpackage1' ].
+
+	self assert: import importingEntity equals: moduleAtRoot.
+	self assert: import importedEntity equals: (self packageNamed: 'subsubpackage1')
 ]
 
 { #category : 'tests - modules' }

@@ -38,12 +38,12 @@ FamixPythonFromImportResolvable >> resolveInScope: aScope currentEntity: current
 				currentPackage := currentPackage parentPackage.
 				remainingPath := remainingPath allButFirst ].
 			possibleEntities := currentPackage children ]
-		ifFalse: [
-			"If we have an absolute path we just start at the root."
+		ifFalse: [ "If we have an absolute path we just start at the root."
 			remainingPath := path.
 			possibleEntities := currentEntity mooseModel rootEntities ].
 
-	possibleEntities := (self findTargetEntityFor: remainingPath from: possibleEntities) allChildren select: [ :child |
+	"We trim the path because we can have spaces after the dots in relativ paths."
+	possibleEntities := (self findTargetEntityFor: remainingPath trim from: possibleEntities) allChildren select: [ :child |
 		                    child isNamedEntity and: [ child name = entityName ] ].
 
 	"It is possible that we have multiple entities with the same name and in that case, python select the last one declared. So we sort by source anchor position to find this one."
