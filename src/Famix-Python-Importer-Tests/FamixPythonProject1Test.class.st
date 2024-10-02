@@ -647,6 +647,47 @@ FamixPythonProject1Test >> testPackageImportsGlobalVariableFromAModule [
 	self assert: import importedEntity equals: global
 ]
 
+{ #category : 'tests - from-import relative' }
+FamixPythonProject1Test >> testPackageImportsGlobalVariableFromAModuleInAPackageTwoLevelHigherRelatively [
+
+	| package global import |
+	self skip. "There is currently a bug in SmaCC preventing to have this test green :(
+	https://github.com/j-brant/SmaCC/issues/27"
+	self denyEmpty: self model allImports.
+	package := self packageNamed: 'subsubpackage3'.
+	global := self globalVariableNamed: 'moduleInRoot3Variable'.
+	import := package outgoingImports detect: [ :pimport | pimport target name = 'moduleInRoot3Variable' ].
+
+	self assert: import importingEntity equals: package.
+	self assert: import importedEntity equals: global
+]
+
+{ #category : 'tests - from-import relative' }
+FamixPythonProject1Test >> testPackageImportsGlobalVariableFromAModuleInaPackageOneLevelHigherRelatively [
+
+	| package global import |
+	self denyEmpty: self model allImports.
+	package := self packageNamed: 'subpackage3'.
+	global := self globalVariableNamed: 'moduleInRoot3Variable'.
+	import := package outgoingImports detect: [ :pimport | pimport target name = 'moduleInRoot3Variable' ].
+
+	self assert: import importingEntity equals: package.
+	self assert: import importedEntity equals: global
+]
+
+{ #category : 'tests - from-import relative' }
+FamixPythonProject1Test >> testPackageImportsGlobalVariableFromAModuleRelatively [
+
+	| package global import |
+	self denyEmpty: self model allImports.
+	package := self packageNamed: 'subpackage3'.
+	global := self globalVariableNamed: 'moduleInSubpackage31Variable'.
+	import := package outgoingImports detect: [ :pimport | pimport target name = 'moduleInSubpackage31Variable' ].
+
+	self assert: import importingEntity equals: package.
+	self assert: import importedEntity equals: global
+]
+
 { #category : 'tests - from-import' }
 FamixPythonProject1Test >> testPackageImportsGlobalVariableFromAPackage [
 

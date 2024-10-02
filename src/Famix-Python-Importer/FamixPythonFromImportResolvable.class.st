@@ -93,8 +93,8 @@ FamixPythonFromImportResolvable >> resolveInScope: aScope currentEntity: current
 FamixPythonFromImportResolvable >> resolveRelativePathFor: currentEntity [
 
 	| possibleEntities splittedPath |
-	splittedPath := path.
-	possibleEntities := currentEntity.
+	splittedPath := path allButFirst.
+	possibleEntities := (currentEntity query ancestors ofType: FamixTPackage) anyOne. "If we have a module, we need to start with its parent package. If we have a package, it starts in itself."
 	[ splittedPath beginsWith: '.' ] whileTrue: [
 		possibleEntities := possibleEntities parentPackage.
 		splittedPath := splittedPath allButFirst ].
