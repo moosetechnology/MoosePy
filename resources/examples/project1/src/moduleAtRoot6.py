@@ -1,0 +1,3 @@
+import root2.NameOfSubpackageOrClass
+
+print(root2.NameOfSubpackageOrClass)

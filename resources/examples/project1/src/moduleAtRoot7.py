@@ -1,0 +1,3 @@
+from root2 import NameOfSubpackageOrClass
+
+print(NameOfSubpackageOrClass)
