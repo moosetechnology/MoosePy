@@ -285,6 +285,21 @@ FamixPythonProject1Test >> testImportASubpackageThatHasTheSameNameAsAClass [
 	self assert: import importedEntity equals: package
 ]
 
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testImportAnEntityThatIsShadowed [
+	"I created a module with a name that is shadowed. First it is assigned to a global variable then a class then a function. If we import the entity, the last decalred should win"
+
+	| module function import |
+	self denyEmpty: self model allImports.
+	module := self moduleNamed: 'moduleInRootPackage21'.
+	function := self functionNamed: 'shadowedName'.
+	import := module outgoingImports detect: [ :pimport | pimport target name = 'shadowedName' ].
+
+	self assert: import importingEntity equals: module.
+	self assert: import importedEntity equals: function.
+	self assert: import importedEntity class equals: FamixPythonFunction
+]
+
 { #category : 'tests - imports' }
 FamixPythonProject1Test >> testImportStubPackages [
 	"For now, if we have a stub at the end of an import we create a package all the time and not a module because we cannot know what kind it is and it is the simplest code."
