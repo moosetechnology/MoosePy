@@ -257,6 +257,34 @@ FamixPythonProject1Test >> testGlobalVariableInPackage [
 	self assert: global sourceText equals: 'rootPackageVariable'
 ]
 
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testImportAClassThatHasTheSameNameAsSubpackage [
+	"We have a package with a class and a subpackage of the same name and here we check we manage well the imports of those entities"
+
+	| module class import |
+	self denyEmpty: self model allImports.
+	module := self moduleNamed: 'moduleAtRoot7'.
+	class := self classNamed: 'NameOfSubpackageOrClass'.
+	import := module outgoingImports detect: [ :pimport | pimport target name = 'NameOfSubpackageOrClass' ].
+
+	self assert: import importingEntity equals: module.
+	self assert: import importedEntity equals: class
+]
+
+{ #category : 'tests - imports' }
+FamixPythonProject1Test >> testImportASubpackageThatHasTheSameNameAsAClass [
+	"We have a package with a class and a subpackage of the same name and here we check we manage well the imports of those entities"
+
+	| module package import |
+	self denyEmpty: self model allImports.
+	module := self moduleNamed: 'moduleAtRoot6'.
+	package := self packageNamed: 'NameOfSubpackageOrClass'.
+	import := module outgoingImports detect: [ :pimport | pimport target name = 'NameOfSubpackageOrClass' ].
+
+	self assert: import importingEntity equals: module.
+	self assert: import importedEntity equals: package
+]
+
 { #category : 'tests - imports' }
 FamixPythonProject1Test >> testImportStubPackages [
 	"For now, if we have a stub at the end of an import we create a package all the time and not a module because we cannot know what kind it is and it is the simplest code."
