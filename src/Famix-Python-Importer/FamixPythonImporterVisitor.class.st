@@ -796,7 +796,9 @@ FamixPythonImporterVisitor >> visitImportStatement: anImport [
 		  ensureImport: anImport
 		  of: (anImport names collect: [ :name | self acceptNode: name ])
 		  from: (self acceptNode: anImport from)
-		  aliases: (anImport renames collect: [ :alias | self acceptNode: alias ])
+		  aliases: (anImport from
+				   ifNil: [ anImport renames collect: [ :alias | self acceptNode: alias ] ]
+				   ifNotNil: [ anImport names collect: [ :name | name alias ] ])
 ]
 
 { #category : 'visiting' }

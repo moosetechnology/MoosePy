@@ -108,6 +108,41 @@ FamixPythonProject1Test >> testClassImportsModule [
 ]
 
 { #category : 'tests - from-import' }
+FamixPythonProject1Test >> testFromImportAGlobalWithAnAlias [
+
+	| module global import |
+	self denyEmpty: self model allImports.
+	module := self moduleNamed: 'moduleWithImportsAndAliases'.
+	global := self globalVariableNamed: 'moduleAtRoot2Variable'.
+	import := module outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRoot2Variable' ].
+
+	self assert: import importingEntity equals: module.
+	self assert: import importedEntity equals: global.
+	self assert: import alias equals: 'marv'
+]
+
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testFromImportMultipleElementsWithAliases [
+
+	| module class function import |
+	self denyEmpty: self model allImports.
+	module := self moduleNamed: 'moduleWithImportsAndAliases'.
+	class := self classNamed: 'Employee'.
+	import := module outgoingImports detect: [ :pimport | pimport target name = 'Employee' ].
+
+	self assert: import importingEntity equals: module.
+	self assert: import importedEntity equals: class.
+	self assert: import alias equals: 'Emp'.
+
+	function := self functionNamed: 'functionWithImportsInRoot2'.
+	import := module outgoingImports detect: [ :pimport | pimport target name = 'functionWithImportsInRoot2' ].
+
+	self assert: import importingEntity equals: module.
+	self assert: import importedEntity equals: function.
+	self assert: import alias equals: 'fwi'
+]
+
+{ #category : 'tests - from-import' }
 FamixPythonProject1Test >> testFromImportStubPackages [
 
 	| matplotlib pyglot plot module import |
