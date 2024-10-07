@@ -200,63 +200,6 @@ def identity():
 	self assert: famix functionOwner name equals: 'identity'
 ]
 
-{ #category : 'tests - import' }
-FamixPythonImporterTest >> testImportModuleWithAlias [
-
-	self skip. "Should be managed in FamixPythonProject1Test"
-	self parseCode: '
-import math as m
-import matplotlib.pyplot as plt
-'.
-
-	self assert: (self importNamed: 'math') isNotNil.
-	self assert: (self importNamed: 'math') alias equals: 'm'.
-
-	self assert: (self importNamed: 'matplotlib.pyplot') isNotNil.
-	self assert: (self importNamed: 'matplotlib.pyplot') alias equals: 'plt'
-]
-
-{ #category : 'tests - import' }
-FamixPythonImporterTest >> testImportModulesWithAliases [
-
-	self skip. "Should be managed in FamixPythonProject1Test"
-	self parseCode: '
-import math as m, matplotlib.pyplot as plt
-'.
-
-	self assert: (self importNamed: 'math') isNotNil.
-	self assert: (self importNamed: 'math') alias equals: 'm'.
-
-	self assert: (self importNamed: 'matplotlib.pyplot') isNotNil.
-	self assert: (self importNamed: 'matplotlib.pyplot') alias equals: 'plt'
-]
-
-{ #category : 'tests - import' }
-FamixPythonImporterTest >> testImportMultiClassesFromModule [
-
-	self skip. "Should be managed in FamixPythonProject1Test"
-	self parseCode: '
-from keras.layers import Flatten, Activation, AveragePooling2D, BatchNormalization
-'.
-
-	self assert: (self importNamed: 'Flatten') isNotNil.
-	self assert: (self importNamed: 'AveragePooling2D') isNotNil.
-	self assert: (self importNamed: 'Activation') fromName equals: 'keras.layers'
-]
-
-{ #category : 'tests - import' }
-FamixPythonImporterTest >> testImportMultiFunctionsFromModule [
-
-	self skip. "Should be managed in FamixPythonProject1Test"
-	self parseCode: '
-from maths import add, subtract
-'.
-
-	self assert: (self importNamed: 'add') isNotNil.
-	self assert: (self importNamed: 'subtract') isNotNil.
-	self assert: (self importNamed: 'add') fromName equals: 'maths'
-]
-
 { #category : 'tests - functions' }
 FamixPythonImporterTest >> testInnerFunctions [
 
