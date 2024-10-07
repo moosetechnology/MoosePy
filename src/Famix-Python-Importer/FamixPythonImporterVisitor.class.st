@@ -141,7 +141,13 @@ FamixPythonImporterVisitor >> createImport: anImport ofName: aName from: fromNam
 		ifNotNil: [
 			self solver
 				resolve: ((FamixPythonFromImportResolvable path: fromName entityName: aName)
-						 notFoundReplacementEntity: [ :unresolvedImport :currentEntity | self ensureStubPackagesFromPath: unresolvedImport path ];
+						 notFoundReplacementEntity: [ :unresolvedImport :currentEntity |
+							 | package |
+							 package := self ensureStubPackagesFromPath: unresolvedImport path.
+
+							 (self ensureStubContainerNamed: unresolvedImport entityName)
+								 parentPackage: package;
+								 yourself ];
 						 yourself)
 				foundAction: [ :entity :currentEntity | entity addIncomingImport: import ] ].
 
@@ -284,6 +290,16 @@ FamixPythonImporterVisitor >> ensureParameter: parameter inBehavioural: aBehavio
 
 	^ (self parameterNamed:parameter parameterName inBehavioural: aBehavioralEntity)
 		ifNil: [ self createParameter: parameter inBehavioural: aBehavioralEntity ]
+]
+
+{ #category : 'private-entity-creation' }
+FamixPythonImporterVisitor >> ensureStubContainerNamed: aString [
+
+	^ (self unknownImportedNamed: aString) ifNil: [
+		  model newUnknownImportedEntity
+			  name: aString;
+			  isStub: true;
+			  yourself ]
 ]
 
 { #category : 'private-entity-creation' }
@@ -673,6 +689,14 @@ FamixPythonImporterVisitor >> signatureFromInvocation: anInvocationNode [
 	startPos := signature indexOf: $( startingAt: startPos + 1.
 	signature := signature copyFrom: startPos + 1 to: signature size - 2.
 	^ signature copyWithoutAll: '"'
+]
+
+{ #category : 'private - searching' }
+FamixPythonImporterVisitor >> unknownImportedNamed: aString [
+
+	^ self model entities
+		  detect: [ :e | e class = FamixPythonUnknownImportedEntity and: [ e name = aString ] ]
+		  ifNone: [ nil ]
 ]
 
 { #category : 'visiting' }

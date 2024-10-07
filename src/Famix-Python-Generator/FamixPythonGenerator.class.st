@@ -20,7 +20,8 @@ Class {
 		'function',
 		'module',
 		'indexedFileAnchor',
-		'globalVariable'
+		'globalVariable',
+		'unknownImportedEntity'
 	],
 	#category : 'Famix-Python-Generator',
 	#package : 'Famix-Python-Generator'
@@ -61,7 +62,8 @@ FamixPythonGenerator >> defineClasses [
 	primitiveType := builder newClassNamed: #PrimitiveType.
 	reference := builder newClassNamed: #Reference.
 	type := builder newClassNamed: #Type.
-	globalVariable := builder newClassNamed: #GlobalVariable
+	globalVariable := builder newClassNamed: #GlobalVariable.
+	unknownImportedEntity := builder newClassNamed: #UnknownImportedEntity
 ]
 
 { #category : 'definition' }
@@ -78,7 +80,6 @@ FamixPythonGenerator >> defineHierarchy [
 
 	class --|> type.
 	class --|> #TClass.
-	class --|> #TWithImports.
 	class --|> #TImportable.
 	class --|> #TWithAnnotationInstances.
 
@@ -160,7 +161,11 @@ FamixPythonGenerator >> defineHierarchy [
 	reference --|> #TReference.
 
 	type --|> containerEntity.
-	type --|> #TType
+	type --|> #TType.
+	
+	unknownImportedEntity --|> containerEntity.
+	unknownImportedEntity --|> #TImportable.
+	unknownImportedEntity--|> #TPackageable 
 ]
 
 { #category : 'definition' }

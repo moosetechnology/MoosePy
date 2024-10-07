@@ -243,3 +243,10 @@ FamixPythonTEntityCreator >> newTypeNamed: aName [
 	<generated>
 	^ self add: (FamixPythonType named: aName)
 ]
+
+{ #category : 'entity creation' }
+FamixPythonTEntityCreator >> newUnknownImportedEntity [
+
+	<generated>
+	^ self add: FamixPythonUnknownImportedEntity new
+]

@@ -64,3 +64,9 @@ FamixPythonAbstractImporterTest >> parameterNamed: aName [
 
 	^ self model allParameters detect: [ :parameter | parameter name = aName ]
 ]
+
+{ #category : 'accessing' }
+FamixPythonAbstractImporterTest >> unknownContainerNamed: aName [
+
+	^ self model entities detect: [ :entity | entity class = FamixPythonUnknownImportedEntity and: [ entity name = aName ] ]
+]

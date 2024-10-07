@@ -108,6 +108,28 @@ FamixPythonProject1Test >> testClassImportsModule [
 ]
 
 { #category : 'tests - from-import' }
+FamixPythonProject1Test >> testFromImportStubPackages [
+
+	| matplotlib pyglot plot module import |
+	self denyEmpty: self model allImports.
+	module := self moduleNamed: 'moduleWithStubs2'.
+	plot := self unknownContainerNamed: 'plot'.
+	import := module outgoingImports detect: [ :pimport | pimport target name = 'plot' ].
+
+	pyglot := self packageNamed: 'pyplot'.
+	matplotlib := pyglot parentPackage.
+
+	self assert: import importingEntity equals: module.
+	self assert: import importedEntity equals: plot.
+	self assert: import importedEntity class equals: FamixPythonUnknownImportedEntity.
+	self assert: import importedEntity parentPackage equals: pyglot.
+	self assert: import importedEntity parentPackage parentPackage equals: matplotlib.
+	self assert: import importedEntity isStub.
+	self assert: import importedEntity parentPackage isStub.
+	self assert: import importedEntity parentPackage parentPackage isStub
+]
+
+{ #category : 'tests - from-import' }
 FamixPythonProject1Test >> testFunctionImportsClassFromAModule [
 
 	| function class import |

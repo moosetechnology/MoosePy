@@ -17,7 +17,6 @@
 ### Outgoing dependencies
 | Relation | Origin | Opposite | Type | Comment |
 |---|
-| `outgoingImports` | `FamixTWithImports` | `importingEntity` | `FamixTImport` | |
 | `superInheritances` | `FamixTWithInheritances` | `subclass` | `FamixTInheritance` | Superinheritance relationships, i.e. known superclasses of this type.|
 
 ### Incoming dependencies
@@ -51,12 +50,12 @@
 Class {
 	#name : 'FamixPythonClass',
 	#superclass : 'FamixPythonType',
-	#traits : 'FamixTClass + FamixTImportable + FamixTWithAnnotationInstances + FamixTWithImports',
-	#classTraits : 'FamixTClass classTrait + FamixTImportable classTrait + FamixTWithAnnotationInstances classTrait + FamixTWithImports classTrait',
+	#traits : 'FamixTClass + FamixTImportable + FamixTWithAnnotationInstances',
+	#classTraits : 'FamixTClass classTrait + FamixTImportable classTrait + FamixTWithAnnotationInstances classTrait',
 	#instVars : [
+		'#instancedClasses => FMMany type: #FamixPythonClass opposite: #metaclass',
 		'#isMetaclass => FMProperty',
-		'#metaclass => FMOne type: #FamixPythonClass opposite: #instancedClasses',
-		'#instancedClasses => FMMany type: #FamixPythonClass opposite: #metaclass'
+		'#metaclass => FMOne type: #FamixPythonClass opposite: #instancedClasses'
 	],
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',

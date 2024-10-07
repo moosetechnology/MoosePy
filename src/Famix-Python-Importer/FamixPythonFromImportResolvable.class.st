@@ -19,6 +19,11 @@ FamixPythonFromImportResolvable class >> path: aStringPath entityName: anEntityN
 ]
 
 { #category : 'accessing' }
+FamixPythonFromImportResolvable >> entityName [
+	^ entityName
+]
+
+{ #category : 'accessing' }
 FamixPythonFromImportResolvable >> entityName: anObject [
 	entityName := anObject
 ]
