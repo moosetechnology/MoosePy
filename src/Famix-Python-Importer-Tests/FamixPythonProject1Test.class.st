@@ -107,6 +107,15 @@ FamixPythonProject1Test >> testClassImportsModule [
 	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot3')
 ]
 
+{ #category : 'tests - imports' }
+FamixPythonProject1Test >> testFileWithTwoIdenticalImportsProduceTwoImports [
+
+	| module |
+	self denyEmpty: self model allImports.
+	module := self moduleNamed: 'moduleAtRoot2'.
+	self assert: (module outgoingImports select: [ :pimport | pimport target name = 'moduleAtRoot' ]) size equals: 2
+]
+
 { #category : 'tests - from-import' }
 FamixPythonProject1Test >> testFromImportAGlobalWithAnAlias [
 
