@@ -25,7 +25,7 @@
 
 | Name | Type | Default value | Comment |
 |---|
-| `asName` | `String` | nil | ""import b as c"", asName is c|
+| `alias` | `String` | nil | Alias of the imported entity in the scope of the import|
 | `isStub` | `Boolean` | false | Flag true if the entity attributes are incomplete, either because the entity is missing or not imported.|
 
 "
@@ -35,7 +35,7 @@ Class {
 	#traits : 'FamixTImport',
 	#classTraits : 'FamixTImport classTrait',
 	#instVars : [
-		'#asName => FMProperty'
+		'#alias => FMProperty'
 	],
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',
@@ -52,16 +52,16 @@ FamixPythonImport class >> annotation [
 ]
 
 { #category : 'accessing' }
-FamixPythonImport >> asName [
+FamixPythonImport >> alias [
 
-	<FMProperty: #asName type: #String>
+	<FMProperty: #alias type: #String>
 	<generated>
-	<FMComment: '"import b as c", asName is c'>
-	^ asName
+	<FMComment: 'Alias of the imported entity in the scope of the import'>
+	^ alias
 ]
 
 { #category : 'accessing' }
-FamixPythonImport >> asName: anObject [
+FamixPythonImport >> alias: anObject [
 	<generated>
-	asName := anObject
+	alias := anObject
 ]

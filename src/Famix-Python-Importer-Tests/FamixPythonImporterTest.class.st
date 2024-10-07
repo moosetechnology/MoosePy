@@ -210,10 +210,10 @@ import matplotlib.pyplot as plt
 '.
 
 	self assert: (self importNamed: 'math') isNotNil.
-	self assert: (self importNamed: 'math') asName equals: 'm'.
+	self assert: (self importNamed: 'math') alias equals: 'm'.
 
 	self assert: (self importNamed: 'matplotlib.pyplot') isNotNil.
-	self assert: (self importNamed: 'matplotlib.pyplot') asName equals: 'plt'
+	self assert: (self importNamed: 'matplotlib.pyplot') alias equals: 'plt'
 ]
 
 { #category : 'tests - import' }
@@ -225,10 +225,10 @@ import math as m, matplotlib.pyplot as plt
 '.
 
 	self assert: (self importNamed: 'math') isNotNil.
-	self assert: (self importNamed: 'math') asName equals: 'm'.
+	self assert: (self importNamed: 'math') alias equals: 'm'.
 
 	self assert: (self importNamed: 'matplotlib.pyplot') isNotNil.
-	self assert: (self importNamed: 'matplotlib.pyplot') asName equals: 'plt'
+	self assert: (self importNamed: 'matplotlib.pyplot') alias equals: 'plt'
 ]
 
 { #category : 'tests - import' }

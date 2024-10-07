@@ -173,7 +173,7 @@ FamixPythonGenerator >> defineProperties [
 
 	super defineProperties.
 
-	(import property: #asName type: #String) comment: '"import b as c", asName is c'.
+	(import property: #alias type: #String) comment: 'Alias of the imported entity in the scope of the import'.
 	
 	(class property: #isMetaclass type: #Boolean) comment: 'Whether this class is a metaclass'
 ]
