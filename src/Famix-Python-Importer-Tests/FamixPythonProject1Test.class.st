@@ -816,8 +816,6 @@ FamixPythonProject1Test >> testPackageImportsGlobalVariableFromAModule [
 FamixPythonProject1Test >> testPackageImportsGlobalVariableFromAModuleInAPackageTwoLevelHigherRelatively [
 
 	| package global import |
-	self skip. "There is currently a bug in SmaCC preventing to have this test green :(
-	https://github.com/j-brant/SmaCC/issues/27"
 	self denyEmpty: self model allImports.
 	package := self packageNamed: 'subsubpackage3'.
 	global := self globalVariableNamed: 'moduleInRoot3Variable'.
