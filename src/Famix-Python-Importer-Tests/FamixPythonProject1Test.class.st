@@ -294,6 +294,20 @@ FamixPythonProject1Test >> testImportAClassThatHasTheSameNameAsSubpackage [
 ]
 
 { #category : 'tests - imports' }
+FamixPythonProject1Test >> testImportAModuleWithAnAlias [
+
+	| module module2 import |
+	self denyEmpty: self model allImports.
+	module := self moduleNamed: 'moduleWithImportsAndAliases'.
+	module2 := self moduleNamed: 'moduleAtRoot'.
+	import := module outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRoot' ].
+
+	self assert: import importingEntity equals: module.
+	self assert: import importedEntity equals: module2.
+	self assert: import alias equals: 'mar'
+]
+
+{ #category : 'tests - imports' }
 FamixPythonProject1Test >> testImportASubpackageThatHasTheSameNameAsAClass [
 	"We have a package with a class and a subpackage of the same name and here we check we manage well the imports of those entities"
 
@@ -305,6 +319,20 @@ FamixPythonProject1Test >> testImportASubpackageThatHasTheSameNameAsAClass [
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: package
+]
+
+{ #category : 'tests - imports' }
+FamixPythonProject1Test >> testImportASubpackageWithAnAlias [
+
+	| module package import |
+	self denyEmpty: self model allImports.
+	module := self moduleNamed: 'moduleWithImportsAndAliases'.
+	package := self packageNamed: 'subsubpackage1'.
+	import := module outgoingImports detect: [ :pimport | pimport target name = 'subsubpackage1' ].
+
+	self assert: import importingEntity equals: module.
+	self assert: import importedEntity equals: package.
+	self assert: import alias equals: 'rss'
 ]
 
 { #category : 'tests - from-import' }
