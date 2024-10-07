@@ -1,4 +1,5 @@
 import moduleAtRoot
+import moduleAtRoot
 import moduleAtRoot3
 
 moduleAtRoot2Variable = 42
