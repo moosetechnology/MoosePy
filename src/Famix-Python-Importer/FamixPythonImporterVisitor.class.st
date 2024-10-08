@@ -129,18 +129,17 @@ FamixPythonImporterVisitor >> createImport: anImport ofName: aName from: fromNam
 
 	self currentEntity addOutgoingImport: import.
 	self flag: #todo. "Check how to manage the push before the main entity and the pops."
-	self flag: #todo. "Clean code about the kind of resolution to do."
 
-	fromName
-		ifNil: [
-			self solver
-				resolve: ((FamixPythonImportResolvable path: aName)
+	"pushResolvableAsScopeBeforeMainEntityScope:"
+
+	self solver
+		resolve: (fromName
+				 ifNil: [
+					 (FamixPythonImportResolvable path: aName)
 						 notFoundReplacementEntity: [ :unresolvedImport :currentEntity | self ensureStubPackagesFromPath: unresolvedImport path ];
-						 yourself)
-				foundAction: [ :entity :currentEntity | entity addIncomingImport: import ] ]
-		ifNotNil: [
-			self solver
-				resolve: ((FamixPythonFromImportResolvable path: fromName entityName: aName)
+						 yourself ]
+				 ifNotNil: [
+					 (FamixPythonFromImportResolvable path: fromName entityName: aName)
 						 notFoundReplacementEntity: [ :unresolvedImport :currentEntity |
 							 | package |
 							 package := self ensureStubPackagesFromPath: unresolvedImport path.
@@ -148,10 +147,8 @@ FamixPythonImporterVisitor >> createImport: anImport ofName: aName from: fromNam
 							 (self ensureStubContainerNamed: unresolvedImport entityName)
 								 parentPackage: package;
 								 yourself ];
-						 yourself)
-				foundAction: [ :entity :currentEntity | entity addIncomingImport: import ] ].
-
-	"pushResolvableAsScopeBeforeMainEntityScope: (FamixPythonImportResolvable path: aName)"
+						 yourself ])
+		foundAction: [ :entity :currentEntity | entity addIncomingImport: import ].
 
 	^ import
 ]
@@ -245,19 +242,6 @@ FamixPythonImporterVisitor >> ensureFunction: aFunctionNode [
 
 	^ (self functionNamed: aFunctionNode fname value) ifNil: [
 		  self createFunction: aFunctionNode  ]
-]
-
-{ #category : 'private-entity-creation' }
-FamixPythonImporterVisitor >> ensureImport: anImportNode of: importedNames from: aName aliases: aliasNames [
-
-	importedNames withIndexDo: [ :importName :i |
-		(self importNamed: importName) ifNil: [ | alias |
-			aliasNames
-				ifEmpty: [ alias := nil ]
-				ifNotEmpty: [ alias := aliasNames at: i ].
-			self createImport: anImportNode ofName: importName from: aName alias: alias
-		]
-	]
 ]
 
 { #category : 'private-entity-creation' }
@@ -495,18 +479,6 @@ FamixPythonImporterVisitor >> importFromName: anImportFromNode [
 	result := self visitDotOptDottedName: anImportFromNode.
 
 	^ result
-]
-
-{ #category : 'private - searching' }
-FamixPythonImporterVisitor >> importNamed: aString [
-
-	self flag: #todo. "This is wrong, should also check the importing module: several modules can have similar imports"
-	self flag: #todo. "The ifNil shout not be needed but it's during the development"
-	^ self model allImports
-		  detect: [ :e | (e importedEntity
-	ifNil: [ '' ]
-	ifNotNil: #name) = aString ]
-		  ifNone: [ nil ]
 ]
 
 { #category : 'accessing - methods' }
@@ -792,13 +764,20 @@ FamixPythonImporterVisitor >> visitFunctionDefinition: aFunctionDefinition [
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> visitImportStatement: anImport [
 
-	^ self
-		  ensureImport: anImport
-		  of: (anImport names collect: [ :name | self acceptNode: name ])
-		  from: (self acceptNode: anImport from)
-		  aliases: (anImport from
-				   ifNil: [ anImport renames collect: [ :alias | self acceptNode: alias ] ]
-				   ifNotNil: [ anImport names collect: [ :name | name alias ] ])
+	| importedEntities aliases |
+	importedEntities := anImport names collect: [ :name | self acceptNode: name ].
+	aliases := anImport from
+		           ifNil: [ anImport renames collect: [ :alias | self acceptNode: alias ] ]
+		           ifNotNil: [ anImport names collect: [ :name | name alias ] ].
+
+	importedEntities withIndexDo: [ :importName :i |
+		| alias |
+		alias := aliases at: i ifAbsent: [ nil ].
+		self
+			createImport: anImport
+			ofName: importName
+			from: (self acceptNode: anImport from)
+			alias: alias ]
 ]
 
 { #category : 'visiting' }
