@@ -889,6 +889,20 @@ FamixPythonProject1Test >> testModuleInSubpackageImportsGlobalVariableFromAModul
 	self assert: import sourceText equals: 'from .moduleInSubPackage3 import moduleInSubpackage31Variable'
 ]
 
+{ #category : 'tests - modules' }
+FamixPythonProject1Test >> testModulesWithTheSameNameAreDifferent [
+
+	| modules rootModule moduleInPackage |
+	modules := self model allModules select: [ :module | module name = 'moduleWithCommonName' ].
+	rootModule := modules detect: [ :module | module isRoot ].
+	moduleInPackage := modules detect: [ :module | module isRoot not ].
+
+	self assert: modules size equals: 2.
+	self assert: rootModule isRoot.
+	self assert: moduleInPackage parentPackage name equals: 'root'.
+	self deny: rootModule identicalTo: moduleInPackage
+]
+
 { #category : 'tests - from-import' }
 FamixPythonProject1Test >> testPackageImportsClassFromAModule [
 

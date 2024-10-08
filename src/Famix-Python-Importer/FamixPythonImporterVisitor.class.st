@@ -263,7 +263,12 @@ FamixPythonImporterVisitor >> ensureMethod: aMethodNode [
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> ensureModuleNamed: moduleName fromNode: aModuleNode [
 
-	^ (self moduleNamed: moduleName) ifNil: [ self createModule: aModuleNode named: moduleName ]
+	self withCurrentEntityDo: [ :entity |
+		(entity query descendants ofType: FamixTModule)
+			detect: [ :module | module name = moduleName ]
+			ifFound: [ :module | ^ module ] ].
+
+	^ self createModule: aModuleNode named: moduleName
 ]
 
 { #category : 'private-entity-creation' }
