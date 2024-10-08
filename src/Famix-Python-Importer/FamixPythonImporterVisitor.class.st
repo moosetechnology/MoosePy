@@ -209,7 +209,14 @@ FamixPythonImporterVisitor >> createModule: aModuleNode named: aName [
 	module := model newModule.
 	module name: aName.
 
-	^ self setSourceAnchor: module from: aModuleNode
+	self setSourceAnchor: module from: aModuleNode.
+
+	"The FileNode exclude things such as the comments at the beginning of files so we just put again manually the whole file"
+	module sourceAnchor
+		startPos: 1;
+		endPos: aModuleNode fileReference size.
+
+	^ module
 ]
 
 { #category : 'private-entity-creation' }
