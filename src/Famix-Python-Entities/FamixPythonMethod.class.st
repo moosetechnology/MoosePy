@@ -43,6 +43,7 @@
 | Name | Type | Default value | Comment |
 |---|
 | `isStub` | `Boolean` | false | Flag true if the entity attributes are incomplete, either because the entity is missing or not imported.|
+| `kind` | `String` | nil | Tag indicating a setter, getter, constant, constructor method|
 | `name` | `String` | nil | Basic name of the entity, not full reference.|
 | `signature` | `String` | nil | Signature of the message being sent|
 
@@ -50,8 +51,8 @@
 Class {
 	#name : 'FamixPythonMethod',
 	#superclass : 'FamixPythonContainerEntity',
-	#traits : 'FamixTImportable + FamixTInvocable + FamixTMethod + FamixTWithAnnotationInstances + FamixTWithComments + FamixTWithFunctions + FamixTWithInvocations',
-	#classTraits : 'FamixTImportable classTrait + FamixTInvocable classTrait + FamixTMethod classTrait + FamixTWithAnnotationInstances classTrait + FamixTWithComments classTrait + FamixTWithFunctions classTrait + FamixTWithInvocations classTrait',
+	#traits : 'FamixTHasKind + FamixTImportable + FamixTInvocable + FamixTMethod + FamixTWithAnnotationInstances + FamixTWithComments + FamixTWithFunctions + FamixTWithInvocations',
+	#classTraits : 'FamixTHasKind classTrait + FamixTImportable classTrait + FamixTInvocable classTrait + FamixTMethod classTrait + FamixTWithAnnotationInstances classTrait + FamixTWithComments classTrait + FamixTWithFunctions classTrait + FamixTWithInvocations classTrait',
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',
 	#tag : 'Entities'

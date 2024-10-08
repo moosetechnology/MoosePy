@@ -114,6 +114,23 @@ FamixPythonProject1Test >> testClassImportsModule [
 	self assert: import sourceText equals: 'import moduleAtRoot3'
 ]
 
+{ #category : 'tests - methods' }
+FamixPythonProject1Test >> testConstructor [
+
+	| method |
+	self denyEmpty: self model allMethods.
+
+	method := (self classNamed: 'Person') methods detect: [ :m | m name = '__init__' ].
+
+	self assert: method name equals: '__init__'.
+	self assert: method isConstructor.
+
+	method := (self classNamed: 'Person') methods detect: [ :m | m name = 'printInfos' ].
+
+	self assert: method name equals: 'printInfos'.
+	self deny: method isConstructor
+]
+
 { #category : 'tests - imports' }
 FamixPythonProject1Test >> testFileWithTwoIdenticalImportsProduceTwoImports [
 
@@ -587,6 +604,21 @@ FamixPythonProject1Test >> testMethodImportsModule [
 	self assert: import importingEntity equals: method.
 	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot4').
 	self assert: import sourceText equals: 'import moduleAtRoot4'
+]
+
+{ #category : 'tests - methods' }
+FamixPythonProject1Test >> testMethodSourceAnchor [
+
+	| method |
+	self denyEmpty: self model allMethods.
+
+	method := self methodNamed: 'printInfos'.
+
+	self assert: method sourceAnchor isNotNil.
+	self assert: method sourceText equals: ('def printInfos(self):
+        import moduleAtRoot4
+        if not moduleAtRoot3.moduleAtRootVariable3:
+            print(self.name + moduleAtRoot4.moduleAtRootSpaceString + str(self.age))' copyReplaceAll: String cr with: String lf)
 ]
 
 { #category : 'tests' }

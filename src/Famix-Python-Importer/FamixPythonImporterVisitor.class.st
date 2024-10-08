@@ -195,9 +195,11 @@ FamixPythonImporterVisitor >> createMethod: aMethodNode [
 
 	| method signature |
 	signature := aMethodNode signatureString.
-	method := self basicCreateMethod: aMethodNode fname value withSignature: signature.
+	method := self basicCreateMethod: aMethodNode name withSignature: signature.
 
 	method parentType: self currentEntity.
+
+	aMethodNode name = '__init__' ifTrue: [ method isConstructor: true ].
 
 	^ self setSourceAnchor: method from: aMethodNode
 ]
@@ -254,10 +256,7 @@ FamixPythonImporterVisitor >> ensureFunction: aFunctionNode [
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> ensureMethod: aMethodNode [
 
-	^ (self
-		   methodNamed: aMethodNode fname value
-		   inClassNamed: self currentEntity name) ifNil: [
-		  self createMethod: aMethodNode ]
+	^ (self methodNamed: aMethodNode fname value inClassNamed: self currentEntity name) ifNil: [ self createMethod: aMethodNode ]
 ]
 
 { #category : 'private-entity-creation' }
