@@ -1,0 +1,1 @@
+moduleWithCommonNameVar = 0
