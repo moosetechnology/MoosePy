@@ -503,7 +503,7 @@ FamixPythonImporterVisitor >> initialize [
 
 	super initialize.
 	model := FamixPythonModel new name: 'default Python Model'.
-	self initialiseFutureSolver 
+	self initialiseSolver 
 ]
 
 { #category : 'private - searching' }
