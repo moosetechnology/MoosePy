@@ -175,6 +175,14 @@ FamixPythonImporterVisitor >> createMethod: aMethodNode [
 			foundAction: [ :entity :currentEntity | method beGetter ]
 			ifNone: [ "We do nothing" ] ].
 
+	(aMethodNode name beginsWith: 'set_') ifTrue: [
+		self
+			resolve: ((SRIdentifierWithNode identifier: (aMethodNode name withoutPrefix: 'set_'))
+					 expectedKind: FamixPythonAttribute;
+					 yourself)
+			foundAction: [ :entity :currentEntity | method beSetter ]
+			ifNone: [ "We do nothing" ] ].
+
 	^ self setSourceAnchor: method from: aMethodNode
 ]
 

@@ -343,7 +343,6 @@ FamixPythonProject1Test >> testFunctionInAPackage [
 FamixPythonProject1Test >> testGetterAndSetter [
 
 	| class getter setter |
-	self skip. "For now I see that instance variables are not well managed so it make it impossible to maager getters and setters properly. Let's finish this later"
 	self denyEmpty: self model allMethods.
 
 	class := self classNamed: 'Person'.
