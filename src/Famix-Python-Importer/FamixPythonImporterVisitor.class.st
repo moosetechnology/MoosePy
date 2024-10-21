@@ -29,23 +29,21 @@ FamixPythonImporterVisitor >> acceptNodes: aCollection [
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> basicCreateFunction: aSelector withSignature: aSignature [
 
-	| function |
-	function := model newFunction.
-	function name: aSelector.
-	function isStub: true.
-	function signature: aSignature.
-	^ function
+	^ model newFunction
+		  name: aSelector;
+		  isStub: true;
+		  signature: aSignature;
+		  yourself
 ]
 
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> basicCreateMethod: aSelector withSignature: aSignature [
 
-	| method |
-	method := model newMethod.
-	method name: aSelector.
-	method isStub: true.
-	method signature: aSignature.
-	^ method
+	^ model newMethod
+		  name: aSelector;
+		  isStub: true;
+		  signature: aSignature;
+		  yourself
 ]
 
 { #category : 'accessing - classes' }
@@ -54,20 +52,6 @@ FamixPythonImporterVisitor >> classNamed: aName [
 	^ (self model allWithType: FamixPythonClass)
 		  detect: [ :e | e name = aName ]
 		  ifNone: [ nil ]
-]
-
-{ #category : 'accessing - classes' }
-FamixPythonImporterVisitor >> classes [
-
-	^ self model allWithType: FamixPythonClass
-]
-
-{ #category : 'private-entity-creation' }
-FamixPythonImporterVisitor >> createAnnotationTypeNamed: aString [ 
-
-	^model newAnnotationType
-		name:  aString ;
-		yourself
 ]
 
 { #category : 'private-entity-creation' }
@@ -170,24 +154,6 @@ FamixPythonImporterVisitor >> createInvocation: anInvocationNode [
 		(self signatureFromInvocation: anInvocationNode).
 
 	^ self setSourceAnchor: invocation from: anInvocationNode
-]
-
-{ #category : 'private-entity-creation' }
-FamixPythonImporterVisitor >> createLambda: aLambdaNode [
-
-	| function signature |
-
-	self flag: 'for now creating a lmbda as an unnamed function, but should be a FamixPythonLambda'.
-
-	"signature := aLambdaNode parameters ifNotNil: [
-		             aLambdaNode parameters signatureString ]."
-	function := self
-		basicCreateFunction: ''
-		withSignature: '(' , aLambdaNode testlist arguments asString , ') -> ' , aLambdaNode testlist body asString.
-
-	function functionOwner: self currentEntity.
-
-	^ self setSourceAnchor: function from: aLambdaNode
 ]
 
 { #category : 'private-entity-creation' }
@@ -691,11 +657,6 @@ FamixPythonImporterVisitor >> unknownImportedNamed: aString [
 ]
 
 { #category : 'visiting' }
-FamixPythonImporterVisitor >> visitAnnotatedSymbol: anAnnotatedSymbol [
-	^ super visitAnnotatedSymbol: anAnnotatedSymbol
-]
-
-{ #category : 'visiting' }
 FamixPythonImporterVisitor >> visitAssignmentStatement: anAssignmentStatement [
 
 	(anAssignmentStatement lhs isKindOf: PyVariableExpressionNode) ifTrue: [
@@ -712,31 +673,6 @@ FamixPythonImporterVisitor >> visitAssignmentStatement: anAssignmentStatement [
 FamixPythonImporterVisitor >> visitClassDefinition: aClassDef [
 
 	^ self useCurrentEntity: (self ensureClass: aClassDef) during: [ super visitClassDefinition: aClassDef ]
-]
-
-{ #category : 'visiting' }
-FamixPythonImporterVisitor >> visitDecorated: aDecoratedNode [
-
-	| decorations decorated |
-	decorations := self acceptNodes: aDecoratedNode decorators.
-	aDecoratedNode classdef ifNotNil: [ :def | decorated := self acceptNode: def ].
-	aDecoratedNode funcdef ifNotNil: [ :def | decorated := self acceptNode: def ].
-
-	(decorations notEmpty and: [ decorated notNil ])
-	ifTrue: [ decorated annotationInstances: decorations ]
-]
-
-{ #category : 'visiting' }
-FamixPythonImporterVisitor >> visitDottedName: anDottedNameNode [
-
-	^$. join: (anDottedNameNode names collect: [:name | self acceptNode: name])
-]
-
-{ #category : 'visiting' }
-FamixPythonImporterVisitor >> visitExprStmt: anExprStmt [
-	anExprStmt isAssignment ifTrue: [ ^self visitAssignmentStmt: anExprStmt ].
-	anExprStmt isLambda ifTrue: [ ^self visitLambda: anExprStmt ].
-	super visitExprStmt: anExprStmt.
 ]
 
 { #category : 'generated' }
@@ -800,29 +736,6 @@ FamixPythonImporterVisitor >> visitImportStatement: anImport [
 ]
 
 { #category : 'visiting' }
-FamixPythonImporterVisitor >> visitInterpolatedString: anInterpolatedString [
-
-	^(anInterpolatedString topParent completeSource
-		copyFrom: anInterpolatedString startPosition
-		to: anInterpolatedString stopPosition)
-		asString
-]
-
-{ #category : 'visiting' }
-FamixPythonImporterVisitor >> visitLambda: aLambdaNode [
-
-	| fmx result |
-	"for now only create lambda if we are inside a function/method
-	This is needed because there is a bug in SmaCC"
-	({
-		 FamixPythonFunction.
-		 FamixPythonMethod } includes: self currentEntity class) ifFalse: [ ^ nil ].
-
-	fmx := self createLambda: aLambdaNode.
-	^ self useCurrentEntity: fmx during: [  ]
-]
-
-{ #category : 'visiting' }
 FamixPythonImporterVisitor >> visitMetaclass: aMetaclass [
 
 	| metaClassName metaClassObject |
@@ -878,12 +791,6 @@ FamixPythonImporterVisitor >> visitSmaCCToken: aSmaCCToken [
 FamixPythonImporterVisitor >> visitString: aStringNode [
 
 	^ (aStringNode source withoutPrefix: '''') withoutSuffix: ''''
-]
-
-{ #category : 'visiting' }
-FamixPythonImporterVisitor >> visitStrings: aStringsNode [
-
-	^ aStringsNode strings collect: [:each| self acceptNode: each]
 ]
 
 { #category : 'visiting' }
