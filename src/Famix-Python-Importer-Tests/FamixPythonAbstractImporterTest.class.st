@@ -6,6 +6,12 @@ Class {
 }
 
 { #category : 'accessing' }
+FamixPythonAbstractImporterTest >> attributeNamed: aName [
+
+	^ self model allAttributes detect: [ :attribute | attribute name = aName ]
+]
+
+{ #category : 'accessing' }
 FamixPythonAbstractImporterTest >> classNamed: aName [
 
 	^ self model allClasses detect: [ :class | class name = aName ]

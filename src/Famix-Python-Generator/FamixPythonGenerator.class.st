@@ -77,6 +77,7 @@ FamixPythonGenerator >> defineHierarchy [
 	attribute --|> #TAttribute.
 	attribute --|> #TInvocationsReceiver.
 	attribute --|> #TWithComments.
+	attribute --|> #TCanBeClassSide.
 
 	class --|> type.
 	class --|> #TClass.

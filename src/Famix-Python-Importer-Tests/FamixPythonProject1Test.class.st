@@ -327,6 +327,28 @@ FamixPythonProject1Test >> testFunctionInAPackage [
 	self assert: function functionOwner equals: (self packageNamed: 'subsubpackage1')
 ]
 
+{ #category : 'tests - methods' }
+FamixPythonProject1Test >> testGetterAndSetter [
+
+	| class getter setter |
+	self skip. "For now I see that instance variables are not well managed so it make it impossible to maager getters and setters properly. Let's finish this later"
+	self denyEmpty: self model allMethods.
+
+	class := self classNamed: 'Person'.
+	getter := class methods detect: [ :m | m name = 'get_name' ].
+	setter := class methods detect: [ :m | m name = 'set_name' ].
+
+	self assert: getter name equals: 'get_name'.
+	self assert: getter isGetter.
+	self deny: getter isSetter.
+	self deny: getter isConstructor.
+
+	self assert: setter name equals: 'set_name'.
+	self deny: getter isGetter.
+	self assert: getter isSetter.
+	self deny: getter isConstructor
+]
+
 { #category : 'tests - global variables' }
 FamixPythonProject1Test >> testGlobalVariableInModule [
 
@@ -1149,6 +1171,20 @@ FamixPythonProject1Test >> testSimpleClass [
 	self assert: class class equals: FamixPythonClass.
 	self assert: class name equals: 'Person'.
 	self assert: class typeContainer equals: (self moduleNamed: 'moduleAtRoot2')
+]
+
+{ #category : 'tests - attributes' }
+FamixPythonProject1Test >> testSimpleClassVariable [
+
+	| variable |
+	self denyEmpty: self model allAttributes.
+
+	variable := self attributeNamed: 'kind'.
+
+	self assert: variable class equals: FamixPythonAttribute.
+	self assert: variable name equals: 'kind'.
+	self assert: variable parentType equals: (self classNamed: 'Dog').
+	self assert: variable isClassSide
 ]
 
 { #category : 'tests - methods' }

@@ -201,6 +201,14 @@ FamixPythonImporterVisitor >> createMethod: aMethodNode [
 
 	aMethodNode name = '__init__' ifTrue: [ method isConstructor: true ].
 
+	(aMethodNode name beginsWith: 'get_') ifTrue: [
+		self
+			resolve: ((SRIdentifierWithNode identifier: (aMethodNode name withoutPrefix: 'get_'))
+					 expectedKind: FamixPythonAttribute;
+					 yourself)
+			foundAction: [ :entity :currentEntity | entity beGetter ]
+			ifNone: [ "We do nothing" ] ].
+
 	^ self setSourceAnchor: method from: aMethodNode
 ]
 

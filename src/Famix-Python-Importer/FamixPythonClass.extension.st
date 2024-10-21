@@ -5,5 +5,6 @@ FamixPythonClass >> createLocalVariable: aString [
 	^mooseModel newAttribute
 		name: aString ;
 		parentType: self ;
+		isClassSide: true;
 		yourself
 ]

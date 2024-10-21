@@ -30,6 +30,7 @@
 
 | Name | Type | Default value | Comment |
 |---|
+| `isClassSide` | `Boolean` | false | Entity can be declared class side i.e. static|
 | `isStub` | `Boolean` | false | Flag true if the entity attributes are incomplete, either because the entity is missing or not imported.|
 | `name` | `String` | nil | Basic name of the entity, not full reference.|
 
@@ -37,8 +38,8 @@
 Class {
 	#name : 'FamixPythonAttribute',
 	#superclass : 'FamixPythonNamedEntity',
-	#traits : 'FamixTAttribute + FamixTInvocationsReceiver + FamixTWithComments',
-	#classTraits : 'FamixTAttribute classTrait + FamixTInvocationsReceiver classTrait + FamixTWithComments classTrait',
+	#traits : 'FamixTAttribute + FamixTCanBeClassSide + FamixTInvocationsReceiver + FamixTWithComments',
+	#classTraits : 'FamixTAttribute classTrait + FamixTCanBeClassSide classTrait + FamixTInvocationsReceiver classTrait + FamixTWithComments classTrait',
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',
 	#tag : 'Entities'
