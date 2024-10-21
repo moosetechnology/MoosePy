@@ -172,7 +172,7 @@ FamixPythonImporterVisitor >> createMethod: aMethodNode [
 			resolve: ((SRIdentifierWithNode identifier: (aMethodNode name withoutPrefix: 'get_'))
 					 expectedKind: FamixPythonAttribute;
 					 yourself)
-			foundAction: [ :entity :currentEntity | entity beGetter ]
+			foundAction: [ :entity :currentEntity | method beGetter ]
 			ifNone: [ "We do nothing" ] ].
 
 	^ self setSourceAnchor: method from: aMethodNode
@@ -225,6 +225,16 @@ FamixPythonImporterVisitor >> ensureFunction: aFunctionNode [
 
 	^ (self functionNamed: aFunctionNode fname value) ifNil: [
 		  self createFunction: aFunctionNode  ]
+]
+
+{ #category : 'as yet unclassified' }
+FamixPythonImporterVisitor >> ensureInstanceVariableFromAssignation: anAssignmentStatementNode [
+
+	^ self model newAttribute
+		  name: anAssignmentStatementNode lhs name;
+		  parentType: (self currentEntityOfType: FamixPythonClass);
+		  isClassSide: false;
+		  yourself
 ]
 
 { #category : 'private-entity-creation' }
@@ -310,6 +320,29 @@ FamixPythonImporterVisitor >> ensureVariable: aName localTo: aFamixEntity [
 	aFamixEntity dictLocalVariables
 		at: aName
 		ifAbsent: [ aFamixEntity createLocalVariable: aName ]
+]
+
+{ #category : 'visiting' }
+FamixPythonImporterVisitor >> ensureVariableFromAssignationStatement: anAssignmentStatement [
+	"I am really not sure what is the best thing to do here. So for now I'll write some code that will keep all the tests I'm adding green and when the parser will cover most cases I might come back to refactore this code into something better with less #isKindOf: or ifs."
+
+	"This is to manage global variables, class variables, local variables."
+
+	(anAssignmentStatement lhs isKindOf: PyVariableExpressionNode) ifTrue: [
+		self currentEntity dictLocalVariables at: anAssignmentStatement lhs name ifAbsent: [
+			| variable |
+			variable := self currentEntity createLocalVariable: anAssignmentStatement lhs name.
+			"We select the lhs node because the source anchor should not be the full assignation."
+			self setSourceAnchor: variable from: anAssignmentStatement lhs.
+			^ variable ] ].
+
+	anAssignmentStatement isInstanceVariableAssignation ifTrue: [
+		self assert: self currentEntity isMethod. "Maybe this could be removed when the parser is stable?"
+		^ self ensureInstanceVariableFromAssignation: anAssignmentStatement ].
+
+	self flag: #todo. "manage other cases."
+	"self error: 'We should not end up here.'"
+	^ nil
 ]
 
 { #category : 'accessing' }
@@ -659,14 +692,7 @@ FamixPythonImporterVisitor >> unknownImportedNamed: aString [
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> visitAssignmentStatement: anAssignmentStatement [
 
-	(anAssignmentStatement lhs isKindOf: PyVariableExpressionNode) ifTrue: [
-		self currentEntity dictLocalVariables at: anAssignmentStatement lhs name ifAbsent: [
-			| variable |
-			variable := self currentEntity createLocalVariable: anAssignmentStatement lhs name.
-			"We select the lhs node because the source anchor should not be the full assignation."
-			self setSourceAnchor: variable from: anAssignmentStatement lhs ] ].
-
-	^ super visitAssignmentStatement: anAssignmentStatement
+	^ self useCurrentEntity: (self ensureVariableFromAssignationStatement: anAssignmentStatement) during: [ super visitAssignmentStatement: anAssignmentStatement ]
 ]
 
 { #category : 'visiting' }

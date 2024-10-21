@@ -114,6 +114,18 @@ FamixPythonProject1Test >> testClassImportsModule [
 	self assert: import sourceText equals: 'import moduleAtRoot3'
 ]
 
+{ #category : 'tests - attributes' }
+FamixPythonProject1Test >> testClassVariableSourceAnchor [
+
+	| variable |
+	self denyEmpty: self model allAttributes.
+
+	variable := self attributeNamed: 'kind'.
+
+	self assert: variable sourceAnchor isNotNil.
+	self assert: variable sourceText equals: 'kind'
+]
+
 { #category : 'tests - methods' }
 FamixPythonProject1Test >> testConstructor [
 
@@ -344,9 +356,9 @@ FamixPythonProject1Test >> testGetterAndSetter [
 	self deny: getter isConstructor.
 
 	self assert: setter name equals: 'set_name'.
-	self deny: getter isGetter.
-	self assert: getter isSetter.
-	self deny: getter isConstructor
+	self deny: setter isGetter.
+	self assert: setter isSetter.
+	self deny: setter isConstructor
 ]
 
 { #category : 'tests - global variables' }
@@ -1185,6 +1197,20 @@ FamixPythonProject1Test >> testSimpleClassVariable [
 	self assert: variable name equals: 'kind'.
 	self assert: variable parentType equals: (self classNamed: 'Dog').
 	self assert: variable isClassSide
+]
+
+{ #category : 'tests - attributes' }
+FamixPythonProject1Test >> testSimpleInstanceVariable [
+
+	| variable |
+	self denyEmpty: self model allAttributes.
+
+	variable := self attributeNamed: 'dog_name'.
+
+	self assert: variable class equals: FamixPythonAttribute.
+	self assert: variable name equals: 'dog_name'.
+	self assert: variable parentType equals: (self classNamed: 'Dog').
+	self deny: variable isClassSide
 ]
 
 { #category : 'tests - methods' }
