@@ -557,6 +557,13 @@ FamixPythonProject1Test >> testImportTwoStubPackagesOfTheSameName [
 ]
 
 { #category : 'tests - attributes' }
+FamixPythonProject1Test >> testInstanceVariableAreDefinedOnlyOnce [
+	"We should have only one ivar even if it is assigned multiple times."
+
+	self assert: (self model allAttributes select: [ :attribute | attribute name = 'dog_color' ]) size equals: 1
+]
+
+{ #category : 'tests - attributes' }
 FamixPythonProject1Test >> testInstanceVariableDeclaredOutsideOfInit [
 
 	| variable |
@@ -568,6 +575,21 @@ FamixPythonProject1Test >> testInstanceVariableDeclaredOutsideOfInit [
 	self assert: variable name equals: 'dog_color'.
 	self assert: variable parentType equals: (self classNamed: 'Dog').
 	self deny: variable isClassSide
+]
+
+{ #category : 'tests - attributes' }
+FamixPythonProject1Test >> testInstanceVariableSourceAnchor [
+
+	| variable |
+	self denyEmpty: self model allAttributes.
+
+	variable := self attributeNamed: 'dog_color'.
+
+	self assert: variable sourceAnchor isNotNil.
+	self assert: variable sourceText equals: 'self.dog_color'.
+	"The start and end pos should be the one of the first assignation and not the second"
+	self assert: variable sourceAnchor startPos equals: 348.
+	self assert: variable sourceAnchor endPos equals: 361
 ]
 
 { #category : 'tests - from-import' }

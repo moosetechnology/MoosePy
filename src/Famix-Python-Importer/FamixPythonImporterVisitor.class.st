@@ -235,14 +235,23 @@ FamixPythonImporterVisitor >> ensureFunction: aFunctionNode [
 		  self createFunction: aFunctionNode  ]
 ]
 
-{ #category : 'as yet unclassified' }
-FamixPythonImporterVisitor >> ensureInstanceVariableFromAssignation: anAssignmentStatementNode [
+{ #category : 'private-entity-creation' }
+FamixPythonImporterVisitor >> ensureInstanceVariableFromAssignation: anAssignmentStatement [
 
-	^ self model newAttribute
-		  name: anAssignmentStatementNode lhs name;
-		  parentType: (self currentEntityOfType: FamixPythonClass);
-		  isClassSide: false;
-		  yourself
+	| class |
+	class := self currentEntityOfType: FamixPythonClass.
+
+	^ (class childOfType: FamixTAttribute named: anAssignmentStatement lhs name) ifNil: [
+		  | variable |
+		  variable := self model newAttribute
+			              name: anAssignmentStatement lhs name;
+			              parentType: class;
+			              isClassSide: false;
+			              yourself.
+
+		  "We select the lhs node because the source anchor should not be the full assignation."
+		  self setSourceAnchor: variable from: anAssignmentStatement lhs.
+		  variable ]
 ]
 
 { #category : 'private-entity-creation' }
@@ -254,10 +263,7 @@ FamixPythonImporterVisitor >> ensureMethod: aMethodNode [
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> ensureModuleNamed: moduleName fromNode: aModuleNode [
 
-	self withCurrentEntityDo: [ :entity |
-		(entity query descendants ofType: FamixTModule)
-			detect: [ :module | module name = moduleName ]
-			ifFound: [ :module | ^ module ] ].
+	self withCurrentEntityDo: [ :entity | (entity childOfType: FamixTModule named: moduleName) ifNotNil: [ :module | ^ module ] ].
 
 	^ self createModule: aModuleNode named: moduleName
 ]
@@ -335,7 +341,6 @@ FamixPythonImporterVisitor >> ensureVariableFromAssignationStatement: anAssignme
 	"I am really not sure what is the best thing to do here. So for now I'll write some code that will keep all the tests I'm adding green and when the parser will cover most cases I might come back to refactore this code into something better with less #isKindOf: or ifs."
 
 	"This is to manage global variables, class variables, local variables."
-
 	(anAssignmentStatement lhs isKindOf: PyVariableExpressionNode) ifTrue: [
 		self currentEntity dictLocalVariables at: anAssignmentStatement lhs name ifAbsent: [
 			| variable |
