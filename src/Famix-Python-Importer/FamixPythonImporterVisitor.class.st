@@ -342,12 +342,12 @@ FamixPythonImporterVisitor >> ensureVariableFromAssignationStatement: anAssignme
 
 	"This is to manage global variables, class variables, local variables."
 	(anAssignmentStatement lhs isKindOf: PyVariableExpressionNode) ifTrue: [
-		self currentEntity dictLocalVariables at: anAssignmentStatement lhs name ifAbsent: [
-			| variable |
-			variable := self currentEntity createLocalVariable: anAssignmentStatement lhs name.
-			"We select the lhs node because the source anchor should not be the full assignation."
-			self setSourceAnchor: variable from: anAssignmentStatement lhs.
-			^ variable ] ].
+		^ (self currentEntity childOfType: FamixTStructuralEntity named: anAssignmentStatement lhs name) ifNil: [
+			  | variable |
+			  variable := self currentEntity createLocalVariable: anAssignmentStatement lhs name.
+			  "We select the lhs node because the source anchor should not be the full assignation."
+			  self setSourceAnchor: variable from: anAssignmentStatement lhs.
+			  ^ variable ] ].
 
 	anAssignmentStatement isInstanceVariableAssignation ifTrue: [
 		self assert: self currentEntity isMethod. "Maybe this could be removed when the parser is stable?"

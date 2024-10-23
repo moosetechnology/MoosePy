@@ -115,6 +115,13 @@ FamixPythonProject1Test >> testClassImportsModule [
 ]
 
 { #category : 'tests - attributes' }
+FamixPythonProject1Test >> testClassVariableAreDefinedOnlyOnce [
+	"We should have only one ivar even if it is assigned multiple times."
+
+	self assert: (self model allAttributes select: [ :attribute | attribute name = 'sound' ]) size equals: 1
+]
+
+{ #category : 'tests - attributes' }
 FamixPythonProject1Test >> testClassVariableNotAtTheBeginningOfTheClass [
 
 	| variable |
@@ -134,10 +141,13 @@ FamixPythonProject1Test >> testClassVariableSourceAnchor [
 	| variable |
 	self denyEmpty: self model allAttributes.
 
-	variable := self attributeNamed: 'kind'.
+	variable := self attributeNamed: 'sound'.
 
 	self assert: variable sourceAnchor isNotNil.
-	self assert: variable sourceText equals: 'kind'
+	self assert: variable sourceText equals: 'sound'.
+	"The start and end pos should be the one of the first assignation and not the second"
+	self assert: variable sourceAnchor startPos equals: 577.
+	self assert: variable sourceAnchor endPos equals: 581
 ]
 
 { #category : 'tests - methods' }
