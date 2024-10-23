@@ -115,6 +115,20 @@ FamixPythonProject1Test >> testClassImportsModule [
 ]
 
 { #category : 'tests - attributes' }
+FamixPythonProject1Test >> testClassVariableNotAtTheBeginningOfTheClass [
+
+	| variable |
+	self denyEmpty: self model allAttributes.
+
+	variable := self attributeNamed: 'sound'.
+
+	self assert: variable class equals: FamixPythonAttribute.
+	self assert: variable name equals: 'sound'.
+	self assert: variable parentType equals: (self classNamed: 'Dog').
+	self assert: variable isClassSide
+]
+
+{ #category : 'tests - attributes' }
 FamixPythonProject1Test >> testClassVariableSourceAnchor [
 
 	| variable |
@@ -540,6 +554,20 @@ FamixPythonProject1Test >> testImportTwoStubPackagesOfTheSameName [
 
 	self assert: ((self moduleNamed: 'moduleWithStubs') outgoingImports anySatisfy: [ :import | import importedEntity = pyplot ]).
 	self assert: ((self moduleNamed: 'moduleWithStubs') outgoingImports anySatisfy: [ :import | import importedEntity = numpy ])
+]
+
+{ #category : 'tests - attributes' }
+FamixPythonProject1Test >> testInstanceVariableDeclaredOutsideOfInit [
+
+	| variable |
+	self denyEmpty: self model allAttributes.
+
+	variable := self attributeNamed: 'dog_color'.
+
+	self assert: variable class equals: FamixPythonAttribute.
+	self assert: variable name equals: 'dog_color'.
+	self assert: variable parentType equals: (self classNamed: 'Dog').
+	self deny: variable isClassSide
 ]
 
 { #category : 'tests - from-import' }
