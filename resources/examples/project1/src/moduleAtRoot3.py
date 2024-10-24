@@ -32,3 +32,19 @@ Dog.newClassVar = 1
 print(dog.newClassVar)
 print(Dog.newClassVar)
 print(dog.sound)
+
+
+class Chair:
+
+    furniture_color = "Blue"
+
+    def __init__(self):
+        self.number_of_legs = 4
+
+
+class Stool:
+
+    furniture_color = "Red"
+
+    def __init__(self):
+        self.number_of_legs = 3
