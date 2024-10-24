@@ -150,6 +150,18 @@ FamixPythonProject1Test >> testClassVariableSourceAnchor [
 	self assert: variable sourceAnchor endPos equals: 581
 ]
 
+{ #category : 'tests - attributes' }
+FamixPythonProject1Test >> testClassVariablesWithSameNameButDifferenClass [
+
+	| variables |
+	variables := self model allAttributes select: [ :variable | variable name = 'furniture_color' ].
+
+	self assert: variables size equals: 2.
+	self assertCollection: (variables flatCollect: #parents) hasSameElements: {
+			(self classNamed: 'Chair').
+			(self classNamed: 'Stool') }
+]
+
 { #category : 'tests - methods' }
 FamixPythonProject1Test >> testConstructor [
 
@@ -600,6 +612,18 @@ FamixPythonProject1Test >> testInstanceVariableSourceAnchor [
 	"The start and end pos should be the one of the first assignation and not the second"
 	self assert: variable sourceAnchor startPos equals: 348.
 	self assert: variable sourceAnchor endPos equals: 361
+]
+
+{ #category : 'tests - attributes' }
+FamixPythonProject1Test >> testInstanceVariablesWithSameNameButDifferenClass [
+
+	| variables |
+	variables := self model allAttributes select: [ :variable | variable name = 'number_of_legs' ].
+
+	self assert: variables size equals: 2.
+	self assertCollection: (variables flatCollect: #parents) hasSameElements: {
+			(self classNamed: 'Chair').
+			(self classNamed: 'Stool') }
 ]
 
 { #category : 'tests - from-import' }
