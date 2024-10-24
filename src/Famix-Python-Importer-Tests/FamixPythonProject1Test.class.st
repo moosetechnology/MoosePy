@@ -348,6 +348,20 @@ FamixPythonProject1Test >> testFunctionImportsModule [
 ]
 
 { #category : 'tests - functions' }
+FamixPythonProject1Test >> testFunctionInAFunction [
+
+	| function |
+	self denyEmpty: self model allFunctions.
+
+	function := self functionNamed: 'inner_function'.
+
+	self assert: function class equals: FamixPythonFunction.
+	self assert: function name equals: 'inner_function'.
+	self assert: function signature equals: 'inner_function(finput)'.
+	self assert: function functionOwner equals: (self functionNamed: 'function_with_inner_function')
+]
+
+{ #category : 'tests - functions' }
 FamixPythonProject1Test >> testFunctionInAModule [
 
 	| function |
