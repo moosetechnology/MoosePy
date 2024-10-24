@@ -357,7 +357,7 @@ FamixPythonProject1Test >> testFunctionInAModule [
 
 	self assert: function class equals: FamixPythonFunction.
 	self assert: function name equals: 'functionWithImport'.
-	self assert: function signature equals: ''.
+	self assert: function signature equals: 'functionWithImport()'.
 	self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot')
 ]
 
@@ -371,8 +371,23 @@ FamixPythonProject1Test >> testFunctionInAPackage [
 
 	self assert: function class equals: FamixPythonFunction.
 	self assert: function name equals: 'return2'.
-	self assert: function signature equals: ''.
+	self assert: function signature equals: 'return2()'.
 	self assert: function functionOwner equals: (self packageNamed: 'subsubpackage1')
+]
+
+{ #category : 'tests - functions' }
+FamixPythonProject1Test >> testFunctionSourceAnchor [
+
+	| function |
+	self denyEmpty: self model allFunctions.
+
+	function := self functionNamed: 'sort_list'.
+
+	self assert: function sourceAnchor isNotNil.
+	self assert: function sourceText equals: ('def sort_list(list1, list2):
+	zipped_pairs = zip(list2, list1)
+	z = [x for _, x in sorted(zipped_pairs)]
+	return z' copyReplaceAll: String cr with: String lf)
 ]
 
 { #category : 'tests - methods' }
@@ -1282,6 +1297,20 @@ FamixPythonProject1Test >> testSimpleClassVariable [
 	self assert: variable isClassSide
 ]
 
+{ #category : 'tests - functions' }
+FamixPythonProject1Test >> testSimpleFunction [
+
+	| function |
+	self denyEmpty: self model allFunctions.
+
+	function := self functionNamed: 'sort_list'.
+
+	self assert: function class equals: FamixPythonFunction.
+	self assert: function name equals: 'sort_list'.
+	self assert: function signature equals: 'sort_list(list1, list2)'.
+	self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot')
+]
+
 { #category : 'tests - attributes' }
 FamixPythonProject1Test >> testSimpleInstanceVariable [
 
@@ -1306,7 +1335,7 @@ FamixPythonProject1Test >> testSimpleMethod [
 
 	self assert: method class equals: FamixPythonMethod.
 	self assert: method name equals: 'printInfos'.
-	self assert: method signature equals: 'self'.
+	self assert: method signature equals: 'printInfos(self)'.
 	self assert: method parentType equals: (self classNamed: 'Person')
 ]
 
