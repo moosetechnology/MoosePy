@@ -20,8 +20,8 @@ FamixPythonImporterWithClassesTest >> testAttribute [
 
 	| class |
 	class := self classNamed: 'Player'.
-	self assert: class attributes size equals: 3.
-	class attributes do: [ :attributes | self assert: (#( width height my_joystick ) anySatisfy: [ :name | name = attributes name ]) ]
+	self assert: class attributes size equals: 5.
+	class attributes do: [ :attributes | self assert: (#( width height my_joystick image rect ) anySatisfy: [ :name | name = attributes name ]) ]
 ]
 
 { #category : 'tests' }
@@ -44,7 +44,7 @@ FamixPythonImporterWithClassesTest >> testClassKnowsItsMethods [
 	| cl |
 	cl := self classNamed: 'Player'.
 	self assert: cl methods first name equals: '__init__'.
-	self assert: cl methods first signature equals: 'self, x, y, joystick_no'
+	self assert: cl methods first signature equals: '__init__(self, x, y, joystick_no)'
 ]
 
 { #category : 'tests - classes' }
@@ -89,7 +89,7 @@ FamixPythonImporterWithClassesTest >> testMethod [
 	self assert: mth class equals: FamixPythonMethod.
 	self assert: mth parents anyOne name equals: 'Player'.
 	self assert: mth name equals: '__init__'.
-	self assert: mth signature equals: 'self, x, y, joystick_no'
+	self assert: mth signature equals: '__init__(self, x, y, joystick_no)'
 ]
 
 { #category : 'tests - methods' }
