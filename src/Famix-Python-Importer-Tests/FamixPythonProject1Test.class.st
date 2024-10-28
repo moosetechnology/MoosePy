@@ -1285,6 +1285,38 @@ FamixPythonProject1Test >> testRootPackage [
 ]
 
 { #category : 'tests - functions' }
+FamixPythonProject1Test >> testShadowableFunction [
+
+	| function shadowable |
+	function := (self model allFunctions select: [ :funct | funct name = 'function_to_shadow' ]) asOrderedCollection detectMax: [ :funct |
+		            funct sourceAnchor startPos ].
+	shadowable := (self model allFunctions select: [ :funct | funct name = 'function_to_shadow' ]) asOrderedCollection detectMin: [ :funct |
+		              funct sourceAnchor startPos ].
+
+	self assert: function name equals: 'function_to_shadow'.
+	self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot6').
+	self assert: function shadowedEntity equals: shadowable.
+	self assert: function sourceText equals: ('def function_to_shadow():
+    return 2' copyReplaceAll: String cr with: String lf)
+]
+
+{ #category : 'tests - functions' }
+FamixPythonProject1Test >> testShadowedFunction [
+
+	| function shadower |
+	function := (self model allFunctions select: [ :funct | funct name = 'function_to_shadow' ]) asOrderedCollection detectMin: [ :funct |
+		            funct sourceAnchor startPos ].
+	shadower := (self model allFunctions select: [ :funct | funct name = 'function_to_shadow' ]) asOrderedCollection detectMax: [ :funct |
+		            funct sourceAnchor startPos ].
+
+	self assert: function name equals: 'function_to_shadow'.
+	self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot6').
+	self assert: function shadowingEntity equals: shadower.
+	self assert: function sourceText equals: ('def function_to_shadow():
+    return 1' copyReplaceAll: String cr with: String lf)
+]
+
+{ #category : 'tests - functions' }
 FamixPythonProject1Test >> testShadowedFunctionCreatesDifferentFunctions [
 
 	| functions |

@@ -91,12 +91,16 @@ FamixPythonImporterVisitor >> createClass: classDefinitionNode [
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> createFunction: aFunctionNode [
 
-	| function signature |
-	signature := aFunctionNode signatureString.
+	| function shadowedFunction |
+	"If the same element already has a function of the same name, we select the last one defined and we mark it as shadowed."
+	self withCurrentEntityDo: [ :entity |
+		((entity query descendants ofType: FamixTFunction) select: [ :child | child name = aFunctionNode fname value ]) ifNotEmpty: [ :functions |
+			shadowedFunction := functions detectMax: [ :aFunction | aFunction sourceAnchor startPos ] ] ].
 
-	function := self basicCreateFunction: aFunctionNode fname value withSignature: signature.
-
+	function := self basicCreateFunction: aFunctionNode fname value withSignature: aFunctionNode signatureString.
 	function functionOwner: self currentEntity.
+
+	shadowedFunction ifNotNil: [ function shadowedEntity: shadowedFunction ].
 
 	^ self setSourceAnchor: function from: aFunctionNode
 ]

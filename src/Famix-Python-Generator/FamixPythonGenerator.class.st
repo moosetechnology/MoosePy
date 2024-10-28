@@ -97,6 +97,8 @@ FamixPythonGenerator >> defineHierarchy [
 	function --|> #TWithInvocations.
 	function --|> #TWithFunctions.
 	function --|> #TWithAnnotationInstances.
+	function --|> #TShadowable.
+	function --|> #TShadower.
 
 	globalVariable --|> namedEntity.
 	globalVariable --|> #TGlobalVariable.
