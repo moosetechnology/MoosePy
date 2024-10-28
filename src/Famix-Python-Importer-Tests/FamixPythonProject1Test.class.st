@@ -1284,6 +1284,16 @@ FamixPythonProject1Test >> testRootPackage [
 	self assert: rootPackage isRoot
 ]
 
+{ #category : 'tests - functions' }
+FamixPythonProject1Test >> testShadowedFunctionCreatesDifferentFunctions [
+
+	| functions |
+	functions := self model allFunctions select: [ :function | function name = 'function_to_shadow' ].
+	self assert: functions size equals: 2.
+
+	functions do: [ :function | self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot6') ]
+]
+
 { #category : 'tests - classes' }
 FamixPythonProject1Test >> testSimpleClass [
 

@@ -229,13 +229,6 @@ FamixPythonImporterVisitor >> ensureClassNamed: aName [
 ]
 
 { #category : 'private-entity-creation' }
-FamixPythonImporterVisitor >> ensureFunction: aFunctionNode [
-
-	^ (self functionNamed: aFunctionNode fname value) ifNil: [
-		  self createFunction: aFunctionNode  ]
-]
-
-{ #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> ensureInstanceVariableFromAssignation: anAssignmentStatement [
 
 	| class |
@@ -455,16 +448,6 @@ FamixPythonImporterVisitor >> extractInvocationInformation: anInvocationNode [
 	invocationDict at: 'args' put: (self extractArgumentsInformation: (self signatureFromInvocation: anInvocationNode)).
 
 	^ invocationDict
-]
-
-{ #category : 'private - searching' }
-FamixPythonImporterVisitor >> functionNamed: aString [
-
-	^ (self model allWithType: FamixPythonFunction)
-		  detect: [ :e |
-			  e name = aString.
-			   ]
-		  ifNone: [ nil ]
 ]
 
 { #category : 'accessing - methods' }
@@ -751,7 +734,7 @@ FamixPythonImporterVisitor >> visitFunctionDefinition: aFunctionDefinition [
 	| fmx |
 	fmx := self currentEntity isClass
 		       ifTrue: [ self ensureMethod: aFunctionDefinition ]
-		       ifFalse: [ self ensureFunction: aFunctionDefinition ].
+		       ifFalse: [ self createFunction: aFunctionDefinition ].
 	^ self useCurrentEntity: fmx during: [ super visitFunctionDefinition: aFunctionDefinition ]
 ]
 
