@@ -10,3 +10,31 @@ def function_with_multiple_assignations():
 
 
 print(function_with_multiple_assignations())
+
+
+def function_to_shadow():
+    return 1
+
+
+print(function_to_shadow())
+
+
+def function_to_shadow():
+    return 2
+
+
+print(function_to_shadow())
+
+
+def function_to_shadow_with_different_signature():
+    return 7
+
+
+print(function_to_shadow_with_different_signature())
+
+
+def function_to_shadow_with_different_signature(age):
+    return age
+
+
+print(function_to_shadow_with_different_signature(3))
