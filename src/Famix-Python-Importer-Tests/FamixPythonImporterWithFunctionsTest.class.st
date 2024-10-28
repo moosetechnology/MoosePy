@@ -21,7 +21,7 @@ FamixPythonImporterWithFunctionsTest >> testFunction [
 	| func |
 	func := self functionNamed: 'tryToPlaceWord'.
 	self assert: func class equals: FamixPythonFunction.
-	self assert: func signature equals: 'grid,word'
+	self assert: func signature equals: 'tryToPlaceWord(grid,word)'
 ]
 
 { #category : 'tests - functions' }

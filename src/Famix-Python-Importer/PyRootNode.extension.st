@@ -8,6 +8,12 @@ PyRootNode >> fileReference [
 ]
 
 { #category : '*Famix-Python-Importer' }
+PyRootNode >> isSubscriptExpression [
+
+	^ false
+]
+
+{ #category : '*Famix-Python-Importer' }
 PyRootNode >> sourceFrom: startPosition to: stopPosition [
 
 	^ self completeSource ifNotNil: [ :value | (value copyFrom: startPosition to: stopPosition) asString ]
