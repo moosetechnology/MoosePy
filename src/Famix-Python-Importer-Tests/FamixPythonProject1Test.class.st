@@ -404,6 +404,18 @@ FamixPythonProject1Test >> testFunctionSourceAnchor [
 	return z' copyReplaceAll: String cr with: String lf)
 ]
 
+{ #category : 'tests - functions' }
+FamixPythonProject1Test >> testFunctionsWithSameNameButDifferentParents [
+
+	| functions |
+	functions := self model allFunctions select: [ :funct | funct name = 'function_with_common_name' ].
+
+	self assert: functions size equals: 2.
+	self assertCollection: (functions collect: #functionOwner) hasSameElements: {
+			(self moduleNamed: 'moduleAtRoot6').
+			(self packageNamed: 'root') }
+]
+
 { #category : 'tests - methods' }
 FamixPythonProject1Test >> testGetterAndSetter [
 
