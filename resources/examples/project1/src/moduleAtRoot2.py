@@ -28,3 +28,23 @@ class Person:
 
 p1 = Person("John", 36)
 p1.printInfos()
+
+
+class ClassWithTuples:
+
+    cvarTuple1, cvarTuple2, cvarTuple3 = ("a", "b", "c")
+
+    def __init__(self, tuple_attr):
+        self.ivarTuple1, self.ivarTuple2, self.ivarTuple3 = tuple_attr
+
+    def set_tuples(self, tuple_attr):
+        self.ivarTuple1, self.ivarTuple2 = tuple_attr
+
+
+t = (1, 2, 3)
+c1 = ClassWithTuples(t)
+print(c1.__dict__)
+t2 = (4, 5)
+c1.set_tuples(t2)
+print(c1.__dict__)
+print(c1.__class__.__dict__)
