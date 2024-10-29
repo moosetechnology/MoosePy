@@ -1294,10 +1294,29 @@ FamixPythonProject1Test >> testShadowableFunction [
 		              funct sourceAnchor startPos ].
 
 	self assert: function name equals: 'function_to_shadow'.
+	self deny: function isShadowed.
 	self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot6').
 	self assert: function shadowedEntity equals: shadowable.
 	self assert: function sourceText equals: ('def function_to_shadow():
     return 2' copyReplaceAll: String cr with: String lf)
+]
+
+{ #category : 'tests - functions' }
+FamixPythonProject1Test >> testShadowableFunctionWithDifferentParameter [
+
+	| function shadowable |
+	function := (self model allFunctions select: [ :funct | funct name = 'function_to_shadow_with_different_signature' ]) asOrderedCollection detectMax: [ :funct |
+		            funct sourceAnchor startPos ].
+	shadowable := (self model allFunctions select: [ :funct | funct name = 'function_to_shadow_with_different_signature' ]) asOrderedCollection detectMin: [ :funct |
+		              funct sourceAnchor startPos ].
+
+	self assert: function name equals: 'function_to_shadow_with_different_signature'.
+	self deny: function isShadowed.
+	self assert: function signature equals: 'function_to_shadow_with_different_signature(age)'.
+	self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot6').
+	self assert: function shadowedEntity equals: shadowable.
+	self assert: function sourceText equals: ('def function_to_shadow_with_different_signature(age):
+    return age' copyReplaceAll: String cr with: String lf)
 ]
 
 { #category : 'tests - functions' }
@@ -1310,6 +1329,7 @@ FamixPythonProject1Test >> testShadowedFunction [
 		            funct sourceAnchor startPos ].
 
 	self assert: function name equals: 'function_to_shadow'.
+	self assert: function isShadowed.
 	self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot6').
 	self assert: function shadowingEntity equals: shadower.
 	self assert: function sourceText equals: ('def function_to_shadow():
@@ -1324,6 +1344,24 @@ FamixPythonProject1Test >> testShadowedFunctionCreatesDifferentFunctions [
 	self assert: functions size equals: 2.
 
 	functions do: [ :function | self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot6') ]
+]
+
+{ #category : 'tests - functions' }
+FamixPythonProject1Test >> testShadowedFunctionWithDifferentParameter [
+
+	| function shadower |
+	function := (self model allFunctions select: [ :funct | funct name = 'function_to_shadow_with_different_signature' ]) asOrderedCollection detectMin: [ :funct |
+		            funct sourceAnchor startPos ].
+	shadower := (self model allFunctions select: [ :funct | funct name = 'function_to_shadow_with_different_signature' ]) asOrderedCollection detectMax: [ :funct |
+		            funct sourceAnchor startPos ].
+
+	self assert: function name equals: 'function_to_shadow_with_different_signature'.
+	self assert: function isShadowed.
+	self assert: function signature equals: 'function_to_shadow_with_different_signature()'.
+	self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot6').
+	self assert: function shadowingEntity equals: shadower.
+	self assert: function sourceText equals: ('def function_to_shadow_with_different_signature():
+    return 7' copyReplaceAll: String cr with: String lf)
 ]
 
 { #category : 'tests - classes' }
