@@ -38,3 +38,7 @@ def function_to_shadow_with_different_signature(age):
 
 
 print(function_to_shadow_with_different_signature(3))
+
+
+def function_with_common_name():
+    return True
