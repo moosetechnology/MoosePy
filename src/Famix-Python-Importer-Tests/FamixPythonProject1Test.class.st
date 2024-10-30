@@ -790,6 +790,16 @@ FamixPythonProject1Test >> testLocalVariableInFunctionSourceAnchor [
 ]
 
 { #category : 'tests - local variables' }
+FamixPythonProject1Test >> testLocalVariableInMethodSourceAnchor [
+
+	| variable |
+	variable := self localVariableNamed: 'local_in_method2'.
+
+	self assert: variable sourceAnchor isNotNil.
+	self assert: variable sourceText equals: 'local_in_method2'
+]
+
+{ #category : 'tests - local variables' }
 FamixPythonProject1Test >> testLocalVariablesInFunctionAssignedWithATuple [
 
 	| global |
@@ -818,6 +828,37 @@ FamixPythonProject1Test >> testLocalVariablesInFunctionWithTheSameNameButDiffere
 	self assertCollection: (variables flatCollect: #parents) hasSameElements: {
 			(self functionNamed: 'function_with_local_variables').
 			(self functionNamed: 'function_with_local_variables2') }
+]
+
+{ #category : 'tests - local variables' }
+FamixPythonProject1Test >> testLocalVariablesInMethodAssignedWithATuple [
+
+	| global |
+	self denyEmpty: self model allLocalVariables.
+
+	global := self localVariableNamed: 'local_in_method_with_tuple1'.
+
+	self assert: global class equals: FamixPythonLocalVariable.
+	self assert: global name equals: 'local_in_method_with_tuple1'.
+	self assert: global parentBehaviouralEntity equals: (self methodNamed: 'method_with_local_variables_and_tuples').
+
+	global := self localVariableNamed: 'local_in_method_with_tuple2'.
+
+	self assert: global class equals: FamixPythonLocalVariable.
+	self assert: global name equals: 'local_in_method_with_tuple2'.
+	self assert: global parentBehaviouralEntity equals: (self methodNamed: 'method_with_local_variables_and_tuples')
+]
+
+{ #category : 'tests - local variables' }
+FamixPythonProject1Test >> testLocalVariablesInMethodWithTheSameNameButDifferentParents [
+
+	| variables |
+	variables := self model allLocalVariables select: [ :variable | variable name = 'local_in_method1' ].
+
+	self assert: variables size equals: 2.
+	self assertCollection: (variables flatCollect: #parents) hasSameElements: {
+			(self methodNamed: 'method_with_local_variables').
+			(self methodNamed: 'method_with_local_variables2') }
 ]
 
 { #category : 'tests - from-import' }
@@ -1595,6 +1636,17 @@ FamixPythonProject1Test >> testSimpleLocalVariableInFunction [
 	self assert: variable parentBehaviouralEntity equals: (self functionNamed: 'function_with_local_variables')
 ]
 
+{ #category : 'tests - local variables' }
+FamixPythonProject1Test >> testSimpleLocalVariableInMethod [
+
+	| variable |
+	variable := self localVariableNamed: 'local_in_method2'.
+
+	self assert: variable class equals: FamixPythonLocalVariable.
+	self assert: variable name equals: 'local_in_method2'.
+	self assert: variable parentBehaviouralEntity equals: (self methodNamed: 'method_with_local_variables')
+]
+
 { #category : 'tests - methods' }
 FamixPythonProject1Test >> testSimpleMethod [
 
@@ -1673,4 +1725,11 @@ FamixPythonProject1Test >> testlocalVariableInFunctionAreDefinedOnlyOnce [
 	"We should have only one global even if it is assigned multiple times."
 
 	self assert: (self model allLocalVariables select: [ :variable | variable name = 'local_in_function3' ]) size equals: 1
+]
+
+{ #category : 'tests - local variables' }
+FamixPythonProject1Test >> testlocalVariableInMethodAreDefinedOnlyOnce [
+	"We should have only one global even if it is assigned multiple times."
+
+	self assert: (self model allLocalVariables select: [ :variable | variable name = 'local_in_method3' ]) size equals: 1
 ]
