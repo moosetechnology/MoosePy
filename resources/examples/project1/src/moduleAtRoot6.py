@@ -42,3 +42,20 @@ print(function_to_shadow_with_different_signature(3))
 
 def function_with_common_name():
     return True
+
+
+def function_with_local_variables():
+    local_in_function1 = 1
+    local_in_function2 = 2
+    return local_in_function1 + local_in_function2
+
+
+def function_with_local_variables2():
+    local_in_function1 = 1
+    return local_in_function1
+
+
+def function_with_local_variables_and_tuples():
+    local_in_function_with_tuple1, local_in_function_with_tuple2 = (1, 2)
+    return local_in_function_with_tuple1 + local_in_function_with_tuple2
+
