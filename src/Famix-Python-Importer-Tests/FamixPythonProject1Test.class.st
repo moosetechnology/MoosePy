@@ -497,6 +497,18 @@ FamixPythonProject1Test >> testGlobalVariableInPackage [
 	self assert: global sourceText equals: 'rootPackageVariable'
 ]
 
+{ #category : 'tests - global variables' }
+FamixPythonProject1Test >> testGlobalVariableSourceAnchor [
+
+	| global |
+	self denyEmpty: self model allGlobalVariables.
+
+	global := self globalVariableNamed: 'moduleAtRootVariable'.
+
+	self assert: global sourceAnchor isNotNil.
+	self assert: global sourceText equals: 'moduleAtRootVariable'
+]
+
 { #category : 'tests - from-import' }
 FamixPythonProject1Test >> testImportAClassThatHasTheSameNameAsSubpackage [
 	"We have a package with a class and a subpackage of the same name and here we check we manage well the imports of those entities"
