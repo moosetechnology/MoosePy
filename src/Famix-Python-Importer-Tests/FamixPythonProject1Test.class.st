@@ -509,6 +509,43 @@ FamixPythonProject1Test >> testGlobalVariableSourceAnchor [
 	self assert: global sourceText equals: 'moduleAtRootVariable'
 ]
 
+{ #category : 'tests - global variables' }
+FamixPythonProject1Test >> testGlobalVariablesAssignedWithATuple [
+
+	| global |
+	self denyEmpty: self model allGlobalVariables.
+
+	global := self globalVariableNamed: 'globalWithTuple1'.
+
+	self assert: global class equals: FamixPythonGlobalVariable.
+	self assert: global name equals: 'globalWithTuple1'.
+	self assert: global parentScope equals: (self moduleNamed: 'moduleAtRoot').
+
+	global := self globalVariableNamed: 'globalWithTuple2'.
+
+	self assert: global class equals: FamixPythonGlobalVariable.
+	self assert: global name equals: 'globalWithTuple2'.
+	self assert: global parentScope equals: (self moduleNamed: 'moduleAtRoot').
+
+	global := self globalVariableNamed: 'globalWithTuple3'.
+
+	self assert: global class equals: FamixPythonGlobalVariable.
+	self assert: global name equals: 'globalWithTuple3'.
+	self assert: global parentScope equals: (self moduleNamed: 'moduleAtRoot')
+]
+
+{ #category : 'tests - global variables' }
+FamixPythonProject1Test >> testGlobalVariablesWithTheSameNameButDifferentParents [
+
+	| globals |
+	globals := self model allGlobalVariables select: [ :variable | variable name = 'globalVariableWithCommonName' ].
+
+	self assert: globals size equals: 2.
+	self assertCollection: (globals flatCollect: #parents) hasSameElements: {
+			(self moduleNamed: 'moduleAtRoot').
+			(self moduleNamed: 'moduleAtRoot2') }
+]
+
 { #category : 'tests - from-import' }
 FamixPythonProject1Test >> testImportAClassThatHasTheSameNameAsSubpackage [
 	"We have a package with a class and a subpackage of the same name and here we check we manage well the imports of those entities"
