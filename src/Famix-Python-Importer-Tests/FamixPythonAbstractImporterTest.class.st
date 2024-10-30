@@ -36,6 +36,12 @@ FamixPythonAbstractImporterTest >> importNamed: aName [
 ]
 
 { #category : 'accessing' }
+FamixPythonAbstractImporterTest >> localVariableNamed: aName [
+
+	^ self model allLocalVariables detect: [ :variable | variable name = aName ]
+]
+
+{ #category : 'accessing' }
 FamixPythonAbstractImporterTest >> methodNamed: aName [
 
 	^ self model allMethods detect: [ :method | method name = aName ]

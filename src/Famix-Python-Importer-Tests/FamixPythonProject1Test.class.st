@@ -772,6 +772,47 @@ FamixPythonProject1Test >> testInstanceVariablesWithSameNameButDifferenClass [
 			(self classNamed: 'Stool') }
 ]
 
+{ #category : 'tests - local variables' }
+FamixPythonProject1Test >> testLocalVariableInFunctionSourceAnchor [
+
+	| variable |
+	variable := self localVariableNamed: 'local_in_function2'.
+
+	self assert: variable sourceAnchor isNotNil.
+	self assert: variable sourceText equals: 'local_in_function2'
+]
+
+{ #category : 'tests - local variables' }
+FamixPythonProject1Test >> testLocalVariablesInFunctionAssignedWithATuple [
+
+	| global |
+	self denyEmpty: self model allLocalVariables.
+
+	global := self localVariableNamed: 'local_in_function_with_tuple1'.
+
+	self assert: global class equals: FamixPythonLocalVariable.
+	self assert: global name equals: 'local_in_function_with_tuple1'.
+	self assert: global parentBehaviouralEntity equals: (self functionNamed: 'function_with_local_variables_and_tuples').
+
+	global := self localVariableNamed: 'local_in_function_with_tuple2'.
+
+	self assert: global class equals: FamixPythonLocalVariable.
+	self assert: global name equals: 'local_in_function_with_tuple2'.
+	self assert: global parentBehaviouralEntity equals: (self functionNamed: 'function_with_local_variables_and_tuples')
+]
+
+{ #category : 'tests - local variables' }
+FamixPythonProject1Test >> testLocalVariablesInFunctionWithTheSameNameButDifferentParents [
+
+	| variables |
+	variables := self model allLocalVariables select: [ :variable | variable name = 'local_in_function1' ].
+
+	self assert: variables size equals: 2.
+	self assertCollection: (variables flatCollect: #parents) hasSameElements: {
+			(self functionNamed: 'function_with_local_variables').
+			(self functionNamed: 'function_with_local_variables2') }
+]
+
 { #category : 'tests - from-import' }
 FamixPythonProject1Test >> testMethodImportsClassFromAModule [
 
@@ -1534,6 +1575,17 @@ FamixPythonProject1Test >> testSimpleInstanceVariable [
 	self assert: variable name equals: 'dog_name'.
 	self assert: variable parentType equals: (self classNamed: 'Dog').
 	self deny: variable isClassSide
+]
+
+{ #category : 'tests - local variables' }
+FamixPythonProject1Test >> testSimpleLocalVariableInFunction [
+
+	| variable |
+	variable := self localVariableNamed: 'local_in_function2'.
+
+	self assert: variable class equals: FamixPythonLocalVariable.
+	self assert: variable name equals: 'local_in_function2'.
+	self assert: variable parentBehaviouralEntity equals: (self functionNamed: 'function_with_local_variables')
 ]
 
 { #category : 'tests - methods' }
