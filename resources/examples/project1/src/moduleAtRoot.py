@@ -4,6 +4,8 @@ import root.subpackage1
 moduleAtRootVariable = 12
 globalVariableWithCommonName = True
 globalWithTuple1, globalWithTuple2, globalWithTuple3 = (1, 2, 3)
+globalAssignedTwice = True
+globalAssignedTwice = False
 
 print(root.rootPackageVariable)
 print(root.subpackage1.subPackage1Variable)

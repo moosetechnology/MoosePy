@@ -47,7 +47,10 @@ def function_with_common_name():
 def function_with_local_variables():
     local_in_function1 = 1
     local_in_function2 = 2
-    return local_in_function1 + local_in_function2
+    local_in_function3 = True
+    if local_in_function3:
+        local_in_function3 = 4
+    return local_in_function1 + local_in_function2 + local_in_function3
 
 
 def function_with_local_variables2():
