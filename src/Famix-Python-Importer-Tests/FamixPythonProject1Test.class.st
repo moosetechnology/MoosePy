@@ -466,6 +466,13 @@ FamixPythonProject1Test >> testGetterAndSetter [
 ]
 
 { #category : 'tests - global variables' }
+FamixPythonProject1Test >> testGlobalVariableAreDefinedOnlyOnce [
+	"We should have only one global even if it is assigned multiple times."
+
+	self assert: (self model allGlobalVariables select: [ :globalVariable | globalVariable name = 'globalAssignedTwice' ]) size equals: 1
+]
+
+{ #category : 'tests - global variables' }
 FamixPythonProject1Test >> testGlobalVariableInModule [
 
 	| global |
@@ -1659,4 +1666,11 @@ FamixPythonProject1Test >> testSubPackage [
 	self assert: subSubPackage name equals: 'subsubpackage1'.
 	self deny: subSubPackage isRoot.
 	self assert: subSubPackage parentPackage equals: subPackage
+]
+
+{ #category : 'tests - local variables' }
+FamixPythonProject1Test >> testlocalVariableInFunctionAreDefinedOnlyOnce [
+	"We should have only one global even if it is assigned multiple times."
+
+	self assert: (self model allLocalVariables select: [ :variable | variable name = 'local_in_function3' ]) size equals: 1
 ]
