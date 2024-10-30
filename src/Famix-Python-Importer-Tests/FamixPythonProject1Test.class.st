@@ -656,6 +656,34 @@ FamixPythonProject1Test >> testInstanceVariableSourceAnchor [
 ]
 
 { #category : 'tests - attributes' }
+FamixPythonProject1Test >> testInstanceVariablesAssignedWithATuple [
+
+	| variable |
+	self denyEmpty: self model allAttributes.
+
+	variable := self attributeNamed: 'ivarTuple1'.
+
+	self assert: variable class equals: FamixPythonAttribute.
+	self assert: variable name equals: 'ivarTuple1'.
+	self assert: variable parentType equals: (self classNamed: 'ClassWithTuples').
+	self deny: variable isClassSide.
+
+	variable := self attributeNamed: 'ivarTuple2'.
+
+	self assert: variable class equals: FamixPythonAttribute.
+	self assert: variable name equals: 'ivarTuple2'.
+	self assert: variable parentType equals: (self classNamed: 'ClassWithTuples').
+	self deny: variable isClassSide.
+
+	variable := self attributeNamed: 'ivarTuple3'.
+
+	self assert: variable class equals: FamixPythonAttribute.
+	self assert: variable name equals: 'ivarTuple3'.
+	self assert: variable parentType equals: (self classNamed: 'ClassWithTuples').
+	self deny: variable isClassSide
+]
+
+{ #category : 'tests - attributes' }
 FamixPythonProject1Test >> testInstanceVariablesWithSameNameButDifferenClass [
 
 	| variables |

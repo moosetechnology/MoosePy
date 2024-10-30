@@ -5,7 +5,8 @@ Class {
 	#classTraits : 'SRTSolverUserVisitor classTrait',
 	#instVars : [
 		'model',
-		'rootFilePath'
+		'rootFilePath',
+		'isInLeftSideOfAssignation'
 	],
 	#category : 'Famix-Python-Importer-Visitors',
 	#package : 'Famix-Python-Importer',
@@ -233,25 +234,6 @@ FamixPythonImporterVisitor >> ensureClassNamed: aName [
 ]
 
 { #category : 'private-entity-creation' }
-FamixPythonImporterVisitor >> ensureInstanceVariableFromAssignation: anAssignmentStatement [
-
-	| class |
-	class := self currentEntityOfType: FamixPythonClass.
-
-	^ (class childOfType: FamixTAttribute named: anAssignmentStatement lhs name) ifNil: [
-		  | variable |
-		  variable := self model newAttribute
-			              name: anAssignmentStatement lhs name;
-			              parentType: class;
-			              isClassSide: false;
-			              yourself.
-
-		  "We select the lhs node because the source anchor should not be the full assignation."
-		  self setSourceAnchor: variable from: anAssignmentStatement lhs.
-		  variable ]
-]
-
-{ #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> ensureMethod: aMethodNode [
 
 	^ (self methodNamed: aMethodNode fname value inClassNamed: self currentEntity name) ifNil: [ self createMethod: aMethodNode ]
@@ -331,28 +313,6 @@ FamixPythonImporterVisitor >> ensureVariable: aName localTo: aFamixEntity [
 	aFamixEntity dictLocalVariables
 		at: aName
 		ifAbsent: [ aFamixEntity createLocalVariable: aName ]
-]
-
-{ #category : 'visiting' }
-FamixPythonImporterVisitor >> ensureVariableFromAssignationStatement: anAssignmentStatement [
-	"I am really not sure what is the best thing to do here. So for now I'll write some code that will keep all the tests I'm adding green and when the parser will cover most cases I might come back to refactore this code into something better with less #isKindOf: or ifs."
-
-	"This is to manage global variables, class variables, local variables."
-	(anAssignmentStatement lhs isKindOf: PyVariableExpressionNode) ifTrue: [
-		^ (self currentEntity childOfType: FamixTStructuralEntity named: anAssignmentStatement lhs name) ifNil: [
-			  | variable |
-			  variable := self currentEntity createLocalVariable: anAssignmentStatement lhs name.
-			  "We select the lhs node because the source anchor should not be the full assignation."
-			  self setSourceAnchor: variable from: anAssignmentStatement lhs.
-			  ^ variable ] ].
-
-	anAssignmentStatement isInstanceVariableAssignation ifTrue: [
-		self assert: self currentEntity isMethod. "Maybe this could be removed when the parser is stable?"
-		^ self ensureInstanceVariableFromAssignation: anAssignmentStatement ].
-
-	self flag: #todo. "manage other cases."
-	"self error: 'We should not end up here.'"
-	^ nil
 ]
 
 { #category : 'accessing' }
@@ -510,7 +470,8 @@ FamixPythonImporterVisitor >> initialize [
 
 	super initialize.
 	model := FamixPythonModel new name: 'default Python Model'.
-	self initialiseSolver 
+	self initialiseSolver.
+	isInLeftSideOfAssignation := false "In Python variables are created during their assignation. So it is good to know if some nodes are visited during this assignation."
 ]
 
 { #category : 'private - searching' }
@@ -692,7 +653,11 @@ FamixPythonImporterVisitor >> unknownImportedNamed: aString [
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> visitAssignmentStatement: anAssignmentStatement [
 
-	^ self useCurrentEntity: (self ensureVariableFromAssignationStatement: anAssignmentStatement) during: [ super visitAssignmentStatement: anAssignmentStatement ]
+	| oldValue |
+	oldValue := isInLeftSideOfAssignation.
+	isInLeftSideOfAssignation := true.
+	[ self acceptNode: anAssignmentStatement lhs ] ensure: [ isInLeftSideOfAssignation := oldValue ].
+	^ super visitAssignmentStatement: anAssignmentStatement
 ]
 
 { #category : 'visiting' }
@@ -703,6 +668,23 @@ FamixPythonImporterVisitor >> visitClassDefinition: aClassDef [
 
 { #category : 'generated' }
 FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression [
+	"If the receiver is self in an assignation then we have an assignation to an instance variable"
+
+	(isInLeftSideOfAssignation and: [ aFieldAccessExpression receiver name = #self ]) ifTrue: [
+		| class |
+		class := self currentEntityOfType: FamixPythonClass.
+
+		^ (class childOfType: FamixTAttribute named: aFieldAccessExpression name) ifNil: [
+			  | variable |
+			  variable := self model newAttribute
+				              name: aFieldAccessExpression name;
+				              parentType: class;
+				              isClassSide: false;
+				              yourself.
+
+			  "We select the lhs node because the source anchor should not be the full assignation."
+			  self setSourceAnchor: variable from: aFieldAccessExpression.
+			  variable ] ].
 
 	^ aFieldAccessExpression source
 ]
@@ -821,6 +803,15 @@ FamixPythonImporterVisitor >> visitString: aStringNode [
 
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> visitVariableExpression: aVariableExpression [
+	"This node is used in multiple situations. If it is in an assignation we need to check if the variable we assign is created. Other uses can be for example in an import, in this case we want to only return the name."
+
+	isInLeftSideOfAssignation ifTrue: [
+		(self currentEntity childOfType: FamixTStructuralEntity named: aVariableExpression name) ifNil: [
+			| variable |
+			variable := self currentEntity createLocalVariable: aVariableExpression name.
+			"We select the lhs node because the source anchor should not be the full assignation."
+			self setSourceAnchor: variable from: aVariableExpression.
+			^ variable ] ].
 
 	^ aVariableExpression name
 ]
