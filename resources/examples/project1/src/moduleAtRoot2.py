@@ -3,6 +3,7 @@ import moduleAtRoot
 import moduleAtRoot3
 
 moduleAtRoot2Variable = 42
+globalVariableWithCommonName = False
 
 print(moduleAtRoot.moduleAtRootVariable)
 
