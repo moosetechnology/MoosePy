@@ -32,7 +32,6 @@ p1.printInfos()
 
 
 class ClassWithTuples:
-
     cvarTuple1, cvarTuple2, cvarTuple3 = ("a", "b", "c")
 
     def __init__(self, tuple_attr):
@@ -49,3 +48,22 @@ t2 = (4, 5)
 c1.set_tuples(t2)
 print(c1.__dict__)
 print(c1.__class__.__dict__)
+
+
+class ClassToTestLocalVariables:
+
+    def method_with_local_variables(self):
+        local_in_method1 = 1
+        local_in_method2 = 2
+        local_in_method3 = True
+        if local_in_method3:
+            local_in_method3 = 4
+        return local_in_method1 + local_in_method2 + local_in_method3
+
+    def method_with_local_variables2(self):
+        local_in_method1 = 1
+        return local_in_method1
+
+    def method_with_local_variables_and_tuples(self):
+        local_in_method_with_tuple1, local_in_method_with_tuple2 = (1, 2)
+        return local_in_method_with_tuple1 + local_in_method_with_tuple2
