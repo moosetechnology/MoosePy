@@ -114,6 +114,18 @@ FamixPythonProject1Test >> testClassImportsModule [
 	self assert: import sourceText equals: 'import moduleAtRoot3'
 ]
 
+{ #category : 'tests - classes' }
+FamixPythonProject1Test >> testClassInPackage [
+
+	| class |
+
+	class := self classNamed: 'ClassInSubpackage'.
+
+	self assert: class class equals: FamixPythonClass.
+	self assert: class name equals: 'ClassInSubpackage'.
+	self assert: class typeContainer equals: (self packageNamed: 'subpackage1')
+]
+
 { #category : 'tests - attributes' }
 FamixPythonProject1Test >> testClassVariableAreDefinedOnlyOnce [
 	"We should have only one ivar even if it is assigned multiple times."
@@ -1718,6 +1730,35 @@ FamixPythonProject1Test >> testSubPackage [
 	self assert: subSubPackage name equals: 'subsubpackage1'.
 	self deny: subSubPackage isRoot.
 	self assert: subSubPackage parentPackage equals: subPackage
+]
+
+{ #category : 'tests - classes' }
+FamixPythonProject1Test >> testSuperclass [
+
+	| class |
+	class := self classNamed: 'Student'.
+
+	self assert: class class equals: FamixPythonClass.
+	self assert: class name equals: 'Student'.
+	self assert: class typeContainer equals: (self moduleNamed: 'moduleAtRoot2').
+	self assert: class superclass equals: (self classNamed: 'Person').
+	self deny: class isStub.
+	self deny: class superclass isStub
+]
+
+{ #category : 'tests - classes' }
+FamixPythonProject1Test >> testSuperclass2 [
+	"Compared to the first test on superclasses, the order of parsing make it important that symbol resolution works in this case."
+
+	| class |
+	class := self classNamed: 'Fish'.
+
+	self assert: class class equals: FamixPythonClass.
+	self assert: class name equals: 'Fish'.
+	self assert: class typeContainer equals: (self moduleNamed: 'moduleAtRoot2').
+	self assert: class superclass equals: (self classNamed: 'Animal').
+	self deny: class isStub.
+	self deny: class superclass isStub
 ]
 
 { #category : 'tests - local variables' }
