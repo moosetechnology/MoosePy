@@ -38,6 +38,13 @@ class Student(Person):
 s = Student("Stolys", 19)
 s.printInfos()
 
+# The parser should probably import the module before the root package. Here I want to check the symbol resolution of superclasses
+from root import Animal
+
+
+class Fish(Animal):
+    pass
+
 
 class ClassWithTuples:
     cvarTuple1, cvarTuple2, cvarTuple3 = ("a", "b", "c")
