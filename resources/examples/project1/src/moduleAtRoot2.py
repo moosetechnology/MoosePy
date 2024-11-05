@@ -31,6 +31,14 @@ p1 = Person("John", 36)
 p1.printInfos()
 
 
+class Student(Person):
+    pass
+
+
+s = Student("Stolys", 19)
+s.printInfos()
+
+
 class ClassWithTuples:
     cvarTuple1, cvarTuple2, cvarTuple3 = ("a", "b", "c")
 
