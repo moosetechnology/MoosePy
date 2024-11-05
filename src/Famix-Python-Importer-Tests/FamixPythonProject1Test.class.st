@@ -1751,6 +1751,19 @@ FamixPythonProject1Test >> testSuperclass2 [
 	"Compared to the first test on superclasses, the order of parsing make it important that symbol resolution works in this case."
 
 	| class |
+	self assert: (self model allClasses select: [ :aClass | aClass name = 'AbstractAnimal' ]) size equals: 1.
+	self assert: (self model allClasses select: [ :aClass | aClass name = 'Animal' ]) size equals: 1.
+	self assert: (self model allClasses select: [ :aClass | aClass name = 'Fish' ]) size equals: 1.
+
+	class := self classNamed: 'Animal'.
+
+	self assert: class class equals: FamixPythonClass.
+	self assert: class name equals: 'Animal'.
+	self assert: class typeContainer equals: (self packageNamed: 'root').
+	self assert: class superclass equals: (self classNamed: 'AbstractAnimal').
+	self deny: class isStub.
+	self deny: class superclass isStub.
+
 	class := self classNamed: 'Fish'.
 
 	self assert: class class equals: FamixPythonClass.

@@ -58,32 +58,26 @@ FamixPythonImporterVisitor >> classNamed: aName [
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> createClass: classDefinitionNode [
 
-	| famixClass superClasses |
-	famixClass := model newClass.
-	famixClass name: classDefinitionNode pythonClassName.
+	| famixClass |
+	famixClass := model newClassNamed: classDefinitionNode pythonClassName.
 
-	"Reject all metaclass declarations, keep only superclasses (if any)"
-	"TODO Handle PyTrailersNode"
-	superClasses := classDefinitionNode superClasses reject: [ :s | s class = PyMetaclassNode ].
-	superClasses do: [ :fieldAccessNode |
-		| superName superObject inheritance |
-		superName := fieldAccessNode name.
-		superObject := self ensureClassNamed: superName.
-		inheritance := model newInheritance.
-		inheritance
-			superclass: superObject;
-			subclass: famixClass ].
+	(classDefinitionNode superClasses reject: [ :class | class class = PyMetaclassNode ])
+		ifEmpty: [
+			model newInheritance
+				superclass: (self ensureStubClassNamed: 'object');
+				subclass: famixClass ]
+		ifNotEmpty: [ :superclasses |
+			superclasses do: [ :superclass |
+				| inheritance |
+				inheritance := model newInheritance.
+				inheritance subclass: famixClass.
+				self
+					resolve: ((SRIdentifierWithNode identifier: superclass name)
+							 expectedKind: FamixPythonClass;
+							 notFoundReplacementEntity: [ :unresolvedSuperclass :currentEntity | self ensureStubClassNamed: unresolvedSuperclass identifier ];
+							 yourself)
+					foundAction: [ :entity :currentEntity | inheritance superclass: entity ] ] ].
 
-	"Case for object, only if needed!"
-	superClasses ifEmpty: [
-		| inheritance object |
-		object := self ensureClassNamed: 'object'.
-		object isStub: true.
-		inheritance := model newInheritance.
-		inheritance
-			superclass: object yourself;
-			subclass: famixClass ].
-		
 	famixClass typeContainer: self currentEntity.
 
 	^ self setSourceAnchor: famixClass from: classDefinitionNode
@@ -222,18 +216,6 @@ FamixPythonImporterVisitor >> createParameter: aParameter inBehavioural: aFamixC
 ]
 
 { #category : 'private-entity-creation' }
-FamixPythonImporterVisitor >> ensureClass: aClassNode [
-
-	^ (self classNamed: aClassNode pythonClassName) ifNil: [ self createClass: aClassNode ]
-]
-
-{ #category : 'private-entity-creation' }
-FamixPythonImporterVisitor >> ensureClassNamed: aName [
-
-	^ (self classNamed: aName) ifNil: [ model newClass name: aName ]
-]
-
-{ #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> ensureMethod: aMethodNode [
 
 	^ (self methodNamed: aMethodNode fname value inClassNamed: self currentEntity name) ifNil: [ self createMethod: aMethodNode ]
@@ -262,6 +244,17 @@ FamixPythonImporterVisitor >> ensureParameter: parameter inBehavioural: aBehavio
 
 	^ (self parameterNamed:parameter parameterName inBehavioural: aBehavioralEntity)
 		ifNil: [ self createParameter: parameter inBehavioural: aBehavioralEntity ]
+]
+
+{ #category : 'private-entity-creation' }
+FamixPythonImporterVisitor >> ensureStubClassNamed: aName [
+
+	^ model allClasses
+		  detect: [ :class | class isStub and: [ class name = aName ] ]
+		  ifNone: [
+			  (model newClassNamed: aName)
+				  isStub: true;
+				  yourself ]
 ]
 
 { #category : 'private-entity-creation' }
@@ -663,7 +656,7 @@ FamixPythonImporterVisitor >> visitAssignmentStatement: anAssignmentStatement [
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> visitClassDefinition: aClassDef [
 
-	^ self useCurrentEntity: (self ensureClass: aClassDef) during: [ super visitClassDefinition: aClassDef ]
+	^ self useCurrentEntity: (self createClass: aClassDef) during: [ super visitClassDefinition: aClassDef ]
 ]
 
 { #category : 'generated' }

@@ -26,11 +26,6 @@ FamixPythonImportResolvable >> entity: anObject [
 ]
 
 { #category : 'accessing' }
-FamixPythonImportResolvable >> identifier [
-	^ self subclassResponsibility
-]
-
-{ #category : 'accessing' }
 FamixPythonImportResolvable >> path [
 	^ path
 ]

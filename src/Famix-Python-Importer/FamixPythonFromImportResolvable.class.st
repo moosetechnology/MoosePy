@@ -28,6 +28,12 @@ FamixPythonFromImportResolvable >> entityName: anObject [
 	entityName := anObject
 ]
 
+{ #category : 'accessing' }
+FamixPythonFromImportResolvable >> identifier [
+
+	^ super identifier , ' -> ' , self entityName
+]
+
 { #category : 'resolution' }
 FamixPythonFromImportResolvable >> resolveInScope: aScope currentEntity: currentEntity [
 	"If we have a dot at first, we have a relative path. Else it's an absolute path"
