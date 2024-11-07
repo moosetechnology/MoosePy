@@ -133,6 +133,13 @@ FamixPythonTEntityCreator >> newInvocation [
 ]
 
 { #category : 'entity creation' }
+FamixPythonTEntityCreator >> newLambda [
+
+	<generated>
+	^ self add: FamixPythonLambda new
+]
+
+{ #category : 'entity creation' }
 FamixPythonTEntityCreator >> newLocalVariable [
 
 	<generated>

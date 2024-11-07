@@ -21,7 +21,8 @@ Class {
 		'module',
 		'indexedFileAnchor',
 		'globalVariable',
-		'unknownImportedEntity'
+		'unknownImportedEntity',
+		'lambda'
 	],
 	#category : 'Famix-Python-Generator',
 	#package : 'Famix-Python-Generator'
@@ -54,6 +55,7 @@ FamixPythonGenerator >> defineClasses [
 	indexedFileAnchor := builder newClassNamed: #IndexedFileAnchor.
 	inheritance := builder newClassNamed: #Inheritance.
 	invocation := builder newClassNamed: #Invocation.
+	lambda := builder newClassNamed: #Lambda.
 	localVariable := builder newClassNamed: #LocalVariable.
 	method := builder newClassNamed: #Method.
 	module := builder newClassNamed: #Module.
@@ -91,7 +93,6 @@ FamixPythonGenerator >> defineHierarchy [
 	function --|> containerEntity.
 	function --|> #TFunction.
 	function --|> #TWithComments.
-	function --|> #TInvocable.
 	function --|> #TImportable.
 	function --|> #TWithImplicitVariables.
 	function --|> #TWithInvocations.
@@ -99,7 +100,13 @@ FamixPythonGenerator >> defineHierarchy [
 	function --|> #TWithAnnotationInstances.
 	function --|> #TShadowable.
 	function --|> #TShadower.
-
+	
+	lambda --|> containerEntity.
+	lambda --|> #TLambda.
+	lambda --|> #TWithComments.
+	lambda --|> #TWithImplicitVariables.
+	lambda --|> #TWithInvocations.
+	
 	globalVariable --|> namedEntity.
 	globalVariable --|> #TGlobalVariable.
 	globalVariable --|> #TInvocationsReceiver.
