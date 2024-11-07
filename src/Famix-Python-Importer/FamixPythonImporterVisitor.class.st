@@ -156,6 +156,17 @@ FamixPythonImporterVisitor >> createInvocation: anInvocationNode [
 ]
 
 { #category : 'private-entity-creation' }
+FamixPythonImporterVisitor >> createLambda: aLambdaExpression [
+
+	| lambda |
+	lambda := model newLambda.
+
+	lambda lambdaContainer: self currentEntity.
+
+	^ self setSourceAnchor: lambda from: aLambdaExpression
+]
+
+{ #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> createMethod: aMethodNode [
 
 	| method signature |
@@ -734,6 +745,12 @@ FamixPythonImporterVisitor >> visitImportStatement: anImport [
 			ofName: importName
 			from: (self acceptNode: anImport from)
 			alias: alias ]
+]
+
+{ #category : 'visiting' }
+FamixPythonImporterVisitor >> visitLambdaExpression: aLambdaExpression [
+
+	^ self useCurrentEntity: (self createLambda: aLambdaExpression) during: [ super visitLambdaExpression: aLambdaExpression ]
 ]
 
 { #category : 'visiting' }

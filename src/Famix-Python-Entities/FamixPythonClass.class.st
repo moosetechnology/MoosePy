@@ -12,6 +12,7 @@
 |---|
 | `attributes` | `FamixTWithAttributes` | `parentType` | `FamixTAttribute` | List of attributes declared by this type.|
 | `comments` | `FamixTWithComments` | `commentedEntity` | `FamixTComment` | List of comments for the entity|
+| `lambdas` | `FamixTWithLambdas` | `lambdaContainer` | `FamixTLambda` | Lambdas defined in the container, if any.|
 | `methods` | `FamixTWithMethods` | `parentType` | `FamixTMethod` | Methods declared by this type.|
 
 ### Outgoing dependencies
@@ -50,8 +51,8 @@
 Class {
 	#name : 'FamixPythonClass',
 	#superclass : 'FamixPythonType',
-	#traits : 'FamixTClass + FamixTImportable + FamixTWithAnnotationInstances',
-	#classTraits : 'FamixTClass classTrait + FamixTImportable classTrait + FamixTWithAnnotationInstances classTrait',
+	#traits : 'FamixTClass + FamixTImportable + FamixTWithAnnotationInstances + FamixTWithLambdas',
+	#classTraits : 'FamixTClass classTrait + FamixTImportable classTrait + FamixTWithAnnotationInstances classTrait + FamixTWithLambdas classTrait',
 	#instVars : [
 		'#instancedClasses => FMMany type: #FamixPythonClass opposite: #metaclass',
 		'#isMetaclass => FMProperty',

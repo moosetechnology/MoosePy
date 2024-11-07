@@ -14,6 +14,7 @@
 | `comments` | `FamixTWithComments` | `commentedEntity` | `FamixTComment` | List of comments for the entity|
 | `functions` | `FamixTWithFunctions` | `functionOwner` | `FamixTFunction` | Functions defined in the container, if any.|
 | `globalVariables` | `FamixTWithGlobalVariables` | `parentScope` | `FamixTGlobalVariable` | Global variables defined in the scope, if any.|
+| `lambdas` | `FamixTWithLambdas` | `lambdaContainer` | `FamixTLambda` | Lambdas defined in the container, if any.|
 
 ### Incoming dependencies
 | Relation | Origin | Opposite | Type | Comment |
@@ -38,8 +39,8 @@
 Class {
 	#name : 'FamixPythonPackage',
 	#superclass : 'FamixPythonContainerEntity',
-	#traits : 'FamixTImportable + FamixTPackage + FamixTPackageable + FamixTWithComments + FamixTWithFunctions + FamixTWithGlobalVariables',
-	#classTraits : 'FamixTImportable classTrait + FamixTPackage classTrait + FamixTPackageable classTrait + FamixTWithComments classTrait + FamixTWithFunctions classTrait + FamixTWithGlobalVariables classTrait',
+	#traits : 'FamixTImportable + FamixTPackage + FamixTPackageable + FamixTWithComments + FamixTWithFunctions + FamixTWithGlobalVariables + FamixTWithLambdas',
+	#classTraits : 'FamixTImportable classTrait + FamixTPackage classTrait + FamixTPackageable classTrait + FamixTWithComments classTrait + FamixTWithFunctions classTrait + FamixTWithGlobalVariables classTrait + FamixTWithLambdas classTrait',
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',
 	#tag : 'Entities'
