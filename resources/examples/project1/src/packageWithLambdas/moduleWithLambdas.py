@@ -17,7 +17,7 @@ print(mytripler(11))
 class ClassWithLambda:
     classVarWithLambda = lambda toto: print(toto.upper())
 
-    def method(self, param):
+    def method_with_lambda(self, param):
         tempVar = lambda tata: not tata
         return tempVar(param)
 
@@ -33,3 +33,7 @@ def function_with_lambda_in_lambda(n):
 
 
 print(function_with_lambda_in_lambda(2)(4))
+
+
+def function_with_lambda_without_parameters():
+    return lambda: 10
