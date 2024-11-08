@@ -791,6 +791,137 @@ FamixPythonProject1Test >> testInstanceVariablesWithSameNameButDifferenClass [
 			(self classNamed: 'Stool') }
 ]
 
+{ #category : 'tests - lambdas' }
+FamixPythonProject1Test >> testLambdaInAClass [
+
+	| lambda container |
+	container := self classNamed: 'ClassWithLambda'.
+
+	self assert: container class equals: FamixPythonClass.
+	self assert: container lambdas size equals: 1.
+
+	lambda := container lambdas anyOne.
+
+	self assert: lambda class equals: FamixPythonLambda.
+	self assert: lambda signature equals: 'toto'.
+	self assert: lambda lambdaContainer equals: container
+]
+
+{ #category : 'tests - lambdas' }
+FamixPythonProject1Test >> testLambdaInAFunction [
+
+	| lambda container |
+	container := self functionNamed: 'function_returning_lambda'.
+
+	self assert: container class equals: FamixPythonFunction.
+	self assert: container lambdas size equals: 1.
+
+	lambda := container lambdas anyOne.
+
+	self assert: lambda class equals: FamixPythonLambda.
+	self assert: lambda signature equals: 'a'.
+	self assert: lambda lambdaContainer equals: container
+]
+
+{ #category : 'tests - lambdas' }
+FamixPythonProject1Test >> testLambdaInALambda [
+
+	| lambda container |
+	container := self functionNamed: 'function_with_lambda_in_lambda'.
+
+	self assert: container class equals: FamixPythonFunction.
+	self assert: container lambdas size equals: 1.
+
+	container := container lambdas first.
+
+	self assert: container class equals: FamixPythonLambda.
+	self assert: container lambdas size equals: 1.
+
+	lambda := container lambdas anyOne.
+
+	self assert: lambda class equals: FamixPythonLambda.
+	self assert: lambda signature equals: 'y'.
+	self assert: lambda lambdaContainer equals: container
+]
+
+{ #category : 'tests - lambdas' }
+FamixPythonProject1Test >> testLambdaInAMethod [
+
+	| lambda container |
+	container := self methodNamed: 'method_with_lambda'.
+
+	self assert: container class equals: FamixPythonMethod.
+	self assert: container lambdas size equals: 1.
+
+	lambda := container lambdas anyOne.
+
+	self assert: lambda class equals: FamixPythonLambda.
+	self assert: lambda signature equals: 'tata'.
+	self assert: lambda lambdaContainer equals: container
+]
+
+{ #category : 'tests - lambdas' }
+FamixPythonProject1Test >> testLambdaInAModule [
+
+	| lambda container |
+	container := self moduleNamed: 'moduleWithLambdas'.
+
+	self assert: container class equals: FamixPythonModule.
+	self assert: container lambdas size equals: 1.
+
+	lambda := container lambdas anyOne.
+
+	self assert: lambda class equals: FamixPythonLambda.
+	self assert: lambda signature equals: 'a, b'.
+	self assert: lambda lambdaContainer equals: container
+]
+
+{ #category : 'tests - lambdas' }
+FamixPythonProject1Test >> testLambdaInAPackage [
+
+	| lambda container |
+	container := self packageNamed: 'packageWithLambdas'.
+	
+	self assert: container class equals: FamixPythonPackage.
+	self assert: container lambdas size equals: 1.
+	
+	lambda := container lambdas anyOne.
+	
+	self assert: lambda class equals: FamixPythonLambda.
+	self assert: lambda signature equals: 'a'.
+	self assert: lambda lambdaContainer equals: container
+	
+	
+	
+	
+]
+
+{ #category : 'tests - lambdas' }
+FamixPythonProject1Test >> testLambdaSourceAnchor [
+
+	| lambda |
+	lambda := (self packageNamed: 'packageWithLambdas') lambdas anyOne.
+
+	self assert: lambda sourceAnchor isNotNil.
+	self assert: lambda sourceText equals: 'lambda a: a + 10'
+]
+
+{ #category : 'tests - lambdas' }
+FamixPythonProject1Test >> testLambdaWithoutParameters [
+
+	| lambda container |
+	container := self functionNamed: 'function_with_lambda_without_parameters'.
+
+	self assert: container class equals: FamixPythonFunction.
+	self assert: container lambdas size equals: 1.
+
+	lambda := container lambdas anyOne.
+
+	self assert: lambda class equals: FamixPythonLambda.
+	self assert: lambda signature equals: ''.
+	self assert: lambda lambdaContainer equals: container
+]
+
 { #category : 'tests - local variables' }
 FamixPythonProject1Test >> testLocalVariableInFunctionSourceAnchor [
 

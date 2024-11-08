@@ -160,7 +160,7 @@ FamixPythonImporterVisitor >> createLambda: aLambdaExpression [
 
 	| lambda |
 	lambda := model newLambda.
-
+	lambda signature: aLambdaExpression signatureString.
 	lambda lambdaContainer: self currentEntity.
 
 	^ self setSourceAnchor: lambda from: aLambdaExpression
