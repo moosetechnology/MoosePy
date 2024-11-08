@@ -674,7 +674,7 @@ FamixPythonImporterVisitor >> visitClassDefinition: aClassDef [
 FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression [
 	"If the receiver is self in an assignation then we have an assignation to an instance variable"
 
-	(isInLeftSideOfAssignation and: [ aFieldAccessExpression receiver name = #self ]) ifTrue: [
+	(isInLeftSideOfAssignation and: [ aFieldAccessExpression receiver isSelf ]) ifTrue: [
 		| class |
 		class := self currentEntityOfType: FamixPythonClass.
 
@@ -751,6 +751,13 @@ FamixPythonImporterVisitor >> visitImportStatement: anImport [
 FamixPythonImporterVisitor >> visitLambdaExpression: aLambdaExpression [
 
 	^ self useCurrentEntity: (self createLambda: aLambdaExpression) during: [ super visitLambdaExpression: aLambdaExpression ]
+]
+
+{ #category : 'visiting' }
+FamixPythonImporterVisitor >> visitListParameter: aListParameter [
+	"We'll manage it later"
+
+	self flag: #todo
 ]
 
 { #category : 'visiting' }
