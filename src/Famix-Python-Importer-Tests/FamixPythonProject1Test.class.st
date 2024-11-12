@@ -115,6 +115,50 @@ FamixPythonProject1Test >> testClassImportsModule [
 ]
 
 { #category : 'tests - classes' }
+FamixPythonProject1Test >> testClassInClass [
+
+	| class |
+	class := self classNamed: 'ClassInClass'.
+
+	self assert: class class equals: FamixPythonClass.
+	self assert: class name equals: 'ClassInClass'.
+	self assert: class typeContainer equals: (self classNamed: 'ClassWithClasses')
+]
+
+{ #category : 'tests - classes' }
+FamixPythonProject1Test >> testClassInFunction [
+
+	| class |
+	class := self classNamed: 'ClassInFunction'.
+
+	self assert: class class equals: FamixPythonClass.
+	self assert: class name equals: 'ClassInFunction'.
+	self assert: class typeContainer equals: (self functionNamed: 'function_with_class_inside')
+]
+
+{ #category : 'tests - classes' }
+FamixPythonProject1Test >> testClassInMethod [
+
+	| class |
+	class := self classNamed: 'ClassInMethod'.
+
+	self assert: class class equals: FamixPythonClass.
+	self assert: class name equals: 'ClassInMethod'.
+	self assert: class typeContainer equals: ((self classNamed: 'ClassWithClasses') methods detect: #isConstructor) 
+]
+
+{ #category : 'tests - classes' }
+FamixPythonProject1Test >> testClassInModule [
+
+	| class |
+	class := self classNamed: 'ClassWithClasses'.
+
+	self assert: class class equals: FamixPythonClass.
+	self assert: class name equals: 'ClassWithClasses'.
+	self assert: class typeContainer equals: (self moduleNamed: 'moduleWithClasses')
+]
+
+{ #category : 'tests - classes' }
 FamixPythonProject1Test >> testClassInPackage [
 
 	| class |
