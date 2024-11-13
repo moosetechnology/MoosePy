@@ -246,6 +246,18 @@ FamixPythonProject1Test >> testClassVariablesWithSameNameButDifferenClass [
 			(self classNamed: 'Stool') }
 ]
 
+{ #category : 'tests - classes' }
+FamixPythonProject1Test >> testClassesWithSameNameButDifferentParents [
+
+	| classes |
+	classes := self model allClasses select: [ :class | class name = 'ClassWithCommonName' ].
+
+	self assert: classes size equals: 2.
+	self assertCollection: (classes collect: #typeContainer) hasSameElements: {
+			(self moduleNamed: 'moduleWithClasses').
+			(self packageNamed: 'subpackage1') }
+]
+
 { #category : 'tests - methods' }
 FamixPythonProject1Test >> testConstructor [
 
