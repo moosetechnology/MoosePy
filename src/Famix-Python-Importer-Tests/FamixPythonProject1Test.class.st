@@ -170,6 +170,32 @@ FamixPythonProject1Test >> testClassInPackage [
 	self assert: class typeContainer equals: (self packageNamed: 'subpackage1')
 ]
 
+{ #category : 'tests - classes' }
+FamixPythonProject1Test >> testClassShadowedByOtherClass [
+
+	| shadower shadowed |
+	shadower := (self model allClasses select: [ :funct | funct name = 'ClassShadowedByOtherClass' ]) asOrderedCollection detectMax: [ :funct |
+		            funct sourceAnchor startPos ].
+	shadowed := (self model allClasses select: [ :funct | funct name = 'ClassShadowedByOtherClass' ]) asOrderedCollection detectMin: [ :funct |
+		            funct sourceAnchor startPos ].
+
+	self assert: shadower name equals: 'ClassShadowedByOtherClass'.
+	self deny: shadower isShadowed.
+	self assert: shadower typeContainer equals: (self moduleNamed: 'moduleWithShadowing').
+	self assert: shadower shadowedEntity equals: shadowed.
+	self assert: shadower sourceText equals: ('class ClassShadowedByOtherClass:
+
+    def __init__(self):
+        self.i_var_of_shadowed_class = 3' copyReplaceAll: String cr with: String lf).
+
+	self assert: shadowed name equals: 'ClassShadowedByOtherClass'.
+	self assert: shadowed isShadowed.
+	self assert: shadowed typeContainer equals: (self moduleNamed: 'moduleWithShadowing').
+	self assert: shadowed shadowingEntity equals: shadower.
+	self assert: shadowed sourceText equals: ('class ClassShadowedByOtherClass:
+    c_var_of_shadowed_class = True' copyReplaceAll: String cr with: String lf)
+]
+
 { #category : 'tests - attributes' }
 FamixPythonProject1Test >> testClassVariableAreDefinedOnlyOnce [
 	"We should have only one ivar even if it is assigned multiple times."

@@ -86,6 +86,8 @@ FamixPythonGenerator >> defineHierarchy [
 	class --|> #TImportable.
 	class --|> #TWithAnnotationInstances.
 	class --|> #TWithLambdas.
+	class --|> #TShadowable.
+	class --|> #TShadower.
 
 	containerEntity --|> namedEntity.
 	containerEntity --|> #TWithClasses.

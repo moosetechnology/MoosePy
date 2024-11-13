@@ -58,44 +58,31 @@ FamixPythonImporterVisitor >> classNamed: aName [
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> createClass: classDefinitionNode [
 
-	| famixClass |
-	famixClass := model newClassNamed: classDefinitionNode pythonClassName.
+	| class shadowedEntity |
+	"If we are shadowing an entity, we need to mark is as shadowed."
+	shadowedEntity := self findSadowedEntityNamed: classDefinitionNode pythonClassName.
 
-	(classDefinitionNode superClasses reject: [ :class | class class = PyMetaclassNode ])
-		ifEmpty: [
-			model newInheritance
-				superclass: (self ensureStubClassNamed: 'object');
-				subclass: famixClass ]
-		ifNotEmpty: [ :superclasses |
-			superclasses do: [ :superclass |
-				| inheritance |
-				inheritance := model newInheritance.
-				inheritance subclass: famixClass.
-				self
-					resolve: ((SRIdentifierWithNode identifier: superclass name)
-							 expectedKind: FamixPythonClass;
-							 notFoundReplacementEntity: [ :unresolvedSuperclass :currentEntity | self ensureStubClassNamed: unresolvedSuperclass identifier ];
-							 yourself)
-					foundAction: [ :entity :currentEntity | inheritance superclass: entity ] ] ].
+	class := model newClassNamed: classDefinitionNode pythonClassName.
 
-	famixClass typeContainer: self currentEntity.
+	self setSuperclassesOf: classDefinitionNode from: class.
 
-	^ self setSourceAnchor: famixClass from: classDefinitionNode
+	shadowedEntity ifNotNil: [ class shadowedEntity: shadowedEntity ].
+	class typeContainer: self currentEntity.
+
+	^ self setSourceAnchor: class from: classDefinitionNode
 ]
 
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> createFunction: aFunctionNode [
 
-	| function shadowedFunction |
-	"If the same element already has a function of the same name, we select the last one defined and we mark it as shadowed."
-	self withCurrentEntityDo: [ :entity |
-		((entity query descendants ofType: FamixTFunction) select: [ :child | child name = aFunctionNode fname value ]) ifNotEmpty: [ :functions |
-			shadowedFunction := functions detectMax: [ :aFunction | aFunction sourceAnchor startPos ] ] ].
+	| function shadowedEntity |
+	"If we are shadowing an entity, we need to mark is as shadowed."
+	shadowedEntity := self findSadowedEntityNamed: aFunctionNode pythonFunctionName.
 
-	function := self basicCreateFunction: aFunctionNode fname value withSignature: aFunctionNode signatureString.
+	function := self basicCreateFunction: aFunctionNode pythonFunctionName withSignature: aFunctionNode signatureString.
 	function functionOwner: self currentEntity.
 
-	shadowedFunction ifNotNil: [ function shadowedEntity: shadowedFunction ].
+	shadowedEntity ifNotNil: [ function shadowedEntity: shadowedEntity ].
 
 	^ self setSourceAnchor: function from: aFunctionNode
 ]
@@ -418,6 +405,17 @@ FamixPythonImporterVisitor >> extractInvocationInformation: anInvocationNode [
 	^ invocationDict
 ]
 
+{ #category : 'accessing' }
+FamixPythonImporterVisitor >> findSadowedEntityNamed: name [
+	"If the same element already has a shadowable entity of the same name, we select the last one defined. If there is none, we return nil"
+
+	self withCurrentEntityDo: [ :entity |
+		((entity query descendants ofType: FamixTShadowable) select: [ :child | child name = name ]) ifNotEmpty: [ :entities |
+			^ entities detectMax: [ :anEntity | anEntity sourceAnchor startPos ] ] ].
+
+	^ nil
+]
+
 { #category : 'accessing - methods' }
 FamixPythonImporterVisitor >> functions [
 
@@ -633,6 +631,27 @@ FamixPythonImporterVisitor >> setSourceAnchor: aFamixEntity from: aSmaccNode [
 	aFamixEntity stub: false.
 
 	^ aFamixEntity
+]
+
+{ #category : 'as yet unclassified' }
+FamixPythonImporterVisitor >> setSuperclassesOf: classDefinitionNode from: class [
+
+	^ (classDefinitionNode superClasses reject: [ :aClass | aClass class = PyMetaclassNode ])
+		  ifEmpty: [
+			  model newInheritance
+				  superclass: (self ensureStubClassNamed: 'object');
+				  subclass: class ]
+		  ifNotEmpty: [ :superclasses |
+			  superclasses do: [ :superclass |
+				  | inheritance |
+				  inheritance := model newInheritance.
+				  inheritance subclass: class.
+				  self
+					  resolve: ((SRIdentifierWithNode identifier: superclass name)
+							   expectedKind: FamixPythonClass;
+							   notFoundReplacementEntity: [ :unresolvedSuperclass :currentEntity | self ensureStubClassNamed: unresolvedSuperclass identifier ];
+							   yourself)
+					  foundAction: [ :entity :currentEntity | inheritance superclass: entity ] ] ]
 ]
 
 { #category : 'accessing - methods' }

@@ -7,6 +7,12 @@ PyFunctionDefinitionNode >> name [
 ]
 
 { #category : '*Famix-Python-Importer' }
+PyFunctionDefinitionNode >> pythonFunctionName [
+
+	^ fname value
+]
+
+{ #category : '*Famix-Python-Importer' }
 PyFunctionDefinitionNode >> signatureString [
 
 	^ (self completeSource copyFrom: self fname startPosition to: self rparenToken stopPosition) asString
