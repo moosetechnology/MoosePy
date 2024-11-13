@@ -28,3 +28,7 @@ class ClassWithClasses:
 
 c = ClassWithClasses()
 print(c.__dict__)
+
+
+class ClassWithCommonName:
+    pass
