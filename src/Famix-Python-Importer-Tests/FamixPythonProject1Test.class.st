@@ -170,14 +170,38 @@ FamixPythonProject1Test >> testClassInPackage [
 	self assert: class typeContainer equals: (self packageNamed: 'subpackage1')
 ]
 
-{ #category : 'tests - classes' }
+{ #category : 'tests - shadowing' }
+FamixPythonProject1Test >> testClassShadowedByFunction [
+
+	| shadower shadowed |
+	shadower := (self model allFunctions select: [ :entity | entity name = 'shadowedName' ]) asOrderedCollection detectMax: [ :entity |
+		            entity sourceAnchor startPos ].
+	shadowed := (self model allClasses select: [ :entity | entity name = 'shadowedName' ]) asOrderedCollection detectMin: [ :entity |
+		            entity sourceAnchor startPos ].
+
+	self assert: shadower name equals: 'shadowedName'.
+	self deny: shadower isShadowed.
+	self assert: shadower functionOwner equals: (self moduleNamed: 'moduleWithShadowing').
+	self assert: shadower shadowedEntity equals: shadowed.
+	self assert: shadower sourceText equals: ('def shadowedName():
+    print("I''m the last one so I win")' copyReplaceAll: String cr with: String lf).
+
+	self assert: shadowed name equals: 'shadowedName'.
+	self assert: shadowed isShadowed.
+	self assert: shadowed typeContainer equals: (self moduleNamed: 'moduleWithShadowing').
+	self assert: shadowed shadowingEntity equals: shadower.
+	self assert: shadowed sourceText equals: ('class shadowedName:
+    shadowedNameVar = 2' copyReplaceAll: String cr with: String lf)
+]
+
+{ #category : 'tests - shadowing' }
 FamixPythonProject1Test >> testClassShadowedByOtherClass [
 
 	| shadower shadowed |
-	shadower := (self model allClasses select: [ :funct | funct name = 'ClassShadowedByOtherClass' ]) asOrderedCollection detectMax: [ :funct |
-		            funct sourceAnchor startPos ].
-	shadowed := (self model allClasses select: [ :funct | funct name = 'ClassShadowedByOtherClass' ]) asOrderedCollection detectMin: [ :funct |
-		            funct sourceAnchor startPos ].
+	shadower := (self model allClasses select: [ :entity | entity name = 'ClassShadowedByOtherClass' ]) asOrderedCollection detectMax: [ :entity |
+		            entity sourceAnchor startPos ].
+	shadowed := (self model allClasses select: [ :entity | entity name = 'ClassShadowedByOtherClass' ]) asOrderedCollection detectMin: [ :entity |
+		            entity sourceAnchor startPos ].
 
 	self assert: shadower name equals: 'ClassShadowedByOtherClass'.
 	self deny: shadower isShadowed.
@@ -509,6 +533,30 @@ FamixPythonProject1Test >> testFunctionInAPackage [
 	self assert: function name equals: 'return2'.
 	self assert: function signature equals: 'return2()'.
 	self assert: function functionOwner equals: (self packageNamed: 'subsubpackage1')
+]
+
+{ #category : 'tests - shadowing' }
+FamixPythonProject1Test >> testFunctionShadowedByClass [
+
+	| shadower shadowed |
+	shadower := (self model allClasses select: [ :entity | entity name = 'function_shadowed_by_class' ]) asOrderedCollection detectMax: [ :entity |
+		            entity sourceAnchor startPos ].
+	shadowed := (self model allFunctions select: [ :entity | entity name = 'function_shadowed_by_class' ]) asOrderedCollection detectMin: [ :entity |
+		            entity sourceAnchor startPos ].
+
+	self assert: shadower name equals: 'function_shadowed_by_class'.
+	self deny: shadower isShadowed.
+	self assert: shadower typeContainer equals: (self moduleNamed: 'moduleWithShadowing').
+	self assert: shadower shadowedEntity equals: shadowed.
+	self assert: shadower sourceText equals: ('class function_shadowed_by_class:
+    pass' copyReplaceAll: String cr with: String lf).
+
+	self assert: shadowed name equals: 'function_shadowed_by_class'.
+	self assert: shadowed isShadowed.
+	self assert: shadowed functionOwner equals: (self moduleNamed: 'moduleWithShadowing').
+	self assert: shadowed shadowingEntity equals: shadower.
+	self assert: shadowed sourceText equals: ('def function_shadowed_by_class():
+    return 2' copyReplaceAll: String cr with: String lf)
 ]
 
 { #category : 'tests - functions' }
@@ -1715,7 +1763,7 @@ FamixPythonProject1Test >> testRootPackage [
 	self assert: rootPackage isRoot
 ]
 
-{ #category : 'tests - functions' }
+{ #category : 'tests - shadowing' }
 FamixPythonProject1Test >> testShadowableFunction [
 
 	| function shadowable |
@@ -1732,7 +1780,7 @@ FamixPythonProject1Test >> testShadowableFunction [
     return 2' copyReplaceAll: String cr with: String lf)
 ]
 
-{ #category : 'tests - functions' }
+{ #category : 'tests - shadowing' }
 FamixPythonProject1Test >> testShadowableFunctionWithDifferentParameter [
 
 	| function shadowable |
@@ -1750,7 +1798,7 @@ FamixPythonProject1Test >> testShadowableFunctionWithDifferentParameter [
     return age' copyReplaceAll: String cr with: String lf)
 ]
 
-{ #category : 'tests - functions' }
+{ #category : 'tests - shadowing' }
 FamixPythonProject1Test >> testShadowedFunction [
 
 	| function shadower |
@@ -1767,7 +1815,7 @@ FamixPythonProject1Test >> testShadowedFunction [
     return 1' copyReplaceAll: String cr with: String lf)
 ]
 
-{ #category : 'tests - functions' }
+{ #category : 'tests - shadowing' }
 FamixPythonProject1Test >> testShadowedFunctionCreatesDifferentFunctions [
 
 	| functions |
@@ -1777,7 +1825,7 @@ FamixPythonProject1Test >> testShadowedFunctionCreatesDifferentFunctions [
 	functions do: [ :function | self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot6') ]
 ]
 
-{ #category : 'tests - functions' }
+{ #category : 'tests - shadowing' }
 FamixPythonProject1Test >> testShadowedFunctionWithDifferentParameter [
 
 	| function shadower |
