@@ -9,6 +9,14 @@ def shadowedName():
     print("I'm the last one so I win")
 
 
+def function_shadowed_by_class():
+    return 2
+
+
+class function_shadowed_by_class:
+    pass
+
+
 class ClassShadowedByOtherClass:
     c_var_of_shadowed_class = True
 
