@@ -60,7 +60,7 @@ FamixPythonImporterWithFunctionsTest >> testFunctions [
 FamixPythonImporterWithFunctionsTest >> testParameter [
 
 	| param |
-	param := self parameterNamed: 'word'.
+	param := (self functionNamed: 'tryToPlaceWord') parameters detect: [ :p | p name = 'word' ].
 	self assert: param class equals: FamixPythonParameter.
 	self assert: param name equals: 'word'.
 	self assert: param parentBehaviouralEntity equals: (self functionNamed: 'tryToPlaceWord')

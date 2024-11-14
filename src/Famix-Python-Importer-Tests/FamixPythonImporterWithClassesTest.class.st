@@ -85,7 +85,7 @@ FamixPythonImporterWithClassesTest >> testKnowsItsModule [
 FamixPythonImporterWithClassesTest >> testMethod [
 
 	| mth |
-	mth := self methodNamed: '__init__'.
+	mth := (self classNamed: 'Player') methods detect: [ :m | m name = '__init__' ].
 	self assert: mth class equals: FamixPythonMethod.
 	self assert: mth parents anyOne name equals: 'Player'.
 	self assert: mth name equals: '__init__'.
@@ -102,7 +102,7 @@ FamixPythonImporterWithClassesTest >> testMethodIsInModel [
 FamixPythonImporterWithClassesTest >> testMethodKnowsItsClass [
 
 	| mth cl |
-	mth := self methodNamed: '__init__'.
+	mth := (self classNamed: 'Player') methods detect: [ :m | m name = '__init__' ].
 	cl := self classNamed: 'Player'.
 	self assert: mth parentType equals: cl.
 	self assert: mth parentType class equals: FamixPythonClass
@@ -112,8 +112,8 @@ FamixPythonImporterWithClassesTest >> testMethodKnowsItsClass [
 FamixPythonImporterWithClassesTest >> testMethodWithParameter [
 
 	| param mth |
-	mth := self methodNamed: '__init__'.
-	param := self parameterNamed: 'y'.
+	mth := (self classNamed: 'Player') methods detect: [ :m | m name = '__init__' ].
+	param := mth parameters detect: [ :p | p name = 'y' ].
 
 	mth := param parentBehaviouralEntity.
 
@@ -162,7 +162,7 @@ FamixPythonImporterWithClassesTest >> testParameter [
 
 	self assert: param class equals: FamixPythonParameter.
 	self assert: param name equals: 'joystick_no'.
-	self assert: param parentBehaviouralEntity equals: (self methodNamed: '__init__')
+	self assert: param parentBehaviouralEntity equals: ((self classNamed: 'Player') methods detect: [ :m | m name = '__init__' ]).
 ]
 
 { #category : 'tests - classes' }

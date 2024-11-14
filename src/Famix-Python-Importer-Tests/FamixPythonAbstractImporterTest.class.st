@@ -8,25 +8,34 @@ Class {
 { #category : 'accessing' }
 FamixPythonAbstractImporterTest >> attributeNamed: aName [
 
-	^ self model allAttributes detect: [ :attribute | attribute name = aName ]
+	^ self entityNamed: aName in: self model allAttributes
 ]
 
 { #category : 'accessing' }
 FamixPythonAbstractImporterTest >> classNamed: aName [
 
-	^ self model allClasses detect: [ :class | class name = aName ]
+	^ self entityNamed: aName in: self model allClasses
+]
+
+{ #category : 'accessing' }
+FamixPythonAbstractImporterTest >> entityNamed: aName in: aCollection [
+
+	| entities |
+	entities := aCollection select: [ :entity | entity name = aName ].
+	entities size ~= 1 ifTrue: [ self error: 'More than 1 entity named ' , aName ].
+	^ entities anyOne
 ]
 
 { #category : 'accessing' }
 FamixPythonAbstractImporterTest >> functionNamed: aName [
 
-	^ self model allFunctions detect: [ :function | function name = aName ]
+	^ self entityNamed: aName in: self model allFunctions
 ]
 
 { #category : 'accessing' }
 FamixPythonAbstractImporterTest >> globalVariableNamed: aName [
 
-	^ self model allGlobalVariables detect: [ :variable | variable name = aName ]
+	^ self entityNamed: aName in: self model allGlobalVariables
 ]
 
 { #category : 'accessing' }
@@ -38,13 +47,13 @@ FamixPythonAbstractImporterTest >> importNamed: aName [
 { #category : 'accessing' }
 FamixPythonAbstractImporterTest >> localVariableNamed: aName [
 
-	^ self model allLocalVariables detect: [ :variable | variable name = aName ]
+	^ self entityNamed: aName in: self model allLocalVariables
 ]
 
 { #category : 'accessing' }
 FamixPythonAbstractImporterTest >> methodNamed: aName [
 
-	^ self model allMethods detect: [ :method | method name = aName ]
+	^ self entityNamed: aName in: self model allMethods
 ]
 
 { #category : 'accessing' }
@@ -62,19 +71,19 @@ FamixPythonAbstractImporterTest >> moduleName [
 { #category : 'accessing' }
 FamixPythonAbstractImporterTest >> moduleNamed: aName [
 
-	^ self model allModules detect: [ :module | module name = aName ]
+	^ self entityNamed: aName in: self model allModules
 ]
 
 { #category : 'accessing' }
 FamixPythonAbstractImporterTest >> packageNamed: aName [
 
-	^ self model allPackages detect: [ :package | package name = aName ]
+	^ self entityNamed: aName in: self model allPackages
 ]
 
 { #category : 'accessing' }
 FamixPythonAbstractImporterTest >> parameterNamed: aName [
 
-	^ self model allParameters detect: [ :parameter | parameter name = aName ]
+	^ self entityNamed: aName in: self model allParameters
 ]
 
 { #category : 'accessing' }
