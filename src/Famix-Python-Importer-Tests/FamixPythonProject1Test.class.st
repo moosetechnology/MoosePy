@@ -200,10 +200,8 @@ FamixPythonProject1Test >> testClassShadowedByClass [
 FamixPythonProject1Test >> testClassShadowedByFunction [
 
 	| shadower shadowed |
-	shadower := (self model allFunctions select: [ :entity | entity name = 'shadowedName' ]) asOrderedCollection detectMax: [ :entity |
-		            entity sourceAnchor startPos ].
-	shadowed := (self model allClasses select: [ :entity | entity name = 'shadowedName' ]) asOrderedCollection detectMin: [ :entity |
-		            entity sourceAnchor startPos ].
+	shadower := self functionNamed: 'shadowedName'.
+	shadowed := self classNamed: 'shadowedName'.
 
 	self assert: shadower name equals: 'shadowedName'.
 	self deny: shadower isShadowed.
@@ -218,6 +216,27 @@ FamixPythonProject1Test >> testClassShadowedByFunction [
 	self assert: shadowed shadowingEntity equals: shadower.
 	self assert: shadowed sourceText equals: ('class shadowedName:
     shadowedNameVar = 2' copyReplaceAll: String cr with: String lf)
+]
+
+{ #category : 'tests - shadowing' }
+FamixPythonProject1Test >> testClassShadowedByGlobal [
+
+	| shadower shadowed |
+	shadower := self globalVariableNamed: 'ClassShadowedByGlobal'.
+	shadowed := self classNamed: 'ClassShadowedByGlobal'.
+
+	self assert: shadower name equals: 'ClassShadowedByGlobal'.
+	self deny: shadower isShadowed.
+	self assert: shadower parentScope equals: (self moduleNamed: 'moduleWithShadowing').
+	self assert: shadower shadowedEntity equals: shadowed.
+	self assert: shadower sourceText equals: 'ClassShadowedByGlobal'.
+
+	self assert: shadowed name equals: 'ClassShadowedByGlobal'.
+	self assert: shadowed isShadowed.
+	self assert: shadowed typeContainer equals: (self moduleNamed: 'moduleWithShadowing').
+	self assert: shadowed shadowingEntity equals: shadower.
+	self assert: shadowed sourceText equals: ('class ClassShadowedByGlobal:
+    pass' copyReplaceAll: String cr with: String lf)
 ]
 
 { #category : 'tests - attributes' }
@@ -539,10 +558,8 @@ FamixPythonProject1Test >> testFunctionInAPackage [
 FamixPythonProject1Test >> testFunctionShadowedByClass [
 
 	| shadower shadowed |
-	shadower := (self model allClasses select: [ :entity | entity name = 'function_shadowed_by_class' ]) asOrderedCollection detectMax: [ :entity |
-		            entity sourceAnchor startPos ].
-	shadowed := (self model allFunctions select: [ :entity | entity name = 'function_shadowed_by_class' ]) asOrderedCollection detectMin: [ :entity |
-		            entity sourceAnchor startPos ].
+	shadower := self classNamed: 'function_shadowed_by_class'.
+	shadowed := self functionNamed: 'function_shadowed_by_class'.
 
 	self assert: shadower name equals: 'function_shadowed_by_class'.
 	self deny: shadower isShadowed.
@@ -587,13 +604,12 @@ FamixPythonProject1Test >> testFunctionShadowedByFunction [
 FamixPythonProject1Test >> testFunctionShadowedByGlobal [
 
 	| shadower shadowed |
-	shadower := (self model allGlobalVariables select: [ :entity | entity name = 'global_then_function_then_global_then_class' ]) asOrderedCollection detectMax: [ :entity |
-		            entity sourceAnchor startPos ].
-	shadowed := (self model allFunctions select: [ :entity | entity name = 'global_then_function_then_global_then_class' ]) asOrderedCollection detectMin: [ :entity |
-		            entity sourceAnchor startPos ].
+	shadower := (self model allGlobalVariables select: [ :entity | entity name = 'global_then_function_then_global_then_class' ]) asOrderedCollection detectMax: [
+		            :entity | entity sourceAnchor startPos ].
+	shadowed := self functionNamed: 'global_then_function_then_global_then_class'.
 
 	self assert: shadower name equals: 'global_then_function_then_global_then_class'.
-	self assert: shadower isShadowed.  "<= In that case the shadower is also shadowed later"
+	self assert: shadower isShadowed. "<= In that case the shadower is also shadowed later"
 	self assert: shadower parentScope equals: (self moduleNamed: 'moduleWithShadowing').
 	self assert: shadower shadowedEntity equals: shadowed.
 	self assert: shadower sourceText equals: ('global_then_function_then_global_then_class' copyReplaceAll: String cr with: String lf).
@@ -658,8 +674,7 @@ FamixPythonProject1Test >> testGetterAndSetter [
 FamixPythonProject1Test >> testGlobalShadowedByClass [
 
 	| shadower shadowed |
-	shadower := (self model allClasses select: [ :entity | entity name = 'global_then_function_then_global_then_class' ]) asOrderedCollection detectMax: [
-		            :entity | entity sourceAnchor startPos ].
+	shadower := self classNamed: 'global_then_function_then_global_then_class'.
 	shadowed := (self model allGlobalVariables select: [ :entity | entity name = 'global_then_function_then_global_then_class' ]) asOrderedCollection detectMax: [
 		            :entity | entity sourceAnchor startPos ].
 
@@ -682,8 +697,7 @@ FamixPythonProject1Test >> testGlobalShadowedByClass [
 FamixPythonProject1Test >> testGlobalShadowedByFunction [
 
 	| shadower shadowed |
-	shadower := (self model allFunctions select: [ :entity | entity name = 'global_then_function_then_global_then_class' ]) asOrderedCollection detectMin: [
-		            :entity | entity sourceAnchor startPos ].
+	shadower := self functionNamed: 'global_then_function_then_global_then_class'.
 	shadowed := (self model allGlobalVariables select: [ :entity | entity name = 'global_then_function_then_global_then_class' ]) asOrderedCollection detectMin: [
 		            :entity | entity sourceAnchor startPos ].
 
