@@ -31,3 +31,28 @@ class ClassShadowedByOtherClass:
 
 
 print(ClassShadowedByOtherClass().__class__.__dict__)
+
+global_then_function_then_global_then_class = 13
+
+print(global_then_function_then_global_then_class)
+
+
+def global_then_function_then_global_then_class():
+    print(14)
+
+
+global_then_function_then_global_then_class()
+print(global_then_function_then_global_then_class)
+
+global_then_function_then_global_then_class = 15
+
+print(global_then_function_then_global_then_class)
+
+
+class global_then_function_then_global_then_class:
+    def __init__(self):
+        print(16)
+
+
+global_then_function_then_global_then_class()
+print(global_then_function_then_global_then_class)
