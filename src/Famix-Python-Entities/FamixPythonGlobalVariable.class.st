@@ -18,6 +18,8 @@
 |---|
 | `declaredType` | `FamixTTypedEntity` | `typedEntities` | `FamixTType` | Type of the entity, if any|
 | `receivingInvocations` | `FamixTInvocationsReceiver` | `receiver` | `FamixTInvocation` | List of invocations performed on this entity (considered as the receiver)|
+| `shadowedEntity` | `FamixTShadower` | `shadowingEntity` | `FamixTShadowable` | Entity that is been shadowed by myself in my defining scope.|
+| `shadowingEntity` | `FamixTShadowable` | `shadowedEntity` | `FamixTShadower` | Entity shadowing me in my defining scope.|
 | `sourceAnchor` | `FamixTSourceEntity` | `element` | `FamixTSourceAnchor` | SourceAnchor entity linking to the original source code for this entity|
 
 
@@ -33,8 +35,8 @@
 Class {
 	#name : 'FamixPythonGlobalVariable',
 	#superclass : 'FamixPythonNamedEntity',
-	#traits : 'FamixTGlobalVariable + FamixTImportable + FamixTInvocationsReceiver',
-	#classTraits : 'FamixTGlobalVariable classTrait + FamixTImportable classTrait + FamixTInvocationsReceiver classTrait',
+	#traits : 'FamixTGlobalVariable + FamixTImportable + FamixTInvocationsReceiver + FamixTShadowable + FamixTShadower',
+	#classTraits : 'FamixTGlobalVariable classTrait + FamixTImportable classTrait + FamixTInvocationsReceiver classTrait + FamixTShadowable classTrait + FamixTShadower classTrait',
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',
 	#tag : 'Entities'

@@ -116,6 +116,8 @@ FamixPythonGenerator >> defineHierarchy [
 	globalVariable --|> #TGlobalVariable.
 	globalVariable --|> #TInvocationsReceiver.
 	globalVariable --|> #TImportable.
+	globalVariable --|> #TShadowable.
+	globalVariable --|> #TShadower.
 
 	implicitVariable --|> namedEntity.
 	implicitVariable --|> #TImplicitVariable.

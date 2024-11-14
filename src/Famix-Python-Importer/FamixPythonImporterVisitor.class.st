@@ -298,14 +298,6 @@ FamixPythonImporterVisitor >> ensureStubPackagesFromPath: aPythonImportPath [
 	^ package
 ]
 
-{ #category : 'visiting' }
-FamixPythonImporterVisitor >> ensureVariable: aName localTo: aFamixEntity [
-
-	aFamixEntity dictLocalVariables
-		at: aName
-		ifAbsent: [ aFamixEntity createLocalVariable: aName ]
-]
-
 { #category : 'accessing' }
 FamixPythonImporterVisitor >> extractArgumentsInformation: aSignature [
 
@@ -841,13 +833,17 @@ FamixPythonImporterVisitor >> visitString: aStringNode [
 FamixPythonImporterVisitor >> visitVariableExpression: aVariableExpression [
 	"This node is used in multiple situations. If it is in an assignation we need to check if the variable we assign is created. Other uses can be for example in an import, in this case we want to only return the name."
 
-	isInLeftSideOfAssignation ifTrue: [
-		(self currentEntity childOfType: FamixTStructuralEntity named: aVariableExpression name) ifNil: [
-			| variable |
-			variable := self currentEntity createLocalVariable: aVariableExpression name.
-			"We select the lhs node because the source anchor should not be the full assignation."
-			self setSourceAnchor: variable from: aVariableExpression.
-			^ variable ] ].
+	isInLeftSideOfAssignation ifTrue: [ "If we have a variable of this name already, we should not recreate it. Except if this variable got shadowed! In that case, we should recreate it."
+		(self currentEntity query descendants ofType: FamixTStructuralEntity)
+			detect: [ :child | child name = aVariableExpression name and: [ child isShadowable not or: [ child isShadowed not ] ] ]
+			ifNone: [
+				| variable shadowedEntity |
+				shadowedEntity := self findSadowedEntityNamed: aVariableExpression name.
+				variable := self currentEntity createLocalVariable: aVariableExpression name.
+				shadowedEntity ifNotNil: [ variable shadowedEntity: shadowedEntity ].
+				"We select the lhs node because the source anchor should not be the full assignation."
+				self setSourceAnchor: variable from: aVariableExpression.
+				^ variable ] ].
 
 	^ aVariableExpression name
 ]

@@ -164,6 +164,13 @@ FamixPythonEntity >> isReference [
 ]
 
 { #category : 'testing' }
+FamixPythonEntity >> isShadowable [
+
+	<generated>
+	^ false
+]
+
+{ #category : 'testing' }
 FamixPythonEntity >> isStructuralEntity [
 
 	<generated>
