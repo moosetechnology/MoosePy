@@ -56,3 +56,10 @@ class global_then_function_then_global_then_class:
 
 global_then_function_then_global_then_class()
 print(global_then_function_then_global_then_class)
+
+
+class ClassShadowedByGlobal:
+    pass
+
+
+ClassShadowedByGlobal = True
