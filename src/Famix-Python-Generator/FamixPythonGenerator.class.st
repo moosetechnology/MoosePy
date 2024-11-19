@@ -88,6 +88,7 @@ FamixPythonGenerator >> defineHierarchy [
 	class --|> #TWithLambdas.
 	class --|> #TShadowable.
 	class --|> #TShadower.
+	class --|> #TWithAccesses.  
 
 	containerEntity --|> namedEntity.
 	containerEntity --|> #TWithClasses.
@@ -111,6 +112,7 @@ FamixPythonGenerator >> defineHierarchy [
 	lambda --|> #TWithImplicitVariables.
 	lambda --|> #TWithInvocations.
 	lambda --|> #TWithLambdas.
+	lambda --|> #TWithAccesses.  
 	
 	globalVariable --|> namedEntity.
 	globalVariable --|> #TGlobalVariable.
@@ -158,6 +160,7 @@ FamixPythonGenerator >> defineHierarchy [
 	module --|> #TWithInvocations.
 	module --|> #TWithGlobalVariables.
 	module --|> #TWithLambdas.
+	module --|> #TWithAccesses. 
 
 	namedEntity --|> sourcedEntity.
 	namedEntity --|> #TInvocationsReceiver.
@@ -171,6 +174,7 @@ FamixPythonGenerator >> defineHierarchy [
 	package --|> #TWithGlobalVariables.
 	package --|> #TWithFunctions.
 	package --|> #TWithLambdas.
+	package --|> #TWithAccesses.
 
 	parameter --|> namedEntity.
 	parameter --|> #TParameter.

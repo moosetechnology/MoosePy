@@ -18,6 +18,7 @@
 ### Outgoing dependencies
 | Relation | Origin | Opposite | Type | Comment |
 |---|
+| `accesses` | `FamixTWithAccesses` | `accessor` | `FamixTAccess` | Accesses to variables made by this behaviour.|
 | `superInheritances` | `FamixTWithInheritances` | `subclass` | `FamixTInheritance` | Superinheritance relationships, i.e. known superclasses of this type.|
 
 ### Incoming dependencies
@@ -53,8 +54,8 @@
 Class {
 	#name : 'FamixPythonClass',
 	#superclass : 'FamixPythonType',
-	#traits : 'FamixTClass + FamixTImportable + FamixTShadowable + FamixTShadower + FamixTWithAnnotationInstances + FamixTWithLambdas',
-	#classTraits : 'FamixTClass classTrait + FamixTImportable classTrait + FamixTShadowable classTrait + FamixTShadower classTrait + FamixTWithAnnotationInstances classTrait + FamixTWithLambdas classTrait',
+	#traits : 'FamixTClass + FamixTImportable + FamixTShadowable + FamixTShadower + FamixTWithAccesses + FamixTWithAnnotationInstances + FamixTWithLambdas',
+	#classTraits : 'FamixTClass classTrait + FamixTImportable classTrait + FamixTShadowable classTrait + FamixTShadower classTrait + FamixTWithAccesses classTrait + FamixTWithAnnotationInstances classTrait + FamixTWithLambdas classTrait',
 	#instVars : [
 		'#instancedClasses => FMMany type: #FamixPythonClass opposite: #metaclass',
 		'#isMetaclass => FMProperty',

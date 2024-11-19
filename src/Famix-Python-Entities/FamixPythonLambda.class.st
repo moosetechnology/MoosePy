@@ -46,8 +46,8 @@
 Class {
 	#name : 'FamixPythonLambda',
 	#superclass : 'FamixPythonContainerEntity',
-	#traits : 'FamixTLambda + FamixTWithComments + FamixTWithImplicitVariables + FamixTWithInvocations + FamixTWithLambdas',
-	#classTraits : 'FamixTLambda classTrait + FamixTWithComments classTrait + FamixTWithImplicitVariables classTrait + FamixTWithInvocations classTrait + FamixTWithLambdas classTrait',
+	#traits : 'FamixTLambda + FamixTWithAccesses + FamixTWithComments + FamixTWithImplicitVariables + FamixTWithInvocations + FamixTWithLambdas',
+	#classTraits : 'FamixTLambda classTrait + FamixTWithAccesses classTrait + FamixTWithComments classTrait + FamixTWithImplicitVariables classTrait + FamixTWithInvocations classTrait + FamixTWithLambdas classTrait',
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',
 	#tag : 'Entities'

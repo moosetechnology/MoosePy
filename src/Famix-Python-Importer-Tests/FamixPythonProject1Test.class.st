@@ -2109,6 +2109,23 @@ FamixPythonProject1Test >> testSuperclass2 [
 	self deny: class superclass isStub
 ]
 
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testWriteAccess [
+
+	| ivar method access |
+	ivar := self attributeNamed: 'dog_name'.
+	method := (self classNamed: 'Dog') methods detect: #isConstructor.
+
+	access := ivar incomingAccesses detect: [ :anAccess | anAccess accessor = method ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: method.
+	self assert: access accessor equals: method.
+	self assert: access target equals: ivar.
+	self assert: access variable equals: ivar.
+	self assert: access isWrite
+]
+
 { #category : 'tests - local variables' }
 FamixPythonProject1Test >> testlocalVariableInFunctionAreDefinedOnlyOnce [
 	"We should have only one global even if it is assigned multiple times."
