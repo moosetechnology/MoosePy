@@ -2121,6 +2121,24 @@ FamixPythonProject1Test >> testSuperclass2 [
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testWriteAccessFromClass [
+
+	| variable class access |
+	variable := self attributeNamed: 'kind'.
+	class := self classNamed: 'Dog'.
+
+	access := variable incomingAccesses detect: [ :anAccess | anAccess accessor = class ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: class.
+	self assert: access accessor equals: class.
+	self assert: access target equals: variable.
+	self assert: access variable equals: variable.
+	self assert: access isWrite.
+	self assert: (class accesses anySatisfy: [ :anAccess | anAccess variable = variable ])
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testWriteAccessFromFunction [
 
 	| variable function access |
@@ -2172,6 +2190,24 @@ FamixPythonProject1Test >> testWriteAccessFromLambda [
 	self assert: access variable equals: variable.
 	self assert: access isWrite.
 	self assert: (lambda accesses anySatisfy: [ :anAccess | anAccess variable = variable ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testWriteAccessFromMethod [
+
+	| variable method access |
+	variable := self attributeNamed: 'dog_name'.
+	method := (self classNamed: 'Dog') methods detect: #isConstructor.
+
+	access := variable incomingAccesses detect: [ :anAccess | anAccess accessor = method ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: method.
+	self assert: access accessor equals: method.
+	self assert: access target equals: variable.
+	self assert: access variable equals: variable.
+	self assert: access isWrite.
+	self assert: (method accesses anySatisfy: [ :anAccess | anAccess variable = variable ])
 ]
 
 { #category : 'tests - accesses' }
