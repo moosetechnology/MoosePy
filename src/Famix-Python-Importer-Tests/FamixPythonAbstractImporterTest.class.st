@@ -22,7 +22,7 @@ FamixPythonAbstractImporterTest >> entityNamed: aName in: aCollection [
 
 	| entities |
 	entities := aCollection select: [ :entity | entity name = aName ].
-	entities size ~= 1 ifTrue: [ self error: 'More than 1 entity named ' , aName ].
+	entities size ~= 1 ifTrue: [ self error: 'Only 1 entity should be named ' , aName , ' but got ' , entities size asString ].
 	^ entities anyOne
 ]
 

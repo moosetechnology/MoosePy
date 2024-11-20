@@ -2110,7 +2110,115 @@ FamixPythonProject1Test >> testSuperclass2 [
 ]
 
 { #category : 'tests - accesses' }
-FamixPythonProject1Test >> testWriteAccess [
+FamixPythonProject1Test >> testWriteAccessFromFunction [
+
+	| variable function access |
+	variable := self localVariableNamed: 'zipped_pairs'.
+	function := self functionNamed: 'sort_list'.
+
+	access := variable incomingAccesses detect: [ :anAccess | anAccess accessor = function ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: function.
+	self assert: access accessor equals: function.
+	self assert: access target equals: variable.
+	self assert: access variable equals: variable.
+	self assert: access isWrite.
+	self assert: (function accesses anySatisfy: [ :anAccess | anAccess variable = variable ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testWriteAccessFromInnerFunction [
+
+	| variable function access |
+	variable := self localVariableNamed: 'inner_local_variable'.
+	function := self functionNamed: 'inner_function'.
+
+	access := variable incomingAccesses detect: [ :anAccess | anAccess accessor = function ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: function.
+	self assert: access accessor equals: function.
+	self assert: access target equals: variable.
+	self assert: access variable equals: variable.
+	self assert: access isWrite.
+	self assert: (function accesses anySatisfy: [ :anAccess | anAccess variable = variable ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testWriteAccessFromModule [
+
+	| variable module access |
+	variable := self globalVariableNamed: 'moduleInRootVariable'.
+	module := self moduleNamed: 'moduleInRootPackage'.
+
+	access := variable incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: variable.
+	self assert: access variable equals: variable.
+	self assert: access isWrite.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = variable ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testWriteAccessFromPackage [
+
+	| variable package access |
+	variable := self globalVariableNamed: 'rootPackageVariable'.
+	package := self packageNamed: 'root'.
+
+	access := variable incomingAccesses detect: [ :anAccess | anAccess accessor = package ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: package.
+	self assert: access accessor equals: package.
+	self assert: access target equals: variable.
+	self assert: access variable equals: variable.
+	self assert: access isWrite.
+	self assert: (package accesses anySatisfy: [ :anAccess | anAccess variable = variable ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testWriteAccessToCVar [
+
+	| cvar class access |
+	cvar := self attributeNamed: 'kind'.
+	class := self classNamed: 'Dog'.
+
+	access := cvar incomingAccesses detect: [ :anAccess | anAccess accessor = class ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: class.
+	self assert: access accessor equals: class.
+	self assert: access target equals: cvar.
+	self assert: access variable equals: cvar.
+	self assert: access isWrite.
+	self assert: (class accesses anySatisfy: [ :anAccess | anAccess variable = cvar ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testWriteAccessToGlobal [
+
+	| global module access |
+	global := self globalVariableNamed: 'moduleAtRootVariable'.
+	module := self moduleNamed: 'moduleAtRoot'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testWriteAccessToIVar [
 
 	| ivar method access |
 	ivar := self attributeNamed: 'dog_name'.
@@ -2125,6 +2233,42 @@ FamixPythonProject1Test >> testWriteAccess [
 	self assert: access variable equals: ivar.
 	self assert: access isWrite.
 	self assert: (method accesses anySatisfy: [ :anAccess | anAccess variable = ivar ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testWriteAccessToLocaleInFunction [
+
+	| locale function access |
+	locale := self localVariableNamed: 'local_in_function2'.
+	function := self functionNamed: 'function_with_local_variables'.
+
+	access := locale incomingAccesses detect: [ :anAccess | anAccess accessor = function ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: function.
+	self assert: access accessor equals: function.
+	self assert: access target equals: locale.
+	self assert: access variable equals: locale.
+	self assert: access isWrite.
+	self assert: (function accesses anySatisfy: [ :anAccess | anAccess variable = locale ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testWriteAccessToLocaleInMethod [
+
+	| locale method access |
+	locale := self localVariableNamed: 'local_in_method2'.
+	method := self methodNamed: 'method_with_local_variables'.
+
+	access := locale incomingAccesses detect: [ :anAccess | anAccess accessor = method ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: method.
+	self assert: access accessor equals: method.
+	self assert: access target equals: locale.
+	self assert: access variable equals: locale.
+	self assert: access isWrite.
+	self assert: (method accesses anySatisfy: [ :anAccess | anAccess variable = locale ])
 ]
 
 { #category : 'tests - accesses' }
