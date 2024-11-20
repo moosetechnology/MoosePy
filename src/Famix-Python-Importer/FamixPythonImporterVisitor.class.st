@@ -672,18 +672,21 @@ FamixPythonImporterVisitor >> visitAssignmentStatement: anAssignmentStatement [
 	oldValue := isInLeftSideOfAssignation.
 	isInLeftSideOfAssignation := true.
 	[
-	| variable |
-	variable := self acceptNode: anAssignmentStatement lhs.
-	variable isMooseEntity
-		ifTrue: [
-			| access |
-			access := model newAccess.
-			access
-				variable: variable;
-				accessor: self currentEntity;
-				isWrite: true.
-			self setSourceAnchor: access from: anAssignmentStatement ]
-		ifFalse: [ self flag: #todo "Is it normal?" ] ] ensure: [ isInLeftSideOfAssignation := oldValue ].
+	| variables |
+	variables := self acceptNode: anAssignmentStatement lhs.
+	"It is possible in case of multiple assignations that we end up with a collection of variables while visiting the left side of an assignation. Else we will have only one assignation. The next line is to make sure of the type of entity we have."
+	variables isCollection ifFalse: [ variables := { variables } ].
+	variables do: [ :variable |
+		variable isMooseEntity
+			ifTrue: [
+				| access |
+				access := model newAccess.
+				access
+					variable: variable;
+					accessor: self currentEntity;
+					isWrite: true.
+				self setSourceAnchor: access from: anAssignmentStatement ]
+			ifFalse: [ self flag: #todo "Is it normal?" ] ] ] ensure: [ isInLeftSideOfAssignation := oldValue ].
 	^ super visitAssignmentStatement: anAssignmentStatement
 ]
 

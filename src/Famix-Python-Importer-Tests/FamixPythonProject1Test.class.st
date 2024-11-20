@@ -2123,7 +2123,50 @@ FamixPythonProject1Test >> testWriteAccess [
 	self assert: access accessor equals: method.
 	self assert: access target equals: ivar.
 	self assert: access variable equals: ivar.
-	self assert: access isWrite
+	self assert: access isWrite.
+	self assert: (method accesses anySatisfy: [ :anAccess | anAccess variable = ivar ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testWriteAccessWithTupleAssignation [
+
+	| global module access |
+	global := self globalVariableNamed: 'globalWithTuple1'.
+	module := self moduleNamed: 'moduleAtRoot'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ]).
+
+	global := self globalVariableNamed: 'globalWithTuple2'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ]).
+
+	global := self globalVariableNamed: 'globalWithTuple3'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
 ]
 
 { #category : 'tests - local variables' }
