@@ -6,7 +6,8 @@ def function_with_inner_function():
     result = 3
 
     def inner_function(finput):
-        return finput + 2
+        inner_local_variable = 4
+        return finput + 2 + inner_local_variable
 
     result = result + inner_function(result)
 

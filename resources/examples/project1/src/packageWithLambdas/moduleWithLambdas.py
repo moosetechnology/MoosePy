@@ -23,7 +23,7 @@ class ClassWithLambda:
 
 
 c = ClassWithLambda()
-print(c.method(False))
+print(c.method_with_lambda(False))
 c.__class__.classVarWithLambda("cyril")
 
 
@@ -37,3 +37,13 @@ print(function_with_lambda_in_lambda(2)(4))
 
 def function_with_lambda_without_parameters():
     return lambda: 10
+
+
+def function_with_lambda_with_temporary():
+    return lambda: (
+        temporary_in_lambda := "Hello world",
+        print(temporary_in_lambda + "\n")
+    )[-1]
+
+
+function_with_lambda_with_temporary()()
