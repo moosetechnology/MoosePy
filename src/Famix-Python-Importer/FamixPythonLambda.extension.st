@@ -1,7 +1,7 @@
-Extension { #name : 'FamixPythonFunction' }
+Extension { #name : 'FamixPythonLambda' }
 
 { #category : '*Famix-Python-Importer' }
-FamixPythonFunction >> createLocalVariable: aString [
+FamixPythonLambda >> createLocalVariable: aString [
 
 	^ mooseModel newLocalVariable
 		  name: aString;

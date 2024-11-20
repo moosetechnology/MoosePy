@@ -666,6 +666,28 @@ FamixPythonImporterVisitor >> unknownImportedNamed: aString [
 ]
 
 { #category : 'visiting' }
+FamixPythonImporterVisitor >> visitAssignmentExpression: anAssignmentExpression [
+
+	| oldValue |
+	oldValue := isInLeftSideOfAssignation.
+	isInLeftSideOfAssignation := true.
+	[
+	| variable |
+	variable := self acceptNode: anAssignmentExpression variable.
+	variable isMooseEntity
+		ifTrue: [
+			| access |
+			access := model newAccess.
+			access
+				variable: variable;
+				accessor: self currentEntity;
+				isWrite: true.
+			self setSourceAnchor: access from: anAssignmentExpression ]
+		ifFalse: [ self flag: #todo "Is it normal?" ] ] ensure: [ isInLeftSideOfAssignation := oldValue ].
+	^ super visitAssignmentExpression: anAssignmentExpression
+]
+
+{ #category : 'visiting' }
 FamixPythonImporterVisitor >> visitAssignmentStatement: anAssignmentStatement [
 
 	| oldValue |

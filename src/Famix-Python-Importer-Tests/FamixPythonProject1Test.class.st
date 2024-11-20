@@ -1984,6 +1984,17 @@ FamixPythonProject1Test >> testSimpleLocalVariableInFunction [
 ]
 
 { #category : 'tests - local variables' }
+FamixPythonProject1Test >> testSimpleLocalVariableInLambda [
+
+	| variable |
+	variable := self localVariableNamed: 'temporary_in_lambda'.
+
+	self assert: variable class equals: FamixPythonLocalVariable.
+	self assert: variable name equals: 'temporary_in_lambda'.
+	self assert: variable parentBehaviouralEntity equals: (self functionNamed: 'function_with_lambda_with_temporary') lambdas anyOne
+]
+
+{ #category : 'tests - local variables' }
 FamixPythonProject1Test >> testSimpleLocalVariableInMethod [
 
 	| variable |
@@ -2143,6 +2154,24 @@ FamixPythonProject1Test >> testWriteAccessFromInnerFunction [
 	self assert: access variable equals: variable.
 	self assert: access isWrite.
 	self assert: (function accesses anySatisfy: [ :anAccess | anAccess variable = variable ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testWriteAccessFromLambda [
+
+	| variable lambda access |
+	variable := self localVariableNamed: 'temporary_in_lambda'.
+	lambda := (self functionNamed: 'function_with_lambda_with_temporary') lambdas anyOne.
+
+	access := variable incomingAccesses detect: [ :anAccess | anAccess accessor = lambda ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: lambda.
+	self assert: access accessor equals: lambda.
+	self assert: access target equals: variable.
+	self assert: access variable equals: variable.
+	self assert: access isWrite.
+	self assert: (lambda accesses anySatisfy: [ :anAccess | anAccess variable = variable ])
 ]
 
 { #category : 'tests - accesses' }
