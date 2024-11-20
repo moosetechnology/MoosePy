@@ -2231,19 +2231,45 @@ FamixPythonProject1Test >> testWriteAccessFromModule [
 { #category : 'tests - accesses' }
 FamixPythonProject1Test >> testWriteAccessFromPackage [
 
-	| variable package access |
-	variable := self globalVariableNamed: 'rootPackageVariable'.
-	package := self packageNamed: 'root'.
+	| a p access |
+	a := self globalVariableNamed: 'rootPackageVariable'.
+	p := self packageNamed: 'root'.
 
-	access := variable incomingAccesses detect: [ :anAccess | anAccess accessor = package ].
+	access := a incomingAccesses detect: [ :anAccess | anAccess accessor = p ].
 
 	self assert: access class equals: FamixPythonAccess.
-	self assert: access source equals: package.
-	self assert: access accessor equals: package.
-	self assert: access target equals: variable.
-	self assert: access variable equals: variable.
+	self assert: access source equals: p.
+	self assert: access accessor equals: p.
+	self assert: access target equals: a.
+	self assert: access variable equals: a.
 	self assert: access isWrite.
-	self assert: (package accesses anySatisfy: [ :anAccess | anAccess variable = variable ])
+	self assert: (p accesses anySatisfy: [ :anAccess | anAccess variable = a ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testWriteAccessSourceAnchor [
+
+	| locale method access |
+	locale := self localVariableNamed: 'local_in_method2'.
+	method := self methodNamed: 'method_with_local_variables'.
+
+	access := locale incomingAccesses detect: [ :anAccess | anAccess accessor = method ].
+
+	self assert: access sourceAnchor isNotNil.
+	self assert: access sourceText equals: 'local_in_method2 = 2'
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testWriteAccessSourceAnchorInTupleAssignation [
+
+	| global module access |
+	global := self globalVariableNamed: 'globalWithTuple1'.
+	module := self moduleNamed: 'moduleAtRoot'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access sourceAnchor isNotNil.
+	self assert: access sourceText equals: 'globalWithTuple1, globalWithTuple2, globalWithTuple3 = (1, 2, 3)'
 ]
 
 { #category : 'tests - accesses' }
