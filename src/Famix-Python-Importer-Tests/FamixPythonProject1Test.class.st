@@ -792,6 +792,18 @@ FamixPythonProject1Test >> testGlobalVariablesAssignedWithATuple [
 ]
 
 { #category : 'tests - global variables' }
+FamixPythonProject1Test >> testGlobalVariablesShadowedThenRedefined [
+
+	| globals |
+	globals := self model allGlobalVariables select: [ :variable | variable name = 'global_then_function_then_global_then_class' ].
+
+	self assert: globals size equals: 2.
+	globals do: [ :global |
+		self assert: global name equals: 'global_then_function_then_global_then_class'.
+		self assert: global parentScope equals: (self moduleNamed: 'moduleWithShadowing') ]
+]
+
+{ #category : 'tests - global variables' }
 FamixPythonProject1Test >> testGlobalVariablesWithTheSameNameButDifferentParents [
 
 	| globals |
@@ -2244,6 +2256,23 @@ FamixPythonProject1Test >> testWriteAccessFromPackage [
 	self assert: access variable equals: a.
 	self assert: access isWrite.
 	self assert: (p accesses anySatisfy: [ :anAccess | anAccess variable = a ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testWriteAccessOfGlobalThatGotShadowedAndRedefined [
+	"This test ensure that if we declare a global, shadow it and redefine it again, the accesses are going to the right global."
+
+	| global1 global2 module accesses |
+	global1 := (self model allGlobalVariables select: [ :entity | entity name = 'global_then_function_then_global_then_class' ]) asOrderedCollection detectMin: [
+		           :entity | entity sourceAnchor startPos ].
+	global2 := (self model allGlobalVariables select: [ :entity | entity name = 'global_then_function_then_global_then_class' ]) asOrderedCollection detectMax: [
+		           :entity | entity sourceAnchor startPos ].
+	module := self moduleNamed: 'moduleWithShadowing'.
+
+	accesses := module accesses select: [ :anAccess | anAccess variable name = 'global_then_function_then_global_then_class' ].
+
+	self assert: (accesses detectMin: [ :entity | entity sourceAnchor startPos ]) variable equals: global1.
+	self assert: (accesses detectMax: [ :entity | entity sourceAnchor startPos ]) variable equals: global2
 ]
 
 { #category : 'tests - accesses' }
