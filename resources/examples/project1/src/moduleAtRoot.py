@@ -7,6 +7,8 @@ globalWithTuple1, globalWithTuple2, globalWithTuple3 = (1, 2, 3)
 globalAssignedTwice = True
 globalAssignedTwice = False
 
+print(moduleAtRootVariable)
+
 print(root.rootPackageVariable)
 print(root.subpackage1.subPackage1Variable)
 
