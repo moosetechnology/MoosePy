@@ -2369,6 +2369,27 @@ FamixPythonProject1Test >> testWriteAccessToGlobal [
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testWriteAccessToGlobalTwice [
+
+	| global module accesses |
+	global := self globalVariableNamed: 'globalAssignedTwice'.
+	module := self moduleNamed: 'moduleAtRoot'.
+
+	accesses := global incomingAccesses select: [ :anAccess | anAccess accessor = module ].
+
+	self assert: accesses size equals: 2.
+
+	accesses do: [ :access |
+		self assert: access class equals: FamixPythonAccess.
+		self assert: access source equals: module.
+		self assert: access accessor equals: module.
+		self assert: access target equals: global.
+		self assert: access variable equals: global.
+		self assert: access isWrite.
+		self deny: access isRead ]
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testWriteAccessToIVar [
 
 	| ivar method access |
