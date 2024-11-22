@@ -1857,6 +1857,28 @@ FamixPythonProject1Test >> testPackageSourceAnchor [
 	self assert: rootPackage sourceAnchor sourceText equals: (FamixPythonBridge parsingExamples / 'project1' / 'src' / 'root' / '__init__.py') contents
 ]
 
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessToGlobal [
+
+	| global module access |
+	self skip.
+	self flag: #todo.
+	global := self globalVariableNamed: 'moduleAtRootVariable'.
+	module := self moduleNamed: 'moduleAtRoot'.
+
+	"We want to have the reading and not the writing."
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :entity | entity sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
 { #category : 'tests - modules' }
 FamixPythonProject1Test >> testRootModule [
 
@@ -2147,6 +2169,7 @@ FamixPythonProject1Test >> testWriteAccessFromClass [
 	self assert: access target equals: variable.
 	self assert: access variable equals: variable.
 	self assert: access isWrite.
+	self deny: access isRead.
 	self assert: (class accesses anySatisfy: [ :anAccess | anAccess variable = variable ])
 ]
 
@@ -2165,6 +2188,7 @@ FamixPythonProject1Test >> testWriteAccessFromFunction [
 	self assert: access target equals: variable.
 	self assert: access variable equals: variable.
 	self assert: access isWrite.
+	self deny: access isRead.
 	self assert: (function accesses anySatisfy: [ :anAccess | anAccess variable = variable ])
 ]
 
@@ -2183,6 +2207,7 @@ FamixPythonProject1Test >> testWriteAccessFromInnerFunction [
 	self assert: access target equals: variable.
 	self assert: access variable equals: variable.
 	self assert: access isWrite.
+	self deny: access isRead.
 	self assert: (function accesses anySatisfy: [ :anAccess | anAccess variable = variable ])
 ]
 
@@ -2201,6 +2226,7 @@ FamixPythonProject1Test >> testWriteAccessFromLambda [
 	self assert: access target equals: variable.
 	self assert: access variable equals: variable.
 	self assert: access isWrite.
+	self deny: access isRead.
 	self assert: (lambda accesses anySatisfy: [ :anAccess | anAccess variable = variable ])
 ]
 
@@ -2219,6 +2245,7 @@ FamixPythonProject1Test >> testWriteAccessFromMethod [
 	self assert: access target equals: variable.
 	self assert: access variable equals: variable.
 	self assert: access isWrite.
+	self deny: access isRead.
 	self assert: (method accesses anySatisfy: [ :anAccess | anAccess variable = variable ])
 ]
 
@@ -2237,25 +2264,27 @@ FamixPythonProject1Test >> testWriteAccessFromModule [
 	self assert: access target equals: variable.
 	self assert: access variable equals: variable.
 	self assert: access isWrite.
+	self deny: access isRead.
 	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = variable ])
 ]
 
 { #category : 'tests - accesses' }
 FamixPythonProject1Test >> testWriteAccessFromPackage [
 
-	| a p access |
-	a := self globalVariableNamed: 'rootPackageVariable'.
-	p := self packageNamed: 'root'.
+	| global package access |
+	global := self globalVariableNamed: 'rootPackageVariable'.
+	package := self packageNamed: 'root'.
 
-	access := a incomingAccesses detect: [ :anAccess | anAccess accessor = p ].
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = package ].
 
 	self assert: access class equals: FamixPythonAccess.
-	self assert: access source equals: p.
-	self assert: access accessor equals: p.
-	self assert: access target equals: a.
-	self assert: access variable equals: a.
+	self assert: access source equals: package.
+	self assert: access accessor equals: package.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
 	self assert: access isWrite.
-	self assert: (p accesses anySatisfy: [ :anAccess | anAccess variable = a ])
+	self deny: access isRead.
+	self assert: (package accesses anySatisfy: [ :anAccess | anAccess variable = global ])
 ]
 
 { #category : 'tests - accesses' }
@@ -2316,6 +2345,7 @@ FamixPythonProject1Test >> testWriteAccessToCVar [
 	self assert: access target equals: cvar.
 	self assert: access variable equals: cvar.
 	self assert: access isWrite.
+	self deny: access isRead.
 	self assert: (class accesses anySatisfy: [ :anAccess | anAccess variable = cvar ])
 ]
 
@@ -2334,6 +2364,7 @@ FamixPythonProject1Test >> testWriteAccessToGlobal [
 	self assert: access target equals: global.
 	self assert: access variable equals: global.
 	self assert: access isWrite.
+	self deny: access isRead.
 	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
 ]
 
@@ -2352,6 +2383,7 @@ FamixPythonProject1Test >> testWriteAccessToIVar [
 	self assert: access target equals: ivar.
 	self assert: access variable equals: ivar.
 	self assert: access isWrite.
+	self deny: access isRead.
 	self assert: (method accesses anySatisfy: [ :anAccess | anAccess variable = ivar ])
 ]
 
@@ -2370,6 +2402,7 @@ FamixPythonProject1Test >> testWriteAccessToLocaleInFunction [
 	self assert: access target equals: locale.
 	self assert: access variable equals: locale.
 	self assert: access isWrite.
+	self deny: access isRead.
 	self assert: (function accesses anySatisfy: [ :anAccess | anAccess variable = locale ])
 ]
 
@@ -2388,6 +2421,7 @@ FamixPythonProject1Test >> testWriteAccessToLocaleInMethod [
 	self assert: access target equals: locale.
 	self assert: access variable equals: locale.
 	self assert: access isWrite.
+	self deny: access isRead.
 	self assert: (method accesses anySatisfy: [ :anAccess | anAccess variable = locale ])
 ]
 
@@ -2406,6 +2440,7 @@ FamixPythonProject1Test >> testWriteAccessWithTupleAssignation [
 	self assert: access target equals: global.
 	self assert: access variable equals: global.
 	self assert: access isWrite.
+	self deny: access isRead.
 	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ]).
 
 	global := self globalVariableNamed: 'globalWithTuple2'.
@@ -2418,6 +2453,7 @@ FamixPythonProject1Test >> testWriteAccessWithTupleAssignation [
 	self assert: access target equals: global.
 	self assert: access variable equals: global.
 	self assert: access isWrite.
+	self deny: access isRead.
 	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ]).
 
 	global := self globalVariableNamed: 'globalWithTuple3'.
@@ -2430,6 +2466,7 @@ FamixPythonProject1Test >> testWriteAccessWithTupleAssignation [
 	self assert: access target equals: global.
 	self assert: access variable equals: global.
 	self assert: access isWrite.
+	self deny: access isRead.
 	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
 ]
 
