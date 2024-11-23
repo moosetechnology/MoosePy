@@ -5,8 +5,7 @@ Class {
 	#classTraits : 'SRTSolverUserVisitor classTrait',
 	#instVars : [
 		'model',
-		'rootFilePath',
-		'isInLeftSideOfAssignation'
+		'rootFilePath'
 	],
 	#category : 'Famix-Python-Importer-Visitors',
 	#package : 'Famix-Python-Importer',
@@ -211,6 +210,18 @@ FamixPythonImporterVisitor >> createParameter: aParameter inBehavioural: aFamixC
 	parameter parentBehaviouralEntity: aFamixContainer.
 
 	^ self setSourceAnchor: parameter from: aParameter
+]
+
+{ #category : 'private-entity-creation' }
+FamixPythonImporterVisitor >> createWriteAccessTo: variable from: anAssignmentNode [
+
+	| access |
+	access := model newAccess
+		          variable: variable;
+		          accessor: self currentEntity;
+		          isWrite: true;
+		          yourself.
+	self setSourceAnchor: access from: anAssignmentNode
 ]
 
 { #category : 'private-entity-creation' }
@@ -464,8 +475,7 @@ FamixPythonImporterVisitor >> initialize [
 
 	super initialize.
 	model := FamixPythonModel new name: 'default Python Model'.
-	self initialiseSolver.
-	isInLeftSideOfAssignation := false "In Python variables are created during their assignation. So it is good to know if some nodes are visited during this assignation."
+	self initialiseSolver
 ]
 
 { #category : 'private - searching' }
@@ -666,53 +676,6 @@ FamixPythonImporterVisitor >> unknownImportedNamed: aString [
 ]
 
 { #category : 'visiting' }
-FamixPythonImporterVisitor >> visitAssignmentExpression: anAssignmentExpression [
-
-	| oldValue |
-	oldValue := isInLeftSideOfAssignation.
-	isInLeftSideOfAssignation := true.
-	[
-	| variable |
-	variable := self acceptNode: anAssignmentExpression variable.
-	variable isMooseEntity
-		ifTrue: [
-			| access |
-			access := model newAccess.
-			access
-				variable: variable;
-				accessor: self currentEntity;
-				isWrite: true.
-			self setSourceAnchor: access from: anAssignmentExpression ]
-		ifFalse: [ self flag: #todo "Is it normal?" ] ] ensure: [ isInLeftSideOfAssignation := oldValue ].
-	^ super visitAssignmentExpression: anAssignmentExpression
-]
-
-{ #category : 'visiting' }
-FamixPythonImporterVisitor >> visitAssignmentStatement: anAssignmentStatement [
-
-	| oldValue |
-	oldValue := isInLeftSideOfAssignation.
-	isInLeftSideOfAssignation := true.
-	[
-	| variables |
-	variables := self acceptNode: anAssignmentStatement lhs.
-	"It is possible in case of multiple assignations that we end up with a collection of variables while visiting the left side of an assignation. Else we will have only one assignation. The next line is to make sure of the type of entity we have."
-	variables isCollection ifFalse: [ variables := { variables } ].
-	variables do: [ :variable |
-		variable isMooseEntity
-			ifTrue: [
-				| access |
-				access := model newAccess.
-				access
-					variable: variable;
-					accessor: self currentEntity;
-					isWrite: true.
-				self setSourceAnchor: access from: anAssignmentStatement ]
-			ifFalse: [ self flag: #todo "Is it normal?" ] ] ] ensure: [ isInLeftSideOfAssignation := oldValue ].
-	^ super visitAssignmentStatement: anAssignmentStatement
-]
-
-{ #category : 'visiting' }
 FamixPythonImporterVisitor >> visitClassDefinition: aClassDef [
 
 	^ self useCurrentEntity: (self createClass: aClassDef) during: [ super visitClassDefinition: aClassDef ]
@@ -722,21 +685,22 @@ FamixPythonImporterVisitor >> visitClassDefinition: aClassDef [
 FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression [
 	"If the receiver is self in an assignation then we have an assignation to an instance variable"
 
-	(isInLeftSideOfAssignation and: [ aFieldAccessExpression receiver isSelf ]) ifTrue: [
-		| class |
+	aFieldAccessExpression isInstanceVariableAssignation ifTrue: [
+		| class variable |
 		class := self currentEntityOfType: FamixPythonClass.
 
-		^ (class childOfType: FamixTAttribute named: aFieldAccessExpression name) ifNil: [
-			  | variable |
-			  variable := self model newAttribute
-				              name: aFieldAccessExpression name;
-				              parentType: class;
-				              isClassSide: false;
-				              yourself.
+		variable := (class childOfType: FamixTAttribute named: aFieldAccessExpression name) ifNil: [
+			            variable := self model newAttribute
+				                        name: aFieldAccessExpression name;
+				                        parentType: class;
+				                        isClassSide: false;
+				                        yourself.
 
-			  "We select the lhs node because the source anchor should not be the full assignation."
-			  self setSourceAnchor: variable from: aFieldAccessExpression.
-			  variable ] ].
+			            "We select the lhs node because the source anchor should not be the full assignation."
+			            self setSourceAnchor: variable from: aFieldAccessExpression.
+			            variable ].
+		self createWriteAccessTo: variable from: aFieldAccessExpression assignationNode.
+		^ variable ].
 
 	^ aFieldAccessExpression source
 ]
@@ -870,17 +834,22 @@ FamixPythonImporterVisitor >> visitString: aStringNode [
 FamixPythonImporterVisitor >> visitVariableExpression: aVariableExpression [
 	"This node is used in multiple situations. If it is in an assignation we need to check if the variable we assign is created. Other uses can be for example in an import, in this case we want to only return the name."
 
-	isInLeftSideOfAssignation ifTrue: [ "If we have a variable of this name already, we should not recreate it. Except if this variable got shadowed! In that case, we should recreate it."
-		^ (self currentEntity query descendants ofType: FamixTStructuralEntity)
-			  detect: [ :child | child name = aVariableExpression name and: [ child isShadowable not or: [ child isShadowed not ] ] ]
-			  ifNone: [
-				  | variable shadowedEntity |
-				  shadowedEntity := self findSadowedEntityNamed: aVariableExpression name.
-				  variable := self currentEntity createLocalVariable: aVariableExpression name.
-				  shadowedEntity ifNotNil: [ variable shadowedEntity: shadowedEntity ].
-				  "We select the lhs node because the source anchor should not be the full assignation."
-				  self setSourceAnchor: variable from: aVariableExpression.
-				  variable ] ].
+	aVariableExpression isLeftSideOfAssignation ifTrue: [
+		| variable |
+		"If we have a variable of this name already, we should not recreate it. Except if this variable got shadowed! In that case, we should recreate it."
+		(self currentEntity query descendants ofType: FamixTStructuralEntity)
+			detect: [ :child | child name = aVariableExpression name and: [ child isShadowable not or: [ child isShadowed not ] ] ]
+			ifFound: [ :var | variable := var ]
+			ifNone: [
+				| shadowedEntity |
+				shadowedEntity := self findSadowedEntityNamed: aVariableExpression name.
+				variable := self currentEntity createLocalVariable: aVariableExpression name.
+				shadowedEntity ifNotNil: [ variable shadowedEntity: shadowedEntity ].
+				"We select the lhs node because the source anchor should not be the full assignation."
+				self setSourceAnchor: variable from: aVariableExpression ].
+
+		self createWriteAccessTo: variable from: aVariableExpression assignationNode.
+		^ variable ].
 
 	^ aVariableExpression name
 ]
