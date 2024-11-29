@@ -851,5 +851,33 @@ FamixPythonImporterVisitor >> visitVariableExpression: aVariableExpression [
 		self createWriteAccessTo: variable from: aVariableExpression assignationNode.
 		^ variable ].
 
+	aVariableExpression isReceiverOfFunctionCall ifTrue: [
+		self flag: #todo.
+		^ aVariableExpression name ].
+
+	"We do not deal with reserved literals in Famix and imports only need the names.."
+	(aVariableExpression isReservedLiteral or: [ aVariableExpression isInImport ]) ifTrue: [ ^ aVariableExpression name ].
+
+	self
+		resolve: ((SRIdentifierWithNode identifier: aVariableExpression name)
+				 expectedKind: {
+						 FamixPythonClass.
+						 FamixPythonLocalVariable.
+						 FamixPythonGlobalVariable.
+						 FamixPythonAttribute.
+						 FamixPythonParameter };
+				 notFoundReplacementEntity: [ :unresolved :currentEntity | self ensureStubClassNamed: unresolved identifier ];
+				 yourself)
+		foundAction: [ :entity :currentEntity | "In case of a class, we need to create a reference. In case of a structural entity we have a read access."
+			entity isClass
+				ifTrue: [  ]
+				ifFalse: [
+					| access |
+					access := model newAccess.
+					access variable: entity.
+					access accessor: currentEntity.
+					access isWrite: false.
+					self setSourceAnchor: access from: aVariableExpression ] ].
+
 	^ aVariableExpression name
 ]

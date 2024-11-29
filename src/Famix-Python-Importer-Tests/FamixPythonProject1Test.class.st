@@ -1861,8 +1861,6 @@ FamixPythonProject1Test >> testPackageSourceAnchor [
 FamixPythonProject1Test >> testReadAccessToGlobal [
 
 	| global module access |
-	self skip.
-	self flag: #todo.
 	global := self globalVariableNamed: 'moduleAtRootVariable'.
 	module := self moduleNamed: 'moduleAtRoot'.
 

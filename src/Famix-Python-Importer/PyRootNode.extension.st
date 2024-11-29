@@ -24,6 +24,18 @@ PyRootNode >> isAssignation [
 ]
 
 { #category : '*Famix-Python-Importer' }
+PyRootNode >> isFunctionCallExpression [
+
+	^ false
+]
+
+{ #category : '*Famix-Python-Importer' }
+PyRootNode >> isImport [
+
+	^ false
+]
+
+{ #category : '*Famix-Python-Importer' }
 PyRootNode >> isLeftSideOfAssignation: aNode [
 
 	^ false
