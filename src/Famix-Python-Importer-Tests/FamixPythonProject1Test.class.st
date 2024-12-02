@@ -2452,6 +2452,49 @@ FamixPythonProject1Test >> testWriteAccessToLocaleInMethod [
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testWriteAccessWithMultipleAssignations [
+	"Test to ensure we parse well this kind of assignations:
+	
+	local_multiple1 = local_multiple2 = local_multiple3 = 2"
+
+	| variable function access |
+	function := self functionNamed: 'function_with_multiple_assignations'.
+
+	variable := self localVariableNamed: 'local_multiple1'.
+	access := variable incomingAccesses detect: [ :anAccess | anAccess accessor = function ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: function.
+	self assert: access accessor equals: function.
+	self assert: access target equals: variable.
+	self assert: access variable equals: variable.
+	self assert: access isWrite.
+	self deny: access isRead.
+
+	variable := self localVariableNamed: 'local_multiple2'.
+	access := variable incomingAccesses detect: [ :anAccess | anAccess accessor = function ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: function.
+	self assert: access accessor equals: function.
+	self assert: access target equals: variable.
+	self assert: access variable equals: variable.
+	self assert: access isWrite.
+	self deny: access isRead.
+
+	variable := self localVariableNamed: 'local_multiple3'.
+	access := variable incomingAccesses detect: [ :anAccess | anAccess accessor = function ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: function.
+	self assert: access accessor equals: function.
+	self assert: access target equals: variable.
+	self assert: access variable equals: variable.
+	self assert: access isWrite.
+	self deny: access isRead
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testWriteAccessWithTupleAssignation [
 
 	| global module access |
