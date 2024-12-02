@@ -1865,6 +1865,25 @@ FamixPythonProject1Test >> testPlaceholderVariablesDoNotCreateStubs [
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessFromLambdaToParameter [
+
+	| parameter lambda access |
+	parameter := (self functionNamed: 'function_returning_lambda') parameters anyOne.
+	lambda := lambda := (self functionNamed: 'function_returning_lambda') lambdas anyOne.
+
+	access := parameter incomingAccesses detect: [ :anAccess | anAccess accessor = lambda ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: lambda.
+	self assert: access accessor equals: lambda.
+	self assert: access target equals: parameter.
+	self assert: access variable equals: parameter.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (lambda accesses anySatisfy: [ :anAccess | anAccess variable = parameter ])
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testReadAccessToGlobal [
 
 	| global module access |
