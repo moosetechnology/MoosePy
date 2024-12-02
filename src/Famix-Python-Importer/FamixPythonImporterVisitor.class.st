@@ -272,7 +272,6 @@ FamixPythonImporterVisitor >> ensureStubContainerNamed: aString [
 	^ (self unknownImportedNamed: aString) ifNil: [
 		  model newUnknownImportedEntity
 			  name: aString;
-			  isStub: true;
 			  yourself ]
 ]
 

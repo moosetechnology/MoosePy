@@ -33,3 +33,10 @@ FamixPythonUnknownImportedEntity class >> annotation [
 	<generated>
 	^ self
 ]
+
+{ #category : 'testing' }
+FamixPythonUnknownImportedEntity >> isStub [
+	"Those entities represent stub entities by design."
+
+	^ true
+]
