@@ -1857,6 +1857,13 @@ FamixPythonProject1Test >> testPackageSourceAnchor [
 	self assert: rootPackage sourceAnchor sourceText equals: (FamixPythonBridge parsingExamples / 'project1' / 'src' / 'root' / '__init__.py') contents
 ]
 
+{ #category : 'tests' }
+FamixPythonProject1Test >> testPlaceholderVariablesDoNotCreateStubs [
+	"Regression test: having a placeholder variable `_` was creating a stub named `_` but we should just ignore those."
+	
+	self assertEmpty: ((self model allUsing: FamixTNamedEntity) select: [ :entity | entity name = '_' ])
+]
+
 { #category : 'tests - accesses' }
 FamixPythonProject1Test >> testReadAccessToGlobal [
 

@@ -15,6 +15,13 @@ PyVariableExpressionNode >> isLeftSideOfAssignation [
 ]
 
 { #category : '*Famix-Python-Importer' }
+PyVariableExpressionNode >> isPlaceholderVariable [
+	"A placeholder variable is the use of `_` instead of a variable to ignore it."
+
+	^ self name = '_'
+]
+
+{ #category : '*Famix-Python-Importer' }
 PyVariableExpressionNode >> isReceiverOfFunctionCall [
 
 	^ self parent isFunctionCallExpression and: [ self parent receiver = self ]

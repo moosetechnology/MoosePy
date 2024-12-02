@@ -858,6 +858,8 @@ FamixPythonImporterVisitor >> visitVariableExpression: aVariableExpression [
 	"We do not deal with reserved literals in Famix and imports only need the names.."
 	(aVariableExpression isReservedLiteral or: [ aVariableExpression isInImport ]) ifTrue: [ ^ aVariableExpression name ].
 
+	aVariableExpression isPlaceholderVariable ifTrue: [ ^ aVariableExpression name ].
+
 	self
 		resolve: ((SRIdentifierWithNode identifier: aVariableExpression name)
 				 expectedKind: {
@@ -866,7 +868,9 @@ FamixPythonImporterVisitor >> visitVariableExpression: aVariableExpression [
 						 FamixPythonGlobalVariable.
 						 FamixPythonAttribute.
 						 FamixPythonParameter };
-				 notFoundReplacementEntity: [ :unresolved :currentEntity | self ensureStubClassNamed: unresolved identifier ];
+				 notFoundReplacementEntity: [ :unresolved :currentEntity |
+					" 1 halt."
+					 self ensureStubClassNamed: unresolved identifier ];
 				 yourself)
 		foundAction: [ :entity :currentEntity | "In case of a class, we need to create a reference. In case of a structural entity we have a read access."
 			entity isClass
