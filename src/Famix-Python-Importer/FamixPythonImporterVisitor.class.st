@@ -675,6 +675,26 @@ FamixPythonImporterVisitor >> unknownImportedNamed: aString [
 ]
 
 { #category : 'visiting' }
+FamixPythonImporterVisitor >> visitAssignedVariable: anAssignedVariable [
+
+	| variable |
+	"If we have a variable of this name already, we should not recreate it. Except if this variable got shadowed! In that case, we should recreate it."
+	(self currentEntity query descendants ofType: FamixTStructuralEntity)
+		detect: [ :child | child name = anAssignedVariable name and: [ child isShadowable not or: [ child isShadowed not ] ] ]
+		ifFound: [ :var | variable := var ]
+		ifNone: [
+			| shadowedEntity |
+			shadowedEntity := self findSadowedEntityNamed: anAssignedVariable name.
+			variable := self currentEntity createLocalVariable: anAssignedVariable name.
+			shadowedEntity ifNotNil: [ variable shadowedEntity: shadowedEntity ].
+			"We select the lhs node because the source anchor should not be the full assignation."
+			self setSourceAnchor: variable from: anAssignedVariable ].
+
+	self createWriteAccessTo: variable from: anAssignedVariable assignationNode.
+	^ variable
+]
+
+{ #category : 'visiting' }
 FamixPythonImporterVisitor >> visitClassDefinition: aClassDef [
 
 	^ self useCurrentEntity: (self createClass: aClassDef) during: [ super visitClassDefinition: aClassDef ]
@@ -861,25 +881,6 @@ FamixPythonImporterVisitor >> visitString: aStringNode [
 
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> visitVariableExpression: aVariableExpression [
-	"This node is used in multiple situations. If it is in an assignation we need to check if the variable we assign is created. Other uses can be for example in an import, in this case we want to only return the name."
-
-	aVariableExpression isLeftSideOfAssignation ifTrue: [
-		| variable |
-		"If we have a variable of this name already, we should not recreate it. Except if this variable got shadowed! In that case, we should recreate it."
-		(self currentEntity query descendants ofType: FamixTStructuralEntity)
-			detect: [ :child | child name = aVariableExpression name and: [ child isShadowable not or: [ child isShadowed not ] ] ]
-			ifFound: [ :var | variable := var ]
-			ifNone: [
-				| shadowedEntity |
-				shadowedEntity := self findSadowedEntityNamed: aVariableExpression name.
-				variable := self currentEntity createLocalVariable: aVariableExpression name.
-				shadowedEntity ifNotNil: [ variable shadowedEntity: shadowedEntity ].
-				"We select the lhs node because the source anchor should not be the full assignation."
-				self setSourceAnchor: variable from: aVariableExpression ].
-
-		self createWriteAccessTo: variable from: aVariableExpression assignationNode.
-		^ variable ].
-
 
 	self
 		resolve: ((SRIdentifierWithNode identifier: aVariableExpression name)

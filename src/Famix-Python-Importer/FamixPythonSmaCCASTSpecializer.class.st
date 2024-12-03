@@ -19,5 +19,7 @@ FamixPythonSmaCCASTSpecializer >> visitVariableExpression: aVariableExpression [
 
 	aVariableExpression isPlaceholderVariable ifTrue: [ ^ FamixPythonPlaceholderVariableNode adoptInstance: aVariableExpression ].
 
-	aVariableExpression isInImport ifTrue: [ ^ FamixPythonImportVariableExpressionNode adoptInstance: aVariableExpression ]
+	aVariableExpression isInImport ifTrue: [ ^ FamixPythonImportVariableExpressionNode adoptInstance: aVariableExpression ].
+
+	aVariableExpression isLeftSideOfAssignation ifTrue: [ ^ FamixPythonAssignedVariableNode adoptInstance: aVariableExpression ]
 ]

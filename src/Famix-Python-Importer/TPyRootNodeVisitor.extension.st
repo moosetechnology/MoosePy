@@ -1,6 +1,12 @@
 Extension { #name : 'TPyRootNodeVisitor' }
 
 { #category : '*Famix-Python-Importer' }
+TPyRootNodeVisitor >> visitAssignedVariable: anAssignedVariable [
+
+	^ self visitVariableExpression: anAssignedVariable
+]
+
+{ #category : '*Famix-Python-Importer' }
 TPyRootNodeVisitor >> visitFunctionCallReceiverVariable: aFunctionCallReceiverVariable [
 
 	^ self visitVariableExpression: aFunctionCallReceiverVariable
