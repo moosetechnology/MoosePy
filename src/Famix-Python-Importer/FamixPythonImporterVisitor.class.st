@@ -708,6 +708,9 @@ FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression
 FamixPythonImporterVisitor >> visitFile: aFileNode [
 
 	| isPackageDeclaration entity |
+	
+	FamixPythonSmaCCASTSpecializer new acceptNode: aFileNode.
+	
 	"If the file is name __init__.py this means that we have the declaration of a package. Else we have a module that can be in a package."
 	isPackageDeclaration := aFileNode fileReference basename = '__init__.py'.
 	entity := isPackageDeclaration
@@ -726,6 +729,13 @@ FamixPythonImporterVisitor >> visitFile: aFileNode [
 	^ isPackageDeclaration
 		  ifTrue: [ self currentEntity ]
 		  ifFalse: [ self popScope ]
+]
+
+{ #category : 'visiting' }
+FamixPythonImporterVisitor >> visitFunctionCallReceiverVariable: aFunctionCallReceiverVariable [
+
+	self flag: #todo.
+	^ aFunctionCallReceiverVariable name
 ]
 
 { #category : 'visiting' }
@@ -756,6 +766,12 @@ FamixPythonImporterVisitor >> visitImportStatement: anImport [
 			ofName: importName
 			from: (self acceptNode: anImport from)
 			alias: alias ]
+]
+
+{ #category : 'visiting' }
+FamixPythonImporterVisitor >> visitImportVariableExpression: anImportVariableExpression [
+
+	^ anImportVariableExpression name
 ]
 
 { #category : 'visiting' }
@@ -798,9 +814,23 @@ FamixPythonImporterVisitor >> visitParameter: aParameter [
 ]
 
 { #category : 'visiting' }
+FamixPythonImporterVisitor >> visitPlaceholderVariable: aPlaceholderVariable [
+	"We do not deal with placeholder variables here."
+
+	^ aPlaceholderVariable name
+]
+
+{ #category : 'visiting' }
 FamixPythonImporterVisitor >> visitRelativeName: aRelativeName [
 
 	^ aRelativeName source
+]
+
+{ #category : 'visiting' }
+FamixPythonImporterVisitor >> visitReservedLiteral: aReservedLiteral [
+	"We do not deal with reserved literals here."
+
+	^ aReservedLiteral name
 ]
 
 { #category : 'visiting' }
