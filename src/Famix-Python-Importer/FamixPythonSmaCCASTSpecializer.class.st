@@ -13,11 +13,11 @@ Class {
 FamixPythonSmaCCASTSpecializer >> visitVariableExpression: aVariableExpression [
 	"This node is used in multiple situations. I am trying to remove some ambiguity by specializing the nodes."
 
+	aVariableExpression isReceiverOfFunctionCall ifTrue: [ ^ FamixPythonFunctionCallReceiverVariableNode adoptInstance: aVariableExpression ].
+
 	aVariableExpression isReservedLiteral ifTrue: [ ^ FamixPythonReservedLiteralNode adoptInstance: aVariableExpression ].
 
 	aVariableExpression isPlaceholderVariable ifTrue: [ ^ FamixPythonPlaceholderVariableNode adoptInstance: aVariableExpression ].
-
-	"aVariableExpression isFunctionCallExpression ifTrue: [ ^ FamixPythonFunctionCallReceiverVariableNode adoptInstance: aVariableExpression ]."
 
 	aVariableExpression isInImport ifTrue: [ ^ FamixPythonImportVariableExpressionNode adoptInstance: aVariableExpression ]
 ]

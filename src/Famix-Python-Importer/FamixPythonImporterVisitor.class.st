@@ -880,22 +880,17 @@ FamixPythonImporterVisitor >> visitVariableExpression: aVariableExpression [
 		self createWriteAccessTo: variable from: aVariableExpression assignationNode.
 		^ variable ].
 
-	aVariableExpression isReceiverOfFunctionCall ifTrue: [
-		self flag: #todo.
-		^ aVariableExpression name ].
 
 	self
 		resolve: ((SRIdentifierWithNode identifier: aVariableExpression name)
 				 expectedKind: {
 						 FamixPythonClass.
-						FamixPythonFunction.
+						 FamixPythonFunction.
 						 FamixPythonLocalVariable.
 						 FamixPythonGlobalVariable.
 						 FamixPythonAttribute.
 						 FamixPythonParameter };
-				 notFoundReplacementEntity: [ :unresolved :currentEntity |
-					 "1 halt."
-					 self ensureStubClassNamed: unresolved identifier ];
+				 notFoundReplacementEntity: [ :unresolved :currentEntity | "1 halt." self ensureStubClassNamed: unresolved identifier ];
 				 yourself)
 		foundAction: [ :entity :currentEntity | "In case of a class, we need to create a reference. In case of a structural entity we have a read access."
 			entity isClass
