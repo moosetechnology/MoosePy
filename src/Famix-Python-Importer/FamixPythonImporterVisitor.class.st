@@ -884,11 +884,6 @@ FamixPythonImporterVisitor >> visitVariableExpression: aVariableExpression [
 		self flag: #todo.
 		^ aVariableExpression name ].
 
-	"We do not deal with reserved literals in Famix and imports only need the names.."
-	(aVariableExpression isReservedLiteral or: [ aVariableExpression isInImport ]) ifTrue: [ ^ aVariableExpression name ].
-
-	aVariableExpression isPlaceholderVariable ifTrue: [ ^ aVariableExpression name ].
-
 	self
 		resolve: ((SRIdentifierWithNode identifier: aVariableExpression name)
 				 expectedKind: {
