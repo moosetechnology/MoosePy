@@ -623,13 +623,13 @@ FamixPythonImporterVisitor >> rootFilePath: aString [
 FamixPythonImporterVisitor >> setSourceAnchor: aFamixEntity from: aSmaccNode [
 
 	aFamixEntity sourceAnchor: (FamixPythonIndexedFileAnchor new
-		fileName: (self relativeFilePath: aSmaccNode) ;
-		startPos: aSmaccNode startPosition;
-		endPos: aSmaccNode stopPosition;
-		mooseModel: self model;
-		yourself).
+			 fileName: (self relativeFilePath: aSmaccNode);
+			 startPos: aSmaccNode startPosition;
+			 endPos: aSmaccNode stopPosition;
+			 mooseModel: self model;
+			 yourself).
 
-	aFamixEntity stub: false.
+	(aFamixEntity class includesTrait: FamixTCanBeStub) ifTrue: [ aFamixEntity isStub: false ].
 
 	^ aFamixEntity
 ]
