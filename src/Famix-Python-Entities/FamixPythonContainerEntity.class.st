@@ -11,6 +11,7 @@
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `outgoingImports` | `FamixTWithImports` | `importingEntity` | `FamixTImport` | |
+| `unknowAccessOrReference` | `FamixPythonContainerEntity` | `accessorOrReferencer` | `FamixPythonUnknowAccessOrReference` | |
 
 
 
@@ -20,6 +21,9 @@ Class {
 	#superclass : 'FamixPythonNamedEntity',
 	#traits : 'FamixTWithClasses + FamixTWithImports',
 	#classTraits : 'FamixTWithClasses classTrait + FamixTWithImports classTrait',
+	#instVars : [
+		'#unknowAccessesOrReferences => FMMany type: #FamixPythonUnknowAccessOrReference opposite: #accessorOrReferencer'
+	],
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',
 	#tag : 'Entities'
@@ -40,4 +44,26 @@ FamixPythonContainerEntity class >> isAbstract [
 
 	<generated>
 	^ self == FamixPythonContainerEntity
+]
+
+{ #category : 'adding' }
+FamixPythonContainerEntity >> addUnknowAccessesOrReferences: anObject [
+	<generated>
+	^ self unknowAccessesOrReferences add: anObject
+]
+
+{ #category : 'accessing' }
+FamixPythonContainerEntity >> unknowAccessesOrReferences [
+	"Relation named: #unknowAccessOrReference type: #FamixPythonUnknowAccessOrReference opposite: #accessorOrReferencer"
+
+	<generated>
+	<derived>
+	^ unknowAccessesOrReferences
+]
+
+{ #category : 'accessing' }
+FamixPythonContainerEntity >> unknowAccessesOrReferences: anObject [
+
+	<generated>
+	unknowAccessesOrReferences value: anObject
 ]

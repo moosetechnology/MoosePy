@@ -87,6 +87,12 @@ FamixPythonAbstractImporterTest >> parameterNamed: aName [
 ]
 
 { #category : 'accessing' }
+FamixPythonAbstractImporterTest >> unknownAccessedOrReferencedEntityNamed: aName [
+
+	^ self model entities detect: [ :entity | entity class = FamixPythonUnknownAccessedOrReferencedEntity and: [ entity name = aName ] ]
+]
+
+{ #category : 'accessing' }
 FamixPythonAbstractImporterTest >> unknownContainerNamed: aName [
 
 	^ self model entities detect: [ :entity | entity class = FamixPythonUnknownImportedEntity and: [ entity name = aName ] ]

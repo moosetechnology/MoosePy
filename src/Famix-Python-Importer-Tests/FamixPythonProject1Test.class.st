@@ -17,6 +17,23 @@ FamixPythonProject1Test >> model [
 	^ FamixPythonProject1TestResource current model
 ]
 
+{ #category : 'tests - unknown access or reference' }
+FamixPythonProject1Test >> testAccessOrReferenceToStubEntity [
+
+	| stub module access |
+	stub := self unknownAccessedOrReferencedEntityNamed: 'MissingClass'.
+	module := self moduleNamed: 'moduleWithRelativeFromImportStub'.
+
+	access := stub accessesOrReferences detect: [ :anAccess | anAccess accessorOrReferencer = module ].
+
+	self assert: access class equals: FamixPythonUnknowAccessOrReference.
+	self assert: access source equals: module.
+	self assert: access accessorOrReferencer equals: module.
+	self assert: access target equals: stub.
+	self assert: access unknownEntity equals: stub.
+	self assert: (module unknowAccessesOrReferences anySatisfy: [ :anAccess | anAccess unknownEntity = stub ])
+]
+
 { #category : 'tests - from-import' }
 FamixPythonProject1Test >> testClassImportsClassFromAModule [
 

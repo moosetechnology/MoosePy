@@ -68,7 +68,8 @@ FamixPythonGenerator >> defineClasses [
 	type := builder newClassNamed: #Type.
 	globalVariable := builder newClassNamed: #GlobalVariable.
 	unknownImportedEntity := builder newClassNamed: #UnknownImportedEntity.
-	unknownAccessedOrReferencedEntity := builder newClassNamed: #UnknownAccessedOrReferencedEntity
+	unknownAccessedOrReferencedEntity := builder newClassNamed: #UnknownAccessedOrReferencedEntity.
+	unknowAccessOrReference := builder newClassNamed: #UnknowAccessOrReference 
 ]
 
 { #category : 'definition' }
@@ -195,7 +196,9 @@ FamixPythonGenerator >> defineHierarchy [
 	unknownImportedEntity --|> #TImportable.
 	unknownImportedEntity--|> #TPackageable .
 	
-	unknownAccessedOrReferencedEntity --|> namedEntity
+	unknownAccessedOrReferencedEntity --|> namedEntity.
+	
+	unknowAccessOrReference --|> #TAssociation
 ]
 
 { #category : 'definition' }
@@ -213,6 +216,9 @@ FamixPythonGenerator >> defineRelations [
 
 	super defineRelations.
 
-	((class property: #metaclass) comment: '')
-	*- ((class property: #instancedClasses) comment: '')
+	((class property: #metaclass) comment: '') *- ((class property: #instancedClasses) comment: '').
+
+	(unknowAccessOrReference property: #accessorOrReferencer) source *- (containerEntity property: #unknowAccessesOrReferences).
+
+	(unknowAccessOrReference property: #unknownEntity) target *- (unknownAccessedOrReferencedEntity property: #accessesOrReferences)
 ]
