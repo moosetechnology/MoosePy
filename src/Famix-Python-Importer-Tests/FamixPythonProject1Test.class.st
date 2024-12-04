@@ -1865,6 +1865,44 @@ FamixPythonProject1Test >> testPlaceholderVariablesDoNotCreateStubs [
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessFromFunction [
+
+	| temporary function access |
+	temporary := self localVariableNamed: 'local_in_function3'.
+	function := self functionNamed: 'function_with_local_variables'.
+
+	access := (temporary incomingAccesses select: [ :anAccess | anAccess accessor = function ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: function.
+	self assert: access accessor equals: function.
+	self assert: access target equals: temporary.
+	self assert: access variable equals: temporary.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (function accesses anySatisfy: [ :anAccess | anAccess variable = temporary ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessFromLambda [
+
+	| parameter lambda access |
+	parameter := self localVariableNamed: 'temporary_in_lambda'.
+	lambda := lambda := (self functionNamed: 'function_with_lambda_with_temporary') lambdas anyOne.
+
+	access := (parameter incomingAccesses select: [ :anAccess | anAccess accessor = lambda ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: lambda.
+	self assert: access accessor equals: lambda.
+	self assert: access target equals: parameter.
+	self assert: access variable equals: parameter.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (lambda accesses anySatisfy: [ :anAccess | anAccess variable = parameter ])
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testReadAccessFromLambdaToParameter [
 
 	| parameter lambda access |
@@ -1881,6 +1919,64 @@ FamixPythonProject1Test >> testReadAccessFromLambdaToParameter [
 	self deny: access isWrite.
 	self assert: access isRead.
 	self assert: (lambda accesses anySatisfy: [ :anAccess | anAccess variable = parameter ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessFromMethod [
+
+	| locale method access |
+	locale := self localVariableNamed: 'local_in_method2'.
+	method := self methodNamed: 'method_with_local_variables'.
+
+	"We want to have the reading and not the writing."
+	access := (locale incomingAccesses select: [ :anAccess | anAccess accessor = method ]) detectMax: [ :entity | entity sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: method.
+	self assert: access accessor equals: method.
+	self assert: access target equals: locale.
+	self assert: access variable equals: locale.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (method accesses anySatisfy: [ :anAccess | anAccess variable = locale ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessFromModule [
+
+	| global module access |
+	global := self globalVariableNamed: 'moduleAtRootVariable'.
+	module := self moduleNamed: 'moduleAtRoot'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ] .
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessFromPackage [
+
+	| global package access |
+	global := self globalVariableNamed: 'rootPackageVariable'.
+	package := self packageNamed: 'root'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = package ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ] .
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: package.
+	self assert: access accessor equals: package.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (package accesses anySatisfy: [ :anAccess | anAccess variable = global ])
 ]
 
 { #category : 'tests - accesses' }
