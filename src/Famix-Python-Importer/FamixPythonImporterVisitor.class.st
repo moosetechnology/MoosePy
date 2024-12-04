@@ -308,6 +308,15 @@ FamixPythonImporterVisitor >> ensureStubPackagesFromPath: aPythonImportPath [
 	^ package
 ]
 
+{ #category : 'private-entity-creation' }
+FamixPythonImporterVisitor >> ensureStubUnknownAccessedOrReferencedEntityNamed: aString [
+
+	^ (self unknownAccessedOrReferencedEntityNamed: aString) ifNil: [
+		  model newUnknownAccessedOrReferencedEntity
+			  name: aString;
+			  yourself ]
+]
+
 { #category : 'accessing' }
 FamixPythonImporterVisitor >> extractArgumentsInformation: aSignature [
 
@@ -667,6 +676,14 @@ FamixPythonImporterVisitor >> signatureFromInvocation: anInvocationNode [
 ]
 
 { #category : 'private - searching' }
+FamixPythonImporterVisitor >> unknownAccessedOrReferencedEntityNamed: aString [
+
+	^ self model entities
+		  detect: [ :e | e class = FamixPythonUnknownAccessedOrReferencedEntity and: [ e name = aString ] ]
+		  ifNone: [ nil ]
+]
+
+{ #category : 'private - searching' }
 FamixPythonImporterVisitor >> unknownImportedNamed: aString [
 
 	^ self model entities
@@ -893,21 +910,12 @@ FamixPythonImporterVisitor >> visitVariableExpression: aVariableExpression [
 						 FamixPythonGlobalVariable.
 						 FamixPythonAttribute.
 						 FamixPythonParameter };
-				 notFoundReplacementEntity: [ :unresolved :currentEntity | "1 halt." self ensureStubClassNamed: unresolved identifier ];
+				 notFoundReplacementEntity: [ :unresolved :currentEntity | "1 halt." self ensureStubUnknownAccessedOrReferencedEntityNamed: unresolved identifier ];
 				 yourself)
-		foundAction: [ :entity :currentEntity | "In case of a class, we need to create a reference. In case of a structural entity we have a read access."
-			entity isClass
-				ifTrue: [ self flag: #todo ]
-				ifFalse: [
-					entity isFunction
-						ifTrue: [ self flag: #todo ]
-						ifFalse: [
-							| access |
-							access := model newAccess.
-							access variable: entity.
-							access accessor: currentEntity.
-							access isWrite: false.
-							self setSourceAnchor: access from: aVariableExpression ] ] ].
+		foundAction: [ :entity :currentEntity |
+			self flag: #todo. "The ifNotNil should be removed later."
+			(entity createAccessOrReferenceFrom: currentEntity node: aVariableExpression) ifNotNil: [ :association |
+				self setSourceAnchor: association from: aVariableExpression ] ].
 
 	^ aVariableExpression name
 ]

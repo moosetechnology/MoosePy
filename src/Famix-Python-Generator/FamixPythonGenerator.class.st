@@ -22,6 +22,8 @@ Class {
 		'indexedFileAnchor',
 		'globalVariable',
 		'unknownImportedEntity',
+		'unknownAccessedOrReferencedEntity',
+		'unknowAccessOrReference',
 		'lambda'
 	],
 	#category : 'Famix-Python-Generator',
@@ -65,7 +67,8 @@ FamixPythonGenerator >> defineClasses [
 	reference := builder newClassNamed: #Reference.
 	type := builder newClassNamed: #Type.
 	globalVariable := builder newClassNamed: #GlobalVariable.
-	unknownImportedEntity := builder newClassNamed: #UnknownImportedEntity
+	unknownImportedEntity := builder newClassNamed: #UnknownImportedEntity.
+	unknownAccessedOrReferencedEntity := builder newClassNamed: #UnknownAccessedOrReferencedEntity
 ]
 
 { #category : 'definition' }
@@ -190,7 +193,9 @@ FamixPythonGenerator >> defineHierarchy [
 	
 	unknownImportedEntity --|> containerEntity.
 	unknownImportedEntity --|> #TImportable.
-	unknownImportedEntity--|> #TPackageable 
+	unknownImportedEntity--|> #TPackageable .
+	
+	unknownAccessedOrReferencedEntity --|> namedEntity
 ]
 
 { #category : 'definition' }

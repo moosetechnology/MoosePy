@@ -26,7 +26,6 @@
 | Name | Type | Default value | Comment |
 |---|
 | `alias` | `String` | nil | Alias of the imported entity in the scope of the import|
-| `isStub` | `Boolean` | false | Flag true if the entity attributes are incomplete, either because the entity is missing or not imported.|
 
 "
 Class {

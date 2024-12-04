@@ -252,6 +252,13 @@ FamixPythonTEntityCreator >> newTypeNamed: aName [
 ]
 
 { #category : 'entity creation' }
+FamixPythonTEntityCreator >> newUnknownAccessedOrReferencedEntity [
+
+	<generated>
+	^ self add: FamixPythonUnknownAccessedOrReferencedEntity new
+]
+
+{ #category : 'entity creation' }
 FamixPythonTEntityCreator >> newUnknownImportedEntity [
 
 	<generated>
