@@ -1884,6 +1884,27 @@ FamixPythonProject1Test >> testReadAccessFromLambdaToParameter [
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessToCVar [
+
+	| cvar module access |
+	self skip. "Todo"
+	cvar := self attributeNamed: 'sound'.
+	module := self moduleNamed: 'moduleAtRoot3'.
+
+	"We want to have the reading and not the writing."
+	access := (cvar incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :entity | entity sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: cvar.
+	self assert: access variable equals: cvar.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = cvar ])
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testReadAccessToGlobal [
 
 	| global module access |
@@ -1901,6 +1922,27 @@ FamixPythonProject1Test >> testReadAccessToGlobal [
 	self deny: access isWrite.
 	self assert: access isRead.
 	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessToIVar [
+
+	| ivar method access |
+	self skip. "Todo"
+	ivar := self attributeNamed: 'dog_color'.
+	method := self methodNamed: 'get_dog_color'.
+
+	"We want to have the reading and not the writing."
+	access := (ivar incomingAccesses select: [ :anAccess | anAccess accessor = method ]) detectMax: [ :entity | entity sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: method.
+	self assert: access accessor equals: method.
+	self assert: access target equals: ivar.
+	self assert: access variable equals: ivar.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (method accesses anySatisfy: [ :anAccess | anAccess variable = ivar ])
 ]
 
 { #category : 'tests - accesses' }
@@ -1942,6 +1984,46 @@ FamixPythonProject1Test >> testReadAccessToImportedGlobalWithAlias [
 	self assert: access isRead.
 	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ]).
 	self assert: access sourceText equals: 'marv' "It's not the name of the var because it is accessed via an alias."
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessToLocaleInFunction [
+
+	| locale function access |
+	locale := self localVariableNamed: 'local_multiple2'.
+	function := self functionNamed: 'function_with_multiple_assignations'.
+
+	"We want to have the reading and not the writing."
+	access := (locale incomingAccesses select: [ :anAccess | anAccess accessor = function ]) detectMax: [ :entity | entity sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: function.
+	self assert: access accessor equals: function.
+	self assert: access target equals: locale.
+	self assert: access variable equals: locale.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (function accesses anySatisfy: [ :anAccess | anAccess variable = locale ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessToLocaleInMethod [
+
+	| locale method access |
+	locale := self localVariableNamed: 'local_in_method2'.
+	method := self methodNamed: 'method_with_local_variables'.
+
+	"We want to have the reading and not the writing."
+	access := (locale incomingAccesses select: [ :anAccess | anAccess accessor = method ]) detectMax: [ :entity | entity sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: method.
+	self assert: access accessor equals: method.
+	self assert: access target equals: locale.
+	self assert: access variable equals: locale.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (method accesses anySatisfy: [ :anAccess | anAccess variable = locale ])
 ]
 
 { #category : 'tests - modules' }
