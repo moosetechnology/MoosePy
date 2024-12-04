@@ -1911,7 +1911,7 @@ FamixPythonProject1Test >> testReadAccessToImportedGlobal [
 	module := self moduleNamed: 'moduleInSubSubPackage3'.
 
 	"We want to have the reading and not the writing."
-	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :entity | entity sourceAnchor startPos ].
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
 
 	self assert: access class equals: FamixPythonAccess.
 	self assert: access source equals: module.
@@ -1921,6 +1921,27 @@ FamixPythonProject1Test >> testReadAccessToImportedGlobal [
 	self deny: access isWrite.
 	self assert: access isRead.
 	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessToImportedGlobalWithAlias [
+
+	| global module access |
+	global := self globalVariableNamed: 'moduleAtRoot2Variable'.
+	module := self moduleNamed: 'moduleWithImportsAndAliases'.
+
+	"We want to have the reading and not the writing."
+	access := (global incomingAccesses detect: [ :anAccess | anAccess accessor = module ]).
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ]).
+	self assert: access sourceText equals: 'marv' "It's not the name of the var because it is accessed via an alias."
 ]
 
 { #category : 'tests - modules' }
