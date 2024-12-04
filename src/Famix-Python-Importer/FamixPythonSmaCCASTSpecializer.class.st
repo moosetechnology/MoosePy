@@ -17,6 +17,11 @@ FamixPythonSmaCCASTSpecializer >> visitFieldAccessExpression: aFieldAccessExpres
 ]
 
 { #category : 'generated' }
+FamixPythonSmaCCASTSpecializer >> visitTypedVariableExpression: aTypedVariableExpression [
+	^ self flag: #todo
+]
+
+{ #category : 'generated' }
 FamixPythonSmaCCASTSpecializer >> visitVariableExpression: aVariableExpression [
 	"This node is used in multiple situations. I am trying to remove some ambiguity by specializing the nodes."
 

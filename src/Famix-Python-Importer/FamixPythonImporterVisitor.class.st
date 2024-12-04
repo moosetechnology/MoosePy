@@ -897,10 +897,10 @@ FamixPythonImporterVisitor >> visitVariableExpression: aVariableExpression [
 				 yourself)
 		foundAction: [ :entity :currentEntity | "In case of a class, we need to create a reference. In case of a structural entity we have a read access."
 			entity isClass
-				ifTrue: [  ]
+				ifTrue: [ self flag: #todo ]
 				ifFalse: [
 					entity isFunction
-						ifTrue: [  ]
+						ifTrue: [ self flag: #todo ]
 						ifFalse: [
 							| access |
 							access := model newAccess.
