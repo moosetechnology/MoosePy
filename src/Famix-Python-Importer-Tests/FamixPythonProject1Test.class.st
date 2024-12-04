@@ -1903,6 +1903,26 @@ FamixPythonProject1Test >> testReadAccessToGlobal [
 	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
 ]
 
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessToImportedGlobal [
+
+	| global module access |
+	global := self globalVariableNamed: 'moduleInSubpackage31Variable'.
+	module := self moduleNamed: 'moduleInSubSubPackage3'.
+
+	"We want to have the reading and not the writing."
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :entity | entity sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
 { #category : 'tests - modules' }
 FamixPythonProject1Test >> testRootModule [
 
