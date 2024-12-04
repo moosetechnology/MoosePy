@@ -674,6 +674,26 @@ FamixPythonImporterVisitor >> unknownImportedNamed: aString [
 		  ifNone: [ nil ]
 ]
 
+{ #category : 'generated' }
+FamixPythonImporterVisitor >> visitAssignedInstanceVariable: anAssignedInstanceVariable [
+
+	| class variable |
+	class := self currentEntityOfType: FamixPythonClass.
+
+	variable := (class childOfType: FamixTAttribute named: anAssignedInstanceVariable name) ifNil: [
+		            variable := self model newAttribute
+			                        name: anAssignedInstanceVariable name;
+			                        parentType: class;
+			                        isClassSide: false;
+			                        yourself.
+
+		            "We select the lhs node because the source anchor should not be the full assignation."
+		            self setSourceAnchor: variable from: anAssignedInstanceVariable.
+		            variable ].
+	self createWriteAccessTo: variable from: anAssignedInstanceVariable assignationNode.
+	^ variable
+]
+
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> visitAssignedVariable: anAssignedVariable [
 
@@ -702,24 +722,6 @@ FamixPythonImporterVisitor >> visitClassDefinition: aClassDef [
 
 { #category : 'generated' }
 FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression [
-	"If the receiver is self in an assignation then we have an assignation to an instance variable"
-
-	aFieldAccessExpression isInstanceVariableAssignation ifTrue: [
-		| class variable |
-		class := self currentEntityOfType: FamixPythonClass.
-
-		variable := (class childOfType: FamixTAttribute named: aFieldAccessExpression name) ifNil: [
-			            variable := self model newAttribute
-				                        name: aFieldAccessExpression name;
-				                        parentType: class;
-				                        isClassSide: false;
-				                        yourself.
-
-			            "We select the lhs node because the source anchor should not be the full assignation."
-			            self setSourceAnchor: variable from: aFieldAccessExpression.
-			            variable ].
-		self createWriteAccessTo: variable from: aFieldAccessExpression assignationNode.
-		^ variable ].
 
 	^ aFieldAccessExpression source
 ]

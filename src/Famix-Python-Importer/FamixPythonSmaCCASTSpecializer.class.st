@@ -10,6 +10,13 @@ Class {
 }
 
 { #category : 'generated' }
+FamixPythonSmaCCASTSpecializer >> visitFieldAccessExpression: aFieldAccessExpression [
+	"This node is used in multiple situations. I am trying to remove some ambiguity by specializing the nodes."
+
+	aFieldAccessExpression isInstanceVariableAssignation ifTrue: [ ^ FamixPythonAssignedInstanceVariableNode adoptInstance: aFieldAccessExpression ]
+]
+
+{ #category : 'generated' }
 FamixPythonSmaCCASTSpecializer >> visitVariableExpression: aVariableExpression [
 	"This node is used in multiple situations. I am trying to remove some ambiguity by specializing the nodes."
 
