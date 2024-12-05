@@ -97,9 +97,6 @@ FamixPythonImporterVisitor >> createImport: anImport ofName: aName from: fromNam
 	self setSourceAnchor: import from: anImport.
 
 	self currentEntity addOutgoingImport: import.
-	self flag: #todo. "Check how to manage the push before the main entity and the pops."
-
-	"pushResolvableAsScopeBeforeMainEntityScope:"
 
 	self solver
 		resolve: (fromName

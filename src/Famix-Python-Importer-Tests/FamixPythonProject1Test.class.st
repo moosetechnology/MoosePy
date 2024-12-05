@@ -1725,7 +1725,6 @@ FamixPythonProject1Test >> testModulesWithTheSameNameAreDifferent [
 { #category : 'tests' }
 FamixPythonProject1Test >> testNoNilSourceOrTargetForAssociations [
 
-	self skip. "To fix"
 	(self model allUsing: FamixTAssociation) do: [ :association |
 		self assert: association source isNotNil.
 		self assert: association target isNotNil ]
