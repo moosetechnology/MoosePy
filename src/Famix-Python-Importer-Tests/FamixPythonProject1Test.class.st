@@ -1710,6 +1710,15 @@ FamixPythonProject1Test >> testModulesWithTheSameNameAreDifferent [
 	self deny: rootModule identicalTo: moduleInPackage
 ]
 
+{ #category : 'tests' }
+FamixPythonProject1Test >> testNoNilSourceOrTargetForAssociations [
+
+	self skip. "To fix"
+	(self model allUsing: FamixTAssociation) do: [ :association |
+		self assert: association source isNotNil.
+		self assert: association target isNotNil ]
+]
+
 { #category : 'tests - from-import' }
 FamixPythonProject1Test >> testPackageImportsClassFromAModule [
 
