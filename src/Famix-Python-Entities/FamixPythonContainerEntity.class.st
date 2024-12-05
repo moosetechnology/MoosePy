@@ -11,7 +11,7 @@
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `outgoingImports` | `FamixTWithImports` | `importingEntity` | `FamixTImport` | |
-| `unknowAccessOrReference` | `FamixPythonContainerEntity` | `accessorOrReferencer` | `FamixPythonUnknowAccessOrReference` | |
+| `unknowAccessesOrReferences` | `FamixPythonContainerEntity` | `accessorOrReferencer` | `FamixPythonUnknowAccessOrReference` | |
 
 
 
@@ -47,14 +47,14 @@ FamixPythonContainerEntity class >> isAbstract [
 ]
 
 { #category : 'adding' }
-FamixPythonContainerEntity >> addUnknowAccessesOrReferences: anObject [
+FamixPythonContainerEntity >> addUnknowAccessesOrReference: anObject [
 	<generated>
 	^ self unknowAccessesOrReferences add: anObject
 ]
 
 { #category : 'accessing' }
 FamixPythonContainerEntity >> unknowAccessesOrReferences [
-	"Relation named: #unknowAccessOrReference type: #FamixPythonUnknowAccessOrReference opposite: #accessorOrReferencer"
+	"Relation named: #unknowAccessesOrReferences type: #FamixPythonUnknowAccessOrReference opposite: #accessorOrReferencer"
 
 	<generated>
 	<derived>

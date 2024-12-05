@@ -35,3 +35,9 @@ TPyRootNodeVisitor >> visitReservedLiteral: aReservedLiteral [
 
 	^ self visitVariableExpression: aReservedLiteral
 ]
+
+{ #category : '*Famix-Python-Importer' }
+TPyRootNodeVisitor >> visitSuperclass: aSuperclass [
+
+	^ self visitVariableExpression: aSuperclass
+]

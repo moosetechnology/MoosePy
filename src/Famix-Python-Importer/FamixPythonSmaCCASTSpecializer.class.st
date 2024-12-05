@@ -33,5 +33,7 @@ FamixPythonSmaCCASTSpecializer >> visitVariableExpression: aVariableExpression [
 
 	aVariableExpression isInImport ifTrue: [ ^ FamixPythonImportVariableExpressionNode adoptInstance: aVariableExpression ].
 
-	aVariableExpression isLeftSideOfAssignation ifTrue: [ ^ FamixPythonAssignedVariableNode adoptInstance: aVariableExpression ]
+	aVariableExpression isLeftSideOfAssignation ifTrue: [ ^ FamixPythonAssignedVariableNode adoptInstance: aVariableExpression ].
+	
+	aVariableExpression isSuperclassDeclaration ifTrue: [ ^ FamixPythonSuperclassNode adoptInstance: aVariableExpression ]
 ]

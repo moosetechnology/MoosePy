@@ -179,6 +179,7 @@ FamixPythonGenerator >> defineHierarchy [
 	package --|> #TWithFunctions.
 	package --|> #TWithLambdas.
 	package --|> #TWithAccesses.
+	package --|> #TWithReferences.
 
 	parameter --|> namedEntity.
 	parameter --|> #TParameter.

@@ -5,7 +5,7 @@
 ### Association source
 | Relation | Origin | Opposite | Type | Comment |
 |---|
-| `accessorOrReferencer` | `FamixPythonUnknowAccessOrReference` | `unknowAccessOrReference` | `FamixPythonContainerEntity` | |
+| `accessorOrReferencer` | `FamixPythonUnknowAccessOrReference` | `unknowAccessesOrReferences` | `FamixPythonContainerEntity` | |
 
 ### Association target
 | Relation | Origin | Opposite | Type | Comment |
@@ -47,7 +47,7 @@ FamixPythonUnknowAccessOrReference class >> annotation [
 
 { #category : 'accessing' }
 FamixPythonUnknowAccessOrReference >> accessorOrReferencer [
-	"Relation named: #accessorOrReferencer type: #FamixPythonContainerEntity opposite: #unknowAccessOrReference"
+	"Relation named: #accessorOrReferencer type: #FamixPythonContainerEntity opposite: #unknowAccessesOrReferences"
 
 	<generated>
 	<source>

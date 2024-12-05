@@ -995,6 +995,18 @@ FamixPythonProject1Test >> testImportTwoStubPackagesOfTheSameName [
 	self assert: ((self moduleNamed: 'moduleWithStubs') outgoingImports anySatisfy: [ :import | import importedEntity = numpy ])
 ]
 
+{ #category : 'tests - inheritances' }
+FamixPythonProject1Test >> testInheritanceDoesNotCreateReference [
+	"Regression test"
+
+	| class superclass |
+	class := self classNamed: 'Animal'.
+	superclass := self classNamed: 'AbstractAnimal'.
+
+	self assert: class superclass equals: superclass.
+	self assertEmpty: superclass incomingReferences
+]
+
 { #category : 'tests - attributes' }
 FamixPythonProject1Test >> testInstanceVariableAreDefinedOnlyOnce [
 	"We should have only one ivar even if it is assigned multiple times."
@@ -2414,7 +2426,7 @@ FamixPythonProject1Test >> testSubPackage [
 	self assert: subSubPackage parentPackage equals: subPackage
 ]
 
-{ #category : 'tests - classes' }
+{ #category : 'tests - inheritances' }
 FamixPythonProject1Test >> testSuperclass [
 
 	| class |
@@ -2428,7 +2440,7 @@ FamixPythonProject1Test >> testSuperclass [
 	self deny: class superclass isStub
 ]
 
-{ #category : 'tests - classes' }
+{ #category : 'tests - inheritances' }
 FamixPythonProject1Test >> testSuperclass2 [
 	"Compared to the first test on superclasses, the order of parsing make it important that symbol resolution works in this case."
 

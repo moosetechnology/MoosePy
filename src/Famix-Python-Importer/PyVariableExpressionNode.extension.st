@@ -40,6 +40,12 @@ PyVariableExpressionNode >> isSelf [
 ]
 
 { #category : '*Famix-Python-Importer' }
+PyVariableExpressionNode >> isSuperclassDeclaration [
+
+	^ self parent isClassDefinition and: [ self parent superClasses includes: self ]
+]
+
+{ #category : '*Famix-Python-Importer' }
 PyVariableExpressionNode >> name [
 
 	^ self nameToken value

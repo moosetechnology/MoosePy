@@ -899,6 +899,13 @@ FamixPythonImporterVisitor >> visitString: aStringNode [
 ]
 
 { #category : 'visiting' }
+FamixPythonImporterVisitor >> visitSuperclass: aSuperclass [
+	"We should not look for the class here because it might not exist yet. So we delegate to the symbol resolution in the creation of the class."
+
+	^ aSuperclass name
+]
+
+{ #category : 'visiting' }
 FamixPythonImporterVisitor >> visitVariableExpression: aVariableExpression [
 
 	self
