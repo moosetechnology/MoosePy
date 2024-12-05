@@ -2193,6 +2193,40 @@ FamixPythonProject1Test >> testReadAccessToParameter [
 	self assert: (function accesses anySatisfy: [ :anAccess | anAccess variable = parameter ])
 ]
 
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testReferenceFromModule [
+
+	| class module reference |
+	class := self classNamed: 'Student'.
+	module := self moduleNamed: 'moduleAtRoot2'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredType equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredType = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testReferenceFromPackage [
+
+	| class package reference |
+	class := self classNamed: 'Room'.
+	package := self packageNamed: 'subsubpackage1'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = package ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: package.
+	self assert: reference referencer equals: package.
+	self assert: reference target equals: class.
+	self assert: reference referredType equals: class.
+	self assert: (package outgoingReferences anySatisfy: [ :aReference | aReference referredType = class ])
+]
+
 { #category : 'tests - modules' }
 FamixPythonProject1Test >> testRootModule [
 
