@@ -2030,6 +2030,20 @@ FamixPythonProject1Test >> testReadAccessFromPackage [
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessSourceAnchor [
+
+	| global module access |
+	global := self globalVariableNamed: 'moduleInSubpackage31Variable'.
+	module := self moduleNamed: 'moduleInSubSubPackage3'.
+
+	"We want to have the reading and not the writing."
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access sourceAnchor isNotNil.
+	self assert: access sourceText equals: 'moduleInSubpackage31Variable'
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testReadAccessToCVar [
 
 	| cvar module access |
