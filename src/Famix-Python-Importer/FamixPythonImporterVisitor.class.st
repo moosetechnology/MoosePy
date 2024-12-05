@@ -653,6 +653,7 @@ FamixPythonImporterVisitor >> setSuperclassesOf: classDefinitionNode from: class
 				  | inheritance |
 				  inheritance := model newInheritance.
 				  inheritance subclass: class.
+				  self setSourceAnchor: inheritance from: superclass.
 				  self
 					  resolve: ((SRIdentifierWithNode identifier: superclass name)
 							   expectedKind: FamixPythonClass;

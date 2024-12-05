@@ -47,6 +47,17 @@ FamixPythonProject1Test >> testAccessOrReferenceToStubEntitySourceAnchor [
 	self assert: access sourceText equals: 'MissingClass'
 ]
 
+{ #category : 'tests' }
+FamixPythonProject1Test >> testAllSourcedEntitiesNotSubHaveSourceAnchor [
+	"We have no source in case we inherit from Object."
+
+	(self model allUsing: FamixTSourceEntity)
+		reject: [ :entity | entity isStub or: [ entity isInheritance and: [ entity target name = 'object' ] ] ]
+		thenDo: [ :entity |
+			self assert: entity sourceAnchor isNotNil.
+			self denyEmpty: entity sourceText ]
+]
+
 { #category : 'tests - from-import' }
 FamixPythonProject1Test >> testClassImportsClassFromAModule [
 
@@ -1005,6 +1016,19 @@ FamixPythonProject1Test >> testInheritanceDoesNotCreateReference [
 
 	self assert: class superclass equals: superclass.
 	self assertEmpty: superclass incomingReferences
+]
+
+{ #category : 'tests - inheritances' }
+FamixPythonProject1Test >> testInheritanceSourceAnchor [
+
+	| class superclass inheritance |
+	class := self classNamed: 'Student'.
+	superclass := self classNamed: 'Person'.
+
+	inheritance := class superInheritances detect: [ :anInheritance | anInheritance superclass = superclass ].
+
+	self assert: inheritance sourceAnchor isNotNil.
+	self assert: inheritance sourceText equals: 'Person'
 ]
 
 { #category : 'tests - attributes' }
@@ -2432,6 +2456,23 @@ FamixPythonProject1Test >> testSimpleFunction [
 	self assert: function name equals: 'sort_list'.
 	self assert: function signature equals: 'sort_list(list1, list2)'.
 	self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot')
+]
+
+{ #category : 'tests - inheritances' }
+FamixPythonProject1Test >> testSimpleInheritance [
+
+	| class superclass inheritance |
+	class := self classNamed: 'Student'.
+	superclass := self classNamed: 'Person'.
+
+	inheritance := class superInheritances detect: [ :anInheritance | anInheritance superclass = superclass ].
+
+	self assert: inheritance class equals: FamixPythonInheritance.
+	self assert: inheritance target equals: superclass.
+	self assert: inheritance superclass equals: superclass.
+	self assert: inheritance source equals: class.
+	self assert: inheritance subclass equals: class.
+	self assert: (superclass subInheritances anySatisfy: [ :anInheritance | anInheritance subclass = class ])
 ]
 
 { #category : 'tests - attributes' }
