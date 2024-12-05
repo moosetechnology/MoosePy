@@ -2161,6 +2161,26 @@ FamixPythonProject1Test >> testReadAccessToLocaleInMethod [
 	self assert: (method accesses anySatisfy: [ :anAccess | anAccess variable = locale ])
 ]
 
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessToParameter [
+
+	| parameter function access |
+	parameter := self parameterNamed: 'list1'.
+	function := self functionNamed: 'sort_list'.
+
+	"We want to have the reading and not the writing."
+	access := (parameter incomingAccesses select: [ :anAccess | anAccess accessor = function ]) detectMax: [ :entity | entity sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: function.
+	self assert: access accessor equals: function.
+	self assert: access target equals: parameter.
+	self assert: access variable equals: parameter.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (function accesses anySatisfy: [ :anAccess | anAccess variable = parameter ])
+]
+
 { #category : 'tests - modules' }
 FamixPythonProject1Test >> testRootModule [
 
