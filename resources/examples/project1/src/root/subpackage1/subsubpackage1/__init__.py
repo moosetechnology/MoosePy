@@ -1,5 +1,6 @@
 subSubPackage1Variable = True
 
+
 # create a class
 class Room:
     length = 0.0
@@ -8,6 +9,9 @@ class Room:
     # method to calculate area
     def calculate_area(self):
         print("Area of Room =", self.length * self.breadth)
+
+
+print(Room)
 
 
 def return2():

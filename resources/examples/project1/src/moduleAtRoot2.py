@@ -34,7 +34,7 @@ p1.printInfos()
 class Student(Person):
     pass
 
-
+print(Student)
 s = Student("Stolys", 19)
 s.printInfos()
 
