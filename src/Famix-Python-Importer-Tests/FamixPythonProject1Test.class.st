@@ -58,6 +58,12 @@ FamixPythonProject1Test >> testAllSourcedEntitiesNotSubHaveSourceAnchor [
 			self denyEmpty: entity sourceText ]
 ]
 
+{ #category : 'tests' }
+FamixPythonProject1Test >> testAssociationsSourcesAreNeverStub [
+
+	(self model allUsing: FamixTAssociation) do: [ :association | self deny: association source isStub ]
+]
+
 { #category : 'tests - from-import' }
 FamixPythonProject1Test >> testClassImportsClassFromAModule [
 
