@@ -93,6 +93,7 @@ FamixPythonGenerator >> defineHierarchy [
 	class --|> #TShadowable.
 	class --|> #TShadower.
 	class --|> #TWithAccesses.  
+	class --|> #TWithReferences. 
 
 	containerEntity --|> namedEntity.
 	containerEntity --|> #TWithClasses.

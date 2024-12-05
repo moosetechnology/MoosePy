@@ -2194,6 +2194,74 @@ FamixPythonProject1Test >> testReadAccessToParameter [
 ]
 
 { #category : 'tests - references' }
+FamixPythonProject1Test >> testReferenceFromClass [
+
+	| class class2 reference |
+	class := self classNamed: 'AClassToReference'.
+	class2 := self classNamed: 'AClassReferencingAClass'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = class2 ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: class2.
+	self assert: reference referencer equals: class2.
+	self assert: reference target equals: class.
+	self assert: reference referredType equals: class.
+	self assert: (class2 outgoingReferences anySatisfy: [ :aReference | aReference referredType = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testReferenceFromFunction [
+
+	| class function reference |
+	class := self classNamed: 'AClassToReference'.
+	function := self functionNamed: 'function_referencing_class'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = function ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: function.
+	self assert: reference referencer equals: function.
+	self assert: reference target equals: class.
+	self assert: reference referredType equals: class.
+	self assert: (function outgoingReferences anySatisfy: [ :aReference | aReference referredType = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testReferenceFromLambda [
+
+	| class lambda reference |
+	class := self classNamed: 'AClassToReference'.
+	lambda := (self functionNamed: 'function_with_lambda_referencing_class') lambdas anyOne.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = lambda ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: lambda.
+	self assert: reference referencer equals: lambda.
+	self assert: reference target equals: class.
+	self assert: reference referredType equals: class.
+	self assert: (lambda outgoingReferences anySatisfy: [ :aReference | aReference referredType = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testReferenceFromMethod [
+
+	| class method reference |
+	class := self classNamed: 'AClassToReference'.
+	method := self methodNamed: 'method_referencing_class'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = method ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: method.
+	self assert: reference referencer equals: method.
+	self assert: reference target equals: class.
+	self assert: reference referredType equals: class.
+	self assert: (method outgoingReferences anySatisfy: [ :aReference | aReference referredType = class ])
+]
+
+{ #category : 'tests - references' }
 FamixPythonProject1Test >> testReferenceFromModule [
 
 	| class module reference |
@@ -2225,6 +2293,19 @@ FamixPythonProject1Test >> testReferenceFromPackage [
 	self assert: reference target equals: class.
 	self assert: reference referredType equals: class.
 	self assert: (package outgoingReferences anySatisfy: [ :aReference | aReference referredType = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testReferenceSourceAnchor [
+
+	| class package reference |
+	class := self classNamed: 'Room'.
+	package := self packageNamed: 'subsubpackage1'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = package ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference sourceAnchor isNotNil.
+	self assert: reference sourceText equals: 'Room'
 ]
 
 { #category : 'tests - modules' }
