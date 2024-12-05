@@ -34,6 +34,19 @@ FamixPythonProject1Test >> testAccessOrReferenceToStubEntity [
 	self assert: (module unknowAccessesOrReferences anySatisfy: [ :anAccess | anAccess unknownEntity = stub ])
 ]
 
+{ #category : 'tests - unknown access or reference' }
+FamixPythonProject1Test >> testAccessOrReferenceToStubEntitySourceAnchor [
+
+	| stub module access |
+	stub := self unknownAccessedOrReferencedEntityNamed: 'MissingClass'.
+	module := self moduleNamed: 'moduleWithRelativeFromImportStub'.
+
+	access := stub accessesOrReferences detect: [ :anAccess | anAccess accessorOrReferencer = module ].
+
+	self assert: access sourceAnchor isNotNil.
+	self assert: access sourceText equals: 'MissingClass'
+]
+
 { #category : 'tests - from-import' }
 FamixPythonProject1Test >> testClassImportsClassFromAModule [
 
@@ -2412,6 +2425,23 @@ FamixPythonProject1Test >> testSuperclass2 [
 	self assert: class superclass equals: (self classNamed: 'Animal').
 	self deny: class isStub.
 	self deny: class superclass isStub
+]
+
+{ #category : 'tests - unknown access or reference' }
+FamixPythonProject1Test >> testTwoAccessOrReferencesToStubEntityCreateOneStub [
+
+	| stub module accesses |
+	stub := self unknownAccessedOrReferencedEntityNamed: 'MissingClass'.
+	module := self moduleNamed: 'moduleWithRelativeFromImportStub'.
+
+	accesses := stub accessesOrReferences select: [ :anAccess | anAccess accessorOrReferencer = module ].
+
+	self assert: accesses size equals: 2.
+	self assert: (accesses allSatisfy: [ :access | access unknownEntity = stub ]).
+	self
+		assert: (self model entities select: [ :entity | entity class = FamixPythonUnknownAccessedOrReferencedEntity and: [ entity name = 'MissingClass' ] ]) size
+		equals: 1.
+	self assert: stub isStub
 ]
 
 { #category : 'tests - accesses' }
