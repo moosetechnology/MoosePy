@@ -676,16 +676,16 @@ FamixPythonImporterVisitor >> signatureFromInvocation: anInvocationNode [
 { #category : 'private - searching' }
 FamixPythonImporterVisitor >> unknownAccessedOrReferencedEntityNamed: aString [
 
-	^ self model entities
-		  detect: [ :e | e class = FamixPythonUnknownAccessedOrReferencedEntity and: [ e name = aString ] ]
+	^ (self model allWithType: FamixPythonUnknownAccessedOrReferencedEntity)
+		  detect: [ :e | e name = aString ]
 		  ifNone: [ nil ]
 ]
 
 { #category : 'private - searching' }
 FamixPythonImporterVisitor >> unknownImportedNamed: aString [
 
-	^ self model entities
-		  detect: [ :e | e class = FamixPythonUnknownImportedEntity and: [ e name = aString ] ]
+	^ (self model allWithType: FamixPythonUnknownImportedEntity)
+		  detect: [ :e | e name = aString ]
 		  ifNone: [ nil ]
 ]
 
