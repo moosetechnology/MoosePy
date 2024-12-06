@@ -275,10 +275,12 @@ FamixPythonImporterVisitor >> ensureStubContainerNamed: aString [
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> ensureStubPackageNamed: aString [
 
-	^ (self packageNamed: aString) ifNil: [
-		  (model newPackageNamed: aString)
-			  isStub: true;
-			  yourself ]
+	^ model allPackages
+		  detect: [ :class | class isStub and: [ class name = aString ] ]
+		  ifNone: [
+			  (model newPackageNamed: aString)
+				  isStub: true;
+				  yourself ]
 ]
 
 { #category : 'private-entity-creation' }
