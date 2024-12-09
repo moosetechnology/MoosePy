@@ -2339,6 +2339,53 @@ FamixPythonProject1Test >> testReferenceFromPackage [
 ]
 
 { #category : 'tests - references' }
+FamixPythonProject1Test >> testReferenceOfImportedEntity [
+
+	| class module reference |
+	class := self classNamed: 'Person'.
+	module := self moduleNamed: 'moduleAtRoot5'.
+
+	reference := class incomingReferences detect: [ :aReference | aReference referencer = module ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredType equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredType = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testReferenceOfImportedEntityViaAlias [
+
+	| class module reference |
+	class := self classNamed: 'Employee'.
+	module := self moduleNamed: 'moduleWithImportsAndAliases'.
+
+	reference := class incomingReferences detect: [ :aReference | aReference referencer = module ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredType equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredType = class ]).
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testReferenceOfImportedEntityViaAliasSourceAnchor [
+
+	| class module reference |
+	class := self classNamed: 'Employee'.
+	module := self moduleNamed: 'moduleWithImportsAndAliases'.
+
+	reference := class incomingReferences detect: [ :aReference | aReference referencer = module ].
+
+	self assert: reference sourceAnchor isNotNil.
+	self assert: reference sourceText equals: 'Emp'
+]
+
+{ #category : 'tests - references' }
 FamixPythonProject1Test >> testReferenceSourceAnchor [
 
 	| class package reference |
