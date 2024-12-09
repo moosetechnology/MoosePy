@@ -8,6 +8,8 @@ from root.subpackage1.subsubpackage1 import return2
 print(rootPackageVariable)
 print(moduleAtRootVariable)
 
+print(Person)
+
 p1 = Person("Imen", 37)
 p1.printInfos()
 
