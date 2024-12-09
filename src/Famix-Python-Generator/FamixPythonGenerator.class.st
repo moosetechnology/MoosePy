@@ -24,7 +24,8 @@ Class {
 		'unknownImportedEntity',
 		'unknownAccessedOrReferencedEntity',
 		'unknowAccessOrReference',
-		'lambda'
+		'lambda',
+		'functionReference'
 	],
 	#category : 'Famix-Python-Generator',
 	#package : 'Famix-Python-Generator'
@@ -52,6 +53,8 @@ FamixPythonGenerator >> defineClasses [
 	class := builder newClassNamed: #Class.
 	containerEntity := builder newAbstractClassNamed: #ContainerEntity.
 	function := builder newClassNamed: #Function.
+	functionReference := builder newClassNamed: #FunctionReference.
+	globalVariable := builder newClassNamed: #GlobalVariable.
 	implicitVariable := builder newClassNamed: #ImplicitVariable.
 	import := builder newClassNamed: #Import.
 	indexedFileAnchor := builder newClassNamed: #IndexedFileAnchor.
@@ -66,10 +69,9 @@ FamixPythonGenerator >> defineClasses [
 	primitiveType := builder newClassNamed: #PrimitiveType.
 	reference := builder newClassNamed: #Reference.
 	type := builder newClassNamed: #Type.
-	globalVariable := builder newClassNamed: #GlobalVariable.
 	unknownImportedEntity := builder newClassNamed: #UnknownImportedEntity.
 	unknownAccessedOrReferencedEntity := builder newClassNamed: #UnknownAccessedOrReferencedEntity.
-	unknowAccessOrReference := builder newClassNamed: #UnknowAccessOrReference 
+	unknowAccessOrReference := builder newClassNamed: #UnknowAccessOrReference
 ]
 
 { #category : 'definition' }
@@ -110,6 +112,8 @@ FamixPythonGenerator >> defineHierarchy [
 	function --|> #TShadowable.
 	function --|> #TShadower.
 	function --|> #TWithLambdas.
+	
+	functionReference --|> #TAssociation.
 	
 	lambda --|> containerEntity.
 	lambda --|> #TLambda.
@@ -223,5 +227,9 @@ FamixPythonGenerator >> defineRelations [
 
 	(unknowAccessOrReference property: #accessorOrReferencer) source *- (containerEntity property: #unknowAccessesOrReferences).
 
-	(unknowAccessOrReference property: #unknownEntity) target *- (unknownAccessedOrReferencedEntity property: #accessesOrReferences)
+	(unknowAccessOrReference property: #unknownEntity) target *- (unknownAccessedOrReferencedEntity property: #accessesOrReferences).
+
+	(functionReference property: #referencer) source *- (containerEntity property: #outgoingFunctionReferences).
+
+	(functionReference property: #referredFunction) target *- (function property: #incomingFunctionReferences)
 ]

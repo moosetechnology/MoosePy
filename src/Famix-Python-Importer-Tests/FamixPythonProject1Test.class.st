@@ -601,6 +601,100 @@ FamixPythonProject1Test >> testFunctionInAPackage [
 	self assert: function functionOwner equals: (self packageNamed: 'subsubpackage1')
 ]
 
+{ #category : 'tests - function references' }
+FamixPythonProject1Test >> testFunctionReferenceFromImportedEntity [
+
+	| function module reference |
+	function := self functionNamed: 'function_in_module_in_root3'.
+	module := self moduleNamed: 'moduleImportingMultipleItems'.
+
+	reference := (function incomingFunctionReferences detect: [ :aReference | aReference referencer = module ]).
+
+	self assert: reference class equals: FamixPythonFunctionReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: function.
+	self assert: reference referredFunction equals: function.
+	self assert: (module outgoingFunctionReferences anySatisfy: [ :aReference | aReference referredFunction = function ])
+]
+
+{ #category : 'tests - function references' }
+FamixPythonProject1Test >> testFunctionReferenceFromImportedEntityWithAlias [
+
+	| function module reference |
+	function := self functionNamed: 'functionWithImportsInRoot2'.
+	module := self moduleNamed: 'moduleWithImportsAndAliases'.
+
+	reference := (function incomingFunctionReferences detect: [ :aReference | aReference referencer = module ]).
+
+	self assert: reference class equals: FamixPythonFunctionReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: function.
+	self assert: reference referredFunction equals: function.
+	self assert: (module outgoingFunctionReferences anySatisfy: [ :aReference | aReference referredFunction = function ])
+]
+
+{ #category : 'tests - function references' }
+FamixPythonProject1Test >> testFunctionReferenceFromImportedEntityWithAliasSourceAnchor [
+
+	| function module reference |
+	function := self functionNamed: 'functionWithImportsInRoot2'.
+	module := self moduleNamed: 'moduleWithImportsAndAliases'.
+
+	reference := (function incomingFunctionReferences detect: [ :aReference | aReference referencer = module ]).
+
+	self assert: reference sourceAnchor isNotNil.
+	self assert: reference sourceText equals: 'fwi'
+]
+
+{ #category : 'tests - function references' }
+FamixPythonProject1Test >> testFunctionReferenceFromModule [
+
+	| function module reference |
+	function := self functionNamed: 'sort_list'.
+	module := self moduleNamed: 'moduleAtRoot1'.
+
+	reference := (function incomingFunctionReferences detect: [ :aReference | aReference referencer = module ]).
+
+	self assert: reference class equals: FamixPythonFunctionReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: function.
+	self assert: reference referredFunction equals: function.
+	self assert: (module outgoingFunctionReferences anySatisfy: [ :aReference | aReference referredFunction = function ])
+]
+
+{ #category : 'tests - function references' }
+FamixPythonProject1Test >> testFunctionReferenceFromPackage [
+
+	| function package reference |
+	function := self functionNamed: 'function_with_common_name'.
+	package := self packageNamed: 'root'.
+
+	reference := (function incomingFunctionReferences detect: [ :aReference | aReference referencer = package ]).
+
+	self assert: reference class equals: FamixPythonFunctionReference.
+	self assert: reference source equals: package.
+	self assert: reference referencer equals: package.
+	self assert: reference target equals: function.
+	self assert: reference referredFunction equals: function.
+	self assert: (package outgoingFunctionReferences anySatisfy: [ :aReference | aReference referredFunction = function ])
+]
+
+{ #category : 'tests - function references' }
+FamixPythonProject1Test >> testFunctionReferenceSourceAnchor [
+
+	| function package reference |
+	function := self functionNamed: 'function_with_common_name'.
+	package := self packageNamed: 'root'.
+
+	reference := function incomingFunctionReferences detect: [ :aReference | aReference referencer = package ].
+
+	self assert: reference sourceAnchor isNotNil.
+	self assert: reference sourceText equals: 'function_with_common_name'
+]
+
 { #category : 'tests - shadowing' }
 FamixPythonProject1Test >> testFunctionShadowedByClass [
 
