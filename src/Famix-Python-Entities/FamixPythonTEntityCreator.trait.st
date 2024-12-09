@@ -77,6 +77,13 @@ FamixPythonTEntityCreator >> newFunctionNamed: aName [
 ]
 
 { #category : 'entity creation' }
+FamixPythonTEntityCreator >> newFunctionReference [
+
+	<generated>
+	^ self add: FamixPythonFunctionReference new
+]
+
+{ #category : 'entity creation' }
 FamixPythonTEntityCreator >> newGlobalVariable [
 
 	<generated>

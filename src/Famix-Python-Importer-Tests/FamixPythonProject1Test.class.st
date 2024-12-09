@@ -653,7 +653,7 @@ FamixPythonProject1Test >> testFunctionReferenceFromModule [
 
 	| function module reference |
 	function := self functionNamed: 'sort_list'.
-	module := self moduleNamed: 'moduleAtRoot1'.
+	module := self moduleNamed: 'moduleAtRoot'.
 
 	reference := (function incomingFunctionReferences detect: [ :aReference | aReference referencer = module ]).
 
@@ -669,8 +669,8 @@ FamixPythonProject1Test >> testFunctionReferenceFromModule [
 FamixPythonProject1Test >> testFunctionReferenceFromPackage [
 
 	| function package reference |
-	function := self functionNamed: 'function_with_common_name'.
-	package := self packageNamed: 'root'.
+	function := self functionNamed: 'return2'.
+	package := self packageNamed: 'subsubpackage1'.
 
 	reference := (function incomingFunctionReferences detect: [ :aReference | aReference referencer = package ]).
 
@@ -686,13 +686,13 @@ FamixPythonProject1Test >> testFunctionReferenceFromPackage [
 FamixPythonProject1Test >> testFunctionReferenceSourceAnchor [
 
 	| function package reference |
-	function := self functionNamed: 'function_with_common_name'.
-	package := self packageNamed: 'root'.
+	function := self functionNamed: 'return2'.
+	package := self packageNamed: 'subsubpackage1'.
 
 	reference := function incomingFunctionReferences detect: [ :aReference | aReference referencer = package ].
 
 	self assert: reference sourceAnchor isNotNil.
-	self assert: reference sourceText equals: 'function_with_common_name'
+	self assert: reference sourceText equals: 'return2'
 ]
 
 { #category : 'tests - shadowing' }

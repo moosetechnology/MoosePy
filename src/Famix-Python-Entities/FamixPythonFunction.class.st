@@ -27,6 +27,7 @@
 ### Incoming dependencies
 | Relation | Origin | Opposite | Type | Comment |
 |---|
+| `incomingFunctionReferences` | `FamixPythonFunction` | `referredFunction` | `FamixPythonFunctionReference` | |
 | `incomingImports` | `FamixTImportable` | `importedEntity` | `FamixTImport` | List of imports of this entity|
 | `incomingInvocations` | `FamixTInvocable` | `candidates` | `FamixTInvocation` | Incoming invocations from other behaviours computed by the candidate operator.|
 
@@ -55,6 +56,9 @@ Class {
 	#superclass : 'FamixPythonContainerEntity',
 	#traits : 'FamixTFunction + FamixTImportable + FamixTShadowable + FamixTShadower + FamixTWithAnnotationInstances + FamixTWithComments + FamixTWithFunctions + FamixTWithImplicitVariables + FamixTWithInvocations + FamixTWithLambdas',
 	#classTraits : 'FamixTFunction classTrait + FamixTImportable classTrait + FamixTShadowable classTrait + FamixTShadower classTrait + FamixTWithAnnotationInstances classTrait + FamixTWithComments classTrait + FamixTWithFunctions classTrait + FamixTWithImplicitVariables classTrait + FamixTWithInvocations classTrait + FamixTWithLambdas classTrait',
+	#instVars : [
+		'#incomingFunctionReferences => FMMany type: #FamixPythonFunctionReference opposite: #referredFunction'
+	],
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',
 	#tag : 'Entities'
@@ -67,4 +71,26 @@ FamixPythonFunction class >> annotation [
 	<package: #'Famix-Python-Entities'>
 	<generated>
 	^ self
+]
+
+{ #category : 'adding' }
+FamixPythonFunction >> addIncomingFunctionReference: anObject [
+	<generated>
+	^ self incomingFunctionReferences add: anObject
+]
+
+{ #category : 'accessing' }
+FamixPythonFunction >> incomingFunctionReferences [
+	"Relation named: #incomingFunctionReferences type: #FamixPythonFunctionReference opposite: #referredFunction"
+
+	<generated>
+	<derived>
+	^ incomingFunctionReferences
+]
+
+{ #category : 'accessing' }
+FamixPythonFunction >> incomingFunctionReferences: anObject [
+
+	<generated>
+	incomingFunctionReferences value: anObject
 ]

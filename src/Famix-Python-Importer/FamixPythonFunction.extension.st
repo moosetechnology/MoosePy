@@ -2,9 +2,11 @@ Extension { #name : 'FamixPythonFunction' }
 
 { #category : '*Famix-Python-Importer' }
 FamixPythonFunction >> createAccessOrReferenceFrom: anEntity node: aNode [
-1halt.
-	self flag: #todo.
-	^ nil
+
+	^ anEntity mooseModel newFunctionReference
+		  referredFunction: self;
+		  referencer: anEntity;
+		  yourself
 ]
 
 { #category : '*Famix-Python-Importer' }
