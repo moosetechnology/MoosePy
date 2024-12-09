@@ -9,9 +9,6 @@ def function_with_common_name():
     return False
 
 
-print(function_with_common_name)
-
-
 class Animal(AbstractAnimal):
 
     def eat(self):

@@ -16,3 +16,5 @@ print(Room)
 
 def return2():
     return 2
+
+print(return2)
