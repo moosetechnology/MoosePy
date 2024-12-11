@@ -2126,6 +2126,26 @@ FamixPythonProject1Test >> testReadAccessFromFunction [
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessFromImportedGlobalWithNamespace [
+
+	| global module access |
+	self skip.
+	global := self globalVariableNamed: 'rootPackage2Variable'.
+	module := self moduleNamed: 'moduleAtRoot'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testReadAccessFromLambda [
 
 	| parameter lambda access |
@@ -2277,10 +2297,9 @@ FamixPythonProject1Test >> testReadAccessToGlobal [
 ]
 
 { #category : 'tests - accesses' }
-FamixPythonProject1Test >> testReadAccessToIVar [
+FamixPythonProject1Test >> testReadAccessToIVarInternalyToTheClass [
 
 	| ivar method access |
-	self skip. "Todo"
 	ivar := self attributeNamed: 'dog_color'.
 	method := self methodNamed: 'get_dog_color'.
 
@@ -2295,6 +2314,20 @@ FamixPythonProject1Test >> testReadAccessToIVar [
 	self deny: access isWrite.
 	self assert: access isRead.
 	self assert: (method accesses anySatisfy: [ :anAccess | anAccess variable = ivar ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessToIVarInternalyToTheClassSourceAnchor [
+
+	| ivar method access |
+	ivar := self attributeNamed: 'dog_color'.
+	method := self methodNamed: 'get_dog_color'.
+
+	"We want to have the reading and not the writing."
+	access := (ivar incomingAccesses select: [ :anAccess | anAccess accessor = method ]) detectMax: [ :entity | entity sourceAnchor startPos ].
+
+	self assert: access sourceAnchor isNotNil.
+	self assert: access sourceText equals: 'self.dog_color'
 ]
 
 { #category : 'tests - accesses' }

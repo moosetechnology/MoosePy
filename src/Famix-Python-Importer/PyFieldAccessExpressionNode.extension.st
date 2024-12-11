@@ -11,6 +11,12 @@ PyFieldAccessExpressionNode >> isInstanceVariableAssignation [
 ]
 
 { #category : '*Famix-Python-Importer' }
+PyFieldAccessExpressionNode >> isInternalInstanceVariableAccess [
+
+	^ self receiver isSelf
+]
+
+{ #category : '*Famix-Python-Importer' }
 PyFieldAccessExpressionNode >> isSelf [
 
 	^ false

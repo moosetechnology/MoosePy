@@ -740,6 +740,10 @@ FamixPythonImporterVisitor >> visitClassDefinition: aClassDef [
 { #category : 'generated' }
 FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression [
 
+	self flag: #todo. "Manage invocations."
+	aFieldAccessExpression parent isFunctionCallExpression ifTrue: [ ^ aFieldAccessExpression source ].
+	
+	aFieldAccessExpression source traceCr.
 	^ aFieldAccessExpression source
 ]
 
@@ -817,6 +821,22 @@ FamixPythonImporterVisitor >> visitImportStatement: anImport [
 FamixPythonImporterVisitor >> visitImportVariableExpression: anImportVariableExpression [
 
 	^ anImportVariableExpression name
+]
+
+{ #category : 'visiting' }
+FamixPythonImporterVisitor >> visitInternalInstanceVariableAccess: anInternalInstanceVariableAccess [
+
+	self
+		resolve: ((SRIdentifierWithNode identifier: anInternalInstanceVariableAccess name)
+				 expectedKind: { FamixPythonAttribute };
+				 notFoundReplacementEntity: [ :unresolved :currentEntity | self flag: #todo. 1 halt "self ensureStubUnknownAccessedOrReferencedEntityNamed: unresolved identifier" ];
+				 yourself)
+		foundAction: [ :entity :currentEntity |
+			| association |
+			association := entity createAccessOrReferenceFrom: currentEntity node: anInternalInstanceVariableAccess.
+			self setSourceAnchor: association from: anInternalInstanceVariableAccess ].
+
+	^ anInternalInstanceVariableAccess source
 ]
 
 { #category : 'visiting' }

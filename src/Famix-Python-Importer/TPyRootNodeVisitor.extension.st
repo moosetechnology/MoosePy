@@ -30,6 +30,11 @@ TPyRootNodeVisitor >> visitImportVariableExpression: anImportVariableExpression 
 ]
 
 { #category : '*Famix-Python-Importer' }
+TPyRootNodeVisitor >> visitInternalInstanceVariableAccess: anInternalInstanceVariableAccess [
+	^ self visitExpression: anInternalInstanceVariableAccess
+]
+
+{ #category : '*Famix-Python-Importer' }
 TPyRootNodeVisitor >> visitPlaceholderVariable: aPlaceholderVariable [
 
 	^ self visitVariableExpression: aPlaceholderVariable

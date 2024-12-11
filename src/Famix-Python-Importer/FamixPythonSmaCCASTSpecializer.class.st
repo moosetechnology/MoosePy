@@ -15,7 +15,10 @@ FamixPythonSmaCCASTSpecializer >> visitFieldAccessExpression: aFieldAccessExpres
 
 	aFieldAccessExpression isInstanceVariableAssignation ifTrue: [ ^ FamixPythonAssignedInstanceVariableNode adoptInstance: aFieldAccessExpression ].
 
-	aFieldAccessExpression isInImport ifTrue: [ ^ FamixPythonImportPathNode adoptInstance: aFieldAccessExpression ]
+	aFieldAccessExpression isInImport ifTrue: [ ^ FamixPythonImportPathNode adoptInstance: aFieldAccessExpression ].
+
+	"This one needs to be after #isInstanceVariableAssignation."
+	aFieldAccessExpression isInternalInstanceVariableAccess ifTrue: [ ^ FamixPythonInternalInstanceVariableAccessNode adoptInstance: aFieldAccessExpression ]
 ]
 
 { #category : 'generated' }
