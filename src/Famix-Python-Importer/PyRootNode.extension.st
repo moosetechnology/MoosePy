@@ -54,6 +54,12 @@ PyRootNode >> isLeftSideOfAssignation: aNode [
 ]
 
 { #category : '*Famix-Python-Importer' }
+PyRootNode >> isSelf [
+
+	^ false
+]
+
+{ #category : '*Famix-Python-Importer' }
 PyRootNode >> isSubscriptExpression [
 
 	^ false

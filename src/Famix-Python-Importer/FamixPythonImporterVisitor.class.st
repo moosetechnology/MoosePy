@@ -829,7 +829,6 @@ FamixPythonImporterVisitor >> visitInternalInstanceVariableAccess: anInternalIns
 	self
 		resolve: ((SRIdentifierWithNode identifier: anInternalInstanceVariableAccess name)
 				 expectedKind: { FamixPythonAttribute };
-				 notFoundReplacementEntity: [ :unresolved :currentEntity | self flag: #todo. 1 halt "self ensureStubUnknownAccessedOrReferencedEntityNamed: unresolved identifier" ];
 				 yourself)
 		foundAction: [ :entity :currentEntity |
 			| association |
