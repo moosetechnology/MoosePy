@@ -602,6 +602,40 @@ FamixPythonProject1Test >> testFunctionInAPackage [
 ]
 
 { #category : 'tests - function references' }
+FamixPythonProject1Test >> testFunctionReferenceFromClass [
+
+	| function class reference |
+	function := self functionNamed: 'return2'.
+	class := self classNamed: 'ClassWithFunctionReference'.
+
+	reference := (function incomingFunctionReferences detect: [ :aReference | aReference referencer = class ]).
+
+	self assert: reference class equals: FamixPythonFunctionReference.
+	self assert: reference source equals: class.
+	self assert: reference referencer equals: class.
+	self assert: reference target equals: function.
+	self assert: reference referredFunction equals: function.
+	self assert: (class outgoingFunctionReferences anySatisfy: [ :aReference | aReference referredFunction = function ])
+]
+
+{ #category : 'tests - function references' }
+FamixPythonProject1Test >> testFunctionReferenceFromFunction [
+
+	| function function2 reference |
+	function := self functionNamed: 'return2'.
+	function2 := self functionNamed: 'function_with_function_ref'.
+
+	reference := (function incomingFunctionReferences detect: [ :aReference | aReference referencer = function2 ]).
+
+	self assert: reference class equals: FamixPythonFunctionReference.
+	self assert: reference source equals: function2.
+	self assert: reference referencer equals: function2.
+	self assert: reference target equals: function.
+	self assert: reference referredFunction equals: function.
+	self assert: (function2 outgoingFunctionReferences anySatisfy: [ :aReference | aReference referredFunction = function ])
+]
+
+{ #category : 'tests - function references' }
 FamixPythonProject1Test >> testFunctionReferenceFromImportedEntity [
 
 	| function module reference |
@@ -646,6 +680,40 @@ FamixPythonProject1Test >> testFunctionReferenceFromImportedEntityWithAliasSourc
 
 	self assert: reference sourceAnchor isNotNil.
 	self assert: reference sourceText equals: 'fwi'
+]
+
+{ #category : 'tests - function references' }
+FamixPythonProject1Test >> testFunctionReferenceFromLambda [
+
+	| function lambda reference |
+	function := self functionNamed: 'return2'.
+	lambda := (self functionNamed: 'function_with_lambda_with_function_ref') lambdas anyOne.
+
+	reference := function incomingFunctionReferences detect: [ :aReference | aReference referencer = lambda ].
+
+	self assert: reference class equals: FamixPythonFunctionReference.
+	self assert: reference source equals: lambda.
+	self assert: reference referencer equals: lambda.
+	self assert: reference target equals: function.
+	self assert: reference referredFunction equals: function.
+	self assert: (lambda outgoingFunctionReferences anySatisfy: [ :aReference | aReference referredFunction = function ])
+]
+
+{ #category : 'tests - function references' }
+FamixPythonProject1Test >> testFunctionReferenceFromMethod [
+
+	| function method reference |
+	function := self functionNamed: 'return2'.
+	method := self methodNamed: 'method_with_function_ref'.
+
+	reference := (function incomingFunctionReferences detect: [ :aReference | aReference referencer = method ]).
+
+	self assert: reference class equals: FamixPythonFunctionReference.
+	self assert: reference source equals: method.
+	self assert: reference referencer equals: method.
+	self assert: reference target equals: function.
+	self assert: reference referredFunction equals: function.
+	self assert: (method outgoingFunctionReferences anySatisfy: [ :aReference | aReference referredFunction = function ])
 ]
 
 { #category : 'tests - function references' }
