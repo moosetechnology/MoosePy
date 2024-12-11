@@ -69,7 +69,7 @@ FamixPythonImporter >> importFileReference: aFileReference [
 			files first isPythonPackageDeclaration ifTrue: [ visitor popScope ] ].
 		^ self ].
 
-	(self isPythonExtension: aFileReference extension) ifFalse: [ ^ self ].
+	aFileReference extension = 'py' ifFalse: [ ^ self ].
 
 	self importPythonFile: aFileReference
 ]
@@ -80,12 +80,6 @@ FamixPythonImporter >> importPythonFile: aFileReference [
 	('Importing ' , aFileReference pathString) traceCr.
 	"(aFileReference basename = #'moduleAtRoot.py') ifTrue: [ 1halt ]."
 	(PythonParser parseFileWithErrors: aFileReference) acceptVisitor: visitor
-]
-
-{ #category : 'testing' }
-FamixPythonImporter >> isPythonExtension: aString [
-
-	^aString = 'py'
 ]
 
 { #category : 'accessing' }

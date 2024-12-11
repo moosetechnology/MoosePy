@@ -42,6 +42,12 @@ PyRootNode >> isImport [
 ]
 
 { #category : '*Famix-Python-Importer' }
+PyRootNode >> isInImport [
+
+	^ self parent isImport
+]
+
+{ #category : '*Famix-Python-Importer' }
 PyRootNode >> isLeftSideOfAssignation: aNode [
 
 	^ false

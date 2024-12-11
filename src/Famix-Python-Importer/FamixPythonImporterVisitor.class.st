@@ -788,6 +788,12 @@ FamixPythonImporterVisitor >> visitFunctionDefinition: aFunctionDefinition [
 	^ self useCurrentEntity: fmx during: [ super visitFunctionDefinition: aFunctionDefinition ]
 ]
 
+{ #category : 'generated' }
+FamixPythonImporterVisitor >> visitImportPath: anImportPath [
+
+	^ anImportPath source
+]
+
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> visitImportStatement: anImport [
 
@@ -920,9 +926,9 @@ FamixPythonImporterVisitor >> visitVariableExpression: aVariableExpression [
 				 notFoundReplacementEntity: [ :unresolved :currentEntity | "1 halt." self ensureStubUnknownAccessedOrReferencedEntityNamed: unresolved identifier ];
 				 yourself)
 		foundAction: [ :entity :currentEntity |
-			self flag: #todo. "The ifNotNil should be removed later."
-			(entity createAccessOrReferenceFrom: currentEntity node: aVariableExpression) ifNotNil: [ :association |
-				self setSourceAnchor: association from: aVariableExpression ] ].
+			| association |
+			association := entity createAccessOrReferenceFrom: currentEntity node: aVariableExpression.
+			self setSourceAnchor: association from: aVariableExpression ].
 
 	^ aVariableExpression name
 ]

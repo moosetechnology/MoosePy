@@ -19,6 +19,11 @@ TPyRootNodeVisitor >> visitFunctionCallReceiverVariable: aFunctionCallReceiverVa
 ]
 
 { #category : '*Famix-Python-Importer' }
+TPyRootNodeVisitor >> visitImportPath: anImportPath [
+	^ self visitExpression: anImportPath
+]
+
+{ #category : '*Famix-Python-Importer' }
 TPyRootNodeVisitor >> visitImportVariableExpression: anImportVariableExpression [
 
 	^ self visitVariableExpression: anImportVariableExpression

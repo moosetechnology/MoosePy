@@ -1,12 +1,6 @@
 Extension { #name : 'PyVariableExpressionNode' }
 
 { #category : '*Famix-Python-Importer' }
-PyVariableExpressionNode >> isInImport [
-
-	^ self parent isImport
-]
-
-{ #category : '*Famix-Python-Importer' }
 PyVariableExpressionNode >> isLeftSideOfAssignation [
 
 	^ self parent
