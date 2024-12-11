@@ -214,6 +214,7 @@ FamixPythonGenerator >> defineProperties [
 	super defineProperties.
 
 	(import property: #alias type: #String) comment: 'Alias of the imported entity in the scope of the import'.
+	(import property: #isFromImport type: #Boolean) comment: 'There are two types of imports in python. `import x` and `from y import x`. A From import is the second type.'.
 	
 	(class property: #isMetaclass type: #Boolean) comment: 'Whether this class is a metaclass'
 ]

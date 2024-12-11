@@ -92,6 +92,7 @@ FamixPythonImporterVisitor >> createImport: anImport ofName: aName from: fromNam
 	| import |
 	import := model newImport
 		          alias: alias;
+		          isFromImport: fromName isNotNil;
 		          yourself.
 
 	self setSourceAnchor: import from: anImport.
@@ -742,7 +743,7 @@ FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression
 
 	self flag: #todo. "Manage invocations."
 	aFieldAccessExpression parent isFunctionCallExpression ifTrue: [ ^ aFieldAccessExpression source ].
-	
+
 	aFieldAccessExpression source traceCr.
 	^ aFieldAccessExpression source
 ]

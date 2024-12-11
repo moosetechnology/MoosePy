@@ -75,6 +75,7 @@ FamixPythonProject1Test >> testClassImportsClassFromAModule [
 
 	self assert: import importingEntity equals: class.
 	self assert: import importedEntity equals: class1.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from moduleAtRoot2 import Person'
 ]
 
@@ -89,6 +90,7 @@ FamixPythonProject1Test >> testClassImportsClassFromAPackage [
 
 	self assert: import importingEntity equals: class.
 	self assert: import importedEntity equals: class1.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root.subpackage1.subsubpackage1 import Room'
 ]
 
@@ -103,6 +105,7 @@ FamixPythonProject1Test >> testClassImportsFunctionFromAModule [
 
 	self assert: import importingEntity equals: class.
 	self assert: import importedEntity equals: function.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from moduleAtRoot import sort_list'
 ]
 
@@ -117,6 +120,7 @@ FamixPythonProject1Test >> testClassImportsFunctionFromAPackage [
 
 	self assert: import importingEntity equals: class.
 	self assert: import importedEntity equals: function.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root.subpackage1.subsubpackage1 import return2'
 ]
 
@@ -131,6 +135,7 @@ FamixPythonProject1Test >> testClassImportsGlobalVariableFromAModule [
 
 	self assert: import importingEntity equals: class.
 	self assert: import importedEntity equals: global.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from moduleAtRoot import moduleAtRootVariable'
 ]
 
@@ -145,6 +150,7 @@ FamixPythonProject1Test >> testClassImportsGlobalVariableFromAPackage [
 
 	self assert: import importingEntity equals: class.
 	self assert: import importedEntity equals: global.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root import rootPackageVariable'
 ]
 
@@ -158,6 +164,7 @@ FamixPythonProject1Test >> testClassImportsModule [
 
 	self assert: import importingEntity equals: class.
 	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot3').
+	self deny: import isFromImport.
 	self assert: import sourceText equals: 'import moduleAtRoot3'
 ]
 
@@ -412,6 +419,7 @@ FamixPythonProject1Test >> testFromImportAGlobalWithAnAlias [
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: global.
 	self assert: import alias equals: 'marv'.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from moduleAtRoot2 import moduleAtRoot2Variable as marv'
 ]
 
@@ -427,6 +435,7 @@ FamixPythonProject1Test >> testFromImportMultipleElementsWithAliases [
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: class.
 	self assert: import alias equals: 'Emp'.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root2.moduleInRootPackage2 import Employee as Emp, functionWithImportsInRoot2 as fwi, Employee2'.
 
 	function := self functionNamed: 'functionWithImportsInRoot2'.
@@ -434,6 +443,7 @@ FamixPythonProject1Test >> testFromImportMultipleElementsWithAliases [
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: function.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root2.moduleInRootPackage2 import Employee as Emp, functionWithImportsInRoot2 as fwi, Employee2'.
 	
 	self assert: import alias equals: 'fwi'
@@ -459,6 +469,7 @@ FamixPythonProject1Test >> testFromImportStubPackages [
 	self assert: import importedEntity isStub.
 	self assert: import importedEntity parentPackage isStub.
 	self assert: import importedEntity parentPackage parentPackage isStub.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from matplotlib.pyplot import plot'
 ]
 
@@ -473,6 +484,7 @@ FamixPythonProject1Test >> testFunctionImportsClassFromAModule [
 
 	self assert: import importingEntity equals: function.
 	self assert: import importedEntity equals: class.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from moduleAtRoot2 import Person'
 ]
 
@@ -487,6 +499,7 @@ FamixPythonProject1Test >> testFunctionImportsClassFromAPackage [
 
 	self assert: import importingEntity equals: function.
 	self assert: import importedEntity equals: class.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root.subpackage1.subsubpackage1 import Room'
 ]
 
@@ -501,6 +514,7 @@ FamixPythonProject1Test >> testFunctionImportsFunctionFromAModule [
 
 	self assert: import importingEntity equals: function.
 	self assert: import importedEntity equals: function1.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from moduleAtRoot import sort_list'
 ]
 
@@ -515,6 +529,7 @@ FamixPythonProject1Test >> testFunctionImportsFunctionFromAPackage [
 
 	self assert: import importingEntity equals: function.
 	self assert: import importedEntity equals: function1.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root.subpackage1.subsubpackage1 import return2'
 ]
 
@@ -529,6 +544,7 @@ FamixPythonProject1Test >> testFunctionImportsGlobalVariableFromAModule [
 
 	self assert: import importingEntity equals: function.
 	self assert: import importedEntity equals: global.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from moduleAtRoot import moduleAtRootVariable'
 ]
 
@@ -543,6 +559,7 @@ FamixPythonProject1Test >> testFunctionImportsGlobalVariableFromAPackage [
 
 	self assert: import importingEntity equals: function.
 	self assert: import importedEntity equals: global.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root import rootPackageVariable'
 ]
 
@@ -556,6 +573,7 @@ FamixPythonProject1Test >> testFunctionImportsModule [
 
 	self assert: import importingEntity equals: function.
 	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot3').
+	self deny: import isFromImport.
 	self assert: import sourceText equals: 'import moduleAtRoot3'
 ]
 
@@ -1036,6 +1054,7 @@ FamixPythonProject1Test >> testImportAClassThatHasTheSameNameAsSubpackage [
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: class.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root2 import NameOfSubpackageOrClass'
 ]
 
@@ -1050,6 +1069,7 @@ FamixPythonProject1Test >> testImportAModuleWithAnAlias [
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: module2.
+	self deny: import isFromImport.
 	self assert: import alias equals: 'mar'.
 	self assert: import sourceText equals: 'import moduleAtRoot as mar'
 ]
@@ -1066,6 +1086,7 @@ FamixPythonProject1Test >> testImportASubpackageThatHasTheSameNameAsAClass [
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: package.
+	self deny: import isFromImport.
 	self assert: import sourceText equals: 'import root2.NameOfSubpackageOrClass'
 ]
 
@@ -1080,6 +1101,7 @@ FamixPythonProject1Test >> testImportASubpackageWithAnAlias [
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: package.
+	self deny: import isFromImport.
 	self assert: import alias equals: 'rss'.
 	self assert: import sourceText equals: 'import root.subpackage1.subsubpackage1 as rss'
 ]
@@ -1097,6 +1119,7 @@ FamixPythonProject1Test >> testImportAnEntityThatIsShadowed [
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: function.
 	self assert: import importedEntity class equals: FamixPythonFunction.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root2.moduleWithShadowing import shadowedName'
 ]
 
@@ -1125,6 +1148,8 @@ FamixPythonProject1Test >> testImportStubPackages [
 	module := self moduleNamed: 'moduleWithStubs'.
 	import := module outgoingImports detect: [ :pimport | pimport target name = 'pyplot' ].
 
+	self deny: import isFromImport.
+
 	pyglot := self packageNamed: 'pyplot'.
 	matplotlib := pyglot parentPackage.
 
@@ -1151,6 +1176,7 @@ FamixPythonProject1Test >> testImportThatIsNotAtTheRootOfAFile [
 
 	self assert: import importingEntity equals: moduleAtRoot.
 	self assert: import importedEntity equals: (self packageNamed: 'root2').
+	self deny: import isFromImport.
 	self assert: import sourceText equals: 'import root2'
 ]
 
@@ -1499,6 +1525,7 @@ FamixPythonProject1Test >> testMethodImportsClassFromAModule [
 
 	self assert: import importingEntity equals: method.
 	self assert: import importedEntity equals: class.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from moduleAtRoot2 import Person'
 ]
 
@@ -1513,6 +1540,7 @@ FamixPythonProject1Test >> testMethodImportsClassFromAPackage [
 
 	self assert: import importingEntity equals: method.
 	self assert: import importedEntity equals: class.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root.subpackage1.subsubpackage1 import Room'
 ]
 
@@ -1527,6 +1555,7 @@ FamixPythonProject1Test >> testMethodImportsFunctionFromAModule [
 
 	self assert: import importingEntity equals: method.
 	self assert: import importedEntity equals: function.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from moduleAtRoot import sort_list'
 ]
 
@@ -1541,6 +1570,7 @@ FamixPythonProject1Test >> testMethodImportsFunctionFromAPackage [
 
 	self assert: import importingEntity equals: method.
 	self assert: import importedEntity equals: function.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root.subpackage1.subsubpackage1 import return2'
 ]
 
@@ -1555,6 +1585,7 @@ FamixPythonProject1Test >> testMethodImportsGlobalVariableFromAModule [
 
 	self assert: import importingEntity equals: method.
 	self assert: import importedEntity equals: global.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from moduleAtRoot import moduleAtRootVariable'
 ]
 
@@ -1569,6 +1600,7 @@ FamixPythonProject1Test >> testMethodImportsGlobalVariableFromAPackage [
 
 	self assert: import importingEntity equals: method.
 	self assert: import importedEntity equals: global.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root import rootPackageVariable'
 ]
 
@@ -1582,6 +1614,7 @@ FamixPythonProject1Test >> testMethodImportsModule [
 
 	self assert: import importingEntity equals: method.
 	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot4').
+	self deny: import isFromImport.
 	self assert: import sourceText equals: 'import moduleAtRoot4'
 ]
 
@@ -1619,6 +1652,7 @@ FamixPythonProject1Test >> testModuleImportsClassFromAModule [
 
 	self assert: import importingEntity equals: rootModule.
 	self assert: import importedEntity equals: class.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from moduleAtRoot2 import Person'
 ]
 
@@ -1633,6 +1667,7 @@ FamixPythonProject1Test >> testModuleImportsClassFromAPackage [
 
 	self assert: import importingEntity equals: rootModule.
 	self assert: import importedEntity equals: class.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root.subpackage1.subsubpackage1 import Room'
 ]
 
@@ -1647,6 +1682,7 @@ FamixPythonProject1Test >> testModuleImportsFunctionFromAModule [
 
 	self assert: import importingEntity equals: rootModule.
 	self assert: import importedEntity equals: function.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from moduleAtRoot import sort_list'
 ]
 
@@ -1661,6 +1697,7 @@ FamixPythonProject1Test >> testModuleImportsFunctionFromAPackage [
 
 	self assert: import importingEntity equals: rootModule.
 	self assert: import importedEntity equals: function.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root.subpackage1.subsubpackage1 import return2'
 ]
 
@@ -1675,6 +1712,7 @@ FamixPythonProject1Test >> testModuleImportsGlobalVariableFromAModule [
 
 	self assert: import importingEntity equals: rootModule.
 	self assert: import importedEntity equals: global.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from moduleAtRoot import moduleAtRootVariable'
 ]
 
@@ -1689,6 +1727,7 @@ FamixPythonProject1Test >> testModuleImportsGlobalVariableFromAModuleInAPackageO
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: global.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from ..moduleInRootPackage3 import moduleInRoot3Variable'
 ]
 
@@ -1703,6 +1742,7 @@ FamixPythonProject1Test >> testModuleImportsGlobalVariableFromAModuleInASubpacka
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: global.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from .subpackage3.moduleInSubPackage3 import moduleInSubpackage31Variable'
 ]
 
@@ -1717,6 +1757,7 @@ FamixPythonProject1Test >> testModuleImportsGlobalVariableFromAModuleRelatively 
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: global.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from .moduleInRootPackage3 import moduleInRoot3Variable'
 ]
 
@@ -1731,6 +1772,7 @@ FamixPythonProject1Test >> testModuleImportsGlobalVariableFromAModuleRelativelyW
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: global.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from .. moduleInSubPackage3 import moduleInSubpackage31Variable'
 ]
 
@@ -1745,6 +1787,7 @@ FamixPythonProject1Test >> testModuleImportsGlobalVariableFromAPackage [
 
 	self assert: import importingEntity equals: rootModule.
 	self assert: import importedEntity equals: global.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root import rootPackageVariable'
 ]
 
@@ -1759,6 +1802,7 @@ FamixPythonProject1Test >> testModuleImportsModule [
 
 	self assert: import importingEntity equals: rootModule2.
 	self assert: import importedEntity equals: rootModule1.
+	self deny: import isFromImport.
 	self assert: import sourceText equals: 'import moduleAtRoot'
 ]
 
@@ -1773,6 +1817,7 @@ FamixPythonProject1Test >> testModuleImportsModuleInPackage [
 
 	self assert: import importingEntity equals: importingModule.
 	self assert: import importedEntity equals: importedModule.
+	self deny: import isFromImport.
 	self assert: import sourceText equals: 'import root.subpackage1.moduleInSubPackage1'
 ]
 
@@ -1791,12 +1836,15 @@ FamixPythonProject1Test >> testModuleImportsMultipleElements [
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: global.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from .moduleInRootPackage3 import moduleInRoot3Variable, ClassInModuleInRoot3, function_in_module_in_root3'.
 	self assert: import2 importingEntity equals: module.
 	self assert: import2 importedEntity equals: class.
+	self assert: import isFromImport.
 	self assert: import2 sourceText equals: 'from .moduleInRootPackage3 import moduleInRoot3Variable, ClassInModuleInRoot3, function_in_module_in_root3'.
 	self assert: import3 importingEntity equals: module.
 	self assert: import3 importedEntity equals: function.
+	self assert: import isFromImport.
 	self assert: import3 sourceText equals: 'from .moduleInRootPackage3 import moduleInRoot3Variable, ClassInModuleInRoot3, function_in_module_in_root3'
 ]
 
@@ -1815,6 +1863,8 @@ FamixPythonProject1Test >> testModuleImportsMultipleModule [
 	self assert: import importedEntity equals: module2.
 	self assert: import2 importingEntity equals: module1.
 	self assert: import2 importedEntity equals: module3.
+	self deny: import isFromImport.
+	self deny: import2 isFromImport.
 	self assert: import sourceText equals: 'import moduleAtRoot, moduleAtRoot3'.
 	self assert: import2 sourceText equals: 'import moduleAtRoot, moduleAtRoot3'
 ]
@@ -1829,6 +1879,7 @@ FamixPythonProject1Test >> testModuleImportsPackage [
 
 	self assert: import importingEntity equals: moduleAtRoot.
 	self assert: import importedEntity equals: (self packageNamed: 'root').
+	self deny: import isFromImport.
 	self assert: import sourceText equals: 'import root'
 ]
 
@@ -1842,6 +1893,7 @@ FamixPythonProject1Test >> testModuleImportsSubPackage [
 
 	self assert: import importingEntity equals: moduleAtRoot.
 	self assert: import importedEntity equals: (self packageNamed: 'subpackage1').
+	self deny: import isFromImport.
 	self assert: import sourceText equals: 'import root.subpackage1'
 ]
 
@@ -1855,6 +1907,7 @@ FamixPythonProject1Test >> testModuleImportsSubPackageWithSpacesInThePath [
 
 	self assert: import importingEntity equals: moduleAtRoot.
 	self assert: import importedEntity equals: (self packageNamed: 'subsubpackage1').
+	self deny: import isFromImport.
 	self assert: import sourceText equals: 'import root .subpackage1 . subsubpackage1'
 ]
 
@@ -1897,6 +1950,7 @@ FamixPythonProject1Test >> testModuleInSubpackageImportsGlobalVariableFromAModul
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: global.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from .moduleInSubPackage3 import moduleInSubpackage31Variable'
 ]
 
@@ -1933,6 +1987,7 @@ FamixPythonProject1Test >> testPackageImportsClassFromAModule [
 
 	self assert: import importingEntity equals: package.
 	self assert: import importedEntity equals: class.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from moduleAtRoot2 import Person'
 ]
 
@@ -1947,6 +2002,7 @@ FamixPythonProject1Test >> testPackageImportsClassFromAPackage [
 
 	self assert: import importingEntity equals: package.
 	self assert: import importedEntity equals: class.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root.subpackage1.subsubpackage1 import Room'
 ]
 
@@ -1961,6 +2017,7 @@ FamixPythonProject1Test >> testPackageImportsFunctionFromAModule [
 
 	self assert: import importingEntity equals: package.
 	self assert: import importedEntity equals: function.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from moduleAtRoot import sort_list'
 ]
 
@@ -1975,6 +2032,7 @@ FamixPythonProject1Test >> testPackageImportsFunctionFromAPackage [
 
 	self assert: import importingEntity equals: package.
 	self assert: import importedEntity equals: function.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root.subpackage1.subsubpackage1 import return2'
 ]
 
@@ -1989,6 +2047,7 @@ FamixPythonProject1Test >> testPackageImportsGlobalVariableFromAModule [
 
 	self assert: import importingEntity equals: package.
 	self assert: import importedEntity equals: global.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from moduleAtRoot import moduleAtRootVariable'
 ]
 
@@ -2003,6 +2062,7 @@ FamixPythonProject1Test >> testPackageImportsGlobalVariableFromAModuleInAPackage
 
 	self assert: import importingEntity equals: package.
 	self assert: import importedEntity equals: global.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from ...moduleInRootPackage3 import moduleInRoot3Variable'
 ]
 
@@ -2017,6 +2077,7 @@ FamixPythonProject1Test >> testPackageImportsGlobalVariableFromAModuleInaPackage
 
 	self assert: import importingEntity equals: package.
 	self assert: import importedEntity equals: global.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from ..moduleInRootPackage3 import moduleInRoot3Variable'
 ]
 
@@ -2031,6 +2092,7 @@ FamixPythonProject1Test >> testPackageImportsGlobalVariableFromAModuleRelatively
 
 	self assert: import importingEntity equals: package.
 	self assert: import importedEntity equals: global.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from .moduleInSubPackage3 import moduleInSubpackage31Variable'
 ]
 
@@ -2045,6 +2107,7 @@ FamixPythonProject1Test >> testPackageImportsGlobalVariableFromAPackage [
 
 	self assert: import importingEntity equals: package.
 	self assert: import importedEntity equals: global.
+	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root import rootPackageVariable'
 ]
 
@@ -2058,6 +2121,7 @@ FamixPythonProject1Test >> testPackageImportsModule [
 
 	self assert: import importingEntity equals: rootPackage.
 	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot3').
+	self deny: import isFromImport.
 	self assert: import sourceText equals: 'import moduleAtRoot3'
 ]
 
@@ -2071,6 +2135,7 @@ FamixPythonProject1Test >> testPackageImportsPackage [
 
 	self assert: import importingEntity equals: rootPackage.
 	self assert: import importedEntity equals: (self packageNamed: 'root').
+	self deny: import isFromImport.
 	self assert: import sourceText equals: 'import root'
 ]
 
@@ -2084,6 +2149,7 @@ FamixPythonProject1Test >> testPackageImportsSubSubPackage [
 
 	self assert: import importingEntity equals: rootPackage.
 	self assert: import importedEntity equals: (self packageNamed: 'subsubpackage1').
+	self deny: import isFromImport.
 	self assert: import sourceText equals: 'import root.subpackage1.subsubpackage1'
 ]
 

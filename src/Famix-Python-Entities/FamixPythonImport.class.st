@@ -26,6 +26,7 @@
 | Name | Type | Default value | Comment |
 |---|
 | `alias` | `String` | nil | Alias of the imported entity in the scope of the import|
+| `isFromImport` | `Boolean` | nil | There are two types of imports in python. `import x` and `from y import x`. A From import is the second type.|
 
 "
 Class {
@@ -34,7 +35,8 @@ Class {
 	#traits : 'FamixTImport',
 	#classTraits : 'FamixTImport classTrait',
 	#instVars : [
-		'#alias => FMProperty'
+		'#alias => FMProperty',
+		'#isFromImport => FMProperty'
 	],
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',
@@ -63,4 +65,32 @@ FamixPythonImport >> alias [
 FamixPythonImport >> alias: anObject [
 	<generated>
 	alias := anObject
+]
+
+{ #category : 'printing' }
+FamixPythonImport >> displayStringOn: aStream [
+
+	aStream
+		nextPutAll: 'a ' ;
+		nextPutAll: self class name ;
+		nextPutAll: '('.
+	self source displayStringOn: aStream.
+	aStream nextPutAll: ' -> '.
+	self target displayStringOn: aStream.
+	aStream nextPutAll: ')'
+]
+
+{ #category : 'accessing' }
+FamixPythonImport >> isFromImport [
+
+	<FMProperty: #isFromImport type: #Boolean>
+	<generated>
+	<FMComment: 'There are two types of imports in python. `import x` and `from y import x`. A From import is the second type.'>
+	^ isFromImport
+]
+
+{ #category : 'accessing' }
+FamixPythonImport >> isFromImport: anObject [
+	<generated>
+	isFromImport := anObject
 ]
