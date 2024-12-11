@@ -18,3 +18,18 @@ def return2():
     return 2
 
 print(return2)
+
+class ClassWithFunctionReference:
+    functionRefCVar = return2
+
+    def method_with_function_ref(self):
+        return return2
+
+def function_with_function_ref():
+    return return2
+
+
+def function_with_lambda_with_function_ref():
+    return lambda: return2
+
+function_with_lambda_with_function_ref()()
