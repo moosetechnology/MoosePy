@@ -859,9 +859,9 @@ FamixPythonProject1Test >> testFunctionSourceAnchor [
 
 	self assert: function sourceAnchor isNotNil.
 	self assert: function sourceText equals: ('def sort_list(list1, list2):
-	zipped_pairs = zip(list2, list1)
-	z = [x for _, x in sorted(zipped_pairs)]
-	return z' copyReplaceAll: String cr with: String lf)
+    zipped_pairs = zip(list2, list1)
+    z = [x for _, x in sorted(zipped_pairs)]
+    return z' copyReplaceAll: String cr with: String lf)
 ]
 
 { #category : 'tests - functions' }
@@ -2195,7 +2195,6 @@ FamixPythonProject1Test >> testReadAccessFromFunction [
 FamixPythonProject1Test >> testReadAccessFromImportedGlobalWithNamespace [
 
 	| global module access |
-	self skip.
 	global := self globalVariableNamed: 'rootPackage2Variable'.
 	module := self moduleNamed: 'moduleAtRoot'.
 

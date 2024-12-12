@@ -742,9 +742,28 @@ FamixPythonImporterVisitor >> visitClassDefinition: aClassDef [
 FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression [
 
 	self flag: #todo. "Manage invocations."
-	aFieldAccessExpression parent isFunctionCallExpression ifTrue: [ ^ aFieldAccessExpression source ].
+	(aFieldAccessExpression parent isFunctionCallExpression and: [ aFieldAccessExpression parent receiver = aFieldAccessExpression ]) ifTrue: [
+		^ aFieldAccessExpression source ].
 
-	aFieldAccessExpression source traceCr.
+	(self currentEntity withAllParents flatCollect: [ :entity | (entity query outgoing local dependenciesOfType: FamixPythonImport) reject: #isFromImport ])
+		detect: [ :import |
+			| importPath |
+			importPath := import importPath , '.'.
+
+			(aFieldAccessExpression source beginsWith: importPath) and: [ ((aFieldAccessExpression source withoutPrefix: importPath) includes: $.) not ] ]
+		ifFound: [ :import |
+			self
+				resolve: ((FamixPythonImportedAccessOrReferenceResolvable identifier: aFieldAccessExpression name import: import)
+						 notFoundReplacementEntity: [ :unresolved :currentEntity | self ensureStubUnknownAccessedOrReferencedEntityNamed: unresolved identifier ];
+						 yourself)
+				foundAction: [ :entity :currentEntity |
+					| association |
+					association := entity createAccessOrReferenceFrom: currentEntity node: aFieldAccessExpression.
+					self setSourceAnchor: association from: aFieldAccessExpression ].
+			^ aFieldAccessExpression source ].
+
+	"	aFieldAccessExpression source traceCr.
+"
 	^ aFieldAccessExpression source
 ]
 
