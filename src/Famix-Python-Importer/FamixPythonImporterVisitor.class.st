@@ -741,16 +741,25 @@ FamixPythonImporterVisitor >> visitClassDefinition: aClassDef [
 { #category : 'generated' }
 FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression [
 
-	self flag: #todo. "Manage invocations."
-	(aFieldAccessExpression parent isFunctionCallExpression and: [ aFieldAccessExpression parent receiver = aFieldAccessExpression ]) ifTrue: [
-		^ aFieldAccessExpression source ].
+	| source |
+	source := aFieldAccessExpression source.
 
-	(self currentEntity withAllParents flatCollect: [ :entity | (entity query outgoing local dependenciesOfType: FamixPythonImport) reject: #isFromImport ])
+	self flag: #todo. "Manage invocations."
+	aFieldAccessExpression isReceiverOfFunctionCall ifTrue: [ ^ source ].
+
+	"Symbol resolution of accesses and references to imported entities.
+	Example:
+	
+	import moduleAtRoot
+	print(moduleAtRoot.moduleVariable)
+	"
+	self currentEntity allEffectiveSimpleImports
 		detect: [ :import |
 			| importPath |
-			importPath := import importPath , '.'.
-
-			(aFieldAccessExpression source beginsWith: importPath) and: [ ((aFieldAccessExpression source withoutPrefix: importPath) includes: $.) not ] ]
+			importPath := (import hasAlias
+				               ifTrue: [ import alias ]
+				               ifFalse: [ import importPath ]) , '.'.
+			(source beginsWith: importPath) and: [ ((source withoutPrefix: importPath) includes: $.) not ] ]
 		ifFound: [ :import |
 			self
 				resolve: ((FamixPythonImportedAccessOrReferenceResolvable identifier: aFieldAccessExpression name import: import)
@@ -760,11 +769,11 @@ FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression
 					| association |
 					association := entity createAccessOrReferenceFrom: currentEntity node: aFieldAccessExpression.
 					self setSourceAnchor: association from: aFieldAccessExpression ].
-			^ aFieldAccessExpression source ].
+			^ source ].
 
-	"	aFieldAccessExpression source traceCr.
-"
-	^ aFieldAccessExpression source
+	aFieldAccessExpression source traceCr.
+
+	^ source
 ]
 
 { #category : 'visiting' }

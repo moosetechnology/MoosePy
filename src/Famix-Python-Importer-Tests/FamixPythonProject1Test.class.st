@@ -2211,6 +2211,51 @@ FamixPythonProject1Test >> testReadAccessFromImportedGlobalWithNamespace [
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessFromImportedGlobalWithNamespaceAlias [
+
+	| global module access |
+	global := self globalVariableNamed: 'subSubPackage1Variable'.
+	module := self moduleNamed: 'moduleWithImportsAndAliases'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessFromImportedGlobalWithNamespaceAliasSourceAnchor [
+
+	| global module access |
+	global := self globalVariableNamed: 'subSubPackage1Variable'.
+	module := self moduleNamed: 'moduleWithImportsAndAliases'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access sourceAnchor isNotNil.
+	self assert: access sourceText equals: 'rss.subSubPackage1Variable'
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessFromImportedGlobalWithNamespaceSourceAnchor [
+
+	| global module access |
+	global := self globalVariableNamed: 'rootPackage2Variable'.
+	module := self moduleNamed: 'moduleAtRoot'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access sourceAnchor isNotNil.
+	self assert: access sourceText equals: 'root2.rootPackage2Variable'
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testReadAccessFromLambda [
 
 	| parameter lambda access |

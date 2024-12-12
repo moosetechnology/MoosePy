@@ -17,6 +17,12 @@ PyFieldAccessExpressionNode >> isInternalInstanceVariableAccess [
 ]
 
 { #category : '*Famix-Python-Importer' }
+PyFieldAccessExpressionNode >> isReceiverOfFunctionCall [
+
+	^ self parent isFunctionCallExpression and: [ self parent receiver = self ]
+]
+
+{ #category : '*Famix-Python-Importer' }
 PyFieldAccessExpressionNode >> name [
 	^ self nameToken value
 ]

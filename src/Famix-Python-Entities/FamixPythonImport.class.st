@@ -80,6 +80,12 @@ FamixPythonImport >> displayStringOn: aStream [
 	aStream nextPutAll: ')'
 ]
 
+{ #category : 'testing' }
+FamixPythonImport >> hasAlias [
+
+	^ alias isNotNil
+]
+
 { #category : 'accessing' }
 FamixPythonImport >> isFromImport [
 
