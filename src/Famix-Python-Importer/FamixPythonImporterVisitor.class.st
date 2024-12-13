@@ -100,9 +100,9 @@ FamixPythonImporterVisitor >> createImport: anImport ofName: aName from: fromNam
 
 	self currentEntity addOutgoingImport: import.
 
-	importPaths at: import put: (fromName
-			 ifNil: [ aName ]
-			 ifNotNil: [ fromName ]).
+	importPaths at: import put: ((fromName
+	 ifNil: [ aName ]
+	 ifNotNil: [ fromName ]) copyWithout: Character space).
 
 	self solver
 		resolve: (fromName

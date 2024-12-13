@@ -2275,6 +2275,25 @@ FamixPythonProject1Test >> testReadAccessFromImportedGlobalWithNamespaceSourceAn
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessFromImportedGlobalWithNamespaceWithImportWithSpaces [
+
+	| global module access |
+	global := self globalVariableNamed: 'subSubPackage1Variable'.
+	module := self moduleNamed: 'moduleWithSpacedImports'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testReadAccessFromLambda [
 
 	| parameter lambda access |
