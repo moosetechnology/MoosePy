@@ -5,7 +5,8 @@ Class {
 	#classTraits : 'SRTSolverUserVisitor classTrait',
 	#instVars : [
 		'model',
-		'rootFilePath'
+		'rootFilePath',
+		'importPaths'
 	],
 	#category : 'Famix-Python-Importer-Visitors',
 	#package : 'Famix-Python-Importer',
@@ -98,6 +99,10 @@ FamixPythonImporterVisitor >> createImport: anImport ofName: aName from: fromNam
 	self setSourceAnchor: import from: anImport.
 
 	self currentEntity addOutgoingImport: import.
+
+	importPaths at: import put: (fromName
+			 ifNil: [ aName ]
+			 ifNotNil: [ fromName ]).
 
 	self solver
 		resolve: (fromName
@@ -483,7 +488,8 @@ FamixPythonImporterVisitor >> initialize [
 
 	super initialize.
 	model := FamixPythonModel new name: 'default Python Model'.
-	self initialiseSolver
+	self initialiseSolver.
+	importPaths := IdentityDictionary new
 ]
 
 { #category : 'private - searching' }
@@ -758,7 +764,7 @@ FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression
 			| importPath |
 			importPath := (import hasAlias
 				               ifTrue: [ import alias ]
-				               ifFalse: [ import importPath ]) , '.'.
+				               ifFalse: [ importPaths at: import ]) , '.'.
 			(source beginsWith: importPath) and: [ ((source withoutPrefix: importPath) includes: $.) not ] ]
 		ifFound: [ :import |
 			self

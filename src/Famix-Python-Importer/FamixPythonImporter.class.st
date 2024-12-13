@@ -78,7 +78,7 @@ FamixPythonImporter >> importFileReference: aFileReference [
 FamixPythonImporter >> importPythonFile: aFileReference [
 
 	('Importing ' , aFileReference pathString) traceCr.
-	"(aFileReference basename = #'moduleAtRoot.py') ifTrue: [ 1halt ]."
+	"(aFileReference basename = #'moduleImportingMultipleItems.py') ifTrue: [ 1halt ]."
 	(PythonParser parseFileWithErrors: aFileReference) acceptVisitor: visitor
 ]
 
