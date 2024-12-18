@@ -74,6 +74,8 @@ FamixPythonImportedAccessOrReferenceResolvable >> import: anObject [
 { #category : 'resolution' }
 FamixPythonImportedAccessOrReferenceResolvable >> resolveInScope: aScope currentEntity: currentEntity [
 
+	import importedEntity name = identifier ifTrue: [ ^ self entity: import importedEntity ].
+
 	^ (import importedEntity definedEntitiesNamed: identifier ofKinds: {
 			   FamixPythonClass.
 			   FamixPythonFunction.

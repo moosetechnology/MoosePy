@@ -762,10 +762,12 @@ FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression
 	self currentEntity allEffectiveSimpleImports
 		detect: [ :import |
 			| importPath |
-			importPath := (import hasAlias
-				               ifTrue: [ import alias ]
-				               ifFalse: [ importPaths at: import ]) , '.'.
-			(source beginsWith: importPath) and: [ ((source withoutPrefix: importPath) includes: $.) not ] ]
+			importPath := import hasAlias
+				              ifTrue: [ import alias ]
+				              ifFalse: [ importPaths at: import ].
+			source = importPath or: [
+				importPath := importPath , '.'.
+				(source beginsWith: importPath) and: [ ((source withoutPrefix: importPath) includes: $.) not ] ] ]
 		ifFound: [ :import |
 			self
 				resolve: ((FamixPythonImportedAccessOrReferenceResolvable identifier: aFieldAccessExpression name import: import)
