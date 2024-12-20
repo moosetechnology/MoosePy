@@ -2114,6 +2114,151 @@ FamixPythonProject1Test >> testModuleInSubpackageImportsGlobalVariableFromAModul
 	self assert: import sourceText equals: 'from .moduleInSubPackage3 import moduleInSubpackage31Variable'
 ]
 
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testModuleReferenceFromClass [
+
+	| module class reference |
+	module := self moduleNamed: 'moduleToReference3'.
+	class := self classNamed: 'ClassReferencingAModule'.
+
+	reference := module incomingReferences detect: [ :aReference | aReference referencer = class ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: class.
+	self assert: reference referencer equals: class.
+	self assert: reference target equals: module.
+	self assert: reference referredEntity equals: module.
+	self assert: (class outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = module ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testModuleReferenceFromFunction [
+
+	| module function reference |
+	module := self moduleNamed: 'moduleToReference5'.
+	function := self functionNamed: 'function_referencing_module'.
+
+	reference := module incomingReferences detect: [ :aReference | aReference referencer = function ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: function.
+	self assert: reference referencer equals: function.
+	self assert: reference target equals: module.
+	self assert: reference referredEntity equals: module.
+	self assert: (function outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = module ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testModuleReferenceFromImportedEntityWithAlias [
+
+	| module module2 reference |
+	module := self moduleNamed: 'moduleToReference7'.
+	module2 := self moduleNamed: 'modulesReferencingThings'.
+
+	reference := module incomingReferences detect: [ :aReference | aReference referencer = module2 ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module2.
+	self assert: reference referencer equals: module2.
+	self assert: reference target equals: module.
+	self assert: reference referredEntity equals: module.
+	self assert: (module2 outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = module ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testModuleReferenceFromImportedEntityWithAliasSourceAnchor [
+
+	| module module2 reference |
+	module := self moduleNamed: 'moduleToReference7'.
+	module2 := self moduleNamed: 'modulesReferencingThings'.
+
+	reference := module incomingReferences detect: [ :aReference | aReference referencer = module2 ].
+
+	self assert: reference sourceAnchor isNotNil.
+	self assert: reference sourceText equals: 'module'
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testModuleReferenceFromLambda [
+
+	| module lambda reference |
+	module := self moduleNamed: 'moduleToReference6'.
+	lambda := (self functionNamed: 'function_with_lambda_with_module_ref') lambdas anyOne.
+
+	reference := module incomingReferences detect: [ :aReference | aReference referencer = lambda ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: lambda.
+	self assert: reference referencer equals: lambda.
+	self assert: reference target equals: module.
+	self assert: reference referredEntity equals: module.
+	self assert: (lambda outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = module ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testModuleReferenceFromMethod [
+
+	| module method reference |
+	module := self moduleNamed: 'moduleToReference4'.
+	method := self methodNamed: 'method_referencing_module'.
+
+	reference := module incomingReferences detect: [ :aReference | aReference referencer = method ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: method.
+	self assert: reference referencer equals: method.
+	self assert: reference target equals: module.
+	self assert: reference referredEntity equals: module.
+	self assert: (method outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = module ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testModuleReferenceFromModule [
+
+	| module module2 reference |
+	module := self moduleNamed: 'moduleToReference2'.
+	module2 := self moduleNamed: 'modulesReferencingThings'.
+
+	reference := module incomingReferences detect: [ :aReference | aReference referencer = module2 ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module2.
+	self assert: reference referencer equals: module2.
+	self assert: reference target equals: module.
+	self assert: reference referredEntity equals: module.
+	self assert: (module2 outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = module ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testModuleReferenceFromPackage [
+
+	| module package reference |
+	module := self moduleNamed: 'moduleToReference1'.
+	package := self packageNamed: 'subsubpackage1'.
+
+	reference := module incomingReferences detect: [ :aReference | aReference referencer = package ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: package.
+	self assert: reference referencer equals: package.
+	self assert: reference target equals: module.
+	self assert: reference referredEntity equals: module.
+	self assert: (package outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = module ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testModuleReferenceSourceAnchor [
+
+	| module class reference |
+	module := self moduleNamed: 'moduleToReference3'.
+	class := self classNamed: 'ClassReferencingAModule'.
+
+	reference := module incomingReferences detect: [ :aReference | aReference referencer = class ].
+
+	self assert: reference sourceAnchor isNotNil.
+	self assert: reference sourceText equals: 'packagesToReference.moduleToReference3'
+]
+
 { #category : 'tests - modules' }
 FamixPythonProject1Test >> testModulesWithTheSameNameAreDifferent [
 
@@ -2350,28 +2495,28 @@ FamixPythonProject1Test >> testPackageReferenceFromFunction [
 { #category : 'tests - references' }
 FamixPythonProject1Test >> testPackageReferenceFromImportedEntityWithAlias [
 
-	| package class reference |
+	| package module reference |
 	package := self packageNamed: 'packagesToReference7'.
-	class := self moduleNamed: 'modulesReferencingThings'.
+	module := self moduleNamed: 'modulesReferencingThings'.
 
-	reference := package incomingReferences detect: [ :aReference | aReference referencer = class ].
+	reference := package incomingReferences detect: [ :aReference | aReference referencer = module ].
 
 	self assert: reference class equals: FamixPythonReference.
-	self assert: reference source equals: class.
-	self assert: reference referencer equals: class.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
 	self assert: reference target equals: package.
 	self assert: reference referredEntity equals: package.
-	self assert: (class outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = package ])
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = package ])
 ]
 
 { #category : 'tests - references' }
 FamixPythonProject1Test >> testPackageReferenceFromImportedEntityWithAliasSourceAnchor [
 
-	| package class reference |
+	| package module reference |
 	package := self packageNamed: 'packagesToReference7'.
-	class := self moduleNamed: 'modulesReferencingThings'.
+	module := self moduleNamed: 'modulesReferencingThings'.
 
-	reference := package incomingReferences detect: [ :aReference | aReference referencer = class ].
+	reference := package incomingReferences detect: [ :aReference | aReference referencer = module ].
 
 	self assert: reference sourceAnchor isNotNil.
 	self assert: reference sourceText equals: 'package'
