@@ -626,14 +626,14 @@ FamixPythonProject1Test >> testFunctionReferenceFromClass [
 	function := self functionNamed: 'return2'.
 	class := self classNamed: 'ClassWithFunctionReference'.
 
-	reference := (function incomingFunctionReferences detect: [ :aReference | aReference referencer = class ]).
+	reference := (function incomingReferences detect: [ :aReference | aReference referencer = class ]).
 
-	self assert: reference class equals: FamixPythonFunctionReference.
+	self assert: reference class equals: FamixPythonReference.
 	self assert: reference source equals: class.
 	self assert: reference referencer equals: class.
 	self assert: reference target equals: function.
-	self assert: reference referredFunction equals: function.
-	self assert: (class outgoingFunctionReferences anySatisfy: [ :aReference | aReference referredFunction = function ])
+	self assert: reference referredEntity equals: function.
+	self assert: (class outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = function ])
 ]
 
 { #category : 'tests - function references' }
@@ -643,14 +643,14 @@ FamixPythonProject1Test >> testFunctionReferenceFromFunction [
 	function := self functionNamed: 'return2'.
 	function2 := self functionNamed: 'function_with_function_ref'.
 
-	reference := (function incomingFunctionReferences detect: [ :aReference | aReference referencer = function2 ]).
+	reference := (function incomingReferences detect: [ :aReference | aReference referencer = function2 ]).
 
-	self assert: reference class equals: FamixPythonFunctionReference.
+	self assert: reference class equals: FamixPythonReference.
 	self assert: reference source equals: function2.
 	self assert: reference referencer equals: function2.
 	self assert: reference target equals: function.
-	self assert: reference referredFunction equals: function.
-	self assert: (function2 outgoingFunctionReferences anySatisfy: [ :aReference | aReference referredFunction = function ])
+	self assert: reference referredEntity equals: function.
+	self assert: (function2 outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = function ])
 ]
 
 { #category : 'tests - function references' }
@@ -660,14 +660,14 @@ FamixPythonProject1Test >> testFunctionReferenceFromImportedEntity [
 	function := self functionNamed: 'function_in_module_in_root3'.
 	module := self moduleNamed: 'moduleImportingMultipleItems'.
 
-	reference := (function incomingFunctionReferences detect: [ :aReference | aReference referencer = module ]).
+	reference := (function incomingReferences detect: [ :aReference | aReference referencer = module ]).
 
-	self assert: reference class equals: FamixPythonFunctionReference.
+	self assert: reference class equals: FamixPythonReference.
 	self assert: reference source equals: module.
 	self assert: reference referencer equals: module.
 	self assert: reference target equals: function.
-	self assert: reference referredFunction equals: function.
-	self assert: (module outgoingFunctionReferences anySatisfy: [ :aReference | aReference referredFunction = function ])
+	self assert: reference referredEntity equals: function.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = function ])
 ]
 
 { #category : 'tests - function references' }
@@ -677,14 +677,14 @@ FamixPythonProject1Test >> testFunctionReferenceFromImportedEntityWithAlias [
 	function := self functionNamed: 'functionWithImportsInRoot2'.
 	module := self moduleNamed: 'moduleWithImportsAndAliases'.
 
-	reference := (function incomingFunctionReferences detect: [ :aReference | aReference referencer = module ]).
+	reference := (function incomingReferences detect: [ :aReference | aReference referencer = module ]).
 
-	self assert: reference class equals: FamixPythonFunctionReference.
+	self assert: reference class equals: FamixPythonReference.
 	self assert: reference source equals: module.
 	self assert: reference referencer equals: module.
 	self assert: reference target equals: function.
-	self assert: reference referredFunction equals: function.
-	self assert: (module outgoingFunctionReferences anySatisfy: [ :aReference | aReference referredFunction = function ])
+	self assert: reference referredEntity equals: function.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = function ])
 ]
 
 { #category : 'tests - function references' }
@@ -694,7 +694,7 @@ FamixPythonProject1Test >> testFunctionReferenceFromImportedEntityWithAliasSourc
 	function := self functionNamed: 'functionWithImportsInRoot2'.
 	module := self moduleNamed: 'moduleWithImportsAndAliases'.
 
-	reference := (function incomingFunctionReferences detect: [ :aReference | aReference referencer = module ]).
+	reference := (function incomingReferences detect: [ :aReference | aReference referencer = module ]).
 
 	self assert: reference sourceAnchor isNotNil.
 	self assert: reference sourceText equals: 'fwi'
@@ -707,14 +707,14 @@ FamixPythonProject1Test >> testFunctionReferenceFromLambda [
 	function := self functionNamed: 'return2'.
 	lambda := (self functionNamed: 'function_with_lambda_with_function_ref') lambdas anyOne.
 
-	reference := function incomingFunctionReferences detect: [ :aReference | aReference referencer = lambda ].
+	reference := function incomingReferences detect: [ :aReference | aReference referencer = lambda ].
 
-	self assert: reference class equals: FamixPythonFunctionReference.
+	self assert: reference class equals: FamixPythonReference.
 	self assert: reference source equals: lambda.
 	self assert: reference referencer equals: lambda.
 	self assert: reference target equals: function.
-	self assert: reference referredFunction equals: function.
-	self assert: (lambda outgoingFunctionReferences anySatisfy: [ :aReference | aReference referredFunction = function ])
+	self assert: reference referredEntity equals: function.
+	self assert: (lambda outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = function ])
 ]
 
 { #category : 'tests - function references' }
@@ -724,14 +724,14 @@ FamixPythonProject1Test >> testFunctionReferenceFromMethod [
 	function := self functionNamed: 'return2'.
 	method := self methodNamed: 'method_with_function_ref'.
 
-	reference := (function incomingFunctionReferences detect: [ :aReference | aReference referencer = method ]).
+	reference := (function incomingReferences detect: [ :aReference | aReference referencer = method ]).
 
-	self assert: reference class equals: FamixPythonFunctionReference.
+	self assert: reference class equals: FamixPythonReference.
 	self assert: reference source equals: method.
 	self assert: reference referencer equals: method.
 	self assert: reference target equals: function.
-	self assert: reference referredFunction equals: function.
-	self assert: (method outgoingFunctionReferences anySatisfy: [ :aReference | aReference referredFunction = function ])
+	self assert: reference referredEntity equals: function.
+	self assert: (method outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = function ])
 ]
 
 { #category : 'tests - function references' }
@@ -741,14 +741,14 @@ FamixPythonProject1Test >> testFunctionReferenceFromModule [
 	function := self functionNamed: 'sort_list'.
 	module := self moduleNamed: 'moduleAtRoot'.
 
-	reference := (function incomingFunctionReferences detect: [ :aReference | aReference referencer = module ]).
+	reference := (function incomingReferences detect: [ :aReference | aReference referencer = module ]).
 
-	self assert: reference class equals: FamixPythonFunctionReference.
+	self assert: reference class equals: FamixPythonReference.
 	self assert: reference source equals: module.
 	self assert: reference referencer equals: module.
 	self assert: reference target equals: function.
-	self assert: reference referredFunction equals: function.
-	self assert: (module outgoingFunctionReferences anySatisfy: [ :aReference | aReference referredFunction = function ])
+	self assert: reference referredEntity equals: function.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = function ])
 ]
 
 { #category : 'tests - function references' }
@@ -758,14 +758,14 @@ FamixPythonProject1Test >> testFunctionReferenceFromPackage [
 	function := self functionNamed: 'return2'.
 	package := self packageNamed: 'subsubpackage1'.
 
-	reference := (function incomingFunctionReferences detect: [ :aReference | aReference referencer = package ]).
+	reference := (function incomingReferences detect: [ :aReference | aReference referencer = package ]).
 
-	self assert: reference class equals: FamixPythonFunctionReference.
+	self assert: reference class equals: FamixPythonReference.
 	self assert: reference source equals: package.
 	self assert: reference referencer equals: package.
 	self assert: reference target equals: function.
-	self assert: reference referredFunction equals: function.
-	self assert: (package outgoingFunctionReferences anySatisfy: [ :aReference | aReference referredFunction = function ])
+	self assert: reference referredEntity equals: function.
+	self assert: (package outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = function ])
 ]
 
 { #category : 'tests - function references' }
@@ -775,7 +775,7 @@ FamixPythonProject1Test >> testFunctionReferenceSourceAnchor [
 	function := self functionNamed: 'return2'.
 	package := self packageNamed: 'subsubpackage1'.
 
-	reference := function incomingFunctionReferences detect: [ :aReference | aReference referencer = package ].
+	reference := function incomingReferences detect: [ :aReference | aReference referencer = package ].
 
 	self assert: reference sourceAnchor isNotNil.
 	self assert: reference sourceText equals: 'return2'
@@ -2612,8 +2612,8 @@ FamixPythonProject1Test >> testReferenceFromClass [
 	self assert: reference source equals: class2.
 	self assert: reference referencer equals: class2.
 	self assert: reference target equals: class.
-	self assert: reference referredType equals: class.
-	self assert: (class2 outgoingReferences anySatisfy: [ :aReference | aReference referredType = class ])
+	self assert: reference referredEntity equals: class.
+	self assert: (class2 outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
 ]
 
 { #category : 'tests - references' }
@@ -2629,8 +2629,8 @@ FamixPythonProject1Test >> testReferenceFromFunction [
 	self assert: reference source equals: function.
 	self assert: reference referencer equals: function.
 	self assert: reference target equals: class.
-	self assert: reference referredType equals: class.
-	self assert: (function outgoingReferences anySatisfy: [ :aReference | aReference referredType = class ])
+	self assert: reference referredEntity equals: class.
+	self assert: (function outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
 ]
 
 { #category : 'tests - references' }
@@ -2646,8 +2646,8 @@ FamixPythonProject1Test >> testReferenceFromLambda [
 	self assert: reference source equals: lambda.
 	self assert: reference referencer equals: lambda.
 	self assert: reference target equals: class.
-	self assert: reference referredType equals: class.
-	self assert: (lambda outgoingReferences anySatisfy: [ :aReference | aReference referredType = class ])
+	self assert: reference referredEntity equals: class.
+	self assert: (lambda outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
 ]
 
 { #category : 'tests - references' }
@@ -2663,8 +2663,8 @@ FamixPythonProject1Test >> testReferenceFromMethod [
 	self assert: reference source equals: method.
 	self assert: reference referencer equals: method.
 	self assert: reference target equals: class.
-	self assert: reference referredType equals: class.
-	self assert: (method outgoingReferences anySatisfy: [ :aReference | aReference referredType = class ])
+	self assert: reference referredEntity equals: class.
+	self assert: (method outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
 ]
 
 { #category : 'tests - references' }
@@ -2680,8 +2680,8 @@ FamixPythonProject1Test >> testReferenceFromModule [
 	self assert: reference source equals: module.
 	self assert: reference referencer equals: module.
 	self assert: reference target equals: class.
-	self assert: reference referredType equals: class.
-	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredType = class ])
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
 ]
 
 { #category : 'tests - references' }
@@ -2697,8 +2697,8 @@ FamixPythonProject1Test >> testReferenceFromPackage [
 	self assert: reference source equals: package.
 	self assert: reference referencer equals: package.
 	self assert: reference target equals: class.
-	self assert: reference referredType equals: class.
-	self assert: (package outgoingReferences anySatisfy: [ :aReference | aReference referredType = class ])
+	self assert: reference referredEntity equals: class.
+	self assert: (package outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
 ]
 
 { #category : 'tests - references' }
@@ -2714,8 +2714,8 @@ FamixPythonProject1Test >> testReferenceOfImportedEntity [
 	self assert: reference source equals: module.
 	self assert: reference referencer equals: module.
 	self assert: reference target equals: class.
-	self assert: reference referredType equals: class.
-	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredType = class ])
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
 ]
 
 { #category : 'tests - references' }
@@ -2731,8 +2731,8 @@ FamixPythonProject1Test >> testReferenceOfImportedEntityViaAlias [
 	self assert: reference source equals: module.
 	self assert: reference referencer equals: module.
 	self assert: reference target equals: class.
-	self assert: reference referredType equals: class.
-	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredType = class ]).
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
 ]
 
 { #category : 'tests - references' }

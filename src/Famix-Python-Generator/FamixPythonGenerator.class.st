@@ -24,8 +24,7 @@ Class {
 		'unknownImportedEntity',
 		'unknownAccessedOrReferencedEntity',
 		'unknowAccessOrReference',
-		'lambda',
-		'functionReference'
+		'lambda'
 	],
 	#category : 'Famix-Python-Generator',
 	#package : 'Famix-Python-Generator'
@@ -53,7 +52,6 @@ FamixPythonGenerator >> defineClasses [
 	class := builder newClassNamed: #Class.
 	containerEntity := builder newAbstractClassNamed: #ContainerEntity.
 	function := builder newClassNamed: #Function.
-	functionReference := builder newClassNamed: #FunctionReference.
 	globalVariable := builder newClassNamed: #GlobalVariable.
 	implicitVariable := builder newClassNamed: #ImplicitVariable.
 	import := builder newClassNamed: #Import.
@@ -112,8 +110,7 @@ FamixPythonGenerator >> defineHierarchy [
 	function --|> #TShadowable.
 	function --|> #TShadower.
 	function --|> #TWithLambdas.
-	
-	functionReference --|> #TAssociation.
+	function --|> #TReferenceable.
 	
 	lambda --|> containerEntity.
 	lambda --|> #TLambda.
@@ -228,9 +225,5 @@ FamixPythonGenerator >> defineRelations [
 
 	(unknowAccessOrReference property: #accessorOrReferencer) source *- (containerEntity property: #unknowAccessesOrReferences).
 
-	(unknowAccessOrReference property: #unknownEntity) target *- (unknownAccessedOrReferencedEntity property: #accessesOrReferences).
-
-	(functionReference property: #referencer) source *- (containerEntity property: #outgoingFunctionReferences).
-
-	(functionReference property: #referredFunction) target *- (function property: #incomingFunctionReferences)
+	(unknowAccessOrReference property: #unknownEntity) target *- (unknownAccessedOrReferencedEntity property: #accessesOrReferences)
 ]
