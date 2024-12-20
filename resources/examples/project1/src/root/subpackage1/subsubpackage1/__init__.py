@@ -1,5 +1,6 @@
-subSubPackage1Variable = True
+import packagesToReference.packagesToReference1
 
+subSubPackage1Variable = True
 
 # create a class
 class Room:
@@ -37,3 +38,5 @@ def function_with_lambda_with_function_ref():
 
 
 function_with_lambda_with_function_ref()()
+
+print(packagesToReference.packagesToReference1)
