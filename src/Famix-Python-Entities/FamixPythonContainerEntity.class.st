@@ -10,7 +10,6 @@
 ### Outgoing dependencies
 | Relation | Origin | Opposite | Type | Comment |
 |---|
-| `outgoingFunctionReferences` | `FamixPythonContainerEntity` | `referencer` | `FamixPythonFunctionReference` | |
 | `outgoingImports` | `FamixTWithImports` | `importingEntity` | `FamixTImport` | |
 | `unknowAccessesOrReferences` | `FamixPythonContainerEntity` | `accessorOrReferencer` | `FamixPythonUnknowAccessOrReference` | |
 
@@ -23,7 +22,6 @@ Class {
 	#traits : 'FamixTWithClasses + FamixTWithImports',
 	#classTraits : 'FamixTWithClasses classTrait + FamixTWithImports classTrait',
 	#instVars : [
-		'#outgoingFunctionReferences => FMMany type: #FamixPythonFunctionReference opposite: #referencer',
 		'#unknowAccessesOrReferences => FMMany type: #FamixPythonUnknowAccessOrReference opposite: #accessorOrReferencer'
 	],
 	#category : 'Famix-Python-Entities-Entities',
@@ -49,31 +47,9 @@ FamixPythonContainerEntity class >> isAbstract [
 ]
 
 { #category : 'adding' }
-FamixPythonContainerEntity >> addOutgoingFunctionReference: anObject [
-	<generated>
-	^ self outgoingFunctionReferences add: anObject
-]
-
-{ #category : 'adding' }
 FamixPythonContainerEntity >> addUnknowAccessesOrReference: anObject [
 	<generated>
 	^ self unknowAccessesOrReferences add: anObject
-]
-
-{ #category : 'accessing' }
-FamixPythonContainerEntity >> outgoingFunctionReferences [
-	"Relation named: #outgoingFunctionReferences type: #FamixPythonFunctionReference opposite: #referencer"
-
-	<generated>
-	<derived>
-	^ outgoingFunctionReferences
-]
-
-{ #category : 'accessing' }
-FamixPythonContainerEntity >> outgoingFunctionReferences: anObject [
-
-	<generated>
-	outgoingFunctionReferences value: anObject
 ]
 
 { #category : 'accessing' }
