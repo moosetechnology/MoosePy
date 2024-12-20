@@ -1,4 +1,5 @@
 import packagesToReference.packagesToReference1
+import packagesToReference.moduleToReference1
 
 subSubPackage1Variable = True
 
@@ -40,3 +41,4 @@ def function_with_lambda_with_function_ref():
 function_with_lambda_with_function_ref()()
 
 print(packagesToReference.packagesToReference1)
+print(packagesToReference.moduleToReference1)
