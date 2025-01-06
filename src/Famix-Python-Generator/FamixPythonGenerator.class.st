@@ -94,6 +94,7 @@ FamixPythonGenerator >> defineHierarchy [
 	class --|> #TShadower.
 	class --|> #TWithAccesses.  
 	class --|> #TWithReferences. 
+	class --|> #TWithInvocations.
 
 	containerEntity --|> namedEntity.
 	containerEntity --|> #TWithClasses.
@@ -185,6 +186,7 @@ FamixPythonGenerator >> defineHierarchy [
 	package --|> #TWithAccesses.
 	package --|> #TWithReferences.
 	package --|> #TReferenceable.
+	package --|> #TWithInvocations.
 
 	parameter --|> namedEntity.
 	parameter --|> #TParameter.

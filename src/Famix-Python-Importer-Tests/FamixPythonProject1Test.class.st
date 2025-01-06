@@ -779,6 +779,23 @@ FamixPythonProject1Test >> testFunctionInAPackage [
 	self assert: function functionOwner equals: (self packageNamed: 'subsubpackage1')
 ]
 
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationFromModule [
+
+	| module function invocation |
+	function := self functionNamed: 'function_printing_arg'.
+	module := self moduleNamed: 'moduleAtRoot'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation anyCandidate equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
+]
+
 { #category : 'tests - references' }
 FamixPythonProject1Test >> testFunctionReferenceFromClass [
 
@@ -1019,9 +1036,9 @@ FamixPythonProject1Test >> testFunctionSourceAnchor [
 
 	self assert: function sourceAnchor isNotNil.
 	self assert: function sourceText equals: ('def sort_list(list1, list2):
-	zipped_pairs = zip(list2, list1)
-	z = [x for _, x in sorted(zipped_pairs)]
-	return z' copyReplaceAll: String cr with: String lf)
+    zipped_pairs = zip(list2, list1)
+    z = [x for _, x in sorted(zipped_pairs)]
+    return z' copyReplaceAll: String cr with: String lf)
 ]
 
 { #category : 'tests - functions' }

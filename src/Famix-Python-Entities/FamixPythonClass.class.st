@@ -19,6 +19,7 @@
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `accesses` | `FamixTWithAccesses` | `accessor` | `FamixTAccess` | Accesses to variables made by this behaviour.|
+| `outgoingInvocations` | `FamixTWithInvocations` | `sender` | `FamixTInvocation` | Outgoing invocations sent by this behaviour.|
 | `outgoingReferences` | `FamixTWithReferences` | `referencer` | `FamixTReference` | References from this entity to other entities.|
 | `superInheritances` | `FamixTWithInheritances` | `subclass` | `FamixTInheritance` | Superinheritance relationships, i.e. known superclasses of this type.|
 
@@ -55,8 +56,8 @@
 Class {
 	#name : 'FamixPythonClass',
 	#superclass : 'FamixPythonType',
-	#traits : 'FamixTClass + FamixTImportable + FamixTShadowable + FamixTShadower + FamixTWithAccesses + FamixTWithAnnotationInstances + FamixTWithLambdas + FamixTWithReferences',
-	#classTraits : 'FamixTClass classTrait + FamixTImportable classTrait + FamixTShadowable classTrait + FamixTShadower classTrait + FamixTWithAccesses classTrait + FamixTWithAnnotationInstances classTrait + FamixTWithLambdas classTrait + FamixTWithReferences classTrait',
+	#traits : 'FamixTClass + FamixTImportable + FamixTShadowable + FamixTShadower + FamixTWithAccesses + FamixTWithAnnotationInstances + FamixTWithInvocations + FamixTWithLambdas + FamixTWithReferences',
+	#classTraits : 'FamixTClass classTrait + FamixTImportable classTrait + FamixTShadowable classTrait + FamixTShadower classTrait + FamixTWithAccesses classTrait + FamixTWithAnnotationInstances classTrait + FamixTWithInvocations classTrait + FamixTWithLambdas classTrait + FamixTWithReferences classTrait',
 	#instVars : [
 		'#instancedClasses => FMMany type: #FamixPythonClass opposite: #metaclass',
 		'#isMetaclass => FMProperty',

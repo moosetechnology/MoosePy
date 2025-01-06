@@ -20,6 +20,7 @@
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `accesses` | `FamixTWithAccesses` | `accessor` | `FamixTAccess` | Accesses to variables made by this behaviour.|
+| `outgoingInvocations` | `FamixTWithInvocations` | `sender` | `FamixTInvocation` | Outgoing invocations sent by this behaviour.|
 | `outgoingReferences` | `FamixTWithReferences` | `referencer` | `FamixTReference` | References from this entity to other entities.|
 
 ### Incoming dependencies
@@ -46,8 +47,8 @@
 Class {
 	#name : 'FamixPythonPackage',
 	#superclass : 'FamixPythonContainerEntity',
-	#traits : 'FamixTImportable + FamixTPackage + FamixTPackageable + FamixTReferenceable + FamixTWithAccesses + FamixTWithComments + FamixTWithFunctions + FamixTWithGlobalVariables + FamixTWithLambdas + FamixTWithReferences',
-	#classTraits : 'FamixTImportable classTrait + FamixTPackage classTrait + FamixTPackageable classTrait + FamixTReferenceable classTrait + FamixTWithAccesses classTrait + FamixTWithComments classTrait + FamixTWithFunctions classTrait + FamixTWithGlobalVariables classTrait + FamixTWithLambdas classTrait + FamixTWithReferences classTrait',
+	#traits : 'FamixTImportable + FamixTPackage + FamixTPackageable + FamixTReferenceable + FamixTWithAccesses + FamixTWithComments + FamixTWithFunctions + FamixTWithGlobalVariables + FamixTWithInvocations + FamixTWithLambdas + FamixTWithReferences',
+	#classTraits : 'FamixTImportable classTrait + FamixTPackage classTrait + FamixTPackageable classTrait + FamixTReferenceable classTrait + FamixTWithAccesses classTrait + FamixTWithComments classTrait + FamixTWithFunctions classTrait + FamixTWithGlobalVariables classTrait + FamixTWithInvocations classTrait + FamixTWithLambdas classTrait + FamixTWithReferences classTrait',
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',
 	#tag : 'Entities'

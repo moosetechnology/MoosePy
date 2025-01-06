@@ -279,6 +279,17 @@ FamixPythonImporterVisitor >> ensureStubContainerNamed: aString [
 ]
 
 { #category : 'private-entity-creation' }
+FamixPythonImporterVisitor >> ensureStubFunctionNamed: aName [
+
+	^ model allFunctions
+		  detect: [ :function | function isStub and: [ function name = aName ] ]
+		  ifNone: [
+			  (model newFunctionNamed: aName)
+				  isStub: true;
+				  yourself ]
+]
+
+{ #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> ensureStubPackageNamed: aString [
 
 	^ model allPackages
@@ -809,6 +820,28 @@ FamixPythonImporterVisitor >> visitFile: aFileNode [
 	^ isPackageDeclaration
 		  ifTrue: [ self currentEntity ]
 		  ifFalse: [ self popScope ]
+]
+
+{ #category : 'visiting' }
+FamixPythonImporterVisitor >> visitFunctionCallExpression: aFunctionCallExpression [
+
+	self flag: #todo. "Temporary hack"
+	(aFunctionCallExpression receiver isKindOf: PyFunctionCallExpressionNode) ifFalse: [
+		self
+			resolve: ((SRInvocationWithNode identifier: aFunctionCallExpression receiver name)
+					 expectedKind: FamixPythonFunction;
+					 notFoundReplacementEntity: [ :unresolved :currentEntity | unresolved identifier = 'inner_function' ifTrue: [ 1halt ]. "1 halt." { (self ensureStubFunctionNamed: unresolved identifier) } ];
+					 yourself)
+			foundAction: [ :entities :currentEntity |
+				| invocation |
+				invocation := self model newInvocation
+					              candidates: entities;
+					              sender: currentEntity;
+					              yourself.
+				self setSourceAnchor: invocation from: aFunctionCallExpression ] ].
+
+
+	^ super visitFunctionCallExpression: aFunctionCallExpression
 ]
 
 { #category : 'visiting' }
