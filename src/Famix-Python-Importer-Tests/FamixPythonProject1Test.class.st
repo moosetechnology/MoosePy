@@ -814,6 +814,23 @@ FamixPythonProject1Test >> testFunctionInvocationFromFunction [
 ]
 
 { #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationFromLambda [
+
+	| lambda function invocation |
+	function := self functionNamed: 'return5'.
+	lambda := (self moduleNamed: 'moduleInRootPackage2') lambdas anyOne.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = lambda ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: lambda.
+	self assert: invocation sender equals: lambda.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation anyCandidate equals: function.
+	self assert: (lambda outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
+]
+
+{ #category : 'tests - invocations' }
 FamixPythonProject1Test >> testFunctionInvocationFromMethod [
 
 	| method function invocation |
@@ -862,6 +879,53 @@ FamixPythonProject1Test >> testFunctionInvocationFromPackage [
 	self assertCollection: invocation target hasSameElements: { function }.
 	self assert: invocation anyCandidate equals: function.
 	self assert: (package outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationOfImportedEntity [
+
+	| class function invocation |
+	function := self functionNamed: 'return2'.
+	class := self classNamed: 'Employee'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = class ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: class.
+	self assert: invocation sender equals: class.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation anyCandidate equals: function.
+	self assert: (class outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationOfImportedEntityViaAlias [
+
+	| module function invocation |
+	function := self functionNamed: 'functionWithImportsInRoot2'.
+	module := self moduleNamed: 'moduleWithImportsAndAliases'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation anyCandidate equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationOfImportedEntityViaAliasSourceAnchor [
+
+	| module function invocation |
+	function := self functionNamed: 'functionWithImportsInRoot2'.
+	module := self moduleNamed: 'moduleWithImportsAndAliases'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation sourceAnchor isNotNil.
+	self assert: invocation sourceText equals: 'fwi()'
 ]
 
 { #category : 'tests - invocations' }
