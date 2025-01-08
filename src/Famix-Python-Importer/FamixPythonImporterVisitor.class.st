@@ -830,7 +830,7 @@ FamixPythonImporterVisitor >> visitFunctionCallExpression: aFunctionCallExpressi
 		self
 			resolve: ((SRInvocationWithNode identifier: aFunctionCallExpression receiver name)
 					 expectedKind: FamixPythonFunction;
-					 notFoundReplacementEntity: [ :unresolved :currentEntity | unresolved identifier = 'inner_function' ifTrue: [ 1halt ]. "1 halt." { (self ensureStubFunctionNamed: unresolved identifier) } ];
+					 notFoundReplacementEntity: [ :unresolved :currentEntity | { (self ensureStubFunctionNamed: unresolved identifier) } ];
 					 yourself)
 			foundAction: [ :entities :currentEntity |
 				| invocation |

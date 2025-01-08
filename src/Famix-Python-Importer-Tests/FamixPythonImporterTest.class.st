@@ -172,7 +172,7 @@ def identity():
     print("identify")
 '.
 
-	self assert: (self model allWithType: FamixPythonFunction) size equals: 1.
+	self assert: (self model allWithType: FamixPythonFunction) size equals: 2.
 
 	famix := self functionNamed: 'identity'.
 	self assert: famix isNotNil.
@@ -209,7 +209,7 @@ FamixPythonImporterTest >> testInnerFunctions [
 		print("Hello, World!")
 	inner_func()'.
 
-	self assert: self model allFunctions size equals: 2.
+	self assert: self model allFunctions size equals: 3.
 	outer := self functionNamed: 'outer_func'.
 	inner := self functionNamed: 'inner_func'.
 

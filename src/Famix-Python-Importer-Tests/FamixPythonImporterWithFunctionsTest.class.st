@@ -50,7 +50,7 @@ FamixPythonImporterWithFunctionsTest >> testFunctionWithParameter [
 { #category : 'tests - functions' }
 FamixPythonImporterWithFunctionsTest >> testFunctions [
 
-	self assert: self model allFunctions size equals: 4.
+	self assert: (self model allFunctions reject: #isStub) size equals: 4.
 
 	self assert: (self functionNamed: 'tryToPlaceWord') isNotNil.
 	self assert: (self functionNamed: 'printGrid') isNotNil

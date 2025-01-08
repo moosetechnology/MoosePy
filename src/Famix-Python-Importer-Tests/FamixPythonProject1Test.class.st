@@ -1623,6 +1623,37 @@ FamixPythonProject1Test >> testInstanceVariablesWithSameNameButDifferenClass [
 			(self classNamed: 'Stool') }
 ]
 
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testInvocationOfMultipleStubFunctionsOfTheSameName [
+
+	| module function invocations |
+	function := self functionNamed: 'print'.
+	module := self moduleNamed: 'moduleAtRoot'.
+
+	invocations := function incomingInvocations select: [ :aReference | aReference sender = module ].
+
+	self assert: invocations size equals: 8.
+	self assert: (invocations collectAsSet: #target) size equals: 1. "Multiple stub of the same name in the same entity should produce only 1 stub and not duplicate them."
+	self assert: function isStub
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testInvocationOfStubFunction [
+
+	| module function invocation |
+	function := self functionNamed: 'print'.
+	module := self moduleNamed: 'moduleAtRoot'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation anyCandidate equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
+]
+
 { #category : 'tests - lambdas' }
 FamixPythonProject1Test >> testLambdaInAClass [
 
