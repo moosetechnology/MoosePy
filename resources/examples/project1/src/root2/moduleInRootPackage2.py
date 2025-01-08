@@ -113,3 +113,12 @@ def functionWithImportsInRoot2():
     study_room.calculate_area()
 
     print(return2())
+
+
+def return5():
+    return 5
+
+
+lamb = lambda: return5() + 2
+
+lamb()
