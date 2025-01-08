@@ -780,6 +780,57 @@ FamixPythonProject1Test >> testFunctionInAPackage [
 ]
 
 { #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationFromClass [
+
+	| class function invocation |
+	function := self functionNamed: 'sort_list'.
+	class := self classNamed: 'Employee'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = class ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: class.
+	self assert: invocation sender equals: class.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation anyCandidate equals: function.
+	self assert: (class outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationFromFunction [
+
+	| function2 function invocation |
+	function := self functionNamed: 'sort_list'.
+	function2 := self functionNamed: 'functionWithImportsInRoot2'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = function2 ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: function2.
+	self assert: invocation sender equals: function2.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation anyCandidate equals: function.
+	self assert: (function2 outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationFromMethod [
+
+	| method function invocation |
+	function := self functionNamed: 'sort_list'.
+	method := self methodNamed: 'print_info_2'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = method ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: method.
+	self assert: invocation sender equals: method.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation anyCandidate equals: function.
+	self assert: (method outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
+]
+
+{ #category : 'tests - invocations' }
 FamixPythonProject1Test >> testFunctionInvocationFromModule [
 
 	| module function invocation |
@@ -794,6 +845,36 @@ FamixPythonProject1Test >> testFunctionInvocationFromModule [
 	self assertCollection: invocation target hasSameElements: { function }.
 	self assert: invocation anyCandidate equals: function.
 	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationFromPackage [
+
+	| package function invocation |
+	function := self functionNamed: 'function_with_lambda_with_function_ref'.
+	package := self packageNamed: 'subsubpackage1'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = package ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: package.
+	self assert: invocation sender equals: package.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation anyCandidate equals: function.
+	self assert: (package outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationSourceAnchor [
+
+	| function2 function invocation |
+	function := self functionNamed: 'sort_list'.
+	function2 := self functionNamed: 'functionWithImportsInRoot2'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = function2 ].
+
+	self assert: invocation sourceAnchor isNotNil.
+	self assert: invocation sourceText equals: 'sort_list(x, y)'
 ]
 
 { #category : 'tests - references' }
@@ -3064,6 +3145,22 @@ FamixPythonProject1Test >> testReadAccessToParameter [
 	self deny: access isWrite.
 	self assert: access isRead.
 	self assert: (function accesses anySatisfy: [ :anAccess | anAccess variable = parameter ])
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testRecursiveFunctionInvocation [
+
+	| function invocation |
+	function := self functionNamed: 'fibonacci'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = function ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: function.
+	self assert: invocation sender equals: function.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation anyCandidate equals: function.
+	self assert: (function outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
 ]
 
 { #category : 'tests - modules' }
