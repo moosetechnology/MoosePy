@@ -126,25 +126,6 @@ FamixPythonImporterVisitor >> createImport: anImport ofName: aName from: fromNam
 ]
 
 { #category : 'private-entity-creation' }
-FamixPythonImporterVisitor >> createInvocation: anInvocationNode [
-
-	| invocation tSize invocDict  |
-	invocation := model newInvocation.
-	tSize := anInvocationNode trailers size.
-
-	invocDict := self extractInvocationInformation: anInvocationNode.
-
-	invocation sender: self currentEntity.
-	invocation cacheAt: 'canditate' put: (invocDict at: 'canditate').
-	invocation cacheAt: 'args' put: (invocDict at: 'args').
-	invocation cacheAt: 'receiver' put: (invocDict at: 'receiver').
-	invocation signature:
-		(self signatureFromInvocation: anInvocationNode).
-
-	^ self setSourceAnchor: invocation from: anInvocationNode
-]
-
-{ #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> createLambda: aLambdaExpression [
 
 	| lambda |
@@ -334,105 +315,6 @@ FamixPythonImporterVisitor >> ensureStubUnknownAccessedOrReferencedEntityNamed: 
 ]
 
 { #category : 'accessing' }
-FamixPythonImporterVisitor >> extractArgumentsInformation: aSignature [
-
-	| arguments argument buffer extractedList tmp res labelCleaned valueCleaned buffer2 mySignature y  |
-	argument := Dictionary new.
-	arguments := OrderedCollection new.
-	extractedList := OrderedCollection new.
-
-	buffer2 := OrderedCollection new.
-
-	"Example : '(2,2), border_mode=''same'''"
-
-	"Extract ()"
-	mySignature := aSignature removeSuffix: ')'.
-	buffer := $( split: mySignature.
-
-
-	buffer do: [ :each |
-		(each indexOf: $)) > 0
-			ifTrue: [
-				y := $) split: each.
-				buffer2 add: ($, split: y first).
-				buffer2 add: y second ]
-			ifFalse: [ buffer2 add: each ] ].
-
-
-	buffer2 do: [ :each |
-		(each indexOf: $() > 0
-			ifTrue: [ extractedList add: (each copyWithoutAll: '(') ]
-			ifFalse: [ ($, split: each) do: [ :x | extractedList add: x ] ] ].
-
-
-
-
-	"Extract label with ="
-	res := extractedList collect: [ :each |
-		       argument := Dictionary new.
-
-		       each isString
-			       ifTrue: [
-				       (each indexOf: $=) > 0
-					       ifTrue: [
-						       tmp := $= split: each.
-
-						       argument at: 'label' put: tmp first.
-						       argument at: 'value' put: tmp second ]
-					       ifFalse: [ argument at: 'value' put: each ] ]
-			       ifFalse: [ argument at: 'value' put: each ].
-		       each = '' | (each = ' ') ifFalse: [ arguments add: argument ] ].
-
-
-	arguments do: [ :arg | "Clean label"
-		arg at: 'label' ifPresent: [
-			labelCleaned := ((arg at: 'label') copyWithoutAll: ',') trim.
-
-			arg at: 'label' put: labelCleaned ].
-
-		"Clean value"
-		arg at: 'value' ifPresent: [
-			(arg at: 'value') isString ifTrue: [
-				valueCleaned := ((arg at: 'value') copyWithoutAll: '''') trim.
-
-
-				(valueCleaned indexOf: $,) > 0 ifTrue: [
-					valueCleaned := $, split: valueCleaned ].
-
-				arg at: 'value' put: valueCleaned ] ] ].
-
-	^ arguments
-]
-
-{ #category : 'accessing' }
-FamixPythonImporterVisitor >> extractInvocationInformation: anInvocationNode [
-
-	| tSize invocationDict |
-	tSize := anInvocationNode trailers size.
-	invocationDict := Dictionary new.
-
-	tSize > 1
-		ifTrue: [
-			invocationDict
-				at: 'canditate'
-				put: (anInvocationNode trailers at: tSize - 1) nameToken value.
-
-			invocationDict
-				at: 'receiver'
-				put: (self getReceiverFromSmaccInvocationNode: anInvocationNode) ]
-		ifFalse: [
-			invocationDict
-				at: 'canditate'
-				put: anInvocationNode atom nameToken value.
-
-			invocationDict at: 'receiver' put: nil ].
-
-	invocationDict at: 'args' put: (self extractArgumentsInformation: (self signatureFromInvocation: anInvocationNode)).
-
-	^ invocationDict
-]
-
-{ #category : 'accessing' }
 FamixPythonImporterVisitor >> findSadowedEntityNamed: name [
 	"If the same element already has a shadowable entity of the same name, we select the last one defined. If there is none, we return nil"
 
@@ -441,51 +323,6 @@ FamixPythonImporterVisitor >> findSadowedEntityNamed: name [
 			^ entities detectMax: [ :anEntity | anEntity sourceAnchor startPos ] ] ].
 
 	^ nil
-]
-
-{ #category : 'accessing - methods' }
-FamixPythonImporterVisitor >> functions [
-
-	^ self model allWithType: FamixPythonFunction
-]
-
-{ #category : 'private - searching' }
-FamixPythonImporterVisitor >> getFileContent: aPath [
-	"Example of path : '/Users/aurelikama/Documents/Projet/These/parserPythonToJson/sample_design_smell/layers_formation/gh_non_dominating_dow_sampling.py'
-		          asFileReference contents."
-
-	^ aPath asFileReference contents
-]
-
-{ #category : 'accessing' }
-FamixPythonImporterVisitor >> getReceiverFromSmaccInvocationNode: anInvocationNode [
-
-	| receiver signature startPos endPos array |
-	signature := anInvocationNode asString.
-
-
-	startPos := signature indexOf: $(.
-	endPos := signature indexOf: $( startingAt: startPos + 1.
-
-	endPos := endPos > startPos ifTrue: [
-		          array := ((signature copyFrom: startPos + 1 to: endPos - 1)
-			                    substrings: '.') asOrderedCollection.
-
-		          receiver := '' join:
-			                      (array
-				                       collect: [ :a | a ]
-				                       from: 1
-				                       to: array size - 1) ].
-	^ receiver
-]
-
-{ #category : 'private - searching' }
-FamixPythonImporterVisitor >> importFromName: anImportFromNode [
-
-	| result |
-	result := self visitDotOptDottedName: anImportFromNode.
-
-	^ result
 ]
 
 { #category : 'accessing - methods' }
@@ -504,48 +341,6 @@ FamixPythonImporterVisitor >> initialize [
 ]
 
 { #category : 'private - searching' }
-FamixPythonImporterVisitor >> invocationArgs: aString [
-
-	^ (self model allWithType: FamixPythonInvocation)
-		  detect: [ :e |
-			  e
-				  cacheAt: 'args'
-				  ifAbsent: [ false ]
-				  ifPresent: [ :name | name = aString ] ]
-		  ifNone: [ nil ]
-]
-
-{ #category : 'private - searching' }
-FamixPythonImporterVisitor >> invocationCandidate: aString [
-
-	^ (self model allWithType: FamixPythonInvocation)
-		  detect: [ :e |
-			  e
-				  cacheAt: 'canditate'
-				  ifAbsent: [ false ]
-				  ifPresent: [ :name | name = aString ] ]
-		  ifNone: [ nil ]
-]
-
-{ #category : 'private - searching' }
-FamixPythonImporterVisitor >> invocationReceiver: aString [
-
-	^ (self model allWithType: FamixPythonInvocation)
-		  detect: [ :e |
-			  e
-				  cacheAt: 'receiver'
-				  ifAbsent: [ false ]
-				  ifPresent: [ :name | name = aString ] ]
-		  ifNone: [ nil ]
-]
-
-{ #category : 'accessing - methods' }
-FamixPythonImporterVisitor >> invocations [
-
-	^ self model allWithType: FamixPythonInvocation
-]
-
-{ #category : 'private - searching' }
 FamixPythonImporterVisitor >> methodNamed: aString inClassNamed: aClassName [
 
 	^ (self model allWithType: FamixPythonMethod)
@@ -554,21 +349,9 @@ FamixPythonImporterVisitor >> methodNamed: aString inClassNamed: aClassName [
 		  ifNone: [ nil ]
 ]
 
-{ #category : 'accessing - methods' }
-FamixPythonImporterVisitor >> methods [
-
-	^ self model allWithType: FamixPythonMethod 
-]
-
 { #category : 'accessing' }
 FamixPythonImporterVisitor >> model [
 	^ model
-]
-
-{ #category : 'accessing - modules' }
-FamixPythonImporterVisitor >> moduleFromFonction: aFunctionNode [
-
-	^(self parentFileForNode: aFunctionNode)
 ]
 
 { #category : 'accessing - modules' }
@@ -604,12 +387,6 @@ FamixPythonImporterVisitor >> parameterNamed: pName inBehavioural: famixBehaviou
 	^ (famixBehavioural parameters)
 		  detect: [ :e | e name = pName ]
 		  ifNone: [ nil ]
-]
-
-{ #category : 'accessing - methods' }
-FamixPythonImporterVisitor >> parameters [
-
-	^ self model allWithType: FamixPythonParameter 
 ]
 
 { #category : 'accessing - modules' }
@@ -680,17 +457,6 @@ FamixPythonImporterVisitor >> setSuperclassesOf: classDefinitionNode from: class
 							   notFoundReplacementEntity: [ :unresolvedSuperclass :currentEntity | self ensureStubClassNamed: unresolvedSuperclass identifier ];
 							   yourself)
 					  foundAction: [ :entity :currentEntity | inheritance superclass: entity ] ] ]
-]
-
-{ #category : 'accessing - methods' }
-FamixPythonImporterVisitor >> signatureFromInvocation: anInvocationNode [
-
-	| signature startPos |
-	signature := anInvocationNode asString.
-	startPos := signature indexOf: $(.
-	startPos := signature indexOf: $( startingAt: startPos + 1.
-	signature := signature copyFrom: startPos + 1 to: signature size - 2.
-	^ signature copyWithoutAll: '"'
 ]
 
 { #category : 'private - searching' }
