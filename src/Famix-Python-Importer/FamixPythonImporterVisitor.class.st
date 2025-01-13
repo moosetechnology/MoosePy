@@ -603,6 +603,7 @@ FamixPythonImporterVisitor >> visitFunctionCallExpression: aFunctionCallExpressi
 				invocation := self model newInvocation
 					              candidates: entities;
 					              sender: currentEntity;
+					              signature: aFunctionCallExpression source;
 					              yourself.
 				self setSourceAnchor: invocation from: aFunctionCallExpression ] ].
 

@@ -882,6 +882,18 @@ FamixPythonProject1Test >> testFunctionInvocationFromPackage [
 ]
 
 { #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationHasSignature [
+
+	| module function invocation |
+	function := self functionNamed: 'function_printing_arg'.
+	module := self moduleNamed: 'moduleAtRoot'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation signature equals: 'function_printing_arg("Cyril")'
+]
+
+{ #category : 'tests - invocations' }
 FamixPythonProject1Test >> testFunctionInvocationOfImportedEntity [
 
 	| class function invocation |
@@ -926,6 +938,18 @@ FamixPythonProject1Test >> testFunctionInvocationOfImportedEntityViaAliasSourceA
 
 	self assert: invocation sourceAnchor isNotNil.
 	self assert: invocation sourceText equals: 'fwi()'
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationSignatureWithAlias [
+
+	| module function invocation |
+	function := self functionNamed: 'functionWithImportsInRoot2'.
+	module := self moduleNamed: 'moduleWithImportsAndAliases'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation signature equals: 'fwi()'
 ]
 
 { #category : 'tests - invocations' }
@@ -3050,6 +3074,26 @@ FamixPythonProject1Test >> testReadAccessFromPackage [
 	self deny: access isWrite.
 	self assert: access isRead.
 	self assert: (package accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessFromThiInsideOfAnInvocation [
+	"Regression test. We were not representing accesses that were done inside the parameters of an invocaiton."
+
+	| global module access |
+	global := self globalVariableNamed: 'moduleAtRootVariable'.
+	module := self moduleNamed: 'moduleAtRoot8'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
 ]
 
 { #category : 'tests - accesses' }
