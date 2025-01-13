@@ -792,8 +792,8 @@ FamixPythonProject1Test >> testFunctionInvocationFromClass [
 	self assert: invocation source equals: class.
 	self assert: invocation sender equals: class.
 	self assertCollection: invocation target hasSameElements: { function }.
-	self assert: invocation anyCandidate equals: function.
-	self assert: (class outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
+	self assert: invocation invokedEntity equals: function.
+	self assert: (class outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
 ]
 
 { #category : 'tests - invocations' }
@@ -809,8 +809,8 @@ FamixPythonProject1Test >> testFunctionInvocationFromFunction [
 	self assert: invocation source equals: function2.
 	self assert: invocation sender equals: function2.
 	self assertCollection: invocation target hasSameElements: { function }.
-	self assert: invocation anyCandidate equals: function.
-	self assert: (function2 outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
+	self assert: invocation invokedEntity equals: function.
+	self assert: (function2 outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
 ]
 
 { #category : 'tests - invocations' }
@@ -826,8 +826,8 @@ FamixPythonProject1Test >> testFunctionInvocationFromLambda [
 	self assert: invocation source equals: lambda.
 	self assert: invocation sender equals: lambda.
 	self assertCollection: invocation target hasSameElements: { function }.
-	self assert: invocation anyCandidate equals: function.
-	self assert: (lambda outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
+	self assert: invocation invokedEntity equals: function.
+	self assert: (lambda outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
 ]
 
 { #category : 'tests - invocations' }
@@ -843,8 +843,8 @@ FamixPythonProject1Test >> testFunctionInvocationFromMethod [
 	self assert: invocation source equals: method.
 	self assert: invocation sender equals: method.
 	self assertCollection: invocation target hasSameElements: { function }.
-	self assert: invocation anyCandidate equals: function.
-	self assert: (method outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
+	self assert: invocation invokedEntity equals: function.
+	self assert: (method outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
 ]
 
 { #category : 'tests - invocations' }
@@ -860,8 +860,8 @@ FamixPythonProject1Test >> testFunctionInvocationFromModule [
 	self assert: invocation source equals: module.
 	self assert: invocation sender equals: module.
 	self assertCollection: invocation target hasSameElements: { function }.
-	self assert: invocation anyCandidate equals: function.
-	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
+	self assert: invocation invokedEntity equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
 ]
 
 { #category : 'tests - invocations' }
@@ -877,8 +877,8 @@ FamixPythonProject1Test >> testFunctionInvocationFromPackage [
 	self assert: invocation source equals: package.
 	self assert: invocation sender equals: package.
 	self assertCollection: invocation target hasSameElements: { function }.
-	self assert: invocation anyCandidate equals: function.
-	self assert: (package outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
+	self assert: invocation invokedEntity equals: function.
+	self assert: (package outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
 ]
 
 { #category : 'tests - invocations' }
@@ -894,8 +894,8 @@ FamixPythonProject1Test >> testFunctionInvocationOfImportedEntity [
 	self assert: invocation source equals: class.
 	self assert: invocation sender equals: class.
 	self assertCollection: invocation target hasSameElements: { function }.
-	self assert: invocation anyCandidate equals: function.
-	self assert: (class outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
+	self assert: invocation invokedEntity equals: function.
+	self assert: (class outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
 ]
 
 { #category : 'tests - invocations' }
@@ -911,8 +911,8 @@ FamixPythonProject1Test >> testFunctionInvocationOfImportedEntityViaAlias [
 	self assert: invocation source equals: module.
 	self assert: invocation sender equals: module.
 	self assertCollection: invocation target hasSameElements: { function }.
-	self assert: invocation anyCandidate equals: function.
-	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
+	self assert: invocation invokedEntity equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
 ]
 
 { #category : 'tests - invocations' }
@@ -1650,8 +1650,8 @@ FamixPythonProject1Test >> testInvocationOfStubFunction [
 	self assert: invocation source equals: module.
 	self assert: invocation sender equals: module.
 	self assertCollection: invocation target hasSameElements: { function }.
-	self assert: invocation anyCandidate equals: function.
-	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
+	self assert: invocation invokedEntity equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
 ]
 
 { #category : 'tests - lambdas' }
@@ -3254,8 +3254,8 @@ FamixPythonProject1Test >> testRecursiveFunctionInvocation [
 	self assert: invocation source equals: function.
 	self assert: invocation sender equals: function.
 	self assertCollection: invocation target hasSameElements: { function }.
-	self assert: invocation anyCandidate equals: function.
-	self assert: (function outgoingInvocations anySatisfy: [ :aReference | aReference anyCandidate = function ])
+	self assert: invocation invokedEntity equals: function.
+	self assert: (function outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
 ]
 
 { #category : 'tests - modules' }
