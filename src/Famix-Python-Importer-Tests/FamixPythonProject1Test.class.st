@@ -405,7 +405,7 @@ FamixPythonProject1Test >> testClassShadowedByClass [
 	self assert: shadowed name equals: 'ClassShadowedByOtherClass'.
 	self assert: shadowed isShadowed.
 	self assert: shadowed typeContainer equals: (self moduleNamed: 'moduleWithShadowing').
-	self assert: shadowed shadowingEntity equals: shadower.
+	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
 	self assert: shadowed sourceText equals: ('class ClassShadowedByOtherClass:
     c_var_of_shadowed_class = True' copyReplaceAll: String cr with: String lf)
 ]
@@ -427,7 +427,7 @@ FamixPythonProject1Test >> testClassShadowedByFunction [
 	self assert: shadowed name equals: 'shadowedName'.
 	self assert: shadowed isShadowed.
 	self assert: shadowed typeContainer equals: (self moduleNamed: 'moduleWithShadowing').
-	self assert: shadowed shadowingEntity equals: shadower.
+	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
 	self assert: shadowed sourceText equals: ('class shadowedName:
     shadowedNameVar = 2' copyReplaceAll: String cr with: String lf)
 ]
@@ -448,7 +448,7 @@ FamixPythonProject1Test >> testClassShadowedByGlobal [
 	self assert: shadowed name equals: 'ClassShadowedByGlobal'.
 	self assert: shadowed isShadowed.
 	self assert: shadowed typeContainer equals: (self moduleNamed: 'moduleWithShadowing').
-	self assert: shadowed shadowingEntity equals: shadower.
+	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
 	self assert: shadowed sourceText equals: ('class ClassShadowedByGlobal:
     pass' copyReplaceAll: String cr with: String lf)
 ]
@@ -1137,14 +1137,14 @@ FamixPythonProject1Test >> testFunctionShadowedByClass [
 	self assert: shadower name equals: 'function_shadowed_by_class'.
 	self deny: shadower isShadowed.
 	self assert: shadower typeContainer equals: (self moduleNamed: 'moduleWithShadowing').
-	self assert: shadower shadowedEntity equals: shadowed.
+	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
 	self assert: shadower sourceText equals: ('class function_shadowed_by_class:
     pass' copyReplaceAll: String cr with: String lf).
 
 	self assert: shadowed name equals: 'function_shadowed_by_class'.
 	self assert: shadowed isShadowed.
 	self assert: shadowed functionOwner equals: (self moduleNamed: 'moduleWithShadowing').
-	self assert: shadowed shadowingEntity equals: shadower.
+	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
 	self assert: shadowed sourceText equals: ('def function_shadowed_by_class():
     return 2' copyReplaceAll: String cr with: String lf)
 ]
@@ -1161,14 +1161,14 @@ FamixPythonProject1Test >> testFunctionShadowedByFunction [
 	self assert: shadower name equals: 'function_to_shadow'.
 	self deny: shadower isShadowed.
 	self assert: shadower functionOwner equals: (self moduleNamed: 'moduleAtRoot6').
-	self assert: shadower shadowedEntity equals: shadowed.
+	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
 	self assert: shadower sourceText equals: ('def function_to_shadow():
     return 2' copyReplaceAll: String cr with: String lf).
 
 	self assert: shadowed name equals: 'function_to_shadow'.
 	self assert: shadowed isShadowed.
 	self assert: shadowed functionOwner equals: (self moduleNamed: 'moduleAtRoot6').
-	self assert: shadowed shadowingEntity equals: shadower.
+	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
 	self assert: shadowed sourceText equals: ('def function_to_shadow():
     return 1' copyReplaceAll: String cr with: String lf)
 ]
@@ -1184,13 +1184,13 @@ FamixPythonProject1Test >> testFunctionShadowedByGlobal [
 	self assert: shadower name equals: 'global_then_function_then_global_then_class'.
 	self assert: shadower isShadowed. "<= In that case the shadower is also shadowed later"
 	self assert: shadower parentScope equals: (self moduleNamed: 'moduleWithShadowing').
-	self assert: shadower shadowedEntity equals: shadowed.
+	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
 	self assert: shadower sourceText equals: ('global_then_function_then_global_then_class' copyReplaceAll: String cr with: String lf).
 
 	self assert: shadowed name equals: 'global_then_function_then_global_then_class'.
 	self assert: shadowed isShadowed.
 	self assert: shadowed functionOwner equals: (self moduleNamed: 'moduleWithShadowing').
-	self assert: shadowed shadowingEntity equals: shadower.
+	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
 	self assert: shadowed sourceText equals: ('def global_then_function_then_global_then_class():
     print(14)' copyReplaceAll: String cr with: String lf)
 ]
@@ -1254,7 +1254,7 @@ FamixPythonProject1Test >> testGlobalShadowedByClass [
 	self assert: shadower name equals: 'global_then_function_then_global_then_class'.
 	self deny: shadower isShadowed.
 	self assert: shadower typeContainer equals: (self moduleNamed: 'moduleWithShadowing').
-	self assert: shadower shadowedEntity equals: shadowed.
+	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
 	self assert: shadower sourceText equals: ('class global_then_function_then_global_then_class:
     def __init__(self):
         print(16)' copyReplaceAll: String cr with: String lf).
@@ -1262,7 +1262,7 @@ FamixPythonProject1Test >> testGlobalShadowedByClass [
 	self assert: shadowed name equals: 'global_then_function_then_global_then_class'.
 	self assert: shadowed isShadowed.
 	self assert: shadowed parentScope equals: (self moduleNamed: 'moduleWithShadowing').
-	self assert: shadowed shadowingEntity equals: shadower.
+	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
 	self assert: shadowed sourceText equals: 'global_then_function_then_global_then_class'
 ]
 
@@ -1277,14 +1277,14 @@ FamixPythonProject1Test >> testGlobalShadowedByFunction [
 	self assert: shadower name equals: 'global_then_function_then_global_then_class'.
 	self assert: shadower isShadowed. "<= In that case the shadower is also shadowed later"
 	self assert: shadower functionOwner equals: (self moduleNamed: 'moduleWithShadowing').
-	self assert: shadower shadowedEntity equals: shadowed.
+	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
 	self assert: shadower sourceText equals: ('def global_then_function_then_global_then_class():
     print(14)' copyReplaceAll: String cr with: String lf).
 
 	self assert: shadowed name equals: 'global_then_function_then_global_then_class'.
 	self assert: shadowed isShadowed.
 	self assert: shadowed parentScope equals: (self moduleNamed: 'moduleWithShadowing').
-	self assert: shadowed shadowingEntity equals: shadower.
+	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
 	self assert: shadowed sourceText equals: 'global_then_function_then_global_then_class'
 ]
 
@@ -3369,7 +3369,7 @@ FamixPythonProject1Test >> testShadowedFunctionWithDifferentParameter [
 	self assert: function isShadowed.
 	self assert: function signature equals: 'function_to_shadow_with_different_signature()'.
 	self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot6').
-	self assert: function shadowingEntity equals: shadower.
+	self assertCollection: function shadowingEntities hasSameElements: { shadower }.
 	self assert: function sourceText equals: ('def function_to_shadow_with_different_signature():
     return 7' copyReplaceAll: String cr with: String lf)
 ]
