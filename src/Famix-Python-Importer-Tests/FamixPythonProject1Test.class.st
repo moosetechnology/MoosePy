@@ -1195,6 +1195,31 @@ FamixPythonProject1Test >> testFunctionShadowedByGlobal [
     print(14)' copyReplaceAll: String cr with: String lf)
 ]
 
+{ #category : 'tests - shadowing' }
+FamixPythonProject1Test >> testFunctionShadowedByTemporary [
+
+	| shadower shadowed |
+	shadower := self localVariableNamed: 'function_with_local_of_same_name'.
+	shadowed := self functionNamed: 'function_with_local_of_same_name'.
+
+	self assert: shadower name equals: 'function_with_local_of_same_name'.
+	self deny: shadower isShadowed.
+	self assert: shadower parentBehaviouralEntity equals: shadowed.
+	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
+	self assert: shadower sourceText equals: ('function_with_local_of_same_name' copyReplaceAll: String cr with: String lf).
+
+	self assert: shadowed name equals: 'function_with_local_of_same_name'.
+	self assert: shadowed isShadowed.
+	self assert: shadowed functionOwner equals: (self moduleNamed: 'moduleWithShadowing').
+	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
+	self assert: shadowed sourceText equals: ('def function_with_local_of_same_name(init):
+    if init > 10:
+        return init
+
+    function_with_local_of_same_name = init
+    return function_with_local_of_same_name + 3' copyReplaceAll: String cr with: String lf)
+]
+
 { #category : 'tests - functions' }
 FamixPythonProject1Test >> testFunctionSourceAnchor [
 

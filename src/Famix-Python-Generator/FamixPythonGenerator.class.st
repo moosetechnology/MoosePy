@@ -146,6 +146,8 @@ FamixPythonGenerator >> defineHierarchy [
 	localVariable --|> #TCanBeFinal.
 	localVariable --|> #TInvocationsReceiver.
 	localVariable --|> #TWithComments.
+	localVariable --|> #TShadowable.
+	localVariable --|> #TShadower.
 
 	method --|> containerEntity.
 	method --|> #TMethod.
