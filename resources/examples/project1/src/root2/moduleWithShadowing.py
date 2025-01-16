@@ -74,3 +74,21 @@ def function_with_local_of_same_name(init):
 
 
 print(function_with_local_of_same_name(0))
+
+
+def function_shadowed_twice(init):
+    if init > 10:
+        return init
+
+    function_shadowed_twice = init
+    return function_shadowed_twice + 3
+
+
+print(function_shadowed_twice(1))
+
+
+def function_shadowed_twice():
+    return 4
+
+
+print(function_shadowed_twice())
