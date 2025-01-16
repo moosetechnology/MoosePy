@@ -51,7 +51,7 @@ FamixPythonFromImportResolvable >> resolveInScope: aScope currentEntity: current
 			possibleEntities := currentPackage children ]
 		ifFalse: [ "If we have an absolute path we just start at the root."
 			remainingPath := path.
-			possibleEntities := currentEntity mooseModel rootEntities ].
+			possibleEntities := currentEntity mooseModel modelRootEntities ].
 
 	"We trim the path because we can have spaces after the dots in relativ paths."
 	possibleEntities := (self findTargetEntityFor: remainingPath trim from: possibleEntities) allChildren select: [ :child |

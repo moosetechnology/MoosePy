@@ -1608,6 +1608,15 @@ FamixPythonProject1Test >> testImportTwoStubPackagesOfTheSameName [
 	self assert: ((self moduleNamed: 'moduleWithStubs') outgoingImports anySatisfy: [ :import | import importedEntity = numpy ])
 ]
 
+{ #category : 'tests - imports' }
+FamixPythonProject1Test >> testImportWithTheNameOfAStubClass [
+
+	| module |
+	module := self moduleNamed: 'moduleWithStubImport'.
+
+	module outgoingImports do: [ :import | self deny: (import importedEntity isKindOf: FamixPythonClass) ]
+]
+
 { #category : 'tests - inheritances' }
 FamixPythonProject1Test >> testInheritanceDoesNotCreateReference [
 	"Regression test"

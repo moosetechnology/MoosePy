@@ -28,6 +28,20 @@ FamixPythonImporter class >> import: aFileName [
 		import: aFileName
 ]
 
+{ #category : 'dev-utils' }
+FamixPythonImporter class >> importBeerTradingBot [
+
+	<script>
+	(self import: '/Users/cyril/testPython/beer-trading-bot-main' asFileReference) inspect
+]
+
+{ #category : 'dev-utils' }
+FamixPythonImporter class >> importReader [
+
+	<script>
+	(self import: '/Users/cyril/testPython/reader' asFileReference) inspect
+]
+
 { #category : 'accessing' }
 FamixPythonImporter >> errorReport [
 
