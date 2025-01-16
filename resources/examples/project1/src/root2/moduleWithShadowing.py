@@ -63,3 +63,14 @@ class ClassShadowedByGlobal:
 
 
 ClassShadowedByGlobal = True
+
+
+def function_with_local_of_same_name(init):
+    if init > 10:
+        return init
+
+    function_with_local_of_same_name = init
+    return function_with_local_of_same_name + 3
+
+
+print(function_with_local_of_same_name(0))
