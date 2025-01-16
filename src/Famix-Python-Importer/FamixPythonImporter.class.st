@@ -1,12 +1,13 @@
 "
 An importer for Python projects
 
-API:
-```St
-MSEPythonProjectImporter import: 'python/project/root/directory'
+You can launch the import of a project like this:
+
+```st
+FamixPythonImporter import: '/Users/cyril/testPython/reader' asFileReference
 ```
 
-will return a `FamixPythonModel`
+It will return a Famix python model generated from the .py files in this folder and if there are errors during the parsing, it'll open an inspector with the list of errors.
 "
 Class {
 	#name : 'FamixPythonImporter',
