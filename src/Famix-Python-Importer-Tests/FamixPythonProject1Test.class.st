@@ -1718,6 +1718,33 @@ FamixPythonProject1Test >> testInstanceVariablesWithSameNameButDifferenClass [
 			(self classNamed: 'Stool') }
 ]
 
+{ #category : 'tests - instantiation' }
+FamixPythonProject1Test >> testInstantiationFromModule [
+
+	| class module reference constructor invocation |
+	class := self classNamed: 'Person'.
+	module := self moduleNamed: 'moduleAtRoot2'.
+
+	reference := class incomingReferences detect: [ :aReference | aReference referencer = module ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ]).
+
+	constructor := class methods detect: #isConstructor.
+	invocation := constructor incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assertCollection: invocation target hasSameElements: { constructor }.
+	self assert: invocation invokedEntity equals: constructor .
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = constructor ])
+]
+
 { #category : 'tests - invocations' }
 FamixPythonProject1Test >> testInvocationOfMultipleStubFunctionsOfTheSameName [
 
@@ -1747,6 +1774,26 @@ FamixPythonProject1Test >> testInvocationOfStubFunction [
 	self assertCollection: invocation target hasSameElements: { function }.
 	self assert: invocation invokedEntity equals: function.
 	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testInvocationOfStubFunctionHasRightParentPackage [
+	"If we have for example matplotlib.pyplot.plot(), we know that #plot() is in the module #pyplot in the package #matplotlib "
+
+	| module function invocation |
+	self skip.
+	self flag: #todo.
+	function := self functionNamed: 'plot'.
+	module := self moduleNamed: 'moduleWithStubs'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: function isStub.
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation invokedEntity equals: function.
+
+	self assert: function functionOwner equals: (self packageNamed: 'pyplot').
+	self assert: function functionOwner isStub
 ]
 
 { #category : 'tests - lambdas' }

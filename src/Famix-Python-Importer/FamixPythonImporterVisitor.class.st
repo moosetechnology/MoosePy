@@ -271,6 +271,17 @@ FamixPythonImporterVisitor >> ensureStubFunctionNamed: aName [
 ]
 
 { #category : 'private-entity-creation' }
+FamixPythonImporterVisitor >> ensureStubMethodNamed: aName [
+
+	^ model allMethods
+		  detect: [ :method | method isStub and: [ method name = aName ] ]
+		  ifNone: [
+			  (model newMethodNamed: aName)
+				  isStub: true;
+				  yourself ]
+]
+
+{ #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> ensureStubPackageNamed: aString [
 
 	^ model allPackages
@@ -325,10 +336,15 @@ FamixPythonImporterVisitor >> findSadowedEntityNamed: name [
 	^ nil
 ]
 
-{ #category : 'accessing - methods' }
-FamixPythonImporterVisitor >> imports [
+{ #category : 'accessing' }
+FamixPythonImporterVisitor >> getConstructorOf: aClass [
 
-	^ self model allWithType: FamixPythonImport 
+	^ aClass methods
+		  detect: [ :method | method isConstructor ]
+		  ifNone: [
+			  (self ensureStubMethodNamed: '__init__')
+				  isConstructor: true;
+				  yourself ]
 ]
 
 { #category : 'initialization' }
@@ -591,21 +607,40 @@ FamixPythonImporterVisitor >> visitFile: aFileNode [
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> visitFunctionCallExpression: aFunctionCallExpression [
 
+	aFunctionCallExpression source traceCr.
 	self flag: #todo. "Temporary hack"
 	(aFunctionCallExpression receiver isKindOf: PyFunctionCallExpressionNode) ifFalse: [
 		self
-			resolve: ((SRInvocationWithNode identifier: aFunctionCallExpression receiver name)
-					 expectedKind: FamixPythonFunction;
-					 notFoundReplacementEntity: [ :unresolved :currentEntity | { (self ensureStubFunctionNamed: unresolved identifier) } ];
+			resolve: ((FamixPythonInvocationOrInstantiationResolvable identifier: aFunctionCallExpression receiver name)
+					 expectedKind: {
+							 FamixPythonFunction.
+							 FamixPythonClass };
+					 notFoundReplacementEntity: [ :unresolved :currentEntity |
+						 self flag: #todo. "This can be something else than a function"
+						 { (self ensureStubFunctionNamed: unresolved identifier) } ];
 					 yourself)
-			foundAction: [ :entities :currentEntity |
-				| invocation |
-				invocation := self model newInvocation
-					              candidates: entities;
-					              sender: currentEntity;
-					              signature: aFunctionCallExpression source;
-					              yourself.
-				self setSourceAnchor: invocation from: aFunctionCallExpression ] ].
+			foundAction: [ :result :currentEntity |
+				self flag: #todo. "Improve code"
+				(result isCollection not and: [ result isClass ])
+					ifTrue: [
+						| reference invocation |
+						reference := result createAccessOrReferenceFrom: currentEntity node: aFunctionCallExpression.
+						self setSourceAnchor: reference from: aFunctionCallExpression.
+
+						invocation := self model newInvocation
+							              candidates: { (self getConstructorOf: result) };
+							              sender: currentEntity;
+							              signature: aFunctionCallExpression source;
+							              yourself.
+						self setSourceAnchor: invocation from: aFunctionCallExpression ]
+					ifFalse: [
+						| invocation |
+						invocation := self model newInvocation
+							              candidates: result;
+							              sender: currentEntity;
+							              signature: aFunctionCallExpression source;
+							              yourself.
+						self setSourceAnchor: invocation from: aFunctionCallExpression ] ] ].
 
 
 	^ super visitFunctionCallExpression: aFunctionCallExpression
