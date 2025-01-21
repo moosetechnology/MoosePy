@@ -1764,6 +1764,52 @@ FamixPythonProject1Test >> testInstantiationSourceAnchor [
 	self assert: invocation sourceText equals: 'Person("John", 36)'
 ]
 
+{ #category : 'tests - instantiation' }
+FamixPythonProject1Test >> testInstantiationWithAlias [
+
+	| class module reference constructor invocation |
+	class := self classNamed: 'Employee'.
+	module := self moduleNamed: 'moduleWithImportsAndAliases'.
+
+	reference := class incomingReferences detect: [ :aReference | aReference referencer = module ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ]).
+
+	constructor := class methods detect: #isConstructor.
+	invocation := constructor incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assertCollection: invocation target hasSameElements: { constructor }.
+	self assert: invocation invokedEntity equals: constructor .
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = constructor ])
+]
+
+{ #category : 'tests - instantiation' }
+FamixPythonProject1Test >> testInstantiationWithAliasSourceAnchor [
+
+	| class module reference constructor invocation |
+	class := self classNamed: 'Employee'.
+	module := self moduleNamed: 'moduleWithImportsAndAliases'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = module ]) detectMax: [ :r | r sourceAnchor startPos ].
+
+	self assert: reference sourceAnchor isNotNil.
+	self assert: reference sourceText equals: 'Emp("Imen", 37)'.
+
+	constructor := class methods detect: #isConstructor.
+	invocation := constructor incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation sourceAnchor isNotNil.
+	self assert: invocation sourceText equals: 'Emp("Imen", 37)'
+]
+
 { #category : 'tests - invocations' }
 FamixPythonProject1Test >> testInvocationOfMultipleStubFunctionsOfTheSameName [
 
