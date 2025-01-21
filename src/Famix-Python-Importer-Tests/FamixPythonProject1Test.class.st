@@ -1745,6 +1745,25 @@ FamixPythonProject1Test >> testInstantiationFromModule [
 	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = constructor ])
 ]
 
+{ #category : 'tests - instantiation' }
+FamixPythonProject1Test >> testInstantiationSourceAnchor [
+
+	| class module reference constructor invocation |
+	class := self classNamed: 'Person'.
+	module := self moduleNamed: 'moduleAtRoot2'.
+
+	reference := class incomingReferences detect: [ :aReference | aReference referencer = module ].
+
+	self assert: reference sourceAnchor isNotNil.
+	self assert: reference sourceText equals: 'Person("John", 36)'.
+
+	constructor := class methods detect: #isConstructor.
+	invocation := constructor incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation sourceAnchor isNotNil.
+	self assert: invocation sourceText equals: 'Person("John", 36)'
+]
+
 { #category : 'tests - invocations' }
 FamixPythonProject1Test >> testInvocationOfMultipleStubFunctionsOfTheSameName [
 
