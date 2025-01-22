@@ -1881,6 +1881,21 @@ FamixPythonProject1Test >> testInstantiationFromPackage [
 ]
 
 { #category : 'tests - instantiation' }
+FamixPythonProject1Test >> testInstantiationOfClassWithoutExplicitConstructorCreatesStubs [
+	"It was decided that if we instantiate a class without a constructor, we create a stub one to create an invocation on it."
+
+	| class package constructor |
+	class := self classNamed: 'Animal'.
+	package := self packageNamed: 'root'.
+
+	self shouldnt: [ constructor := class methods detect: #isConstructor ] raise: Error.
+
+	self assert: constructor isStub.
+	self assert: constructor name equals: '__init__'.
+	self assert: constructor parentType equals: class
+]
+
+{ #category : 'tests - instantiation' }
 FamixPythonProject1Test >> testInstantiationSourceAnchor [
 
 	| class module reference constructor invocation |
