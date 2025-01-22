@@ -1719,6 +1719,114 @@ FamixPythonProject1Test >> testInstanceVariablesWithSameNameButDifferenClass [
 ]
 
 { #category : 'tests - instantiation' }
+FamixPythonProject1Test >> testInstantiationFromClass [
+
+	| class class2 reference constructor invocation |
+	class := self classNamed: 'Dog'.
+	class2 := self classNamed: 'ClassWithInstantiation'.
+
+	reference := class incomingReferences detect: [ :aReference | aReference referencer = class2 ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: class2.
+	self assert: reference referencer equals: class2.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (class2 outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ]).
+
+	constructor := class methods detect: #isConstructor.
+	invocation := constructor incomingInvocations detect: [ :aReference | aReference sender = class2 ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: class2.
+	self assert: invocation sender equals: class2.
+	self assertCollection: invocation target hasSameElements: { constructor }.
+	self assert: invocation invokedEntity equals: constructor .
+	self assert: (class2 outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = constructor ])
+]
+
+{ #category : 'tests - instantiation' }
+FamixPythonProject1Test >> testInstantiationFromFunction [
+
+	| class function reference constructor invocation |
+	class := self classNamed: 'Dog'.
+	function := self functionNamed: 'function_with_instantiation'.
+
+	reference := class incomingReferences detect: [ :aReference | aReference referencer = function ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: function.
+	self assert: reference referencer equals: function.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (function outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ]).
+
+	constructor := class methods detect: #isConstructor.
+	invocation := constructor incomingInvocations detect: [ :aReference | aReference sender = function ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: function.
+	self assert: invocation sender equals: function.
+	self assertCollection: invocation target hasSameElements: { constructor }.
+	self assert: invocation invokedEntity equals: constructor .
+	self assert: (function outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = constructor ])
+]
+
+{ #category : 'tests - instantiation' }
+FamixPythonProject1Test >> testInstantiationFromLambda [
+
+	| class lambda reference constructor invocation |
+	class := self classNamed: 'Dog'.
+	lambda := (self functionNamed: 'function_with_lambda_and_instantiation') lambdas anyOne.
+
+	reference := class incomingReferences detect: [ :aReference | aReference referencer = lambda ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: lambda.
+	self assert: reference referencer equals: lambda.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (lambda outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ]).
+
+	constructor := class methods detect: #isConstructor.
+	invocation := constructor incomingInvocations detect: [ :aReference | aReference sender = lambda ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: lambda.
+	self assert: invocation sender equals: lambda.
+	self assertCollection: invocation target hasSameElements: { constructor }.
+	self assert: invocation invokedEntity equals: constructor .
+	self assert: (lambda outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = constructor ])
+]
+
+{ #category : 'tests - instantiation' }
+FamixPythonProject1Test >> testInstantiationFromMethod [
+
+	| class method reference constructor invocation |
+	class := self classNamed: 'Dog'.
+	method := self methodNamed: 'method_with_instantiation'.
+
+	reference := class incomingReferences detect: [ :aReference | aReference referencer = method ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: method.
+	self assert: reference referencer equals: method.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (method outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ]).
+
+	constructor := class methods detect: #isConstructor.
+	invocation := constructor incomingInvocations detect: [ :aReference | aReference sender = method ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: method.
+	self assert: invocation sender equals: method.
+	self assertCollection: invocation target hasSameElements: { constructor }.
+	self assert: invocation invokedEntity equals: constructor .
+	self assert: (method outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = constructor ])
+]
+
+{ #category : 'tests - instantiation' }
 FamixPythonProject1Test >> testInstantiationFromModule [
 
 	| class module reference constructor invocation |
@@ -1743,6 +1851,33 @@ FamixPythonProject1Test >> testInstantiationFromModule [
 	self assertCollection: invocation target hasSameElements: { constructor }.
 	self assert: invocation invokedEntity equals: constructor .
 	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = constructor ])
+]
+
+{ #category : 'tests - instantiation' }
+FamixPythonProject1Test >> testInstantiationFromPackage [
+
+	| class package reference constructor invocation |
+	class := self classNamed: 'Animal'.
+	package := self packageNamed: 'root'.
+
+	reference := class incomingReferences detect: [ :aReference | aReference referencer = package ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: package.
+	self assert: reference referencer equals: package.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (package outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ]).
+
+	constructor := class methods detect: #isConstructor.
+	invocation := constructor incomingInvocations detect: [ :aReference | aReference sender = package ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: package.
+	self assert: invocation sender equals: package.
+	self assertCollection: invocation target hasSameElements: { constructor }.
+	self assert: invocation invokedEntity equals: constructor .
+	self assert: (package outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = constructor ])
 ]
 
 { #category : 'tests - instantiation' }

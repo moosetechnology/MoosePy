@@ -271,17 +271,6 @@ FamixPythonImporterVisitor >> ensureStubFunctionNamed: aName [
 ]
 
 { #category : 'private-entity-creation' }
-FamixPythonImporterVisitor >> ensureStubMethodNamed: aName [
-
-	^ model allMethods
-		  detect: [ :method | method isStub and: [ method name = aName ] ]
-		  ifNone: [
-			  (model newMethodNamed: aName)
-				  isStub: true;
-				  yourself ]
-]
-
-{ #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> ensureStubPackageNamed: aString [
 
 	^ model allPackages
@@ -342,8 +331,10 @@ FamixPythonImporterVisitor >> getConstructorOf: aClass [
 	^ aClass methods
 		  detect: [ :method | method isConstructor ]
 		  ifNone: [
-			  (self ensureStubMethodNamed: '__init__')
+			  (model newMethodNamed: '__init__')
+				  isStub: true;
 				  isConstructor: true;
+				  parentType: aClass;
 				  yourself ]
 ]
 
