@@ -13,3 +13,6 @@ class Animal(AbstractAnimal):
 
     def eat(self):
         print("I can eat")
+
+
+print(Animal())

@@ -34,6 +34,24 @@ print(Dog.newClassVar)
 print(dog.sound)
 
 
+def function_with_instantiation():
+    return Dog("Celeste")
+
+
+print(function_with_instantiation().dog_name)
+
+
+class ClassWithInstantiation:
+    instantiation_c_var = Dog("Skye")
+
+    def method_with_instantiation(self):
+        return Dog("Camille")
+
+
+def function_with_lambda_and_instantiation():
+    return lambda: Dog("Swify")
+
+
 class Chair:
 
     furniture_color = "Blue"
