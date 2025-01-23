@@ -21,10 +21,9 @@ Class {
 		'module',
 		'indexedFileAnchor',
 		'globalVariable',
-		'unknownImportedEntity',
-		'unknownAccessedOrReferencedEntity',
 		'unknowAccessOrReference',
-		'lambda'
+		'lambda',
+		'unknownEntity'
 	],
 	#category : 'Famix-Python-Generator',
 	#package : 'Famix-Python-Generator'
@@ -67,9 +66,8 @@ FamixPythonGenerator >> defineClasses [
 	primitiveType := builder newClassNamed: #PrimitiveType.
 	reference := builder newClassNamed: #Reference.
 	type := builder newClassNamed: #Type.
-	unknownImportedEntity := builder newClassNamed: #UnknownImportedEntity.
-	unknownAccessedOrReferencedEntity := builder newClassNamed: #UnknownAccessedOrReferencedEntity.
-	unknowAccessOrReference := builder newClassNamed: #UnknowAccessOrReference
+	unknowAccessOrReference := builder newClassNamed: #UnknowAccessOrReference.
+	unknownEntity := builder newClassNamed: #UnknownEntity
 ]
 
 { #category : 'definition' }
@@ -202,11 +200,9 @@ FamixPythonGenerator >> defineHierarchy [
 	type --|> containerEntity.
 	type --|> #TType.
 	
-	unknownImportedEntity --|> containerEntity.
-	unknownImportedEntity --|> #TImportable.
-	unknownImportedEntity--|> #TPackageable .
-	
-	unknownAccessedOrReferencedEntity --|> namedEntity.
+	unknownEntity --|> namedEntity.
+	unknownEntity --|> #TImportable.
+	unknownEntity--|> #TPackageable .
 	
 	unknowAccessOrReference --|> #TAssociation
 ]
@@ -231,5 +227,5 @@ FamixPythonGenerator >> defineRelations [
 
 	(unknowAccessOrReference property: #accessorOrReferencer) source *- (containerEntity property: #unknowAccessesOrReferences).
 
-	(unknowAccessOrReference property: #unknownEntity) target *- (unknownAccessedOrReferencedEntity property: #accessesOrReferences)
+	(unknowAccessOrReference property: #unknownEntity) target *- (unknownEntity property: #accessesOrReferences)
 ]

@@ -21,7 +21,7 @@ FamixPythonProject1Test >> model [
 FamixPythonProject1Test >> testAccessOrReferenceToStubEntity [
 
 	| stub module access |
-	stub := self unknownAccessedOrReferencedEntityNamed: 'MissingClass'.
+	stub := self unknownEntityNamed: 'MissingClass'.
 	module := self moduleNamed: 'moduleWithRelativeFromImportStub'.
 
 	access := stub accessesOrReferences detect: [ :anAccess | anAccess accessorOrReferencer = module ].
@@ -38,7 +38,7 @@ FamixPythonProject1Test >> testAccessOrReferenceToStubEntity [
 FamixPythonProject1Test >> testAccessOrReferenceToStubEntitySourceAnchor [
 
 	| stub module access |
-	stub := self unknownAccessedOrReferencedEntityNamed: 'MissingClass'.
+	stub := self unknownEntityNamed: 'MissingClass'.
 	module := self moduleNamed: 'moduleWithRelativeFromImportStub'.
 
 	access := stub accessesOrReferences detect: [ :anAccess | anAccess accessorOrReferencer = module ].
@@ -615,7 +615,7 @@ FamixPythonProject1Test >> testFromImportStubPackages [
 	| matplotlib pyglot plot module import |
 	self denyEmpty: self model allImports.
 	module := self moduleNamed: 'moduleWithStubs2'.
-	plot := self unknownContainerNamed: 'plot'.
+	plot := self unknownEntityNamed: 'plot'.
 	import := module outgoingImports detect: [ :pimport | pimport target name = 'plot' ].
 
 	pyglot := self packageNamed: 'pyplot'.
@@ -623,7 +623,7 @@ FamixPythonProject1Test >> testFromImportStubPackages [
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: plot.
-	self assert: import importedEntity class equals: FamixPythonUnknownImportedEntity.
+	self assert: import importedEntity class equals: FamixPythonUnknownEntity.
 	self assert: import importedEntity parentPackage equals: pyglot.
 	self assert: import importedEntity parentPackage parentPackage equals: matplotlib.
 	self assert: import importedEntity isStub.
@@ -3931,7 +3931,7 @@ FamixPythonProject1Test >> testSuperclass2 [
 FamixPythonProject1Test >> testTwoAccessOrReferencesToStubEntityCreateOneStub [
 
 	| stub module accesses |
-	stub := self unknownAccessedOrReferencedEntityNamed: 'MissingClass'.
+	stub := self unknownEntityNamed: 'MissingClass'.
 	module := self moduleNamed: 'moduleWithRelativeFromImportStub'.
 
 	accesses := stub accessesOrReferences select: [ :anAccess | anAccess accessorOrReferencer = module ].
@@ -3939,7 +3939,7 @@ FamixPythonProject1Test >> testTwoAccessOrReferencesToStubEntityCreateOneStub [
 	self assert: accesses size equals: 2.
 	self assert: (accesses allSatisfy: [ :access | access unknownEntity = stub ]).
 	self
-		assert: (self model entities select: [ :entity | entity class = FamixPythonUnknownAccessedOrReferencedEntity and: [ entity name = 'MissingClass' ] ]) size
+		assert: (self model entities select: [ :entity | entity class = FamixPythonUnknownEntity and: [ entity name = 'MissingClass' ] ]) size
 		equals: 1.
 	self assert: stub isStub
 ]

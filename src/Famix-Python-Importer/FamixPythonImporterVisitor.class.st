@@ -253,8 +253,8 @@ FamixPythonImporterVisitor >> ensureStubClassNamed: aName [
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> ensureStubContainerNamed: aString [
 
-	^ (self unknownImportedNamed: aString) ifNil: [
-		  model newUnknownImportedEntity
+	^ (self unknownEntityNamed: aString) ifNil: [
+		  model newUnknownEntity
 			  name: aString;
 			  yourself ]
 ]
@@ -306,10 +306,10 @@ FamixPythonImporterVisitor >> ensureStubPackagesFromPath: aPythonImportPath [
 ]
 
 { #category : 'private-entity-creation' }
-FamixPythonImporterVisitor >> ensureStubUnknownAccessedOrReferencedEntityNamed: aString [
+FamixPythonImporterVisitor >> ensureStubUnknownEntityNamed: aString [
 
-	^ (self unknownAccessedOrReferencedEntityNamed: aString) ifNil: [
-		  model newUnknownAccessedOrReferencedEntity
+	^ (self unknownEntityNamed: aString) ifNil: [
+		  model newUnknownEntity
 			  name: aString;
 			  yourself ]
 ]
@@ -467,17 +467,9 @@ FamixPythonImporterVisitor >> setSuperclassesOf: classDefinitionNode from: class
 ]
 
 { #category : 'private - searching' }
-FamixPythonImporterVisitor >> unknownAccessedOrReferencedEntityNamed: aString [
+FamixPythonImporterVisitor >> unknownEntityNamed: aString [
 
-	^ (self model allWithType: FamixPythonUnknownAccessedOrReferencedEntity)
-		  detect: [ :e | e name = aString ]
-		  ifNone: [ nil ]
-]
-
-{ #category : 'private - searching' }
-FamixPythonImporterVisitor >> unknownImportedNamed: aString [
-
-	^ (self model allWithType: FamixPythonUnknownImportedEntity)
+	^ (self model allWithType: FamixPythonUnknownEntity)
 		  detect: [ :e | e name = aString ]
 		  ifNone: [ nil ]
 ]
@@ -555,7 +547,7 @@ FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression
 		ifFound: [ :import |
 			self
 				resolve: ((FamixPythonImportedAccessOrReferenceResolvable identifier: aFieldAccessExpression name import: import)
-						 notFoundReplacementEntity: [ :unresolved :currentEntity | self ensureStubUnknownAccessedOrReferencedEntityNamed: unresolved identifier ];
+						 notFoundReplacementEntity: [ :unresolved :currentEntity | self ensureStubUnknownEntityNamed: unresolved identifier ];
 						 yourself)
 				foundAction: [ :entity :currentEntity |
 					| association |
@@ -805,7 +797,7 @@ FamixPythonImporterVisitor >> visitVariableExpression: aVariableExpression [
 						 FamixPythonGlobalVariable.
 						 FamixPythonAttribute.
 						 FamixPythonParameter };
-				 notFoundReplacementEntity: [ :unresolved :currentEntity | "1 halt." self ensureStubUnknownAccessedOrReferencedEntityNamed: unresolved identifier ];
+				 notFoundReplacementEntity: [ :unresolved :currentEntity | "1 halt." self ensureStubUnknownEntityNamed: unresolved identifier ];
 				 yourself)
 		foundAction: [ :entity :currentEntity |
 			| association |

@@ -259,15 +259,8 @@ FamixPythonTEntityCreator >> newUnknowAccessOrReference [
 ]
 
 { #category : 'entity creation' }
-FamixPythonTEntityCreator >> newUnknownAccessedOrReferencedEntity [
+FamixPythonTEntityCreator >> newUnknownEntity [
 
 	<generated>
-	^ self add: FamixPythonUnknownAccessedOrReferencedEntity new
-]
-
-{ #category : 'entity creation' }
-FamixPythonTEntityCreator >> newUnknownImportedEntity [
-
-	<generated>
-	^ self add: FamixPythonUnknownImportedEntity new
+	^ self add: FamixPythonUnknownEntity new
 ]

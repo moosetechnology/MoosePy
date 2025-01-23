@@ -1,7 +1,7 @@
-Extension { #name : 'FamixPythonUnknownAccessedOrReferencedEntity' }
+Extension { #name : 'FamixPythonUnknownEntity' }
 
 { #category : '*Famix-Python-Importer' }
-FamixPythonUnknownAccessedOrReferencedEntity >> createAccessOrReferenceFrom: anEntity node: aNode [
+FamixPythonUnknownEntity >> createAccessOrReferenceFrom: anEntity node: aNode [
 
 	^ anEntity mooseModel newUnknowAccessOrReference
 		  unknownEntity: self;

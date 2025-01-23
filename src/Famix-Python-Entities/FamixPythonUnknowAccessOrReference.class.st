@@ -10,7 +10,7 @@
 ### Association target
 | Relation | Origin | Opposite | Type | Comment |
 |---|
-| `unknownEntity` | `FamixPythonUnknowAccessOrReference` | `accessesOrReferences` | `FamixPythonUnknownAccessedOrReferencedEntity` | |
+| `unknownEntity` | `FamixPythonUnknowAccessOrReference` | `accessesOrReferences` | `FamixPythonUnknownEntity` | |
 
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
@@ -29,7 +29,7 @@ Class {
 	#classTraits : 'FamixTAssociation classTrait',
 	#instVars : [
 		'#accessorOrReferencer => FMOne type: #FamixPythonContainerEntity opposite: #unknowAccessesOrReferences',
-		'#unknownEntity => FMOne type: #FamixPythonUnknownAccessedOrReferencedEntity opposite: #accessesOrReferences'
+		'#unknownEntity => FMOne type: #FamixPythonUnknownEntity opposite: #accessesOrReferences'
 	],
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',
@@ -63,7 +63,7 @@ FamixPythonUnknowAccessOrReference >> accessorOrReferencer: anObject [
 
 { #category : 'accessing' }
 FamixPythonUnknowAccessOrReference >> unknownEntity [
-	"Relation named: #unknownEntity type: #FamixPythonUnknownAccessedOrReferencedEntity opposite: #accessesOrReferences"
+	"Relation named: #unknownEntity type: #FamixPythonUnknownEntity opposite: #accessesOrReferences"
 
 	<generated>
 	<target>
