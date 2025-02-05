@@ -3748,6 +3748,23 @@ FamixPythonProject1Test >> testSimpleFunction [
 	self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot')
 ]
 
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testSimpleFunctionInvocationWithNamespace [
+
+	| module function invocation |
+	function := self functionNamed: 'sort_list'.
+	module := self moduleNamed: 'moduleAtRoot2'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation invokedEntity equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
+]
+
 { #category : 'tests - inheritances' }
 FamixPythonProject1Test >> testSimpleInheritance [
 

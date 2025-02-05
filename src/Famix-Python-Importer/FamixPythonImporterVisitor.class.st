@@ -416,6 +416,117 @@ FamixPythonImporterVisitor >> relativeFilePath: aNode [
 	^(parentFileName relativeTo: rootFilePath asPath) pathString
 ]
 
+{ #category : 'visiting' }
+FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCallExpression [
+	"When we end up here we might have multiple cases to manage:
+	- x() => This is either a function invocation or instantiation. There should be no stub. 
+	- package.module.x() => Function invocation of instantiation comming from one of the import. Stub is an unknown entity.
+	- self.x() => Method invocation. There should be no stub.
+	- c.x() => Method invocation. Can be a stub method
+	- x()() => Invocation or Instantiation of the result of another invocation. This we cannot really treat it here so for now I'll just ignore this case. We can discuss in a Moose meeting if we want to do something else."
+
+	| source |
+	aFunctionCallExpression source traceCr.
+	self flag: #todo. "Once we managed all cases we should refactor."
+
+	self flag: #todo. "Discuss in meeting"
+	" => x()()
+	This is happening when we invoke the result of an invocation. The parser cannot know what is invoked. For now I'm ignoring it"
+	(aFunctionCallExpression receiver isKindOf: PyFunctionCallExpressionNode) ifTrue: [ ^ self ].
+
+	"=> x()"
+	self flag: #todo. "Stubs should not be functions."
+	self flag: #todo. "See if we can simplify the code since there is only 1 possibility?"
+	aFunctionCallExpression hasReceiver ifFalse: [
+		self
+			resolve: ((FamixPythonInvocationOrInstantiationResolvable identifier: aFunctionCallExpression receiver name)
+					 expectedKind: {
+							 FamixPythonFunction.
+							 FamixPythonClass };
+					 notFoundReplacementEntity: [ :unresolved :currentEntity |
+						 self flag: #todo. "This can be something else than a function"
+						 { (self ensureStubFunctionNamed: unresolved identifier) } ];
+					 yourself)
+			foundAction: [ :result :currentEntity |
+				self flag: #todo. "Improve code"
+				(result isCollection not and: [ result isClass ])
+					ifTrue: [
+						| reference invocation |
+						reference := result createAccessOrReferenceFrom: currentEntity node: aFunctionCallExpression.
+						self setSourceAnchor: reference from: aFunctionCallExpression.
+
+						invocation := self model newInvocation
+							              candidates: { (self getConstructorOf: result) };
+							              sender: currentEntity;
+							              signature: aFunctionCallExpression source;
+							              yourself.
+						self setSourceAnchor: invocation from: aFunctionCallExpression ]
+					ifFalse: [
+						| invocation |
+						invocation := self model newInvocation
+							              candidates: result;
+							              sender: currentEntity;
+							              signature: aFunctionCallExpression source;
+							              yourself.
+						self setSourceAnchor: invocation from: aFunctionCallExpression ] ] ].
+
+	"=> package.module.x()"
+	self flag: #todo.
+	source := aFunctionCallExpression receiver source.
+	self flag: #todo. "duplication with visitFieldAccessExpression."
+	self flag: #todo. "duplacation with what is just above."
+	self flag: #todo. "Stubs should not be functions."
+	self flag: #todo. "Add tests in case of alias + imports with spaces + multiple levels"
+	self flag: #todo. "See if we can simplify the code since there is only 1 possibility?"
+	self currentEntity allEffectiveSimpleImports
+		detect: [ :import |
+			| importPath |
+			importPath := import hasAlias
+				              ifTrue: [ import alias ]
+				              ifFalse: [ importPaths at: import ].
+			source = importPath or: [
+				importPath := importPath , '.'.
+				(source beginsWith: importPath) and: [ ((source withoutPrefix: importPath) includes: $.) not ] ] ]
+		ifFound: [ :import |
+			self
+				resolve: ((FamixPythonInvocationOrInstantiationWithNamespaceResolvable identifier: aFunctionCallExpression receiver name import: import)
+						 expectedKind: {
+								 FamixPythonFunction.
+								 FamixPythonClass };
+						 notFoundReplacementEntity: [ :unresolved :currentEntity |
+							 self flag: #todo. "This can be something else than a function"
+							 { (self ensureStubFunctionNamed: unresolved identifier) } ];
+						 yourself)
+				foundAction: [ :result :currentEntity |
+					self flag: #todo. "Improve code"
+					(result isCollection not and: [ result isClass ])
+						ifTrue: [
+							| reference invocation |
+							reference := result createAccessOrReferenceFrom: currentEntity node: aFunctionCallExpression.
+							self setSourceAnchor: reference from: aFunctionCallExpression.
+
+							invocation := self model newInvocation
+								              candidates: { (self getConstructorOf: result) };
+								              sender: currentEntity;
+								              signature: aFunctionCallExpression source;
+								              yourself.
+							self setSourceAnchor: invocation from: aFunctionCallExpression ]
+						ifFalse: [
+							| invocation |
+							invocation := self model newInvocation
+								              candidates: result;
+								              sender: currentEntity;
+								              signature: aFunctionCallExpression source;
+								              yourself.
+							self setSourceAnchor: invocation from: aFunctionCallExpression ] ] ].
+	self flag: #todo.
+
+	"=> self.x()"
+
+	"=> c.x()"
+	self flag: #todo
+]
+
 { #category : 'accessing - modules' }
 FamixPythonImporterVisitor >> rootFilePath [
 
@@ -590,41 +701,7 @@ FamixPythonImporterVisitor >> visitFile: aFileNode [
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> visitFunctionCallExpression: aFunctionCallExpression [
 
-	aFunctionCallExpression source traceCr.
-	self flag: #todo. "Temporary hack"
-	(aFunctionCallExpression receiver isKindOf: PyFunctionCallExpressionNode) ifFalse: [
-		self
-			resolve: ((FamixPythonInvocationOrInstantiationResolvable identifier: aFunctionCallExpression receiver name)
-					 expectedKind: {
-							 FamixPythonFunction.
-							 FamixPythonClass };
-					 notFoundReplacementEntity: [ :unresolved :currentEntity |
-						 self flag: #todo. "This can be something else than a function"
-						 { (self ensureStubFunctionNamed: unresolved identifier) } ];
-					 yourself)
-			foundAction: [ :result :currentEntity |
-				self flag: #todo. "Improve code"
-				(result isCollection not and: [ result isClass ])
-					ifTrue: [
-						| reference invocation |
-						reference := result createAccessOrReferenceFrom: currentEntity node: aFunctionCallExpression.
-						self setSourceAnchor: reference from: aFunctionCallExpression.
-
-						invocation := self model newInvocation
-							              candidates: { (self getConstructorOf: result) };
-							              sender: currentEntity;
-							              signature: aFunctionCallExpression source;
-							              yourself.
-						self setSourceAnchor: invocation from: aFunctionCallExpression ]
-					ifFalse: [
-						| invocation |
-						invocation := self model newInvocation
-							              candidates: result;
-							              sender: currentEntity;
-							              signature: aFunctionCallExpression source;
-							              yourself.
-						self setSourceAnchor: invocation from: aFunctionCallExpression ] ] ].
-
+	self resolveInvocationOrInstantiationFrom: aFunctionCallExpression.
 
 	^ super visitFunctionCallExpression: aFunctionCallExpression
 ]

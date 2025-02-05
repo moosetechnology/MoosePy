@@ -14,3 +14,9 @@ FamixPythonFunctionCallReceiverVariableNode >> acceptVisitor: aRootVisitor [
 
 	^ aRootVisitor visitFunctionCallReceiverVariable: self
 ]
+
+{ #category : 'as yet unclassified' }
+FamixPythonFunctionCallReceiverVariableNode >> hasReceiver [
+
+	^ false
+]

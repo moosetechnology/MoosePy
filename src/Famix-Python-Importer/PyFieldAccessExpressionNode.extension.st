@@ -1,6 +1,12 @@
 Extension { #name : 'PyFieldAccessExpressionNode' }
 
 { #category : '*Famix-Python-Importer' }
+PyFieldAccessExpressionNode >> hasReceiver [
+
+	^ self receiver isNotNil
+]
+
+{ #category : '*Famix-Python-Importer' }
 PyFieldAccessExpressionNode >> isInstanceVariableAssignation [
 
 	self parent
