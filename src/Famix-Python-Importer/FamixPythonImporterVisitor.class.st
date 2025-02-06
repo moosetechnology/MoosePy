@@ -116,7 +116,7 @@ FamixPythonImporterVisitor >> createImport: anImport ofName: aName from: fromNam
 							 | package |
 							 package := self ensureStubPackagesFromPath: unresolvedImport path.
 
-							 (self ensureStubContainerNamed: unresolvedImport entityName)
+							 (self ensureStubUnknownEntityNamed: unresolvedImport entityName)
 								 parentPackage: package;
 								 yourself ];
 						 yourself ])
@@ -248,15 +248,6 @@ FamixPythonImporterVisitor >> ensureStubClassNamed: aName [
 			  (model newClassNamed: aName)
 				  isStub: true;
 				  yourself ]
-]
-
-{ #category : 'private-entity-creation' }
-FamixPythonImporterVisitor >> ensureStubContainerNamed: aString [
-
-	^ (self unknownEntityNamed: aString) ifNil: [
-		  model newUnknownEntity
-			  name: aString;
-			  yourself ]
 ]
 
 { #category : 'private-entity-creation' }
@@ -423,15 +414,14 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 	- package.module.x() => Function invocation of instantiation comming from one of the import. Stub is an unknown entity.
 	- self.x() => Method invocation. There should be no stub.
 	- c.x() => Method invocation. Can be a stub method
-	- x()() => Invocation or Instantiation of the result of another invocation. This we cannot really treat it here so for now I'll just ignore this case. We can discuss in a Moose meeting if we want to do something else."
+	- x()() => Invocation or Instantiation of the result of another invocation. This we cannot really treat it here so for now I'll just ignore this case."
 
 	| source |
 	aFunctionCallExpression source traceCr.
 	self flag: #todo. "Once we managed all cases we should refactor."
 
-	self flag: #todo. "Discuss in meeting"
 	" => x()()
-	This is happening when we invoke the result of an invocation. The parser cannot know what is invoked. For now I'm ignoring it"
+	This is happening when we invoke the result of an invocation. The parser cannot know what is invoked. I'm ignoring it"
 	(aFunctionCallExpression receiver isKindOf: PyFunctionCallExpressionNode) ifTrue: [ ^ self ].
 
 	"=> x()"
@@ -519,9 +509,9 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 								              signature: aFunctionCallExpression source;
 								              yourself.
 							self setSourceAnchor: invocation from: aFunctionCallExpression ] ] ].
-	self flag: #todo.
 
 	"=> self.x()"
+	self flag: #todo.
 
 	"=> c.x()"
 	self flag: #todo
