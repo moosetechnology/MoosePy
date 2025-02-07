@@ -1996,9 +1996,7 @@ FamixPythonProject1Test >> testInvocationOfStubFunctionHasRightParentPackage [
 	"If we have for example matplotlib.pyplot.plot(), we know that #plot() is in the module #pyplot in the package #matplotlib "
 
 	| module function invocation |
-	self skip.
-	self flag: #todo.
-	function := self functionNamed: 'plot'.
+	function := self unknownEntityNamed: 'plot'.
 	module := self moduleNamed: 'moduleWithStubs'.
 
 	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
@@ -2007,8 +2005,25 @@ FamixPythonProject1Test >> testInvocationOfStubFunctionHasRightParentPackage [
 	self assert: invocation class equals: FamixPythonInvocation.
 	self assert: invocation invokedEntity equals: function.
 
-	self assert: function functionOwner equals: (self packageNamed: 'pyplot').
-	self assert: function functionOwner isStub
+	self assert: function parentPackage equals: (self packageNamed: 'pyplot').
+	self assert: function parentPackage isStub
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testInvocationOfStubFunctionWithNamespace [
+
+	| module function invocation |
+	function := self unknownEntityNamed: 'array'.
+	module := self moduleNamed: 'moduleWithStubs'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation invokedEntity equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
 ]
 
 { #category : 'tests - lambdas' }
