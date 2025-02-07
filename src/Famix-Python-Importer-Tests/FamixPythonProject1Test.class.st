@@ -965,6 +965,96 @@ FamixPythonProject1Test >> testFunctionInvocationSourceAnchor [
 	self assert: invocation sourceText equals: 'sort_list(x, y)'
 ]
 
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationWithNamespaceAndAlias [
+
+	| module function invocation |
+	function := self functionNamed: 'sort_list'.
+	module := self moduleNamed: 'moduleWithImportsAndAliases'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation invokedEntity equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationWithNamespaceAndAliasSourceAnchor [
+
+	| module function invocation |
+	function := self functionNamed: 'sort_list'.
+	module := self moduleNamed: 'moduleWithImportsAndAliases'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation sourceAnchor isNotNil.
+	self assert: invocation sourceText equals: 'mar.sort_list(["a", "b", "c", "d", "e", "f", "g", "h", "i"], [0, 1, 1, 0, 1, 2, 2, 0, 1])'
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationWithNamespaceOfMultipleLevel [
+
+	| module function invocation |
+	function := self functionNamed: 'function_with_function_ref'.
+	module := self moduleNamed: 'moduleAtRoot8'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation invokedEntity equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationWithNamespaceOfMultipleLevelAndSpaces [
+
+	| module function invocation |
+	function := self functionNamed: 'function_returning_75'.
+	module := self moduleNamed: 'moduleAtRoot8'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation invokedEntity equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationWithNamespaceOfMultipleLevelAndSpacesSourceAnchor [
+
+	| module function invocation |
+	function := self functionNamed: 'function_returning_75'.
+	module := self moduleNamed: 'moduleAtRoot8'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation sourceAnchor isNotNil.
+	self assert: invocation sourceText equals: 'root2. subpackageInRoot2. function_returning_75()'
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationWithNamespaceOfMultipleLevelSourceAnchor [
+
+	| module function invocation |
+	function := self functionNamed: 'function_with_function_ref'.
+	module := self moduleNamed: 'moduleAtRoot8'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation sourceAnchor isNotNil.
+	self assert: invocation sourceText equals: 'root.subpackage1.subsubpackage1.function_with_function_ref()'
+]
+
 { #category : 'tests - references' }
 FamixPythonProject1Test >> testFunctionReferenceFromClass [
 
@@ -3778,36 +3868,6 @@ FamixPythonProject1Test >> testSimpleFunctionInvocationWithNamespace [
 	self assertCollection: invocation target hasSameElements: { function }.
 	self assert: invocation invokedEntity equals: function.
 	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
-]
-
-{ #category : 'tests - invocations' }
-FamixPythonProject1Test >> testSimpleFunctionInvocationWithNamespaceAndAlias [
-
-	| module function invocation |
-	function := self functionNamed: 'sort_list'.
-	module := self moduleNamed: 'moduleWithImportsAndAliases'.
-
-	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
-
-	self assert: invocation class equals: FamixPythonInvocation.
-	self assert: invocation source equals: module.
-	self assert: invocation sender equals: module.
-	self assertCollection: invocation target hasSameElements: { function }.
-	self assert: invocation invokedEntity equals: function.
-	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
-]
-
-{ #category : 'tests - invocations' }
-FamixPythonProject1Test >> testSimpleFunctionInvocationWithNamespaceAndAliasSourceAnchor [
-
-	| module function invocation |
-	function := self functionNamed: 'sort_list'.
-	module := self moduleNamed: 'moduleWithImportsAndAliases'.
-
-	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
-
-	self assert: invocation sourceAnchor isNotNil.
-	self assert: invocation sourceText equals: 'mar.sort_list(["a", "b", "c", "d", "e", "f", "g", "h", "i"], [0, 1, 1, 0, 1, 2, 2, 0, 1])'
 ]
 
 { #category : 'tests - invocations' }

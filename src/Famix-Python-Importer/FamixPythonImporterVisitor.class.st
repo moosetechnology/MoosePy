@@ -320,6 +320,8 @@ FamixPythonImporterVisitor >> findImportMatchingSource: aString ifFound: aBlock 
 	This method is useful to resolve accesses, invocations and references of imported entities.
 	"
 
+	| source |
+	source := aString copyWithoutAll: ' '.
 	^ self currentEntity allEffectiveSimpleImports
 		  detect: [ :import |
 			  | importPath |
@@ -328,7 +330,8 @@ FamixPythonImporterVisitor >> findImportMatchingSource: aString ifFound: aBlock 
 				                ifFalse: [ importPaths at: import ].
 			  aString = importPath or: [
 				  importPath := importPath , '.'.
-				  (aString beginsWith: importPath) and: [ ((aString withoutPrefix: importPath) includes: $.) not ] ] ]
+				  importPath := importPath copyWithoutAll: ' '.
+				  (source beginsWith: importPath) and: [ ((source withoutPrefix: importPath) includes: $.) not ] ] ]
 		  ifFound: aBlock
 ]
 
@@ -486,39 +489,38 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 
 	"=> package.module.x()"
 	self flag: #todo. "duplication with what is just above."
-	self flag: #todo. "Add tests in case of  imports with spaces + multiple levels"
 	self flag: #todo. "See if we can simplify the code since there is only 1 possibility?"
 	self findImportMatchingSource: aFunctionCallExpression receiver source ifFound: [ :import |
-			self
-				resolve: ((FamixPythonInvocationOrInstantiationWithNamespaceResolvable identifier: aFunctionCallExpression receiver name import: import)
-						 expectedKind: {
-								 FamixPythonFunction.
-								 FamixPythonClass };
-						 notFoundReplacementEntity: [ :unresolved :currentEntity | "This one can be a function or a class"
-							 { (self ensureStubUnknownEntityNamed: unresolved identifier) } ];
-						 yourself)
-				foundAction: [ :result :currentEntity |
-					self flag: #todo. "Improve code"
-					(result isCollection not and: [ result isClass ])
-						ifTrue: [
-							| reference invocation |
-							reference := result createAccessOrReferenceFrom: currentEntity node: aFunctionCallExpression.
-							self setSourceAnchor: reference from: aFunctionCallExpression.
+		self
+			resolve: ((FamixPythonInvocationOrInstantiationWithNamespaceResolvable identifier: aFunctionCallExpression receiver name import: import)
+					 expectedKind: {
+							 FamixPythonFunction.
+							 FamixPythonClass };
+					 notFoundReplacementEntity: [ :unresolved :currentEntity | "This one can be a function or a class"
+						 { (self ensureStubUnknownEntityNamed: unresolved identifier) } ];
+					 yourself)
+			foundAction: [ :result :currentEntity |
+				self flag: #todo. "Improve code"
+				(result isCollection not and: [ result isClass ])
+					ifTrue: [
+						| reference invocation |
+						reference := result createAccessOrReferenceFrom: currentEntity node: aFunctionCallExpression.
+						self setSourceAnchor: reference from: aFunctionCallExpression.
 
-							invocation := self model newInvocation
-								              candidates: { (self getConstructorOf: result) };
-								              sender: currentEntity;
-								              signature: aFunctionCallExpression source;
-								              yourself.
-							self setSourceAnchor: invocation from: aFunctionCallExpression ]
-						ifFalse: [
-							| invocation |
-							invocation := self model newInvocation
-								              candidates: result;
-								              sender: currentEntity;
-								              signature: aFunctionCallExpression source;
-								              yourself.
-							self setSourceAnchor: invocation from: aFunctionCallExpression ] ] ].
+						invocation := self model newInvocation
+							              candidates: { (self getConstructorOf: result) };
+							              sender: currentEntity;
+							              signature: aFunctionCallExpression source;
+							              yourself.
+						self setSourceAnchor: invocation from: aFunctionCallExpression ]
+					ifFalse: [
+						| invocation |
+						invocation := self model newInvocation
+							              candidates: result;
+							              sender: currentEntity;
+							              signature: aFunctionCallExpression source;
+							              yourself.
+						self setSourceAnchor: invocation from: aFunctionCallExpression ] ] ].
 
 	"=> self.x()"
 	self flag: #todo.
