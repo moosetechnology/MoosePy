@@ -25,3 +25,6 @@ study_room.breadth = 30.8
 study_room.calculate_area()
 
 print(return2())
+
+def function_returning_75():
+    return 75
