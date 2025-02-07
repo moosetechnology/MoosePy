@@ -305,6 +305,33 @@ FamixPythonImporterVisitor >> ensureStubUnknownEntityNamed: aString [
 			  yourself ]
 ]
 
+{ #category : 'visiting' }
+FamixPythonImporterVisitor >> findImportMatchingSource: aString ifFound: aBlock [
+	"If I get a string such as `matplotlib.pyglot.array()`, I'll check if we have an import that is not a from import matching `matplotlib.pyglot` and execute the block as parameter if this is the case.
+	
+	I also manages the case of aliases like this:
+	
+	```python
+	import matplotlib.pyglot as mp
+	
+	mp.array()
+	```
+	
+	This method is useful to resolve accesses, invocations and references of imported entities.
+	"
+
+	^ self currentEntity allEffectiveSimpleImports
+		  detect: [ :import |
+			  | importPath |
+			  importPath := import hasAlias
+				                ifTrue: [ import alias ]
+				                ifFalse: [ importPaths at: import ].
+			  aString = importPath or: [
+				  importPath := importPath , '.'.
+				  (aString beginsWith: importPath) and: [ ((aString withoutPrefix: importPath) includes: $.) not ] ] ]
+		  ifFound: aBlock
+]
+
 { #category : 'accessing' }
 FamixPythonImporterVisitor >> findSadowedEntityNamed: name [
 	"If the same element already has a shadowable entity of the same name, we select the last one defined. If there is none, we return nil"
@@ -416,7 +443,6 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 	- c.x() => Method invocation. Can be a stub method
 	- x()() => Invocation or Instantiation of the result of another invocation. This we cannot really treat it here so for now I'll just ignore this case."
 
-	| source |
 	aFunctionCallExpression source traceCr.
 	self flag: #todo. "Once we managed all cases we should refactor."
 
@@ -459,22 +485,10 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 						self setSourceAnchor: invocation from: aFunctionCallExpression ] ] ].
 
 	"=> package.module.x()"
-	self flag: #todo.
-	source := aFunctionCallExpression receiver source.
-	self flag: #todo. "duplication with visitFieldAccessExpression."
 	self flag: #todo. "duplication with what is just above."
-	self flag: #todo. "Add tests in case of alias + imports with spaces + multiple levels"
+	self flag: #todo. "Add tests in case of  imports with spaces + multiple levels"
 	self flag: #todo. "See if we can simplify the code since there is only 1 possibility?"
-	self currentEntity allEffectiveSimpleImports
-		detect: [ :import |
-			| importPath |
-			importPath := import hasAlias
-				              ifTrue: [ import alias ]
-				              ifFalse: [ importPaths at: import ].
-			source = importPath or: [
-				importPath := importPath , '.'.
-				(source beginsWith: importPath) and: [ ((source withoutPrefix: importPath) includes: $.) not ] ] ]
-		ifFound: [ :import |
+	self findImportMatchingSource: aFunctionCallExpression receiver source ifFound: [ :import |
 			self
 				resolve: ((FamixPythonInvocationOrInstantiationWithNamespaceResolvable identifier: aFunctionCallExpression receiver name import: import)
 						 expectedKind: {
@@ -632,27 +646,17 @@ FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression
 	import moduleAtRoot
 	print(moduleAtRoot.moduleVariable)
 	"
-	self currentEntity allEffectiveSimpleImports
-		detect: [ :import |
-			| importPath |
-			importPath := import hasAlias
-				              ifTrue: [ import alias ]
-				              ifFalse: [ importPaths at: import ].
-			source = importPath or: [
-				importPath := importPath , '.'.
-				(source beginsWith: importPath) and: [ ((source withoutPrefix: importPath) includes: $.) not ] ] ]
-		ifFound: [ :import |
-			self
-				resolve: ((FamixPythonImportedAccessOrReferenceResolvable identifier: aFieldAccessExpression name import: import)
-						 notFoundReplacementEntity: [ :unresolved :currentEntity | 
-							"This unknown entity can be a variable or a class."
-							self ensureStubUnknownEntityNamed: unresolved identifier ];
-						 yourself)
-				foundAction: [ :entity :currentEntity |
-					| association |
-					association := entity createAccessOrReferenceFrom: currentEntity node: aFieldAccessExpression.
-					self setSourceAnchor: association from: aFieldAccessExpression ].
-			^ source ].
+	self findImportMatchingSource: source ifFound: [ :import |
+		self
+			resolve: ((FamixPythonImportedAccessOrReferenceResolvable identifier: aFieldAccessExpression name import: import)
+					 notFoundReplacementEntity: [ :unresolved :currentEntity | "This unknown entity can be a variable or a class."
+						 self ensureStubUnknownEntityNamed: unresolved identifier ];
+					 yourself)
+			foundAction: [ :entity :currentEntity |
+				| association |
+				association := entity createAccessOrReferenceFrom: currentEntity node: aFieldAccessExpression.
+				self setSourceAnchor: association from: aFieldAccessExpression ].
+		^ source ].
 
 	aFieldAccessExpression source traceCr.
 
