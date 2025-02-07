@@ -1964,7 +1964,7 @@ FamixPythonProject1Test >> testInstantiationWithAliasSourceAnchor [
 FamixPythonProject1Test >> testInvocationOfMultipleStubFunctionsOfTheSameName [
 
 	| module function invocations |
-	function := self functionNamed: 'print'.
+	function := self unknownEntityNamed: 'print'.
 	module := self moduleNamed: 'moduleAtRoot'.
 
 	invocations := function incomingInvocations select: [ :aReference | aReference sender = module ].
@@ -1978,7 +1978,7 @@ FamixPythonProject1Test >> testInvocationOfMultipleStubFunctionsOfTheSameName [
 FamixPythonProject1Test >> testInvocationOfStubFunction [
 
 	| module function invocation |
-	function := self functionNamed: 'print'.
+	function := self unknownEntityNamed: 'print'.
 	module := self moduleNamed: 'moduleAtRoot'.
 
 	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].

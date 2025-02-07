@@ -116,7 +116,7 @@ FamixPythonImporterVisitor >> createImport: anImport ofName: aName from: fromNam
 							 | package |
 							 package := self ensureStubPackagesFromPath: unresolvedImport path.
 
-							 (self ensureStubUnknownEntityNamed: unresolvedImport entityName)
+							 (self ensureStubUnknownEntityNamed: unresolvedImport entityName) "This entity can be a package on a module."
 								 parentPackage: package;
 								 yourself ];
 						 yourself ])
@@ -425,7 +425,6 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 	(aFunctionCallExpression receiver isKindOf: PyFunctionCallExpressionNode) ifTrue: [ ^ self ].
 
 	"=> x()"
-	self flag: #todo. "Stubs should not be functions."
 	self flag: #todo. "See if we can simplify the code since there is only 1 possibility?"
 	aFunctionCallExpression hasReceiver ifFalse: [
 		self
@@ -433,9 +432,8 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 					 expectedKind: {
 							 FamixPythonFunction.
 							 FamixPythonClass };
-					 notFoundReplacementEntity: [ :unresolved :currentEntity |
-						 self flag: #todo. "This can be something else than a function"
-						 { (self ensureStubFunctionNamed: unresolved identifier) } ];
+					 notFoundReplacementEntity: [ :unresolved :currentEntity | "This one can be a function or a class"
+						 { (self ensureStubUnknownEntityNamed: unresolved identifier) } ];
 					 yourself)
 			foundAction: [ :result :currentEntity |
 				self flag: #todo. "Improve code"
@@ -648,7 +646,9 @@ FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression
 		ifFound: [ :import |
 			self
 				resolve: ((FamixPythonImportedAccessOrReferenceResolvable identifier: aFieldAccessExpression name import: import)
-						 notFoundReplacementEntity: [ :unresolved :currentEntity | self ensureStubUnknownEntityNamed: unresolved identifier ];
+						 notFoundReplacementEntity: [ :unresolved :currentEntity | 
+							"This unknown entity can be a variable or a class."
+							self ensureStubUnknownEntityNamed: unresolved identifier ];
 						 yourself)
 				foundAction: [ :entity :currentEntity |
 					| association |
@@ -864,7 +864,7 @@ FamixPythonImporterVisitor >> visitVariableExpression: aVariableExpression [
 						 FamixPythonGlobalVariable.
 						 FamixPythonAttribute.
 						 FamixPythonParameter };
-				 notFoundReplacementEntity: [ :unresolved :currentEntity | "1 halt." self ensureStubUnknownEntityNamed: unresolved identifier ];
+				 notFoundReplacementEntity: [ :unresolved :currentEntity | "This can be a structural entity or a class" self ensureStubUnknownEntityNamed: unresolved identifier ];
 				 yourself)
 		foundAction: [ :entity :currentEntity |
 			| association |

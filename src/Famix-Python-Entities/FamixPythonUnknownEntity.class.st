@@ -12,6 +12,7 @@
 |---|
 | `accessesOrReferences` | `FamixPythonUnknownEntity` | `unknownEntity` | `FamixPythonUnknowAccessOrReference` | |
 | `incomingImports` | `FamixTImportable` | `importedEntity` | `FamixTImport` | List of imports of this entity|
+| `incomingInvocations` | `FamixTInvocable` | `candidates` | `FamixTInvocation` | Incoming invocations from other behaviours computed by the candidate operator.|
 
 
 
@@ -19,8 +20,8 @@
 Class {
 	#name : 'FamixPythonUnknownEntity',
 	#superclass : 'FamixPythonNamedEntity',
-	#traits : 'FamixTImportable + FamixTPackageable',
-	#classTraits : 'FamixTImportable classTrait + FamixTPackageable classTrait',
+	#traits : 'FamixTImportable + FamixTInvocable + FamixTPackageable',
+	#classTraits : 'FamixTImportable classTrait + FamixTInvocable classTrait + FamixTPackageable classTrait',
 	#instVars : [
 		'#accessesOrReferences => FMMany type: #FamixPythonUnknowAccessOrReference opposite: #unknownEntity'
 	],
