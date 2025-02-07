@@ -462,7 +462,7 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 	self flag: #todo.
 	source := aFunctionCallExpression receiver source.
 	self flag: #todo. "duplication with visitFieldAccessExpression."
-	self flag: #todo. "duplacation with what is just above."
+	self flag: #todo. "duplication with what is just above."
 	self flag: #todo. "Add tests in case of alias + imports with spaces + multiple levels"
 	self flag: #todo. "See if we can simplify the code since there is only 1 possibility?"
 	self currentEntity allEffectiveSimpleImports
