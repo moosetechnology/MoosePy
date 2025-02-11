@@ -2059,7 +2059,7 @@ FamixPythonProject1Test >> testInvocationOfMultipleStubFunctionsOfTheSameName [
 
 	invocations := function incomingInvocations select: [ :aReference | aReference sender = module ].
 
-	self assert: invocations size equals: 8.
+	self assert: invocations size equals: 9.
 	self assert: (invocations collectAsSet: #target) size equals: 1. "Multiple stub of the same name in the same entity should produce only 1 stub and not duplicate them."
 	self assert: function isStub
 ]

@@ -470,11 +470,12 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 	- package.module.x() => Function invocation of instantiation comming from one of the import. Stub is an unknown entity.
 	- self.x() => Method invocation. There should be no stub.
 	- c.x() => Method invocation. Can be a stub method
-	- x()() => Invocation or Instantiation of the result of another invocation. This we cannot really treat it here so for now I'll just ignore this case."
+	- x()() => Invocation or Instantiation of the result of another invocation. This we cannot really treat it here so for now I'll just ignore this case.
+	- table[x]() => Same as above but with the content of a table"
 
-	" => x()()
+	" => x()()/table[x]()
 	This is happening when we invoke the result of an invocation. The parser cannot know what is invoked. I'm ignoring it"
-	(aFunctionCallExpression receiver isKindOf: PyFunctionCallExpressionNode) ifTrue: [ ^ self ].
+	({ PyFunctionCallExpressionNode . PySubscriptExpressionNode } anySatisfy: [ :class | aFunctionCallExpression receiver isKindOf: class ] ) ifTrue: [ ^ self ].
 
 	"=> x()"
 	aFunctionCallExpression hasReceiver ifFalse: [
