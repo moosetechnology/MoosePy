@@ -2247,6 +2247,36 @@ FamixPythonProject1Test >> testLambdaWithoutParameters [
 	self assert: lambda lambdaContainer equals: container
 ]
 
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testLocalMethodInvocationFromMethod [
+
+	| method method2 invocation |
+	method2 := self methodNamed: 'get_name'.
+	method := self methodNamed: 'printInfos'.
+
+	invocation := method2 incomingInvocations detect: [ :aReference | aReference sender = method ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: method.
+	self assert: invocation sender equals: method.
+	self assertCollection: invocation target hasSameElements: { method2 }.
+	self assert: invocation invokedEntity equals: method2.
+	self assert: (method outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = method2 ])
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testLocalMethodInvocationSourceAnchor [
+
+	| method method2 invocation |
+	method2 := self methodNamed: 'get_name'.
+	method := self methodNamed: 'printInfos'.
+
+	invocation := method2 incomingInvocations detect: [ :aReference | aReference sender = method ].
+
+	self assert: invocation sourceAnchor isNotNil.
+	self assert: invocation sourceText equals: 'self.get_name()'
+]
+
 { #category : 'tests - local variables' }
 FamixPythonProject1Test >> testLocalVariableInFunctionSourceAnchor [
 
@@ -2445,7 +2475,7 @@ FamixPythonProject1Test >> testMethodSourceAnchor [
 	self assert: method sourceText equals: ('def printInfos(self):
         import moduleAtRoot4
         if not moduleAtRoot3.moduleAtRootVariable3:
-            print(self.name + moduleAtRoot4.moduleAtRootSpaceString + str(self.age))' copyReplaceAll: String cr with: String lf)
+            print(self.get_name() + moduleAtRoot4.moduleAtRootSpaceString + str(self.age))' copyReplaceAll: String cr with: String lf)
 ]
 
 { #category : 'tests' }

@@ -485,6 +485,18 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 							                signature: aFunctionCallExpression source;
 							                yourself.
 						  self setSourceAnchor: invocation from: aFunctionCallExpression ] ] ].
+			
+	"=> self.x()"
+	self flag: #todo.
+	aFunctionCallExpression isLocalMethodInvocation ifTrue: [
+		^ self resolve: (FamixPythonLocalMethodInvocationResolvable identifier: aFunctionCallExpression receiver name) foundAction: [ :method :currentEntity |
+			  | invocation |
+			  invocation := self model newInvocation
+				                invokedEntity: method;
+				                sender: currentEntity;
+				                signature: aFunctionCallExpression source;
+				                yourself.
+			  self setSourceAnchor: invocation from: aFunctionCallExpression ] ].
 
 	"=> package.module.x()"
 	self flag: #todo. "duplication with what is just above."
@@ -507,7 +519,7 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 						  self setSourceAnchor: reference from: aFunctionCallExpression.
 
 						  invocation := self model newInvocation
-							                candidates: { (self getConstructorOf: result) };
+							                invokedEntity: (self getConstructorOf: result);
 							                sender: currentEntity;
 							                signature: aFunctionCallExpression source;
 							                yourself.
@@ -522,8 +534,6 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 						  self setSourceAnchor: invocation from: aFunctionCallExpression ] ] ].
 
 	aFunctionCallExpression source traceCr.
-	"=> self.x()"
-	self flag: #todo.
 
 	"=> c.x()"
 	self flag: #todo
