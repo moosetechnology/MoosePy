@@ -14,13 +14,13 @@ class Person:
     import moduleAtRoot3
 
     def __init__(self, name, age):
-        self.name = name
+        self.set_name(name)
         self.age = age
 
     def printInfos(self):
         import moduleAtRoot4
         if not moduleAtRoot3.moduleAtRootVariable3:
-            print(self.name + moduleAtRoot4.moduleAtRootSpaceString + str(self.age))
+            print(self.get_name() + moduleAtRoot4.moduleAtRootSpaceString + str(self.age))
 
     def get_name(self):
         return self.name
