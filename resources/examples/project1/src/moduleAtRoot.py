@@ -36,6 +36,8 @@ print(sort_list(x, y))
 
 print(sort_list)
 
+print([sort_list][0](x, y))
+
 # ============================================================
 
 import root2
