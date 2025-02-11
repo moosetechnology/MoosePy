@@ -262,6 +262,17 @@ FamixPythonImporterVisitor >> ensureStubFunctionNamed: aName [
 ]
 
 { #category : 'private-entity-creation' }
+FamixPythonImporterVisitor >> ensureStubMethodNamed: aName [
+
+	^ model allMethods
+		  detect: [ :method | method isStub and: [ method name = aName ] ]
+		  ifNone: [
+			  (model newMethodNamed: aName)
+				  isStub: true;
+				  yourself ]
+]
+
+{ #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> ensureStubPackageNamed: aString [
 
 	^ model allPackages
@@ -485,9 +496,8 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 							                signature: aFunctionCallExpression source;
 							                yourself.
 						  self setSourceAnchor: invocation from: aFunctionCallExpression ] ] ].
-			
+
 	"=> self.x()"
-	self flag: #todo.
 	aFunctionCallExpression isLocalMethodInvocation ifTrue: [
 		^ self resolve: (FamixPythonLocalMethodInvocationResolvable identifier: aFunctionCallExpression receiver name) foundAction: [ :method :currentEntity |
 			  | invocation |
@@ -536,7 +546,19 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 	aFunctionCallExpression source traceCr.
 
 	"=> c.x()"
-	self flag: #todo
+	^ self
+		  resolve: ((FamixPythonMethodInvocationResolvable identifier: aFunctionCallExpression receiver name)
+				   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one can be a function or a class"
+					   { (self ensureStubMethodNamed: unresolved identifier) } ];
+				   yourself)
+		  foundAction: [ :methods :currentEntity |
+			  | invocation |
+			  invocation := self model newInvocation
+				                candidates: methods;
+				                sender: currentEntity;
+				                signature: aFunctionCallExpression source;
+				                yourself.
+			  self setSourceAnchor: invocation from: aFunctionCallExpression ]
 ]
 
 { #category : 'accessing - modules' }

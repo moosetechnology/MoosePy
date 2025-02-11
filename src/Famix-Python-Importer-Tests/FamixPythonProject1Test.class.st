@@ -2463,6 +2463,23 @@ FamixPythonProject1Test >> testMethodImportsModule [
 	self assert: import sourceText equals: 'import moduleAtRoot4'
 ]
 
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testMethodInvocationFromModule [
+
+	| module method invocation |
+	method := self methodNamed: 'printInfos'.
+	module := self moduleNamed: 'moduleAtRoot2'.
+
+	invocation := method incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assertCollection: invocation target hasSameElements: { method }.
+	self assert: invocation invokedEntity equals: method.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = method ])
+]
+
 { #category : 'tests - methods' }
 FamixPythonProject1Test >> testMethodSourceAnchor [
 
