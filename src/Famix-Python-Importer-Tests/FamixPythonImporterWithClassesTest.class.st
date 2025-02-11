@@ -95,7 +95,7 @@ FamixPythonImporterWithClassesTest >> testMethod [
 { #category : 'tests - methods' }
 FamixPythonImporterWithClassesTest >> testMethodIsInModel [
 
-	self assert: self model numberOfMethods equals: 5
+	self assert: self model allModelMethods size equals: 5
 ]
 
 { #category : 'tests - methods' }
@@ -127,7 +127,7 @@ FamixPythonImporterWithClassesTest >> testMethodWithParameter [
 { #category : 'tests - methods' }
 FamixPythonImporterWithClassesTest >> testMethods [
 
-	self assert: self model allMethods size equals: 5.
+	self assert: self model allModelMethods size equals: 5.
 	self assert: ((self classNamed: 'Ball') methods anySatisfy: [ :method | method name = 'update' ]).
 	self assert: ((self classNamed: 'Wall') methods anySatisfy: [ :method | method name = '__init__' ]).
 	self assert: ((self classNamed: 'Player') methods anySatisfy: [ :method | method name = '__init__' ])
