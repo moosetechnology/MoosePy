@@ -2480,6 +2480,19 @@ FamixPythonProject1Test >> testMethodInvocationFromModule [
 	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = method ])
 ]
 
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testMethodInvocationSourceAnchor [
+
+	| module method invocation |
+	method := self methodNamed: 'printInfos'.
+	module := self moduleNamed: 'moduleAtRoot2'.
+
+	invocation := method incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation sourceAnchor isNotNil.
+	self assert: invocation sourceText equals: 'p1.printInfos()'
+]
+
 { #category : 'tests - methods' }
 FamixPythonProject1Test >> testMethodSourceAnchor [
 

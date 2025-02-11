@@ -125,6 +125,21 @@ FamixPythonImporterVisitor >> createImport: anImport ofName: aName from: fromNam
 	^ import
 ]
 
+{ #category : 'visiting' }
+FamixPythonImporterVisitor >> createInvocationOf: target from: currentEntity node: aPyNode [
+
+	| invocation |
+	invocation := self model newInvocation
+		              sender: currentEntity;
+		              signature: aPyNode source;
+		              yourself.
+	target isCollection
+		ifTrue: [ invocation candidates: target ]
+		ifFalse: [ invocation invokedEntity: target ].
+	self setSourceAnchor: invocation from: aPyNode.
+	^ invocation
+]
+
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> createLambda: aLambdaExpression [
 
@@ -457,108 +472,56 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 	- c.x() => Method invocation. Can be a stub method
 	- x()() => Invocation or Instantiation of the result of another invocation. This we cannot really treat it here so for now I'll just ignore this case."
 
-	self flag: #todo. "Once we managed all cases we should refactor."
-
 	" => x()()
 	This is happening when we invoke the result of an invocation. The parser cannot know what is invoked. I'm ignoring it"
 	(aFunctionCallExpression receiver isKindOf: PyFunctionCallExpressionNode) ifTrue: [ ^ self ].
 
 	"=> x()"
-	self flag: #todo. "See if we can simplify the code since there is only 1 possibility?"
 	aFunctionCallExpression hasReceiver ifFalse: [
 		^ self
 			  resolve: ((FamixPythonInvocationOrInstantiationResolvable identifier: aFunctionCallExpression receiver name)
-					   expectedKind: {
-							   FamixPythonFunction.
-							   FamixPythonClass };
-					   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one can be a function or a class"
-						   { (self ensureStubUnknownEntityNamed: unresolved identifier) } ];
+					   expectedKind: { FamixPythonFunction . FamixPythonClass };
+					   notFoundReplacementEntity: [ :unresolved :currentEntity | { (self ensureStubUnknownEntityNamed: unresolved identifier) } ]; "This one can be a function or a class"
 					   yourself)
 			  foundAction: [ :result :currentEntity |
-				  self flag: #todo. "Improve code"
 				  (result isCollection not and: [ result isClass ])
 					  ifTrue: [
-						  | reference invocation |
+						  | reference |
 						  reference := result createAccessOrReferenceFrom: currentEntity node: aFunctionCallExpression.
 						  self setSourceAnchor: reference from: aFunctionCallExpression.
 
-						  invocation := self model newInvocation
-							                candidates: { (self getConstructorOf: result) };
-							                sender: currentEntity;
-							                signature: aFunctionCallExpression source;
-							                yourself.
-						  self setSourceAnchor: invocation from: aFunctionCallExpression ]
-					  ifFalse: [
-						  | invocation |
-						  invocation := self model newInvocation
-							                candidates: result;
-							                sender: currentEntity;
-							                signature: aFunctionCallExpression source;
-							                yourself.
-						  self setSourceAnchor: invocation from: aFunctionCallExpression ] ] ].
+						  self createInvocationOf: (self getConstructorOf: result) from: currentEntity node: aFunctionCallExpression ]
+					  ifFalse: [ self createInvocationOf: result from: currentEntity node: aFunctionCallExpression ] ] ].
 
 	"=> self.x()"
 	aFunctionCallExpression isLocalMethodInvocation ifTrue: [
-		^ self resolve: (FamixPythonLocalMethodInvocationResolvable identifier: aFunctionCallExpression receiver name) foundAction: [ :method :currentEntity |
-			  | invocation |
-			  invocation := self model newInvocation
-				                invokedEntity: method;
-				                sender: currentEntity;
-				                signature: aFunctionCallExpression source;
-				                yourself.
-			  self setSourceAnchor: invocation from: aFunctionCallExpression ] ].
+		^ self
+			  resolve: (FamixPythonLocalMethodInvocationResolvable identifier: aFunctionCallExpression receiver name)
+			  foundAction: [ :method :currentEntity | self createInvocationOf: method from: currentEntity node: aFunctionCallExpression ] ].
 
 	"=> package.module.x()"
-	self flag: #todo. "duplication with what is just above."
-	self flag: #todo. "See if we can simplify the code since there is only 1 possibility?"
 	self findImportMatchingSource: aFunctionCallExpression receiver source ifFound: [ :import |
 		^ self
 			  resolve: ((FamixPythonInvocationOrInstantiationWithNamespaceResolvable identifier: aFunctionCallExpression receiver name import: import)
-					   expectedKind: {
-							   FamixPythonFunction.
-							   FamixPythonClass };
-					   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one can be a function or a class"
-						   { (self ensureStubUnknownEntityNamed: unresolved identifier) } ];
+					   expectedKind: { FamixPythonFunction . FamixPythonClass };
+					   notFoundReplacementEntity: [ :unresolved :currentEntity | { (self ensureStubUnknownEntityNamed: unresolved identifier) } ]; "This one can be a function or a class"
 					   yourself)
 			  foundAction: [ :result :currentEntity |
-				  self flag: #todo. "Improve code"
 				  (result isCollection not and: [ result isClass ])
 					  ifTrue: [
-						  | reference invocation |
+						  | reference |
 						  reference := result createAccessOrReferenceFrom: currentEntity node: aFunctionCallExpression.
 						  self setSourceAnchor: reference from: aFunctionCallExpression.
 
-						  invocation := self model newInvocation
-							                invokedEntity: (self getConstructorOf: result);
-							                sender: currentEntity;
-							                signature: aFunctionCallExpression source;
-							                yourself.
-						  self setSourceAnchor: invocation from: aFunctionCallExpression ]
-					  ifFalse: [
-						  | invocation |
-						  invocation := self model newInvocation
-							                candidates: result;
-							                sender: currentEntity;
-							                signature: aFunctionCallExpression source;
-							                yourself.
-						  self setSourceAnchor: invocation from: aFunctionCallExpression ] ] ].
-
-	aFunctionCallExpression source traceCr.
+						  self createInvocationOf: (self getConstructorOf: result) from: currentEntity node: aFunctionCallExpression ]
+					  ifFalse: [ self createInvocationOf: result from: currentEntity node: aFunctionCallExpression ] ] ].
 
 	"=> c.x()"
 	^ self
 		  resolve: ((FamixPythonMethodInvocationResolvable identifier: aFunctionCallExpression receiver name)
-				   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one can be a function or a class"
-					   { (self ensureStubMethodNamed: unresolved identifier) } ];
+				   notFoundReplacementEntity: [ :unresolved :currentEntity | { (self ensureStubMethodNamed: unresolved identifier) } ]; "This one can be a function or a class"
 				   yourself)
-		  foundAction: [ :methods :currentEntity |
-			  | invocation |
-			  invocation := self model newInvocation
-				                candidates: methods;
-				                sender: currentEntity;
-				                signature: aFunctionCallExpression source;
-				                yourself.
-			  self setSourceAnchor: invocation from: aFunctionCallExpression ]
+		  foundAction: [ :methods :currentEntity | self createInvocationOf: methods from: currentEntity node: aFunctionCallExpression ]
 ]
 
 { #category : 'accessing - modules' }
