@@ -541,6 +541,16 @@ FamixPythonProject1Test >> testClassesWithSameNameButDifferentParents [
 			(self packageNamed: 'subpackage1') }
 ]
 
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testCommentInModule [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment | aComment sourceText beginsWith: '# Comment in module at root 2' ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self moduleNamed: 'moduleAtRoot2')
+]
+
 { #category : 'tests - methods' }
 FamixPythonProject1Test >> testConstructor [
 

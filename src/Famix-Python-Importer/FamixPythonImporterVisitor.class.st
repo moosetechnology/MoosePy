@@ -72,6 +72,30 @@ FamixPythonImporterVisitor >> createClass: classDefinitionNode [
 	^ self setSourceAnchor: class from: classDefinitionNode
 ]
 
+{ #category : 'visiting' }
+FamixPythonImporterVisitor >> createCommentsFor: aFileNode [
+	"Comments are not represented by nodes in SmaCC. A FileNode can return the intervals of the comments so we need to find to whose entity those comments are attached to."
+
+	aFileNode comments ifNotEmpty: [ :commentIntervals |
+		| entitiesInFile |
+		"Sorting by the number of characters allows us to have the most atomic entities first. Imagine we have an inner function in a function. If a comment is an the inner function, it is also in the function containing it. So we want to check the inner function first because it's the most inner entity that should have the comment attached."
+		entitiesInFile := self currentEntity withAllChildren sorted: [ :entity | entity sourceAnchor numberOfCharacters ] ascending.
+
+		commentIntervals do: [ :commentInterval |
+			entitiesInFile
+				detect: [ :entity | entity sourceAnchor includesInterval: commentInterval ]
+				ifFound: [ :commentedEntity |
+					| comment |
+					comment := self model newComment.
+					comment commentedEntity: commentedEntity.
+					self
+						setSourceAnchorTo: comment
+						fileName: (self relativeFilePath: aFileNode)
+						start: commentInterval first
+						end: commentInterval last ]
+				ifNone: [ self error: 'All comments should be at least in the top module/package.' ] ] ]
+]
+
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> createFunction: aFunctionNode [
 
@@ -541,10 +565,20 @@ FamixPythonImporterVisitor >> rootFilePath: aString [
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> setSourceAnchor: aFamixEntity from: aSmaccNode [
 
+	^ self
+		  setSourceAnchorTo: aFamixEntity
+		  fileName: (self relativeFilePath: aSmaccNode)
+		  start: aSmaccNode startPosition
+		  end: aSmaccNode stopPosition
+]
+
+{ #category : 'private-entity-creation' }
+FamixPythonImporterVisitor >> setSourceAnchorTo: aFamixEntity fileName: aString start: aNumber end: anotherNumber [
+
 	aFamixEntity sourceAnchor: (FamixPythonIndexedFileAnchor new
-			 fileName: (self relativeFilePath: aSmaccNode);
-			 startPos: aSmaccNode startPosition;
-			 endPos: aSmaccNode stopPosition;
+			 fileName: aString;
+			 startPos: aNumber;
+			 endPos: anotherNumber;
 			 mooseModel: self model;
 			 yourself).
 
