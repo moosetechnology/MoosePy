@@ -2423,6 +2423,22 @@ FamixPythonProject1Test >> testLocalVariablesInMethodWithTheSameNameButDifferent
 			(self methodNamed: 'method_with_local_variables2') }
 ]
 
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testMergeFollowingSingleLineComments [
+
+	| function |
+	function := self functionNamed: 'function_with_single_lines_comments_to_merge'.
+
+	self assert: function comments size equals: 2.
+
+	self assertCollection: (function comments collect: #sourceText) hasSameElements: ({ '# Comment line 1
+    # Comment line 2
+    # Comment line 3
+'. '# Other comment line 4
+    # Other comment line 5
+' } collect: [ :comment | comment copyReplaceAll: String cr with: String lf ])
+]
+
 { #category : 'tests - from-import' }
 FamixPythonProject1Test >> testMethodImportsClassFromAModule [
 

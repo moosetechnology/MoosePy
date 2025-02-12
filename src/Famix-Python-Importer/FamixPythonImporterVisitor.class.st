@@ -77,11 +77,21 @@ FamixPythonImporterVisitor >> createCommentsFor: aFileNode [
 	"Comments are not represented by nodes in SmaCC. A FileNode can return the intervals of the comments so we need to find to whose entity those comments are attached to."
 
 	aFileNode comments ifNotEmpty: [ :commentIntervals |
-		| entitiesInFile |
+		| entitiesInFile intervals |
 		"Sorting by the number of characters allows us to have the most atomic entities first. Imagine we have an inner function in a function. If a comment is an the inner function, it is also in the function containing it. So we want to check the inner function first because it's the most inner entity that should have the comment attached."
 		entitiesInFile := self currentEntity withAllChildren sorted: [ :entity | entity sourceAnchor numberOfCharacters ] ascending.
 
-		commentIntervals do: [ :commentInterval |
+		"If we have two single line comments following each other, we can merge them."
+		intervals := OrderedCollection new.
+		commentIntervals do: [ :interval |
+			intervals ifEmpty: [ intervals add: interval ] ifNotEmpty: [ "We can merge if we have only spaces and tabs between the comments."
+				((aFileNode sourceFrom: intervals last second + 1 to: interval first - 1) allSatisfy: [ :character |
+					 character isSpaceSeparator or: [ character = Character tab ] ])
+					ifTrue: [ intervals last at: 2 put: interval second ]
+					ifFalse: [ intervals add: interval ] ] ].
+		intervals collect: [ :i | aFileNode sourceFrom: i first to: i second ].
+
+		intervals do: [ :commentInterval |
 			entitiesInFile
 				detect: [ :entity | entity sourceAnchor includesInterval: commentInterval ]
 				ifFound: [ :commentedEntity |
