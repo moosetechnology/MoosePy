@@ -542,6 +542,49 @@ FamixPythonProject1Test >> testClassesWithSameNameButDifferentParents [
 ]
 
 { #category : 'tests - comments' }
+FamixPythonProject1Test >> testCommentInClass [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment |
+		           aComment sourceText beginsWith: '# Comment in Class' ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self classNamed: 'Person')
+]
+
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testCommentInFunction [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment |
+		           aComment sourceText beginsWith: '# Comment in function' ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self functionNamed: 'function_with_comment_inside')
+]
+
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testCommentInInnerFunction [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment |
+		           aComment sourceText beginsWith: '# Comment in inner function' ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self functionNamed: 'inner_function_with_comment_inside')
+]
+
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testCommentInMethod [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment | aComment sourceText beginsWith: '# Comment in method' ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self methodNamed: 'get_name')
+]
+
+{ #category : 'tests - comments' }
 FamixPythonProject1Test >> testCommentInModule [
 
 	| comment |
@@ -549,6 +592,17 @@ FamixPythonProject1Test >> testCommentInModule [
 
 	self assert: comment class equals: FamixPythonComment.
 	self assert: comment commentedEntity equals: (self moduleNamed: 'moduleAtRoot2')
+]
+
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testCommentInPackage [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment |
+		           aComment sourceText beginsWith: '# The goal of this subpackage is to have the same name as a class in the parent package' ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self packageNamed: 'NameOfSubpackageOrClass')
 ]
 
 { #category : 'tests - methods' }
