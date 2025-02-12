@@ -3330,6 +3330,21 @@ FamixPythonProject1Test >> testPackageSourceAnchor [
 	self assert: rootPackage sourceAnchor sourceText equals: (FamixPythonBridge parsingExamples / 'project1' / 'src' / 'root' / '__init__.py') contents
 ]
 
+{ #category : 'tests - packages' }
+FamixPythonProject1Test >> testPackageSourceAnchorWithComment [
+	"Regression test. If a package starts with a comment, the comment is not taken into account in the source in SmaCC which is not right."
+
+	| rootPackage |
+	self denyEmpty: self model allPackages.
+
+	rootPackage := self packageNamed: 'NameOfSubpackageOrClass'.
+
+	self assert: rootPackage sourceAnchor mooseModel equals: self model.
+	self assert: rootPackage sourceAnchor sourceText equals: ('# The goal of this subpackage is to have the same name as a class in the parent package
+
+print("I have the same name as a class")' copyReplaceAll: String cr with: String lf)
+]
+
 { #category : 'tests' }
 FamixPythonProject1Test >> testPlaceholderVariablesDoNotCreateStubs [
 	"Regression test: having a placeholder variable `_` was creating a stub named `_` but we should just ignore those."

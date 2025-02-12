@@ -24,3 +24,9 @@ SmaCCParseNode >> sourceInspectorExtension [
 		  text: self source;
 		  beNotEditable
 ]
+
+{ #category : '*Famix-Python-Importer' }
+SmaCCParseNode >> startPosition: aNumber [
+
+	^ self attributeNamed: #startPosition put: aNumber
+]

@@ -665,9 +665,11 @@ FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression
 FamixPythonImporterVisitor >> visitFile: aFileNode [
 
 	| isPackageDeclaration entity |
-	
+	"If a package or module starts by a comment, the comment is ignored by SmaCC but we don't want to ignore it so we ensure the start pos is at the beginning of the file."
+	aFileNode startPosition: 1.
+
 	FamixPythonSmaCCASTSpecializer new acceptNode: aFileNode.
-	
+
 	"If the file is name __init__.py this means that we have the declaration of a package. Else we have a module that can be in a package."
 	isPackageDeclaration := aFileNode fileReference basename = '__init__.py'.
 	entity := isPackageDeclaration
@@ -681,6 +683,8 @@ FamixPythonImporterVisitor >> visitFile: aFileNode [
 	(self currentEntity: entity) isMainEntity: true.
 
 	self acceptNodes: aFileNode statements.
+
+	self createCommentsFor: aFileNode.
 
 	"If we are in a package declaration we need to keep the package in the context for the modules in the package. The package will be pop later by the importer."
 	^ isPackageDeclaration
@@ -837,12 +841,6 @@ FamixPythonImporterVisitor >> visitSmaCCToken: aSmaCCToken [
 	 see also extension method to SmaCCToken"
 
 	^aSmaCCToken value
-]
-
-{ #category : 'visiting' }
-FamixPythonImporterVisitor >> visitString: aStringNode [
-
-	^ (aStringNode source withoutPrefix: '''') withoutSuffix: ''''
 ]
 
 { #category : 'visiting' }
