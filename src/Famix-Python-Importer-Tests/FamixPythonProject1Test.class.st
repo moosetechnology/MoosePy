@@ -542,6 +542,58 @@ FamixPythonProject1Test >> testClassesWithSameNameButDifferentParents [
 ]
 
 { #category : 'tests - comments' }
+FamixPythonProject1Test >> testCommentBeforeClass [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment |
+		           aComment sourceText beginsWith: '# Comment before class' ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self classNamed: 'Student')
+]
+
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testCommentBeforeFunction [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment |
+		           aComment sourceText beginsWith: '# Comment before function' ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self functionNamed: 'function_with_comment_before')
+]
+
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testCommentBeforeGlobale [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment | aComment sourceText beginsWith: '# Comment before global' ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self globalVariableNamed: 'globalInModuleAtRoot2')
+]
+
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testCommentBeforeIVar [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment | aComment sourceText beginsWith: '# Comment before ivar' ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals:((self classNamed: 'Person') attributes detect: [ :attribute | attribute name = 'name' ])
+]
+
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testCommentBeforeMethod [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment | aComment sourceText beginsWith: '# Comment before method' ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self methodNamed: 'set_name')
+]
+
+{ #category : 'tests - comments' }
 FamixPythonProject1Test >> testCommentInClass [
 
 	| comment |

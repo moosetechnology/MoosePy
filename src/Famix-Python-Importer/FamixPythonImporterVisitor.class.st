@@ -72,10 +72,45 @@ FamixPythonImporterVisitor >> createClass: classDefinitionNode [
 	^ self setSourceAnchor: class from: classDefinitionNode
 ]
 
-{ #category : 'visiting' }
+{ #category : 'comments' }
+FamixPythonImporterVisitor >> createCommentFromInterval: commentInterval node: aFileNode entitiesInFile: entitiesInFile [
+	
+	"Before checking if the comment is inside an entity, we check that it is not right before the declaration of an entity.
+	For that we check with the entity the closest after the comment"
+	((entitiesInFile select: [ :entity | entity sourceAnchor startPos > commentInterval second ]) detectMin: [ :entity | entity sourceAnchor startPos ]) ifNotNil: [
+		:entity |
+		(aFileNode hasOnlySpacesAndTabsBetween: commentInterval second + 1 and: entity sourceAnchor startPos - 1) ifTrue: [
+			| comment |
+			comment := self model newComment.
+			comment commentedEntity: entity.
+			self
+				setSourceAnchorTo: comment
+				fileName: (self relativeFilePath: aFileNode)
+				start: commentInterval first
+				end: commentInterval last.
+			^ comment ] ].
+
+
+	^ entitiesInFile
+		  detect: [ :entity | entity sourceAnchor includesInterval: commentInterval ]
+		  ifFound: [ :commentedEntity |
+			  | comment |
+			  comment := self model newComment.
+			  comment commentedEntity: commentedEntity.
+			  self
+				  setSourceAnchorTo: comment
+				  fileName: (self relativeFilePath: aFileNode)
+				  start: commentInterval first
+				  end: commentInterval last ]
+		  ifNone: [ self error: 'All comments should be at least in the top module/package.' ]
+]
+
+{ #category : 'comments' }
 FamixPythonImporterVisitor >> createCommentsFor: aFileNode [
 	"Comments are not represented by nodes in SmaCC. A FileNode can return the intervals of the comments so we need to find to whose entity those comments are attached to."
 
+	self flag: #todo. "Reify as class"
+	self flag: #todo. "Remove duplication of comment creation"
 	aFileNode comments ifNotEmpty: [ :commentIntervals |
 		| entitiesInFile intervals |
 		"Sorting by the number of characters allows us to have the most atomic entities first. Imagine we have an inner function in a function. If a comment is an the inner function, it is also in the function containing it. So we want to check the inner function first because it's the most inner entity that should have the comment attached."
@@ -85,25 +120,12 @@ FamixPythonImporterVisitor >> createCommentsFor: aFileNode [
 		intervals := OrderedCollection new.
 		commentIntervals do: [ :interval |
 			intervals ifEmpty: [ intervals add: interval ] ifNotEmpty: [ "We can merge if we have only spaces and tabs between the comments."
-				((aFileNode sourceFrom: intervals last second + 1 to: interval first - 1) allSatisfy: [ :character |
-					 character isSpaceSeparator or: [ character = Character tab ] ])
+				(aFileNode hasOnlySpacesAndTabsBetween: intervals last second + 1 and: interval first - 1)
 					ifTrue: [ intervals last at: 2 put: interval second ]
 					ifFalse: [ intervals add: interval ] ] ].
 		intervals collect: [ :i | aFileNode sourceFrom: i first to: i second ].
 
-		intervals do: [ :commentInterval |
-			entitiesInFile
-				detect: [ :entity | entity sourceAnchor includesInterval: commentInterval ]
-				ifFound: [ :commentedEntity |
-					| comment |
-					comment := self model newComment.
-					comment commentedEntity: commentedEntity.
-					self
-						setSourceAnchorTo: comment
-						fileName: (self relativeFilePath: aFileNode)
-						start: commentInterval first
-						end: commentInterval last ]
-				ifNone: [ self error: 'All comments should be at least in the top module/package.' ] ] ]
+		intervals do: [ :commentInterval | self createCommentFromInterval: commentInterval node: aFileNode entitiesInFile: entitiesInFile ] ]
 ]
 
 { #category : 'private-entity-creation' }

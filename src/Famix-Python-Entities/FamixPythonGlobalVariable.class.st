@@ -7,6 +7,11 @@
 |---|
 | `parentScope` | `FamixTGlobalVariable` | `globalVariables` | `FamixTWithGlobalVariables` | Scope declaring the global variable. belongsTo implementation|
 
+### Children
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `comments` | `FamixTWithComments` | `commentedEntity` | `FamixTComment` | List of comments for the entity|
+
 ### Incoming dependencies
 | Relation | Origin | Opposite | Type | Comment |
 |---|
@@ -35,8 +40,8 @@
 Class {
 	#name : 'FamixPythonGlobalVariable',
 	#superclass : 'FamixPythonNamedEntity',
-	#traits : 'FamixTGlobalVariable + FamixTImportable + FamixTInvocationsReceiver + FamixTShadowable + FamixTShadower',
-	#classTraits : 'FamixTGlobalVariable classTrait + FamixTImportable classTrait + FamixTInvocationsReceiver classTrait + FamixTShadowable classTrait + FamixTShadower classTrait',
+	#traits : 'FamixTGlobalVariable + FamixTImportable + FamixTInvocationsReceiver + FamixTShadowable + FamixTShadower + FamixTWithComments',
+	#classTraits : 'FamixTGlobalVariable classTrait + FamixTImportable classTrait + FamixTInvocationsReceiver classTrait + FamixTShadowable classTrait + FamixTShadower classTrait + FamixTWithComments classTrait',
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',
 	#tag : 'Entities'
