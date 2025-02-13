@@ -2,7 +2,9 @@ import moduleAtRoot
 import moduleAtRoot
 import moduleAtRoot3
 
-moduleAtRoot2Variable = 42
+# Comment in module at root 2
+
+moduleAtRoot2Variable = 42  # Comment at the end of a line
 globalVariableWithCommonName = False
 
 moduleAtRoot.sort_list(["a", "b", "c", "d", "e", "f", "g", "h", "i"], [0, 1, 1, 0, 1, 2, 2, 0, 1])
@@ -10,8 +12,42 @@ moduleAtRoot.sort_list(["a", "b", "c", "d", "e", "f", "g", "h", "i"], [0, 1, 1, 
 print(moduleAtRoot.moduleAtRootVariable)
 
 
+def function_with_comment_inside():
+    # Comment in function
+    return 42
+
+
+def function_with_inner_function_with_comment_inside():
+    def inner_function_with_comment_inside():
+        # Comment in inner function
+        return 31
+
+    return inner_function_with_comment_inside()
+
+
+def function_with_single_lines_comments_to_merge():
+    # Comment line 1
+    # Comment line 2
+    # Comment line 3
+
+    # Other comment line 4
+    # Other comment line 5
+    return "String"
+
+
+# Comment before function
+def function_with_comment_before():
+    return True
+
+
+# Comment before global
+globalInModuleAtRoot2 = False
+
+
 class Person:
     import moduleAtRoot3
+
+    # Comment in Class
 
     def __init__(self, name, age):
         self.set_name(name)
@@ -23,9 +59,12 @@ class Person:
             print(self.get_name() + moduleAtRoot4.moduleAtRootSpaceString + str(self.age))
 
     def get_name(self):
+        # Comment in method
         return self.name
 
+    # Comment before method
     def set_name(self, name):
+        # Comment before ivar
         self.name = name
 
 
@@ -33,8 +72,10 @@ p1 = Person("John", 36)
 p1.printInfos()
 
 
+# Comment before class
 class Student(Person):
     pass
+
 
 print(Student)
 s = Student("Stolys", 19)
