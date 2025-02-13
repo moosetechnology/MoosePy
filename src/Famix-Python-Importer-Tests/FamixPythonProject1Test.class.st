@@ -552,7 +552,7 @@ FamixPythonProject1Test >> testCommentAfterIvar [
 ]
 
 { #category : 'tests - comments' }
-FamixPythonProject1Test >> testCommentAfterLocale [
+FamixPythonProject1Test >> testCommentAfterLocal [
 
 	| comment |
 	comment := self model allComments detect: [ :aComment | aComment sourceText beginsWith: '# Comment after temp' ].
@@ -604,7 +604,7 @@ FamixPythonProject1Test >> testCommentBeforeIVar [
 ]
 
 { #category : 'tests - comments' }
-FamixPythonProject1Test >> testCommentBeforeLocale [
+FamixPythonProject1Test >> testCommentBeforeLocal [
 
 	| comment |
 	comment := self model allComments detect: [ :aComment | aComment sourceText beginsWith: '# Comment before temp' ].
@@ -3159,6 +3159,111 @@ FamixPythonProject1Test >> testModulesWithTheSameNameAreDifferent [
 	self assert: rootModule isRoot.
 	self assert: moduleInPackage parentPackage name equals: 'root'.
 	self deny: rootModule identicalTo: moduleInPackage
+]
+
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testMultilineCommentBeforeClass [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment |
+		           aComment sourceText beginsWith: ('"""
+Multiline
+Comment
+Before class
+"""' copyReplaceAll: String cr with: String lf) ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self classNamed: 'ClassWihtComments')
+]
+
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testMultilineCommentBeforeFunction [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment |
+		           aComment sourceText beginsWith: ('"""
+Multiline
+Comment
+Before function
+"""' copyReplaceAll: String cr with: String lf) ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self functionNamed: 'function_containing_multiline_comment')
+]
+
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testMultilineCommentBeforeGlobal [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment |
+		           aComment sourceText beginsWith: ('"""
+Multiline
+Comment
+Before global
+"""' copyReplaceAll: String cr with: String lf) ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self globalVariableNamed: 'global_with_multiline_comment')
+]
+
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testMultilineCommentBeforeIvar [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment |
+		           aComment sourceText beginsWith: ('"""
+        Multiline
+        Comment
+        Before ivar
+        """' copyReplaceAll: String cr with: String lf) ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self attributeNamed: 'ivar_commented')
+]
+
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testMultilineCommentBeforeLocal [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment |
+		           aComment sourceText beginsWith: ('"""
+    Multiline
+    Comment
+    Before temp
+    """' copyReplaceAll: String cr with: String lf) ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self localVariableNamed: 'temp_with_multiline_comment_before')
+]
+
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testMultilineCommentBeforeMethod [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment |
+		           aComment sourceText beginsWith: ('"""
+    Multiline
+    Comment
+    Before method
+    """' copyReplaceAll: String cr with: String lf) ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self methodNamed: 'get_ivar_commented')
+]
+
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testMultilineCommentInClass [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment |
+		           aComment sourceText beginsWith: ('"""
+    Multiline
+    Comment
+    In Class
+    """' copyReplaceAll: String cr with: String lf) ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self classNamed: 'ClassWihtComments')
 ]
 
 { #category : 'tests - comments' }
