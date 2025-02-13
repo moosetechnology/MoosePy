@@ -72,77 +72,6 @@ FamixPythonImporterVisitor >> createClass: classDefinitionNode [
 	^ self setSourceAnchor: class from: classDefinitionNode
 ]
 
-{ #category : 'comments' }
-FamixPythonImporterVisitor >> createCommentFromInterval: commentInterval node: aFileNode entitiesInFile: entitiesInFile [
-
-	self flag: #todo. "Maybe we should also consider invocations?"
-	"First we look for comments that are right after the declaration of an entity on the same line."
-	((entitiesInFile select: [ :entity | entity isStructuralEntity and: [ entity sourceAnchor endPos < commentInterval first ] ]) detectMax: [ :entity | "We take the start because comments are not considered part of the entites so we might have multiple entities with the same end pos if they are imbricated."
-		 entity sourceAnchor startPos ]) ifNotNil: [ :entity |
-		(aFileNode hasNoLineReturnBetween: entity sourceAnchor endPos + 1 and: commentInterval first - 1) ifTrue: [
-			| comment |
-			comment := self model newComment.
-			comment commentedEntity: entity.
-			self
-				setSourceAnchorTo: comment
-				fileName: (self relativeFilePath: aFileNode)
-				start: commentInterval first
-				end: commentInterval last.
-			^ comment ] ].
-
-	"Before checking if the comment is inside an entity, we check that it is not right before the declaration of an entity.
-	For that we check with the entity the closest after the comment"
-	((entitiesInFile select: [ :entity | entity sourceAnchor startPos > commentInterval second ]) detectMin: [ :entity | entity sourceAnchor startPos ]) ifNotNil: [
-		:entity |
-		(aFileNode hasOnlySpacesAndTabsBetween: commentInterval second + 1 and: entity sourceAnchor startPos - 1) ifTrue: [
-			| comment |
-			comment := self model newComment.
-			comment commentedEntity: entity.
-			self
-				setSourceAnchorTo: comment
-				fileName: (self relativeFilePath: aFileNode)
-				start: commentInterval first
-				end: commentInterval last.
-			^ comment ] ].
-
-
-	^ entitiesInFile
-		  detect: [ :entity | entity sourceAnchor includesInterval: commentInterval ]
-		  ifFound: [ :commentedEntity |
-			  | comment |
-			  comment := self model newComment.
-			  comment commentedEntity: commentedEntity.
-			  self
-				  setSourceAnchorTo: comment
-				  fileName: (self relativeFilePath: aFileNode)
-				  start: commentInterval first
-				  end: commentInterval last ]
-		  ifNone: [ self error: 'All comments should be at least in the top module/package.' ]
-]
-
-{ #category : 'comments' }
-FamixPythonImporterVisitor >> createCommentsFor: aFileNode [
-	"Comments are not represented by nodes in SmaCC. A FileNode can return the intervals of the comments so we need to find to whose entity those comments are attached to."
-
-	self flag: #todo. "Reify as class"
-	self flag: #todo. "Remove duplication of comment creation"
-	aFileNode comments ifNotEmpty: [ :commentIntervals |
-		| entitiesInFile intervals |
-		"Sorting by the number of characters allows us to have the most atomic entities first. Imagine we have an inner function in a function. If a comment is an the inner function, it is also in the function containing it. So we want to check the inner function first because it's the most inner entity that should have the comment attached."
-		entitiesInFile := self currentEntity withAllChildren sorted: [ :entity | entity sourceAnchor numberOfCharacters ] ascending.
-
-		"If we have two single line comments following each other, we can merge them."
-		intervals := OrderedCollection new.
-		commentIntervals do: [ :interval |
-			intervals ifEmpty: [ intervals add: interval ] ifNotEmpty: [ "We can merge if we have only spaces and tabs between the comments."
-				(aFileNode hasOnlySpacesAndTabsBetween: intervals last second + 1 and: interval first - 1)
-					ifTrue: [ intervals last at: 2 put: interval second ]
-					ifFalse: [ intervals add: interval ] ] ].
-		intervals collect: [ :i | aFileNode sourceFrom: i first to: i second ].
-
-		intervals do: [ :commentInterval | self createCommentFromInterval: commentInterval node: aFileNode entitiesInFile: entitiesInFile ] ]
-]
-
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> createFunction: aFunctionNode [
 
@@ -765,7 +694,7 @@ FamixPythonImporterVisitor >> visitFile: aFileNode [
 
 	self acceptNodes: aFileNode statements.
 
-	self createCommentsFor: aFileNode.
+	FamixPythonCommentsImporter importCommentsOf: aFileNode visitor: self. 
 
 	"If we are in a package declaration we need to keep the package in the context for the modules in the package. The package will be pop later by the importer."
 	^ isPackageDeclaration
@@ -929,7 +858,7 @@ FamixPythonImporterVisitor >> visitString: aString [
 	"If a string is not assigned to anything it is considered as a comment. "
 
 	aString parent isExpressionStatement ifTrue: [
-		aString topParent comments add: (Array with: aString startPosition with: (aString topParent stopPosition min: aString stopPosition + 1)) "Take the line return" ].
+		aString topParent comments add: (Array with: aString startPosition with: (aString topParent stopPosition min: aString stopPosition + 1)) "Take the line return. This might not work on files from windows since it's CRLF alos we can have spaces before the line return. We should maybe do something more robust." ].
 
 	^ super visitString: aString
 ]
