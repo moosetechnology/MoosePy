@@ -4,7 +4,7 @@ import moduleAtRoot3
 
 # Comment in module at root 2
 
-moduleAtRoot2Variable = 42  # Comment at the end of a line
+moduleAtRoot2Variable = 42  # Comment after global
 globalVariableWithCommonName = False
 
 moduleAtRoot.sort_list(["a", "b", "c", "d", "e", "f", "g", "h", "i"], [0, 1, 1, 0, 1, 2, 2, 0, 1])
@@ -40,6 +40,19 @@ def function_with_comment_before():
     return True
 
 
+def function_with_locale_with_comment():
+    # Comment before temp
+    temp_after_comment = False
+    temp_before_comment = True  # Comment after temp
+    return temp_after_comment | temp_before_comment
+
+
+def function_with_conflicting_comment_attribution():
+    temp_conflicting_1 = True  # Comment to attribute to temp 1 and not 2
+    temp_conflicting_2 = False
+    return temp_conflicting_2 & temp_conflicting_1
+
+
 # Comment before global
 globalInModuleAtRoot2 = False
 
@@ -51,7 +64,7 @@ class Person:
 
     def __init__(self, name, age):
         self.set_name(name)
-        self.age = age
+        self.age = age  # Comment after ivar
 
     def printInfos(self):
         import moduleAtRoot4
