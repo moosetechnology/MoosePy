@@ -925,6 +925,16 @@ FamixPythonImporterVisitor >> visitSmaCCToken: aSmaCCToken [
 ]
 
 { #category : 'visiting' }
+FamixPythonImporterVisitor >> visitString: aString [
+	"If a string is not assigned to anything it is considered as a comment. "
+
+	aString parent isExpressionStatement ifTrue: [
+		aString topParent comments add: (Array with: aString startPosition with: (aString topParent stopPosition min: aString stopPosition + 1)) "Take the line return" ].
+
+	^ super visitString: aString
+]
+
+{ #category : 'visiting' }
 FamixPythonImporterVisitor >> visitSuperclass: aSuperclass [
 	"We should not look for the class here because it might not exist yet. So we delegate to the symbol resolution in the creation of the class."
 

@@ -30,6 +30,12 @@ PyRootNode >> isClassDefinition [
 ]
 
 { #category : '*Famix-Python-Importer' }
+PyRootNode >> isExpressionStatement [
+
+	^ false
+]
+
+{ #category : '*Famix-Python-Importer' }
 PyRootNode >> isFunctionCallExpression [
 
 	^ false

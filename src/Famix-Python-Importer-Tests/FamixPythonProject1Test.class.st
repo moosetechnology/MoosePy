@@ -3161,6 +3161,66 @@ FamixPythonProject1Test >> testModulesWithTheSameNameAreDifferent [
 	self deny: rootModule identicalTo: moduleInPackage
 ]
 
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testMultilineCommentInFunction [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment |
+		           aComment sourceText beginsWith: ('"""
+    Multiline
+    Comment
+    In function
+    """' copyReplaceAll: String cr with: String lf) ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self functionNamed: 'function_containing_multiline_comment')
+]
+
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testMultilineCommentInMethod [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment |
+		           aComment sourceText beginsWith: ('"""
+        Multiline
+        Comment
+        In method
+        """' copyReplaceAll: String cr with: String lf) ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self methodNamed: 'get_ivar_commented')
+]
+
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testMultilineCommentInModule [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment |
+		           aComment sourceText beginsWith: ('"""
+Multiline
+Comment
+In module
+"""' copyReplaceAll: String cr with: String lf) ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self moduleNamed: 'moduleAtRoot2')
+]
+
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testMultilineCommentInPackage [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment |
+		           aComment sourceText beginsWith: ('"""
+Multiline
+Comment
+In package
+"""' copyReplaceAll: String cr with: String lf) ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self packageNamed: 'NameOfSubpackageOrClass')
+]
+
 { #category : 'tests' }
 FamixPythonProject1Test >> testNoNilSourceOrTargetForAssociations [
 
