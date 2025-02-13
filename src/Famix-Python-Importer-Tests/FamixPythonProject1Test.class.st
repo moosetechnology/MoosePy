@@ -542,6 +542,26 @@ FamixPythonProject1Test >> testClassesWithSameNameButDifferentParents [
 ]
 
 { #category : 'tests - comments' }
+FamixPythonProject1Test >> testCommentAfterIvar [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment | aComment sourceText beginsWith: '# Comment after ivar' ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: ((self classNamed: 'Person') attributes detect: [ :attribute | attribute name = 'age' ])
+]
+
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testCommentAfterLocale [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment | aComment sourceText beginsWith: '# Comment after temp' ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self localVariableNamed: 'temp_before_comment')
+]
+
+{ #category : 'tests - comments' }
 FamixPythonProject1Test >> testCommentBeforeClass [
 
 	| comment |
@@ -580,7 +600,17 @@ FamixPythonProject1Test >> testCommentBeforeIVar [
 	comment := self model allComments detect: [ :aComment | aComment sourceText beginsWith: '# Comment before ivar' ].
 
 	self assert: comment class equals: FamixPythonComment.
-	self assert: comment commentedEntity equals:((self classNamed: 'Person') attributes detect: [ :attribute | attribute name = 'name' ])
+	self assert: comment commentedEntity equals: ((self classNamed: 'Person') attributes detect: [ :attribute | attribute name = 'name' ])
+]
+
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testCommentBeforeLocale [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment | aComment sourceText beginsWith: '# Comment before temp' ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self localVariableNamed: 'temp_after_comment')
 ]
 
 { #category : 'tests - comments' }
@@ -591,6 +621,17 @@ FamixPythonProject1Test >> testCommentBeforeMethod [
 
 	self assert: comment class equals: FamixPythonComment.
 	self assert: comment commentedEntity equals: (self methodNamed: 'set_name')
+]
+
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testCommentBothBeforeAndAfterAnEntity [
+	"In that case, it should got to the entity before it."
+
+	| comment |
+	comment := self model allComments detect: [ :aComment | aComment sourceText beginsWith: '# Comment to attribute to temp 1 and not 2' ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self localVariableNamed: 'temp_conflicting_1')
 ]
 
 { #category : 'tests - comments' }

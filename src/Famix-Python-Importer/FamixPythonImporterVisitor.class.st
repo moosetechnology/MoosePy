@@ -74,7 +74,22 @@ FamixPythonImporterVisitor >> createClass: classDefinitionNode [
 
 { #category : 'comments' }
 FamixPythonImporterVisitor >> createCommentFromInterval: commentInterval node: aFileNode entitiesInFile: entitiesInFile [
-	
+
+	self flag: #todo. "Maybe we should also consider invocations?"
+	"First we look for comments that are right after the declaration of an entity on the same line."
+	((entitiesInFile select: [ :entity | entity isStructuralEntity and: [ entity sourceAnchor endPos < commentInterval first ] ]) detectMax: [ :entity | "We take the start because comments are not considered part of the entites so we might have multiple entities with the same end pos if they are imbricated."
+		 entity sourceAnchor startPos ]) ifNotNil: [ :entity |
+		(aFileNode hasNoLineReturnBetween: entity sourceAnchor endPos + 1 and: commentInterval first - 1) ifTrue: [
+			| comment |
+			comment := self model newComment.
+			comment commentedEntity: entity.
+			self
+				setSourceAnchorTo: comment
+				fileName: (self relativeFilePath: aFileNode)
+				start: commentInterval first
+				end: commentInterval last.
+			^ comment ] ].
+
 	"Before checking if the comment is inside an entity, we check that it is not right before the declaration of an entity.
 	For that we check with the entity the closest after the comment"
 	((entitiesInFile select: [ :entity | entity sourceAnchor startPos > commentInterval second ]) detectMin: [ :entity | entity sourceAnchor startPos ]) ifNotNil: [
