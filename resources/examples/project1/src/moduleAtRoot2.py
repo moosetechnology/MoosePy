@@ -138,3 +138,72 @@ class ClassToTestLocalVariables:
     def method_with_local_variables_and_tuples(self):
         local_in_method_with_tuple1, local_in_method_with_tuple2 = (1, 2)
         return local_in_method_with_tuple1 + local_in_method_with_tuple2
+
+
+"""
+Multiline
+Comment
+In module
+"""
+
+"""
+Multiline
+Comment
+Before global
+"""
+global_with_multiline_comment = 3
+
+"""
+Multiline
+Comment
+Before function
+"""
+def function_containing_multiline_comment():
+    """
+    Multiline
+    Comment
+    In function
+    """
+
+    """
+    Multiline
+    Comment
+    Before temp
+    """
+    temp_with_multiline_comment_before = 3
+
+    return temp_with_multiline_comment_before
+
+
+"""
+Multiline
+Comment
+Before class
+"""
+class ClassWihtComments():
+    """
+    Multiline
+    Comment
+    In Class
+    """
+
+    def __init__(self):
+        """
+        Multiline
+        Comment
+        Before ivar
+        """
+        self.ivar_commented = 3
+
+    """
+    Multiline
+    Comment
+    Before method
+    """
+    def get_ivar_commented(self):
+        """
+        Multiline
+        Comment
+        In method
+        """
+        return self.ivar_commented
