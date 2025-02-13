@@ -57,19 +57,11 @@ FamixPythonCommentsImporter >> createCommentFor: anEntity from: start to: stop [
 { #category : 'actions' }
 FamixPythonCommentsImporter >> createCommentFromInterval: commentInterval [
 
-	self flag: #todo. "Maybe we should also consider invocations?"
 	"First we look for comments that are right after the declaration of an entity on the same line."
-	((self entitiesInFile select: [ :entity | entity isStructuralEntity and: [ entity sourceAnchor endPos < commentInterval first ] ]) detectMax: [ :entity | "We take the start because comments are not considered part of the entites so we might have multiple entities with the same end pos if they are imbricated."
-		 entity sourceAnchor startPos ]) ifNotNil: [ :entity |
-		(fileNode hasNoLineReturnBetween: entity sourceAnchor endPos + 1 and: commentInterval first - 1) ifTrue: [
-			^ self createCommentFor: entity from: commentInterval first to: commentInterval second ] ].
+	(self entityOnLineOfComment: commentInterval) ifNotNil: [ :entity | ^ self createCommentFor: entity from: commentInterval first to: commentInterval second ].
 
-	"Before checking if the comment is inside an entity, we check that it is not right before the declaration of an entity.
-	For that we check with the entity the closest after the comment"
-	((self entitiesInFile select: [ :entity | entity sourceAnchor startPos > commentInterval second ]) detectMin: [ :entity | entity sourceAnchor startPos ])
-		ifNotNil: [ :entity |
-			(fileNode hasOnlySpacesAndTabsBetween: commentInterval second + 1 and: entity sourceAnchor startPos - 1) ifTrue: [
-				^ self createCommentFor: entity from: commentInterval first to: commentInterval second ] ].
+	"Before checking if the comment is inside an entity, we check that it is not right before the declaration of an entity."
+	(self entityFollowingComment: commentInterval) ifNotNil: [ :entity | ^ self createCommentFor: entity from: commentInterval first to: commentInterval second ].
 
 	^ self entitiesInFile
 		  detect: [ :entity | entity sourceAnchor includesInterval: commentInterval ]
@@ -82,6 +74,39 @@ FamixPythonCommentsImporter >> entitiesInFile [
 	"Sorting by the number of characters allows us to have the most atomic entities first. Imagine we have an inner function in a function. If a comment is an the inner function, it is also in the function containing it. So we want to check the inner function first because it's the most inner entity that should have the comment attached."
 
 	^ entitiesInFile ifNil: [ entitiesInFile := visitor currentEntity withAllChildren sorted: [ :entity | entity sourceAnchor numberOfCharacters ] ascending ]
+]
+
+{ #category : 'actions' }
+FamixPythonCommentsImporter >> entityFollowingComment: commentInterval [
+	"Return an entity declared right after the comment. For example:
+	
+	```
+	# Function doing things
+	def function():
+	  pass
+	```
+	"
+	"Take the entity right after the comment"
+	((self entitiesInFile select: [ :entity | entity sourceAnchor startPos > commentInterval second ]) detectMin: [ :entity | entity sourceAnchor startPos ])
+		ifNotNil: [ :entity | (fileNode hasOnlySpacesAndTabsBetween: commentInterval second + 1 and: entity sourceAnchor startPos - 1) ifTrue: [ ^ entity ] ].
+	^ nil
+]
+
+{ #category : 'actions' }
+FamixPythonCommentsImporter >> entityOnLineOfComment: commentInterval [
+	"We check if the comment is on the same line than a variable declaration such as:
+	
+	`var = 31 # Number of bytes`
+	"
+	
+	"Take the entity right before the comment"
+	((self entitiesInFile select: [ :entity | entity isStructuralEntity and: [ entity sourceAnchor endPos < commentInterval first ] ])
+		detectMax: [ :entity |
+			"We take the start because comments are not considered part of the entites so we might have multiple entities with the same end pos if they are imbricated."
+		 	entity sourceAnchor startPos ]) ifNotNil: [ :entity |
+		(fileNode hasNoLineReturnBetween: entity sourceAnchor endPos + 1 and: commentInterval first - 1) ifTrue: [ ^ entity ] ].
+
+	^ nil
 ]
 
 { #category : 'accessing' }
