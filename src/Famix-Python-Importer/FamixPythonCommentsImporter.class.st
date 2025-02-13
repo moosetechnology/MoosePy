@@ -61,15 +61,14 @@ FamixPythonCommentsImporter >> createCommentFromInterval: commentInterval entiti
 	((entitiesInFile select: [ :entity | entity isStructuralEntity and: [ entity sourceAnchor endPos < commentInterval first ] ]) detectMax: [ :entity | "We take the start because comments are not considered part of the entites so we might have multiple entities with the same end pos if they are imbricated."
 		 entity sourceAnchor startPos ]) ifNotNil: [ :entity |
 		(fileNode hasNoLineReturnBetween: entity sourceAnchor endPos + 1 and: commentInterval first - 1) ifTrue: [
-			self createCommentFor: entity from: commentInterval first to: commentInterval second ] ].
+			^ self createCommentFor: entity from: commentInterval first to: commentInterval second ] ].
 
 	"Before checking if the comment is inside an entity, we check that it is not right before the declaration of an entity.
 	For that we check with the entity the closest after the comment"
 	((entitiesInFile select: [ :entity | entity sourceAnchor startPos > commentInterval second ]) detectMin: [ :entity | entity sourceAnchor startPos ]) ifNotNil: [
 		:entity |
 		(fileNode hasOnlySpacesAndTabsBetween: commentInterval second + 1 and: entity sourceAnchor startPos - 1) ifTrue: [
-			self createCommentFor: entity from: commentInterval first to: commentInterval second ] ].
-
+			^ self createCommentFor: entity from: commentInterval first to: commentInterval second ] ].
 
 	^ entitiesInFile
 		  detect: [ :entity | entity sourceAnchor includesInterval: commentInterval ]
