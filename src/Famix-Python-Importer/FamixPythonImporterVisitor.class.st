@@ -858,7 +858,7 @@ FamixPythonImporterVisitor >> visitString: aString [
 	"If a string is not assigned to anything it is considered as a comment. "
 
 	aString parent isExpressionStatement ifTrue: [
-		aString topParent comments add: (Array with: aString startPosition with: (aString topParent stopPosition min: aString stopPosition + 1)) "Take the line return. This might not work on files from windows since it's CRLF alos we can have spaces before the line return. We should maybe do something more robust." ].
+		aString topParent multilineComments add: (Array with: aString startPosition with: (aString topParent stopPosition min: aString stopPosition + 1)) "Take the line return. This might not work on files from windows since it's CRLF alos we can have spaces before the line return. We should maybe do something more robust." ].
 
 	^ super visitString: aString
 ]

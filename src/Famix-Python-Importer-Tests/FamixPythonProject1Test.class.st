@@ -715,6 +715,23 @@ FamixPythonProject1Test >> testConstructor [
 	self deny: method isConstructor
 ]
 
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testDoNotMergeMergeSingleAndMultiLinesComments [
+
+	| comment comment2 |
+	comment := self model allComments detect: [ :aComment |
+		           aComment sourceText beginsWith: ('"""
+Multiline
+Comment
+Before single line
+"""' copyReplaceAll: String cr with: String lf) ].
+
+	comment2 := self model allComments detect: [ :aComment | aComment sourceText beginsWith: '# Single line comment after multiline' ].
+
+	self deny: (comment sourceText includes: $#).
+	self deny: (comment2 sourceText includes: $")
+]
+
 { #category : 'tests - imports' }
 FamixPythonProject1Test >> testFileWithTwoIdenticalImportsProduceTwoImports [
 

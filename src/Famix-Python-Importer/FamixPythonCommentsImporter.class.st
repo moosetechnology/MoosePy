@@ -55,7 +55,19 @@ FamixPythonCommentsImporter >> createCommentFor: anEntity from: start to: stop [
 ]
 
 { #category : 'actions' }
-FamixPythonCommentsImporter >> createCommentFromInterval: commentInterval [
+FamixPythonCommentsImporter >> createMultilineCommentFromInterval: commentInterval [
+
+	"Before checking if the comment is inside an entity, we check that it is not right before the declaration of an entity."
+	(self entityFollowingComment: commentInterval) ifNotNil: [ :entity | ^ self createCommentFor: entity from: commentInterval first to: commentInterval second ].
+
+	^ self entitiesInFile
+		  detect: [ :entity | entity sourceAnchor includesInterval: commentInterval ]
+		  ifFound: [ :entity | self createCommentFor: entity from: commentInterval first to: commentInterval second ]
+		  ifNone: [ self error: 'All comments should be at least in the top module/package.' ]
+]
+
+{ #category : 'actions' }
+FamixPythonCommentsImporter >> createSingleLineCommentFromInterval: commentInterval [
 
 	"First we look for comments that are right after the declaration of an entity on the same line."
 	(self entityOnLineOfComment: commentInterval) ifNotNil: [ :entity | ^ self createCommentFor: entity from: commentInterval first to: commentInterval second ].
@@ -123,7 +135,8 @@ FamixPythonCommentsImporter >> fileNode: anObject [
 
 { #category : 'actions' }
 FamixPythonCommentsImporter >> import [
-	"Comments are not represented by nodes in SmaCC. A FileNode can return the intervals of the comments so we need to find to whose entity those comments are attached to."
+	"Comments are not represented by nodes in SmaCC. A FileNode can return the intervals of the comments so we need to find to whose entity those comments are attached to.
+	I also save strings that are comments into the #multilineComments property."
 
 	fileNode comments ifNotEmpty: [ :commentIntervals |
 		| intervals |
@@ -135,7 +148,9 @@ FamixPythonCommentsImporter >> import [
 					ifTrue: [ intervals last at: 2 put: interval second ]
 					ifFalse: [ intervals add: interval ] ] ].
 
-		intervals do: [ :commentInterval | self createCommentFromInterval: commentInterval ] ]
+		intervals do: [ :commentInterval | self createSingleLineCommentFromInterval: commentInterval ] ].
+
+	fileNode multilineComments do: [ :interval | self createMultilineCommentFromInterval: interval ]
 ]
 
 { #category : 'accessing' }

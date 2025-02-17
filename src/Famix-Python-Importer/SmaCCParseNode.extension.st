@@ -15,6 +15,17 @@ SmaCCParseNode >> fullSourceInspectorExtension [
 ]
 
 { #category : '*Famix-Python-Importer' }
+SmaCCParseNode >> multilineComments [
+
+	^ self attributeNamed: #multilineComments ifAbsentPut: [ OrderedCollection new ]
+]
+
+{ #category : '*Famix-Python-Importer' }
+SmaCCParseNode >> multilineComments: anObject [
+	self attributeNamed: #multilineComments put: anObject
+]
+
+{ #category : '*Famix-Python-Importer' }
 SmaCCParseNode >> sourceInspectorExtension [
 
 	<inspectorPresentationOrder: 901 title: 'Source'>
