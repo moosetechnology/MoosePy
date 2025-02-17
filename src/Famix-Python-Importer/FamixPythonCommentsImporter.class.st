@@ -15,6 +15,7 @@ Class {
 	#instVars : [
 		'visitor',
 		'fileNode',
+		'topEntity',
 		'entitiesInFile'
 	],
 	#category : 'Famix-Python-Importer-Importer',
@@ -29,15 +30,6 @@ FamixPythonCommentsImporter class >> importCommentsOf: aFileNode visitor: aPytho
 		  visitor: aPythonImporterVisitor;
 		  fileNode: aFileNode;
 		  import
-]
-
-{ #category : 'instance creation' }
-FamixPythonCommentsImporter class >> visitor: aPythonImporterVisitor fileNode: aFileNode [
-
-	^ self new
-		  visitor: aPythonImporterVisitor;
-		  fileNode: aFileNode;
-		  yourself
 ]
 
 { #category : 'actions' }

@@ -230,14 +230,6 @@ FamixPythonImporterVisitor >> ensureMethod: aMethodNode [
 ]
 
 { #category : 'private-entity-creation' }
-FamixPythonImporterVisitor >> ensureModuleNamed: moduleName fromNode: aModuleNode [
-
-	self withCurrentEntityDo: [ :entity | (entity childOfType: FamixTModule named: moduleName) ifNotNil: [ :module | ^ module ] ].
-
-	^ self createModule: aModuleNode named: moduleName
-]
-
-{ #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> ensurePackageFromNode: aFileNode [
 
 	^ (self packageNamed: aFileNode packageName) ifNil: [
@@ -684,7 +676,7 @@ FamixPythonImporterVisitor >> visitFile: aFileNode [
 	isPackageDeclaration := aFileNode fileReference basename = '__init__.py'.
 	entity := isPackageDeclaration
 		          ifTrue: [ self ensurePackageFromNode: aFileNode ]
-		          ifFalse: [ self ensureModuleNamed: (self moduleNameStringOf: aFileNode) fromNode: aFileNode ].
+		          ifFalse: [ self createModule: aFileNode named: (self moduleNameStringOf: aFileNode) ].
 
 	self solver scopeIsEmpty ifFalse: [
 		self assert: self currentEntity isPackage.
@@ -694,7 +686,7 @@ FamixPythonImporterVisitor >> visitFile: aFileNode [
 
 	self acceptNodes: aFileNode statements.
 
-	FamixPythonCommentsImporter importCommentsOf: aFileNode visitor: self. 
+	FamixPythonCommentsImporter importCommentsOf: aFileNode visitor: self.
 
 	"If we are in a package declaration we need to keep the package in the context for the modules in the package. The package will be pop later by the importer."
 	^ isPackageDeclaration
