@@ -16,7 +16,7 @@ Class {
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> acceptNode: aNode [
 
-	^ self errorReport catch: Error during: [ super acceptNode: aNode ]
+	^ self errorReport catch: Exception during: [ super acceptNode: aNode ]
 ]
 
 { #category : 'visiting' }

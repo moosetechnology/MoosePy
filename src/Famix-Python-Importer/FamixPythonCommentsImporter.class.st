@@ -140,9 +140,9 @@ FamixPythonCommentsImporter >> import [
 					ifTrue: [ intervals last at: 2 put: interval second ]
 					ifFalse: [ intervals add: interval ] ] ].
 
-		intervals do: [ :commentInterval | self createSingleLineCommentFromInterval: commentInterval ] ].
+		intervals do: [ :commentInterval | visitor errorReport catch: Exception during: [ self createSingleLineCommentFromInterval: commentInterval ] ] ].
 
-	fileNode multilineComments do: [ :interval | self createMultilineCommentFromInterval: interval ]
+	fileNode multilineComments do: [ :interval | visitor errorReport catch: Exception during: [ self createMultilineCommentFromInterval: interval ] ]
 ]
 
 { #category : 'accessing' }
