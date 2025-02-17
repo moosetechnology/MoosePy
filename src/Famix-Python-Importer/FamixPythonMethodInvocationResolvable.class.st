@@ -9,7 +9,7 @@ Class {
 { #category : 'resolution' }
 FamixPythonMethodInvocationResolvable >> resolveInScope: aScope currentEntity: currentEntity [
 
-	^ (aScope entity withAllParents flatCollectAsSet: [ :entity | entity reachableEntitiesNamed: identifier ofKinds: { FamixPythonMethod } ])
+	^ (aScope entity withAllParents flatCollectAsSet: [ :anEntity | anEntity reachableEntitiesNamed: identifier ofKinds: { FamixPythonMethod } ])
 		  ifNotEmpty: [ :methods | entity := methods ]
-		  ifEmpty: [ NotFound signal ]
+		  ifEmpty: [ SRNoResolutionPossible signal ]
 ]
