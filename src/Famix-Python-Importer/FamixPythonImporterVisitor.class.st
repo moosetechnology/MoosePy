@@ -382,6 +382,7 @@ FamixPythonImporterVisitor >> initialize [
 
 	super initialize.
 	model := FamixPythonModel new name: 'default Python Model'.
+	model sourceLanguage: model newSourceLanguage.
 	self initialiseSolver.
 	importPaths := IdentityDictionary new
 ]

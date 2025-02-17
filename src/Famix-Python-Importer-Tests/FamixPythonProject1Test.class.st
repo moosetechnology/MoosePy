@@ -2728,6 +2728,12 @@ FamixPythonProject1Test >> testModel [
 	self assert: self model rootFolder equals: FamixPythonBridge parsingExamples / 'project1'
 ]
 
+{ #category : 'tests' }
+FamixPythonProject1Test >> testModelSourceLanguage [
+
+	self assert: self model sourceLanguage class equals: FamixPythonSourceLanguage
+]
+
 { #category : 'tests - from-import' }
 FamixPythonProject1Test >> testModuleImportsClassFromAModule [
 
