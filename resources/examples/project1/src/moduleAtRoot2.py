@@ -11,6 +11,24 @@ moduleAtRoot.sort_list(["a", "b", "c", "d", "e", "f", "g", "h", "i"], [0, 1, 1, 
 
 print(moduleAtRoot.moduleAtRootVariable)
 
+"""
+Multiline
+Comment
+Before single line
+"""
+# Single line comment after multiline
+
+"""
+Multiline
+Comment
+Followed by other multiline
+"""
+"""
+Following
+Multiline
+Comment
+"""
+
 
 def function_with_comment_inside():
     # Comment in function
