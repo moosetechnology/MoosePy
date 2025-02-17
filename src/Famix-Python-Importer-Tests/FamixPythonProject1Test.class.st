@@ -716,6 +716,28 @@ FamixPythonProject1Test >> testConstructor [
 ]
 
 { #category : 'tests - comments' }
+FamixPythonProject1Test >> testDoNotMergeMergeMultiLinesComments [
+
+	| comment comment2 |
+	comment := self model allComments detect: [ :aComment |
+		           aComment sourceText beginsWith: ('"""
+Multiline
+Comment
+Followed by other multiline
+"""' copyReplaceAll: String cr with: String lf) ].
+
+	comment2 := self model allComments detect: [ :aComment |
+		            aComment sourceText beginsWith: ('"""
+Following
+Multiline
+Comment
+"""' copyReplaceAll: String cr with: String lf) ].
+
+	self deny: (comment sourceText includesSubstring: 'Following').
+	self deny: (comment2 sourceText includesSubstring: 'Followed')
+]
+
+{ #category : 'tests - comments' }
 FamixPythonProject1Test >> testDoNotMergeMergeSingleAndMultiLinesComments [
 
 	| comment comment2 |
