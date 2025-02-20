@@ -12,7 +12,7 @@ def function_importing_module():
 
 def function_importing_package():
     from root2 import subpackageInRoot2
-    return subpackageInRoot2.function_returning_75
+    return subpackageInRoot2.function_returning_75()
 
 
 class ClassImportingModule:
