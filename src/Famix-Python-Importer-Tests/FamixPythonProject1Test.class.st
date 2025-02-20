@@ -181,6 +181,21 @@ FamixPythonProject1Test >> testClassImportsModuleFrom [
 	self assert: import sourceText equals: 'from root import moduleToTestSourceAnchor'
 ]
 
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testClassImportsPackageFrom [
+
+	| class package import |
+	self denyEmpty: self model allImports.
+	class := self classNamed: 'ClassImportingPackage'.
+	package := self packageNamed: 'subpackageInRoot2'.
+	import := class outgoingImports detect: [ :pimport | pimport target name = 'subpackageInRoot2' ].
+
+	self assert: import importingEntity equals: class.
+	self assert: import importedEntity equals: package.
+	self assert: import isFromImport.
+	self assert: import sourceText equals: 'from root2 import subpackageInRoot2'
+]
+
 { #category : 'tests - classes' }
 FamixPythonProject1Test >> testClassInClass [
 
@@ -961,6 +976,21 @@ FamixPythonProject1Test >> testFunctionImportsModuleFrom [
 	self assert: import importedEntity equals: module.
 	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root.subpackage1 import moduleInSubPackage1'
+]
+
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testFunctionImportsPackageFrom [
+
+	| function package import |
+	self denyEmpty: self model allImports.
+	function := self functionNamed: 'function_importing_package'.
+	package := self packageNamed: 'subpackageInRoot2'.
+	import := function outgoingImports detect: [ :pimport | pimport target name = 'subpackageInRoot2' ].
+
+	self assert: import importingEntity equals: function.
+	self assert: import importedEntity equals: package.
+	self assert: import isFromImport.
+	self assert: import sourceText equals: 'from root2 import subpackageInRoot2'
 ]
 
 { #category : 'tests - functions' }
@@ -2720,6 +2750,21 @@ FamixPythonProject1Test >> testMethodImportsModuleFrom [
 	self assert: import sourceText equals: 'from root.subpackage1 import moduleInSubPackage1'
 ]
 
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testMethodImportsPackageFrom [
+
+	| method package import |
+	self denyEmpty: self model allImports.
+	method := self methodNamed: 'method_importing_package'.
+	package := self packageNamed: 'subsubpackage1'.
+	import := method outgoingImports detect: [ :pimport | pimport target name = 'subsubpackage1' ].
+
+	self assert: import importingEntity equals: method.
+	self assert: import importedEntity equals: package.
+	self assert: import isFromImport.
+	self assert: import sourceText equals: 'from root.subpackage1 import subsubpackage1'
+]
+
 { #category : 'tests - invocations' }
 FamixPythonProject1Test >> testMethodInvocationFromModule [
 
@@ -3034,6 +3079,21 @@ FamixPythonProject1Test >> testModuleImportsPackage [
 	self assert: import importedEntity equals: (self packageNamed: 'root').
 	self deny: import isFromImport.
 	self assert: import sourceText equals: 'import root'
+]
+
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testModuleImportsPackageFrom [
+
+	| module package import |
+	self denyEmpty: self model allImports.
+	module := self moduleNamed: 'moduleWithModulesAndPackageImport'.
+	package := self packageNamed: 'subpackage1'.
+	import := module outgoingImports detect: [ :pimport | pimport target name = 'subpackage1' ].
+
+	self assert: import importingEntity equals: module.
+	self assert: import importedEntity equals: package.
+	self assert: import isFromImport.
+	self assert: import sourceText equals: 'from root import subpackage1'
 ]
 
 { #category : 'tests - imports' }
@@ -3615,6 +3675,21 @@ FamixPythonProject1Test >> testPackageImportsPackage [
 	self assert: import importedEntity equals: (self packageNamed: 'root').
 	self deny: import isFromImport.
 	self assert: import sourceText equals: 'import root'
+]
+
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testPackageImportsPackageFrom [
+
+	| package package2 import |
+	self denyEmpty: self model allImports.
+	package := self packageNamed: 'root'.
+	package2 := self packageNamed: 'subpackageInRoot2'.
+	import := package outgoingImports detect: [ :pimport | pimport target name = 'subpackageInRoot2' ].
+
+	self assert: import importingEntity equals: package.
+	self assert: import importedEntity equals: package2.
+	self assert: import isFromImport.
+	self assert: import sourceText equals: 'from root2 import subpackageInRoot2'
 ]
 
 { #category : 'tests - imports' }
