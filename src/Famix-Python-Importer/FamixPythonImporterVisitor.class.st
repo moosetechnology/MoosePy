@@ -468,15 +468,20 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 
 	" => x()()/table[x]()
 	This is happening when we invoke the result of an invocation. The parser cannot know what is invoked. I'm ignoring it"
-	({ PyFunctionCallExpressionNode . PySubscriptExpressionNode } anySatisfy: [ :class | aFunctionCallExpression receiver isKindOf: class ] ) ifTrue: [ ^ self ].
+
+	({
+		 PyFunctionCallExpressionNode.
+		 PySubscriptExpressionNode } anySatisfy: [ :class | aFunctionCallExpression receiver isKindOf: class ]) ifTrue: [ ^ self ].
 
 	"=> x()"
 	aFunctionCallExpression hasReceiver ifFalse: [
 		^ self
 			  resolve: ((FamixPythonInvocationOrInstantiationResolvable identifier: aFunctionCallExpression receiver name)
-					   expectedKind: { FamixPythonFunction . FamixPythonClass };
-					   notFoundReplacementEntity: [ :unresolved :currentEntity | { (self ensureStubUnknownEntityNamed: unresolved identifier) } ]; "This one can be a function or a class"
-					   yourself)
+					   expectedKind: {
+							   FamixPythonFunction.
+							   FamixPythonClass };
+					   notFoundReplacementEntity: [ :unresolved :currentEntity | { (self ensureStubUnknownEntityNamed: unresolved identifier) } ];
+					   "This one can be a function or a class"yourself)
 			  foundAction: [ :result :currentEntity |
 				  (result isCollection not and: [ result isClass ])
 					  ifTrue: [
@@ -497,9 +502,17 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 	self findImportMatchingSource: aFunctionCallExpression receiver source ifFound: [ :import |
 		^ self
 			  resolve: ((FamixPythonInvocationOrInstantiationWithNamespaceResolvable identifier: aFunctionCallExpression receiver name import: import)
-					   expectedKind: { FamixPythonFunction . FamixPythonClass };
-					   notFoundReplacementEntity: [ :unresolved :currentEntity | { (self ensureStubUnknownEntityNamed: unresolved identifier) } ]; "This one can be a function or a class"
-					   yourself)
+					   expectedKind: {
+							   FamixPythonFunction.
+							   FamixPythonClass };
+					   notFoundReplacementEntity: [ :unresolved :currentEntity |
+						   | stub |
+						   stub := self ensureStubUnknownEntityNamed: unresolved identifier.
+
+						   stub parentPackage: import importedEntity.
+
+						   stub ];
+					   "This one can be a function or a class"yourself)
 			  foundAction: [ :result :currentEntity |
 				  (result isCollection not and: [ result isClass ])
 					  ifTrue: [
@@ -513,8 +526,8 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 	"=> c.x()"
 	^ self
 		  resolve: ((FamixPythonMethodInvocationResolvable identifier: aFunctionCallExpression receiver name)
-				   notFoundReplacementEntity: [ :unresolved :currentEntity | { (self ensureStubMethodNamed: unresolved identifier) } ]; "This one can be a function or a class"
-				   yourself)
+				   notFoundReplacementEntity: [ :unresolved :currentEntity | { (self ensureStubMethodNamed: unresolved identifier) } ];
+				   "This one can be a function or a class"yourself)
 		  foundAction: [ :methods :currentEntity | self createInvocationOf: methods from: currentEntity node: aFunctionCallExpression ]
 ]
 
