@@ -397,17 +397,17 @@ FamixPythonProject1Test >> testClassShadowedByClass [
 	self deny: shadower isShadowed.
 	self assert: shadower typeContainer equals: (self moduleNamed: 'moduleWithShadowing').
 	self assert: shadower shadowedEntity equals: shadowed.
-	self assert: shadower sourceText equals: ('class ClassShadowedByOtherClass:
+	self assert: shadower sourceText equals: 'class ClassShadowedByOtherClass:
 
     def __init__(self):
-        self.i_var_of_shadowed_class = 3' copyReplaceAll: String cr with: String lf).
+        self.i_var_of_shadowed_class = 3' withPlatformLineEndings.
 
 	self assert: shadowed name equals: 'ClassShadowedByOtherClass'.
 	self assert: shadowed isShadowed.
 	self assert: shadowed typeContainer equals: (self moduleNamed: 'moduleWithShadowing').
 	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
-	self assert: shadowed sourceText equals: ('class ClassShadowedByOtherClass:
-    c_var_of_shadowed_class = True' copyReplaceAll: String cr with: String lf)
+	self assert: shadowed sourceText equals: 'class ClassShadowedByOtherClass:
+    c_var_of_shadowed_class = True' withPlatformLineEndings
 ]
 
 { #category : 'tests - shadowing' }
@@ -421,15 +421,15 @@ FamixPythonProject1Test >> testClassShadowedByFunction [
 	self deny: shadower isShadowed.
 	self assert: shadower functionOwner equals: (self moduleNamed: 'moduleWithShadowing').
 	self assert: shadower shadowedEntity equals: shadowed.
-	self assert: shadower sourceText equals: ('def shadowedName():
-    print("I''m the last one so I win")' copyReplaceAll: String cr with: String lf).
+	self assert: shadower sourceText equals: 'def shadowedName():
+    print("I''m the last one so I win")' withPlatformLineEndings.
 
 	self assert: shadowed name equals: 'shadowedName'.
 	self assert: shadowed isShadowed.
 	self assert: shadowed typeContainer equals: (self moduleNamed: 'moduleWithShadowing').
 	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
-	self assert: shadowed sourceText equals: ('class shadowedName:
-    shadowedNameVar = 2' copyReplaceAll: String cr with: String lf)
+	self assert: shadowed sourceText equals: 'class shadowedName:
+    shadowedNameVar = 2' withPlatformLineEndings
 ]
 
 { #category : 'tests - shadowing' }
@@ -449,8 +449,8 @@ FamixPythonProject1Test >> testClassShadowedByGlobal [
 	self assert: shadowed isShadowed.
 	self assert: shadowed typeContainer equals: (self moduleNamed: 'moduleWithShadowing').
 	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
-	self assert: shadowed sourceText equals: ('class ClassShadowedByGlobal:
-    pass' copyReplaceAll: String cr with: String lf)
+	self assert: shadowed sourceText equals: 'class ClassShadowedByGlobal:
+    pass' withPlatformLineEndings
 ]
 
 { #category : 'tests - attributes' }
@@ -720,18 +720,18 @@ FamixPythonProject1Test >> testDoNotMergeMergeMultiLinesComments [
 
 	| comment comment2 |
 	comment := self model allComments detect: [ :aComment |
-		           aComment sourceText beginsWith: ('"""
+		           aComment sourceText beginsWith: '"""
 Multiline
 Comment
 Followed by other multiline
-"""' copyReplaceAll: String cr with: String lf) ].
+"""' withPlatformLineEndings ].
 
 	comment2 := self model allComments detect: [ :aComment |
-		            aComment sourceText beginsWith: ('"""
+		            aComment sourceText beginsWith: '"""
 Following
 Multiline
 Comment
-"""' copyReplaceAll: String cr with: String lf) ].
+"""' withPlatformLineEndings ].
 
 	self deny: (comment sourceText includesSubstring: 'Following').
 	self deny: (comment2 sourceText includesSubstring: 'Followed')
@@ -742,11 +742,11 @@ FamixPythonProject1Test >> testDoNotMergeMergeSingleAndMultiLinesComments [
 
 	| comment comment2 |
 	comment := self model allComments detect: [ :aComment |
-		           aComment sourceText beginsWith: ('"""
+		           aComment sourceText beginsWith: '"""
 Multiline
 Comment
 Before single line
-"""' copyReplaceAll: String cr with: String lf) ].
+"""' withPlatformLineEndings ].
 
 	comment2 := self model allComments detect: [ :aComment | aComment sourceText beginsWith: '# Single line comment after multiline' ].
 
@@ -1424,15 +1424,15 @@ FamixPythonProject1Test >> testFunctionShadowedByClass [
 	self deny: shadower isShadowed.
 	self assert: shadower typeContainer equals: (self moduleNamed: 'moduleWithShadowing').
 	self assert: shadower shadowedEntity equals: shadowed.
-	self assert: shadower sourceText equals: ('class function_shadowed_by_class:
-    pass' copyReplaceAll: String cr with: String lf).
+	self assert: shadower sourceText equals: 'class function_shadowed_by_class:
+    pass' withPlatformLineEndings.
 
 	self assert: shadowed name equals: 'function_shadowed_by_class'.
 	self assert: shadowed isShadowed.
 	self assert: shadowed functionOwner equals: (self moduleNamed: 'moduleWithShadowing').
 	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
-	self assert: shadowed sourceText equals: ('def function_shadowed_by_class():
-    return 2' copyReplaceAll: String cr with: String lf)
+	self assert: shadowed sourceText equals: 'def function_shadowed_by_class():
+    return 2' withPlatformLineEndings
 ]
 
 { #category : 'tests - shadowing' }
@@ -1448,15 +1448,15 @@ FamixPythonProject1Test >> testFunctionShadowedByFunction [
 	self deny: shadower isShadowed.
 	self assert: shadower functionOwner equals: (self moduleNamed: 'moduleAtRoot6').
 	self assert: shadower shadowedEntity equals: shadowed.
-	self assert: shadower sourceText equals: ('def function_to_shadow():
-    return 2' copyReplaceAll: String cr with: String lf).
+	self assert: shadower sourceText equals: 'def function_to_shadow():
+    return 2' withPlatformLineEndings.
 
 	self assert: shadowed name equals: 'function_to_shadow'.
 	self assert: shadowed isShadowed.
 	self assert: shadowed functionOwner equals: (self moduleNamed: 'moduleAtRoot6').
 	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
-	self assert: shadowed sourceText equals: ('def function_to_shadow():
-    return 1' copyReplaceAll: String cr with: String lf)
+	self assert: shadowed sourceText equals: 'def function_to_shadow():
+    return 1' withPlatformLineEndings
 ]
 
 { #category : 'tests - shadowing' }
@@ -1471,14 +1471,14 @@ FamixPythonProject1Test >> testFunctionShadowedByGlobal [
 	self assert: shadower isShadowed. "<= In that case the shadower is also shadowed later"
 	self assert: shadower parentScope equals: (self moduleNamed: 'moduleWithShadowing').
 	self assert: shadower shadowedEntity equals: shadowed.
-	self assert: shadower sourceText equals: ('global_then_function_then_global_then_class' copyReplaceAll: String cr with: String lf).
+	self assert: shadower sourceText equals: 'global_then_function_then_global_then_class' withPlatformLineEndings.
 
 	self assert: shadowed name equals: 'global_then_function_then_global_then_class'.
 	self assert: shadowed isShadowed.
 	self assert: shadowed functionOwner equals: (self moduleNamed: 'moduleWithShadowing').
 	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
-	self assert: shadowed sourceText equals: ('def global_then_function_then_global_then_class():
-    print(14)' copyReplaceAll: String cr with: String lf)
+	self assert: shadowed sourceText equals: 'def global_then_function_then_global_then_class():
+    print(14)' withPlatformLineEndings
 ]
 
 { #category : 'tests - shadowing' }
@@ -1492,18 +1492,18 @@ FamixPythonProject1Test >> testFunctionShadowedByTemporary [
 	self deny: shadower isShadowed.
 	self assert: shadower parentBehaviouralEntity equals: shadowed.
 	self assert: shadower shadowedEntity equals: shadowed.
-	self assert: shadower sourceText equals: ('function_with_local_of_same_name' copyReplaceAll: String cr with: String lf).
+	self assert: shadower sourceText equals: 'function_with_local_of_same_name'.
 
 	self assert: shadowed name equals: 'function_with_local_of_same_name'.
 	self assert: shadowed isShadowed.
 	self assert: shadowed functionOwner equals: (self moduleNamed: 'moduleWithShadowing').
 	self assertCollection: shadowed shadowingEntities hasSameElements: { shadower }.
-	self assert: shadowed sourceText equals: ('def function_with_local_of_same_name(init):
+	self assert: shadowed sourceText equals: 'def function_with_local_of_same_name(init):
     if init > 10:
         return init
 
     function_with_local_of_same_name = init
-    return function_with_local_of_same_name + 3' copyReplaceAll: String cr with: String lf)
+    return function_with_local_of_same_name + 3' withPlatformLineEndings
 ]
 
 { #category : 'tests - shadowing' }
@@ -1526,8 +1526,8 @@ FamixPythonProject1Test >> testFunctionShadowedTwice [
 	self deny: shadower2 isShadowed.
 	self assert: shadower2 functionOwner equals: (self moduleNamed: 'moduleWithShadowing').
 	self assert: shadower2 shadowedEntity equals: shadowed.
-	self assert: shadower2 sourceText equals: ('def function_shadowed_twice():
-    return 4' copyReplaceAll: String cr with: String lf).
+	self assert: shadower2 sourceText equals: 'def function_shadowed_twice():
+    return 4' withPlatformLineEndings.
 
 	self assert: shadowed name equals: 'function_shadowed_twice'.
 	self assert: shadowed isShadowed.
@@ -1535,12 +1535,12 @@ FamixPythonProject1Test >> testFunctionShadowedTwice [
 	self assertCollection: shadowed shadowingEntities hasSameElements: {
 			shadower.
 			shadower2 }.
-	self assert: shadowed sourceText equals: ('def function_shadowed_twice(init):
+	self assert: shadowed sourceText equals: 'def function_shadowed_twice(init):
     if init > 10:
         return init
 
     function_shadowed_twice = init
-    return function_shadowed_twice + 3' copyReplaceAll: String cr with: String lf)
+    return function_shadowed_twice + 3' withPlatformLineEndings
 ]
 
 { #category : 'tests - functions' }
@@ -1552,10 +1552,10 @@ FamixPythonProject1Test >> testFunctionSourceAnchor [
 	function := self functionNamed: 'sort_list'.
 
 	self assert: function sourceAnchor isNotNil.
-	self assert: function sourceText equals: ('def sort_list(list1, list2):
+	self assert: function sourceText equals: 'def sort_list(list1, list2):
     zipped_pairs = zip(list2, list1)
     z = [x for _, x in sorted(zipped_pairs)]
-    return z' copyReplaceAll: String cr with: String lf)
+    return z' withPlatformLineEndings
 ]
 
 { #category : 'tests - functions' }
@@ -1603,9 +1603,9 @@ FamixPythonProject1Test >> testGlobalShadowedByClass [
 	self deny: shadower isShadowed.
 	self assert: shadower typeContainer equals: (self moduleNamed: 'moduleWithShadowing').
 	self assert: shadower shadowedEntity equals: shadowed.
-	self assert: shadower sourceText equals: ('class global_then_function_then_global_then_class:
+	self assert: shadower sourceText equals: 'class global_then_function_then_global_then_class:
     def __init__(self):
-        print(16)' copyReplaceAll: String cr with: String lf).
+        print(16)' withPlatformLineEndings.
 
 	self assert: shadowed name equals: 'global_then_function_then_global_then_class'.
 	self assert: shadowed isShadowed.
@@ -1626,8 +1626,8 @@ FamixPythonProject1Test >> testGlobalShadowedByFunction [
 	self assert: shadower isShadowed. "<= In that case the shadower is also shadowed later"
 	self assert: shadower functionOwner equals: (self moduleNamed: 'moduleWithShadowing').
 	self assert: shadower shadowedEntity equals: shadowed.
-	self assert: shadower sourceText equals: ('def global_then_function_then_global_then_class():
-    print(14)' copyReplaceAll: String cr with: String lf).
+	self assert: shadower sourceText equals: 'def global_then_function_then_global_then_class():
+    print(14)' withPlatformLineEndings.
 
 	self assert: shadowed name equals: 'global_then_function_then_global_then_class'.
 	self assert: shadowed isShadowed.
@@ -2568,7 +2568,7 @@ FamixPythonProject1Test >> testMergeFollowingSingleLineComments [
     # Comment line 3
 '. '# Other comment line 4
     # Other comment line 5
-' } collect: [ :comment | comment copyReplaceAll: String cr with: String lf ])
+' } collect: [ :comment | comment withPlatformLineEndings ])
 ]
 
 { #category : 'tests - from-import' }
@@ -2714,10 +2714,10 @@ FamixPythonProject1Test >> testMethodSourceAnchor [
 	method := self methodNamed: 'printInfos'.
 
 	self assert: method sourceAnchor isNotNil.
-	self assert: method sourceText equals: ('def printInfos(self):
+	self assert: method sourceText equals: 'def printInfos(self):
         import moduleAtRoot4
         if not moduleAtRoot3.moduleAtRootVariable3:
-            print(self.get_name() + moduleAtRoot4.moduleAtRootSpaceString + str(self.age))' copyReplaceAll: String cr with: String lf)
+            print(self.get_name() + moduleAtRoot4.moduleAtRootSpaceString + str(self.age))' withPlatformLineEndings
 ]
 
 { #category : 'tests' }
@@ -3211,11 +3211,11 @@ FamixPythonProject1Test >> testMultilineCommentBeforeClass [
 
 	| comment |
 	comment := self model allComments detect: [ :aComment |
-		           aComment sourceText beginsWith: ('"""
+		           aComment sourceText beginsWith: '"""
 Multiline
 Comment
 Before class
-"""' copyReplaceAll: String cr with: String lf) ].
+"""' withPlatformLineEndings ].
 
 	self assert: comment class equals: FamixPythonComment.
 	self assert: comment commentedEntity equals: (self classNamed: 'ClassWihtComments')
@@ -3226,11 +3226,11 @@ FamixPythonProject1Test >> testMultilineCommentBeforeFunction [
 
 	| comment |
 	comment := self model allComments detect: [ :aComment |
-		           aComment sourceText beginsWith: ('"""
+		           aComment sourceText beginsWith: '"""
 Multiline
 Comment
 Before function
-"""' copyReplaceAll: String cr with: String lf) ].
+"""' withPlatformLineEndings ].
 
 	self assert: comment class equals: FamixPythonComment.
 	self assert: comment commentedEntity equals: (self functionNamed: 'function_containing_multiline_comment')
@@ -3241,11 +3241,11 @@ FamixPythonProject1Test >> testMultilineCommentBeforeGlobal [
 
 	| comment |
 	comment := self model allComments detect: [ :aComment |
-		           aComment sourceText beginsWith: ('"""
+		           aComment sourceText beginsWith: '"""
 Multiline
 Comment
 Before global
-"""' copyReplaceAll: String cr with: String lf) ].
+"""' withPlatformLineEndings ].
 
 	self assert: comment class equals: FamixPythonComment.
 	self assert: comment commentedEntity equals: (self globalVariableNamed: 'global_with_multiline_comment')
@@ -3256,11 +3256,11 @@ FamixPythonProject1Test >> testMultilineCommentBeforeIvar [
 
 	| comment |
 	comment := self model allComments detect: [ :aComment |
-		           aComment sourceText beginsWith: ('"""
+		           aComment sourceText beginsWith: '"""
         Multiline
         Comment
         Before ivar
-        """' copyReplaceAll: String cr with: String lf) ].
+        """' withPlatformLineEndings ].
 
 	self assert: comment class equals: FamixPythonComment.
 	self assert: comment commentedEntity equals: (self attributeNamed: 'ivar_commented')
@@ -3271,11 +3271,11 @@ FamixPythonProject1Test >> testMultilineCommentBeforeLocal [
 
 	| comment |
 	comment := self model allComments detect: [ :aComment |
-		           aComment sourceText beginsWith: ('"""
+		           aComment sourceText beginsWith: '"""
     Multiline
     Comment
     Before temp
-    """' copyReplaceAll: String cr with: String lf) ].
+    """' withPlatformLineEndings ].
 
 	self assert: comment class equals: FamixPythonComment.
 	self assert: comment commentedEntity equals: (self localVariableNamed: 'temp_with_multiline_comment_before')
@@ -3286,11 +3286,11 @@ FamixPythonProject1Test >> testMultilineCommentBeforeMethod [
 
 	| comment |
 	comment := self model allComments detect: [ :aComment |
-		           aComment sourceText beginsWith: ('"""
+		           aComment sourceText beginsWith: '"""
     Multiline
     Comment
     Before method
-    """' copyReplaceAll: String cr with: String lf) ].
+    """' withPlatformLineEndings ].
 
 	self assert: comment class equals: FamixPythonComment.
 	self assert: comment commentedEntity equals: (self methodNamed: 'get_ivar_commented')
@@ -3301,11 +3301,11 @@ FamixPythonProject1Test >> testMultilineCommentInClass [
 
 	| comment |
 	comment := self model allComments detect: [ :aComment |
-		           aComment sourceText beginsWith: ('"""
+		           aComment sourceText beginsWith: '"""
     Multiline
     Comment
     In Class
-    """' copyReplaceAll: String cr with: String lf) ].
+    """' withPlatformLineEndings ].
 
 	self assert: comment class equals: FamixPythonComment.
 	self assert: comment commentedEntity equals: (self classNamed: 'ClassWihtComments')
@@ -3316,11 +3316,11 @@ FamixPythonProject1Test >> testMultilineCommentInFunction [
 
 	| comment |
 	comment := self model allComments detect: [ :aComment |
-		           aComment sourceText beginsWith: ('"""
+		           aComment sourceText beginsWith: '"""
     Multiline
     Comment
     In function
-    """' copyReplaceAll: String cr with: String lf) ].
+    """' withPlatformLineEndings ].
 
 	self assert: comment class equals: FamixPythonComment.
 	self assert: comment commentedEntity equals: (self functionNamed: 'function_containing_multiline_comment')
@@ -3331,11 +3331,11 @@ FamixPythonProject1Test >> testMultilineCommentInMethod [
 
 	| comment |
 	comment := self model allComments detect: [ :aComment |
-		           aComment sourceText beginsWith: ('"""
+		           aComment sourceText beginsWith: '"""
         Multiline
         Comment
         In method
-        """' copyReplaceAll: String cr with: String lf) ].
+        """' withPlatformLineEndings ].
 
 	self assert: comment class equals: FamixPythonComment.
 	self assert: comment commentedEntity equals: (self methodNamed: 'get_ivar_commented')
@@ -3346,11 +3346,11 @@ FamixPythonProject1Test >> testMultilineCommentInModule [
 
 	| comment |
 	comment := self model allComments detect: [ :aComment |
-		           aComment sourceText beginsWith: ('"""
+		           aComment sourceText beginsWith: '"""
 Multiline
 Comment
 In module
-"""' copyReplaceAll: String cr with: String lf) ].
+"""' withPlatformLineEndings ].
 
 	self assert: comment class equals: FamixPythonComment.
 	self assert: comment commentedEntity equals: (self moduleNamed: 'moduleAtRoot2')
@@ -3361,11 +3361,11 @@ FamixPythonProject1Test >> testMultilineCommentInPackage [
 
 	| comment |
 	comment := self model allComments detect: [ :aComment |
-		           aComment sourceText beginsWith: ('"""
+		           aComment sourceText beginsWith: '"""
 Multiline
 Comment
 In package
-"""' copyReplaceAll: String cr with: String lf) ].
+"""' withPlatformLineEndings ].
 
 	self assert: comment class equals: FamixPythonComment.
 	self assert: comment commentedEntity equals: (self packageNamed: 'NameOfSubpackageOrClass')
@@ -3723,7 +3723,7 @@ FamixPythonProject1Test >> testPackageSourceAnchorWithComment [
 	rootPackage := self packageNamed: 'NameOfSubpackageOrClass'.
 
 	self assert: rootPackage sourceAnchor mooseModel equals: self model.
-	self assert: rootPackage sourceAnchor sourceText equals: ('# The goal of this subpackage is to have the same name as a class in the parent package
+	self assert: rootPackage sourceAnchor sourceText equals: '# The goal of this subpackage is to have the same name as a class in the parent package
 
 print("I have the same name as a class")
 
@@ -3731,7 +3731,7 @@ print("I have the same name as a class")
 Multiline
 Comment
 In package
-"""' copyReplaceAll: String cr with: String lf)
+"""' withPlatformLineEndings
 ]
 
 { #category : 'tests' }
@@ -4244,8 +4244,8 @@ FamixPythonProject1Test >> testShadowableFunctionWithDifferentParameter [
 	self assert: function signature equals: 'function_to_shadow_with_different_signature(age)'.
 	self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot6').
 	self assert: function shadowedEntity equals: shadowable.
-	self assert: function sourceText equals: ('def function_to_shadow_with_different_signature(age):
-    return age' copyReplaceAll: String cr with: String lf)
+	self assert: function sourceText equals: 'def function_to_shadow_with_different_signature(age):
+    return age' withPlatformLineEndings
 ]
 
 { #category : 'tests - shadowing' }
@@ -4272,8 +4272,8 @@ FamixPythonProject1Test >> testShadowedFunctionWithDifferentParameter [
 	self assert: function signature equals: 'function_to_shadow_with_different_signature()'.
 	self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot6').
 	self assertCollection: function shadowingEntities hasSameElements: { shadower }.
-	self assert: function sourceText equals: ('def function_to_shadow_with_different_signature():
-    return 7' copyReplaceAll: String cr with: String lf)
+	self assert: function sourceText equals: 'def function_to_shadow_with_different_signature():
+    return 7' withPlatformLineEndings
 ]
 
 { #category : 'tests - classes' }
@@ -4434,7 +4434,7 @@ FamixPythonProject1Test >> testSourceAnchorModule [
 	module := self moduleNamed: 'moduleToTestSourceAnchor'.
 
 	self assert: module sourceAnchor isNotNil.
-	self assert: module sourceText equals:('# DO NOT UPDATE THIS MODULE CONTENT THIS IS TO TEST SOURCE ANCHOR
+	self assert: module sourceText equals: '# DO NOT UPDATE THIS MODULE CONTENT THIS IS TO TEST SOURCE ANCHOR
 
 def fibonacci(n):
 
@@ -4459,7 +4459,7 @@ def fibonacci(n):
 
 # Driver Program
 print(fibonacci(9))
-' copyReplaceAll: String cr with: String lf)
+' withPlatformLineEndings
 ]
 
 { #category : 'tests - packages' }
