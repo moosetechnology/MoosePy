@@ -3653,7 +3653,7 @@ FamixPythonProject1Test >> testPackageImportsModuleFrom [
 
 	| package module import |
 	self denyEmpty: self model allImports.
-	package := self packageNamed: 'root'.
+	package := self packageNamed: 'root3'.
 	module := self moduleNamed: 'moduleInRootPackage2'.
 	import := package outgoingImports detect: [ :pimport | pimport target name = 'moduleInRootPackage2' ].
 
@@ -3682,7 +3682,7 @@ FamixPythonProject1Test >> testPackageImportsPackageFrom [
 
 	| package package2 import |
 	self denyEmpty: self model allImports.
-	package := self packageNamed: 'root'.
+	package := self packageNamed: 'root3'.
 	package2 := self packageNamed: 'subpackageInRoot2'.
 	import := package outgoingImports detect: [ :pimport | pimport target name = 'subpackageInRoot2' ].
 
