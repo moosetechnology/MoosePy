@@ -40,6 +40,12 @@ PyVariableExpressionNode >> isSuperclassDeclaration [
 ]
 
 { #category : '*Famix-Python-Importer' }
+PyVariableExpressionNode >> isVariableExpression [
+
+	^ true
+]
+
+{ #category : '*Famix-Python-Importer' }
 PyVariableExpressionNode >> name [
 
 	^ self nameToken value

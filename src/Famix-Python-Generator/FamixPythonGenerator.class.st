@@ -205,6 +205,7 @@ FamixPythonGenerator >> defineHierarchy [
 	unknownEntity --|> #TImportable.
 	unknownEntity --|> #TPackageable.
 	unknownEntity --|> #TInvocable.
+	unknownEntity --|> #TPackage. "Sometimes we know later it can be a package and we use this info"
 	
 	unknowAccessOrReference --|> #TAssociation
 ]

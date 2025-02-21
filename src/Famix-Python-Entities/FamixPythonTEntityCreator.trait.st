@@ -264,3 +264,10 @@ FamixPythonTEntityCreator >> newUnknownEntity [
 	<generated>
 	^ self add: FamixPythonUnknownEntity new
 ]
+
+{ #category : 'entity creation' }
+FamixPythonTEntityCreator >> newUnknownEntityNamed: aName [
+
+	<generated>
+	^ self add: (FamixPythonUnknownEntity named: aName)
+]

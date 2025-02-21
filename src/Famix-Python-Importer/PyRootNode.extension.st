@@ -72,6 +72,12 @@ PyRootNode >> isSubscriptExpression [
 ]
 
 { #category : '*Famix-Python-Importer' }
+PyRootNode >> isVariableExpression [
+
+	^ false
+]
+
+{ #category : '*Famix-Python-Importer' }
 PyRootNode >> sourceFrom: startPosition to: stopPosition [
 
 	^ self completeSource ifNotNil: [ :value | (value copyFrom: startPosition to: stopPosition) asString ]

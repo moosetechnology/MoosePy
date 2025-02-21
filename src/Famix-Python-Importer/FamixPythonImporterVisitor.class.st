@@ -55,6 +55,19 @@ FamixPythonImporterVisitor >> classNamed: aName [
 		  ifNone: [ nil ]
 ]
 
+{ #category : 'visiting' }
+FamixPythonImporterVisitor >> createAssociationsForFunctionCallNode: aFunctionCallExpression forResult: result in: currentEntity [
+
+	^ (result isCollection not and: [ result isClass ])
+		  ifTrue: [
+			  | reference |
+			  reference := result createAccessOrReferenceFrom: currentEntity node: aFunctionCallExpression.
+			  self setSourceAnchor: reference from: aFunctionCallExpression.
+
+			  self createInvocationOf: (self getConstructorOf: result) from: currentEntity node: aFunctionCallExpression ]
+		  ifFalse: [ self createInvocationOf: result from: currentEntity node: aFunctionCallExpression ]
+]
+
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> createClass: classDefinitionNode [
 
@@ -460,7 +473,8 @@ FamixPythonImporterVisitor >> relativeFilePath: aNode [
 FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCallExpression [
 	"When we end up here we might have multiple cases to manage:
 	- x() => This is either a function invocation or instantiation. There should be no stub. 
-	- package.module.x() => Function invocation of instantiation comming from one of the import. Stub is an unknown entity.
+	- package.module.x() => Function invocation or instantiation comming from one of the import. Stub is an unknown entity.
+	- module.x() with `from package import module` => Function invecation or instantiation from an imported module. Stub is an unknown entity.
 	- self.x() => Method invocation. There should be no stub.
 	- c.x() => Method invocation. Can be a stub method
 	- x()() => Invocation or Instantiation of the result of another invocation. This we cannot really treat it here so for now I'll just ignore this case.
@@ -480,17 +494,10 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 					   expectedKind: {
 							   FamixPythonFunction.
 							   FamixPythonClass };
-					   notFoundReplacementEntity: [ :unresolved :currentEntity | { (self ensureStubUnknownEntityNamed: unresolved identifier) } ];
-					   "This one can be a function or a class"yourself)
-			  foundAction: [ :result :currentEntity |
-				  (result isCollection not and: [ result isClass ])
-					  ifTrue: [
-						  | reference |
-						  reference := result createAccessOrReferenceFrom: currentEntity node: aFunctionCallExpression.
-						  self setSourceAnchor: reference from: aFunctionCallExpression.
-
-						  self createInvocationOf: (self getConstructorOf: result) from: currentEntity node: aFunctionCallExpression ]
-					  ifFalse: [ self createInvocationOf: result from: currentEntity node: aFunctionCallExpression ] ] ].
+					   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one can be a function or a class"
+						   { (self ensureStubUnknownEntityNamed: unresolved identifier) } ];
+					   yourself)
+			  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aFunctionCallExpression forResult: result in: currentEntity ] ].
 
 	"=> self.x()"
 	aFunctionCallExpression isLocalMethodInvocation ifTrue: [
@@ -505,30 +512,30 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 					   expectedKind: {
 							   FamixPythonFunction.
 							   FamixPythonClass };
-					   notFoundReplacementEntity: [ :unresolved :currentEntity |
-						   | stub |
-						   stub := self ensureStubUnknownEntityNamed: unresolved identifier.
+					   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one can be a function or a class"
+						   (self ensureStubUnknownEntityNamed: unresolved identifier)
+							   parentPackage: import importedEntity;
+							   yourself ];
+					   yourself)
+			  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aFunctionCallExpression forResult: result in: currentEntity ] ].
 
-						   stub parentPackage: import importedEntity.
-
-						   stub ];
-					   "This one can be a function or a class"yourself)
-			  foundAction: [ :result :currentEntity |
-				  (result isCollection not and: [ result isClass ])
-					  ifTrue: [
-						  | reference |
-						  reference := result createAccessOrReferenceFrom: currentEntity node: aFunctionCallExpression.
-						  self setSourceAnchor: reference from: aFunctionCallExpression.
-
-						  self createInvocationOf: (self getConstructorOf: result) from: currentEntity node: aFunctionCallExpression ]
-					  ifFalse: [ self createInvocationOf: result from: currentEntity node: aFunctionCallExpression ] ] ].
-
-	"=> c.x()"
+	"=> c.x() or module.x() with `from package import module`"
 	^ self
-		  resolve: ((FamixPythonMethodInvocationResolvable identifier: aFunctionCallExpression receiver name)
-				   notFoundReplacementEntity: [ :unresolved :currentEntity | { (self ensureStubMethodNamed: unresolved identifier) } ];
-				   "This one can be a function or a class"yourself)
-		  foundAction: [ :methods :currentEntity | self createInvocationOf: methods from: currentEntity node: aFunctionCallExpression ]
+		  resolve: ((FamixPythonInvocationOrInstantiationWithUnknownReceiverResolvable
+				    identifier: aFunctionCallExpression receiver name
+				    node: aFunctionCallExpression
+				    visitor: self)
+				   notFoundReplacementEntity: [ :unresolved :currentEntity | "Two case possible:
+						- The receiver is an import of a stub module or package and we should create an unknown entity that can be a function or a class invoked
+						- The receiver is not an imported module or package but an instance of a class and the entity is a stub method"
+					   unresolved hasCorrespondingImport
+						   ifTrue: [
+							   (self ensureStubUnknownEntityNamed: unresolved identifier)
+								   parentPackage: unresolved correspondingImport importedEntity;
+								   yourself ]
+						   ifFalse: [ { (self ensureStubMethodNamed: unresolved identifier) } ] ];
+				   yourself)
+		  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aFunctionCallExpression forResult: result in: currentEntity ]
 ]
 
 { #category : 'accessing - modules' }

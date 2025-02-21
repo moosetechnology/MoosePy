@@ -1070,6 +1070,23 @@ FamixPythonProject1Test >> testFunctionInvocationFromFunction [
 ]
 
 { #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationFromImportedModule [
+
+	| invokerFunction function invocation |
+	function := self functionNamed: 'function_returning_75'.
+	invokerFunction := self functionNamed: 'function_importing_package'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = invokerFunction ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: invokerFunction.
+	self assert: invocation sender equals: invokerFunction.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation invokedEntity equals: function.
+	self assert: (invokerFunction outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
+]
+
+{ #category : 'tests - invocations' }
 FamixPythonProject1Test >> testFunctionInvocationFromLambda [
 
 	| lambda function invocation |
@@ -4610,6 +4627,102 @@ def fibonacci(n):
 # Driver Program
 print(fibonacci(9))
 ' withPlatformLineEndings
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testStubFunctionInvocationFromFromImportedModule [
+
+	| module function invocation |
+	function := self unknownEntityNamed: 'function'.
+	module := self moduleNamed: 'moduleAtRoot10'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assert: function isStub.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation invokedEntity equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testStubFunctionInvocationFromFromImportedModuleHasParent [
+
+	| module function invocation |
+	function := self unknownEntityNamed: 'function'.
+	module := self moduleNamed: 'moduleAtRoot10'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: function isStub.
+	self assert: function parentPackage equals: (self unknownEntityNamed: 'subpackage').
+	self assert: function parentPackage isStub.
+	self assert: function parentPackage parentPackage equals: (self packageNamed: 'package').
+	self assert: function parentPackage parentPackage isStub
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testStubFunctionInvocationFromImportedModule [
+
+	| module function invocation |
+	function := self unknownEntityNamed: 'read_csv'.
+	module := self moduleNamed: 'moduleAtRoot7'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assert: function isStub.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation invokedEntity equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testStubFunctionInvocationFromImportedModuleHasParent [
+
+	| module function invocation |
+	function := self unknownEntityNamed: 'read_csv'.
+	module := self moduleNamed: 'moduleAtRoot7'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: function isStub.
+	self assert: function parentPackage equals: (self packageNamed: 'pandas')
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testStubFunctionInvocationFromImportedModuleWithAlias [
+
+	| module function invocation |
+	function := self unknownEntityNamed: 'read_csv'.
+	module := self moduleNamed: 'moduleAtRoot8'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assert: function isStub.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation invokedEntity equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testStubFunctionInvocationFromImportedModuleWithAliasHasParent [
+
+	| module function invocation |
+	function := self unknownEntityNamed: 'read_csv'.
+	module := self moduleNamed: 'moduleAtRoot8'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: function isStub.
+	self assert: function parentPackage equals: (self packageNamed: 'pandas')
 ]
 
 { #category : 'tests - packages' }
