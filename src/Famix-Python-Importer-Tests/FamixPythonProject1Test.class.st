@@ -2389,6 +2389,14 @@ FamixPythonProject1Test >> testInvocationOfStubFunctionWithNamespace [
 	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
 ]
 
+{ #category : 'tests - unknown access or reference' }
+FamixPythonProject1Test >> testKeywordsParametersShouldNotCreateAccessOrReference [
+	"Regression test"
+
+	self deny: ((self model allWithType: FamixPythonUnknownEntity) anySatisfy: [ :entity | entity name = 'param1' ]).
+	self deny: ((self model allWithType: FamixPythonUnknownEntity) anySatisfy: [ :entity | entity name = 'param2' ])
+]
+
 { #category : 'tests - lambdas' }
 FamixPythonProject1Test >> testLambdaInAClass [
 

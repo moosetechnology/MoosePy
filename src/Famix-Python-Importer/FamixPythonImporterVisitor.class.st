@@ -328,7 +328,7 @@ FamixPythonImporterVisitor >> ensureStubPackagesFromPath: aPythonImportPath [
 
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> ensureStubUnknownEntityNamed: aString [
-
+	(aString = 'param1') ifTrue: [ 1halt. ].
 	^ (self unknownEntityNamed: aString) ifNil: [
 		  model newUnknownEntity
 			  name: aString;
@@ -589,6 +589,12 @@ FamixPythonImporterVisitor >> unknownEntityNamed: aString [
 	^ (self model allWithType: FamixPythonUnknownEntity)
 		  detect: [ :e | e name = aString ]
 		  ifNone: [ nil ]
+]
+
+{ #category : 'visiting' }
+FamixPythonImporterVisitor >> visitArgumentKeyword: anAssignedInstanceVariable [
+
+	self flag: #todo
 ]
 
 { #category : 'generated' }

@@ -18,6 +18,12 @@ PyRootNode >> fileReference [
 ]
 
 { #category : '*Famix-Python-Importer' }
+PyRootNode >> isArgumentNode [
+
+	^ false
+]
+
+{ #category : '*Famix-Python-Importer' }
 PyRootNode >> isAssignation [
 
 	^ false

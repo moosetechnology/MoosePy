@@ -1,6 +1,12 @@
 Extension { #name : 'TPyRootNodeVisitor' }
 
 { #category : '*Famix-Python-Importer' }
+TPyRootNodeVisitor >> visitArgumentKeyword: anAssignedInstanceVariable [
+
+	^ self visitVariableExpression: anAssignedInstanceVariable
+]
+
+{ #category : '*Famix-Python-Importer' }
 TPyRootNodeVisitor >> visitAssignedInstanceVariable: anAssignedInstanceVariable [
 
 	^ self visitVariableExpression: anAssignedInstanceVariable
