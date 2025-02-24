@@ -1,4 +1,7 @@
 from root2 import NameOfSubpackageOrClass
+import pandas
+
+pandas.read_csv("https://raw.githubusercontent.com/cs109/2014_data/master/countries.csv")
 
 print(NameOfSubpackageOrClass)
 
