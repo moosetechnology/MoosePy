@@ -53,12 +53,13 @@ FamixPythonImporter >> import: aFileName [
 
 	| fileReference |
 	visitor := FamixPythonImporterVisitor new.
-	visitor rootFilePath: aFileName.
-
 	fileReference := aFileName asFileReference.
+
 	visitor model
 		name: fileReference basename;
-		rootFolder: aFileName asFileReference.
+		rootFolder: (fileReference isFile
+				 ifTrue: [ fileReference parent ]
+				 ifFalse: [ aFileName ]). "If we parse a folder, it will be the root. If it's just a file, we consider that the root is its parent"
 
 	self importFileReference: fileReference.
 

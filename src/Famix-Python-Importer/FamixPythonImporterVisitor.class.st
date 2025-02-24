@@ -5,7 +5,6 @@ Class {
 	#classTraits : 'SRTSolverUserVisitor classTrait',
 	#instVars : [
 		'model',
-		'rootFilePath',
 		'importPaths'
 	],
 	#category : 'Famix-Python-Importer-Visitors',
@@ -461,12 +460,11 @@ FamixPythonImporterVisitor >> parentFileForNode: aPyNode [
 FamixPythonImporterVisitor >> relativeFilePath: aNode [
 
 	| parentFileName |
-
 	parentFileName := (self parentFileForNode: aNode) attributes at: #filename.
-	
-	rootFilePath ifNil: [	^(parentFileName fullName removePrefix: '/')].
 
-	^(parentFileName relativeTo: rootFilePath asPath) pathString
+	self model rootFolder ifNil: [ ^ parentFileName fullName removePrefix: '/' ].
+
+	^ (parentFileName relativeTo: self model rootFolder asPath) pathString
 ]
 
 { #category : 'visiting' }
@@ -536,19 +534,6 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 						   ifFalse: [ { (self ensureStubMethodNamed: unresolved identifier) } ] ];
 				   yourself)
 		  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aFunctionCallExpression forResult: result in: currentEntity ]
-]
-
-{ #category : 'accessing - modules' }
-FamixPythonImporterVisitor >> rootFilePath [
-
-	^ rootFilePath
-]
-
-{ #category : 'accessing - modules' }
-FamixPythonImporterVisitor >> rootFilePath: aString [
-
-	rootFilePath := aString.
-	model rootFolder: aString
 ]
 
 { #category : 'private-entity-creation' }
