@@ -23,7 +23,9 @@ Class {
 		'globalVariable',
 		'unknowAccessOrReference',
 		'lambda',
-		'unknownEntity'
+		'unknownEntity',
+		'metaclass',
+		'metaclassUsage'
 	],
 	#category : 'Famix-Python-Generator',
 	#package : 'Famix-Python-Generator'
@@ -59,6 +61,8 @@ FamixPythonGenerator >> defineClasses [
 	invocation := builder newClassNamed: #Invocation.
 	lambda := builder newClassNamed: #Lambda.
 	localVariable := builder newClassNamed: #LocalVariable.
+	metaclass := builder newClassNamed: #Metaclass.
+	metaclassUsage := builder newClassNamed: #MetaclassUsage.
 	method := builder newClassNamed: #Method.
 	module := builder newClassNamed: #Module.
 	package := builder newClassNamed: #Package.
@@ -147,6 +151,10 @@ FamixPythonGenerator >> defineHierarchy [
 	localVariable --|> #TWithComments.
 	localVariable --|> #TShadowable.
 	localVariable --|> #TShadower.
+	
+	metaclass --|> class.
+	
+	metaclassUsage --|> #TAssociation.
 
 	method --|> containerEntity.
 	method --|> #TMethod.
@@ -216,9 +224,7 @@ FamixPythonGenerator >> defineProperties [
 	super defineProperties.
 
 	(import property: #alias type: #String) comment: 'Alias of the imported entity in the scope of the import'.
-	(import property: #isFromImport type: #Boolean) comment: 'There are two types of imports in python. `import x` and `from y import x`. A From import is the second type.'.
-	
-	(class property: #isMetaclass type: #Boolean) comment: 'Whether this class is a metaclass'
+	(import property: #isFromImport type: #Boolean) comment: 'There are two types of imports in python. `import x` and `from y import x`. A From import is the second type.'
 ]
 
 { #category : 'definition' }
@@ -226,9 +232,9 @@ FamixPythonGenerator >> defineRelations [
 
 	super defineRelations.
 
-	((class property: #metaclass) comment: '') *- ((class property: #instancedClasses) comment: '').
-
 	(unknowAccessOrReference property: #accessorOrReferencer) source *- (containerEntity property: #unknowAccessesOrReferences).
+	(unknowAccessOrReference property: #unknownEntity) target *- (unknownEntity property: #accessesOrReferences).
 
-	(unknowAccessOrReference property: #unknownEntity) target *- (unknownEntity property: #accessesOrReferences)
+	(metaclassUsage property: #user) source - (class property: #metaclassUsage).
+	(metaclassUsage property: #metaclass) target *- (metaclass property: #metaclassUsers)
 ]

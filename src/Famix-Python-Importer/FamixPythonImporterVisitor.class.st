@@ -18,14 +18,6 @@ FamixPythonImporterVisitor >> acceptNode: aNode [
 	^ self errorReport catch: Exception during: [ super acceptNode: aNode ]
 ]
 
-{ #category : 'visiting' }
-FamixPythonImporterVisitor >> acceptNodes: aCollection [
-	"override to return the result of the visits"
-
-	^aCollection collect: [ :each | self acceptNode: each ].
-
-]
-
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> basicCreateFunction: aSelector withSignature: aSignature [
 
@@ -795,6 +787,7 @@ FamixPythonImporterVisitor >> visitListParameter: aListParameter [
 FamixPythonImporterVisitor >> visitMetaclass: aMetaclass [
 
 	| metaClassName metaClassObject |
+	1halt.
 	metaClassName := aMetaclass superclass name.
 	metaClassObject := self classNamed: metaClassName.
 	metaClassObject ifNil: [
