@@ -656,8 +656,9 @@ FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression
 	| source |
 	source := aFieldAccessExpression source.
 
-	self flag: #todo. "Manage invocations."
-	aFieldAccessExpression isReceiverOfFunctionCall ifTrue: [ ^ source ].
+	aFieldAccessExpression isReceiverOfFunctionCall ifTrue: [ 
+		super visitFieldAccessExpression: aFieldAccessExpression.
+		^ source ].
 
 	"Symbol resolution of accesses and references to imported entities.
 	Example:
@@ -896,12 +897,16 @@ FamixPythonImporterVisitor >> visitVariableExpression: aVariableExpression [
 						 FamixPythonGlobalVariable.
 						 FamixPythonAttribute.
 						 FamixPythonParameter };
-				 notFoundReplacementEntity: [ :unresolved :currentEntity | "This can be a structural entity or a class" self ensureStubUnknownEntityNamed: unresolved identifier ];
+				 notFoundReplacementEntity: [ :unresolved :currentEntity | "If we are the receiver of an invocation and we did not find the associated entity it's because it's an instance of a class or the namespace from the import. In that case we should create nothing so we give a null entity."
+					 aVariableExpression isInvocationOrInstantiationReceiver
+						 ifTrue: [ FamixPythonNilEntity ]
+						 ifFalse: [ "This can be a structural entity or a class" self ensureStubUnknownEntityNamed: unresolved identifier ] ];
 				 yourself)
-		foundAction: [ :entity :currentEntity |
-			| association |
-			association := entity createAccessOrReferenceFrom: currentEntity node: aVariableExpression.
-			self setSourceAnchor: association from: aVariableExpression ].
+		foundAction: [ :entity :currentEntity | "See the comment in the notFoundReplacementEntity block to see why we do this."
+			entity isMooseEntity ifTrue: [
+				| association |
+				association := entity createAccessOrReferenceFrom: currentEntity node: aVariableExpression.
+				self setSourceAnchor: association from: aVariableExpression ] ].
 
 	^ aVariableExpression name
 ]

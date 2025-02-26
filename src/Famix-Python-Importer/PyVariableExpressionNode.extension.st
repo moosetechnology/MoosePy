@@ -14,6 +14,12 @@ PyVariableExpressionNode >> isInvocationOrInstantiationIdentifier [
 ]
 
 { #category : '*Famix-Python-Importer' }
+PyVariableExpressionNode >> isInvocationOrInstantiationReceiver [
+
+	^ self parent isNotNil and: [ self parent isInstantiationOrInvocationWithReceiver: self ]
+]
+
+{ #category : '*Famix-Python-Importer' }
 PyVariableExpressionNode >> isLeftSideOfAssignation [
 
 	^ self parent

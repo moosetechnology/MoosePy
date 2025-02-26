@@ -47,6 +47,24 @@ FamixPythonProject1Test >> testAccessOrReferenceToStubEntitySourceAnchor [
 	self assert: access sourceText equals: 'MissingClass'
 ]
 
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAccessesOfrnstate [
+	"Regression test"
+
+	| global |
+	global := self globalVariableNamed: 'rnstate'.
+
+	self assert: global incomingAccesses size equals: 3.
+
+	self assert: global incomingAccesses first isWrite.
+	self deny: global incomingAccesses second isWrite.
+	self deny: global incomingAccesses third isWrite.
+
+	self assert: global incomingAccesses first sourceText equals: 'rnstate = np.random.RandomState(1)'.
+	self assert: global incomingAccesses second sourceText equals: 'rnstate'.
+	self assert: global incomingAccesses third sourceText equals: 'rnstate'
+]
+
 { #category : 'tests' }
 FamixPythonProject1Test >> testAllSourcedEntitiesNotSubHaveSourceAnchor [
 	"We have no source in case we inherit from Object."

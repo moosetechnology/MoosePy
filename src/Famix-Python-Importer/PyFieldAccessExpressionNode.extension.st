@@ -17,6 +17,12 @@ PyFieldAccessExpressionNode >> isInstanceVariableAssignation [
 ]
 
 { #category : '*Famix-Python-Importer' }
+PyFieldAccessExpressionNode >> isInstantiationOrInvocationWithReceiver: aPyVariableExpressionNode [
+
+	^ self parent isNotNil and: [ self parent isFunctionCallExpression and: [ self receiver = aPyVariableExpressionNode ] ]
+]
+
+{ #category : '*Famix-Python-Importer' }
 PyFieldAccessExpressionNode >> isInternalInstanceVariableAccess [
 
 	(self parent isFunctionCallExpression and: [ self parent receiver = self ]) ifTrue: [ "In that case we are in a method invocation" ^ false ].
