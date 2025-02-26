@@ -8,3 +8,7 @@ def function_to_try_keywords_parameters(param1, param2):
 
 
 print(function_to_try_keywords_parameters(param2=2, param1=5))
+
+
+class ClassWithStubMetaclass(metaclass=subpackage.StubMetaclass):
+    pass
