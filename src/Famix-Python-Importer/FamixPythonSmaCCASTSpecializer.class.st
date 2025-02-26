@@ -30,7 +30,7 @@ FamixPythonSmaCCASTSpecializer >> visitTypedVariableExpression: aTypedVariableEx
 FamixPythonSmaCCASTSpecializer >> visitVariableExpression: aVariableExpression [
 	"This node is used in multiple situations. I am trying to remove some ambiguity by specializing the nodes."
 
-	aVariableExpression isReceiverOfFunctionCall ifTrue: [ ^ FamixPythonFunctionCallReceiverVariableNode adoptInstance: aVariableExpression ].
+	aVariableExpression isInvocationOrInstantiationIdentifier ifTrue: [ ^ FamixPythonInstatiationOrInvocationIdentifierNode adoptInstance: aVariableExpression ].
 
 	aVariableExpression isReservedLiteral ifTrue: [ ^ FamixPythonReservedLiteralNode adoptInstance: aVariableExpression ].
 

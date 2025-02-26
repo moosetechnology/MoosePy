@@ -722,13 +722,6 @@ FamixPythonImporterVisitor >> visitFunctionCallExpression: aFunctionCallExpressi
 ]
 
 { #category : 'visiting' }
-FamixPythonImporterVisitor >> visitFunctionCallReceiverVariable: aFunctionCallReceiverVariable [
-
-	self flag: #todo.
-	^ aFunctionCallReceiverVariable name
-]
-
-{ #category : 'visiting' }
 FamixPythonImporterVisitor >> visitFunctionDefinition: aFunctionDefinition [
 	"the parser does not make a difference between function and method, but a method is defined in a class and its first parameter is self."
 
@@ -768,6 +761,13 @@ FamixPythonImporterVisitor >> visitImportStatement: anImport [
 FamixPythonImporterVisitor >> visitImportVariableExpression: anImportVariableExpression [
 
 	^ anImportVariableExpression name
+]
+
+{ #category : 'visiting' }
+FamixPythonImporterVisitor >> visitInstantiationOrInvocationIdentifier: aFunctionCallReceiverVariable [
+	"We have nothing to do here."
+
+	^ aFunctionCallReceiverVariable name
 ]
 
 { #category : 'visiting' }

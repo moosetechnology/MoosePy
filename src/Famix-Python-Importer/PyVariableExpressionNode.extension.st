@@ -7,6 +7,13 @@ PyVariableExpressionNode >> isArgumentKeyword [
 ]
 
 { #category : '*Famix-Python-Importer' }
+PyVariableExpressionNode >> isInvocationOrInstantiationIdentifier [
+	"If we have an invocation or instantiation such as `print(3)` or `AClass()`, then I represent the identifier `print` or `AClass`."
+
+	^ self parent isFunctionCallExpression and: [ self parent receiver = self ]
+]
+
+{ #category : '*Famix-Python-Importer' }
 PyVariableExpressionNode >> isLeftSideOfAssignation [
 
 	^ self parent
@@ -19,12 +26,6 @@ PyVariableExpressionNode >> isPlaceholderVariable [
 	"A placeholder variable is the use of `_` instead of a variable to ignore it."
 
 	^ self name = '_'
-]
-
-{ #category : '*Famix-Python-Importer' }
-PyVariableExpressionNode >> isReceiverOfFunctionCall [
-
-	^ self parent isFunctionCallExpression and: [ self parent receiver = self ]
 ]
 
 { #category : '*Famix-Python-Importer' }
