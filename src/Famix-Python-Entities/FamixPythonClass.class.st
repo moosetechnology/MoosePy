@@ -19,6 +19,7 @@
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `accesses` | `FamixTWithAccesses` | `accessor` | `FamixTAccess` | Accesses to variables made by this behaviour.|
+| `metaclassUsage` | `FamixPythonClass` | `user` | `FamixPythonMetaclassUsage` | |
 | `outgoingInvocations` | `FamixTWithInvocations` | `sender` | `FamixTInvocation` | Outgoing invocations sent by this behaviour.|
 | `outgoingReferences` | `FamixTWithReferences` | `referencer` | `FamixTReference` | References from this entity to other entities.|
 | `superInheritances` | `FamixTWithInheritances` | `subclass` | `FamixTInheritance` | Superinheritance relationships, i.e. known superclasses of this type.|
@@ -34,8 +35,6 @@
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `annotationInstances` | `FamixTWithAnnotationInstances` | `annotatedEntity` | `FamixTAnnotationInstance` | This property corresponds to the set of annotations associated to the entity|
-| `instancedClasses` | `FamixPythonClass` | `metaclass` | `FamixPythonClass` | |
-| `metaclass` | `FamixPythonClass` | `instancedClasses` | `FamixPythonClass` | |
 | `receivingInvocations` | `FamixTInvocationsReceiver` | `receiver` | `FamixTInvocation` | List of invocations performed on this entity (considered as the receiver)|
 | `shadowedEntity` | `FamixTShadower` | `shadowingEntities` | `FamixTShadowable` | Entity that is been shadowed by myself in my defining scope.|
 | `shadowingEntities` | `FamixTShadowable` | `shadowedEntity` | `FamixTShadower` | Entities shadowing me in my defining scope.|
@@ -48,7 +47,6 @@
 
 | Name | Type | Default value | Comment |
 |---|
-| `isMetaclass` | `Boolean` | nil | Whether this class is a metaclass|
 | `isStub` | `Boolean` | false | Flag true if the entity attributes are incomplete, either because the entity is missing or not imported.|
 | `name` | `String` | nil | Basic name of the entity, not full reference.|
 
@@ -59,9 +57,7 @@ Class {
 	#traits : 'FamixTClass + FamixTImportable + FamixTShadowable + FamixTShadower + FamixTWithAccesses + FamixTWithAnnotationInstances + FamixTWithInvocations + FamixTWithLambdas + FamixTWithReferences',
 	#classTraits : 'FamixTClass classTrait + FamixTImportable classTrait + FamixTShadowable classTrait + FamixTShadower classTrait + FamixTWithAccesses classTrait + FamixTWithAnnotationInstances classTrait + FamixTWithInvocations classTrait + FamixTWithLambdas classTrait + FamixTWithReferences classTrait',
 	#instVars : [
-		'#instancedClasses => FMMany type: #FamixPythonClass opposite: #metaclass',
-		'#isMetaclass => FMProperty',
-		'#metaclass => FMOne type: #FamixPythonClass opposite: #instancedClasses'
+		'#metaclassUsage => FMOne type: #FamixPythonMetaclassUsage opposite: #user'
 	],
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',
@@ -77,54 +73,18 @@ FamixPythonClass class >> annotation [
 	^ self
 ]
 
-{ #category : 'adding' }
-FamixPythonClass >> addInstancedClass: anObject [
-	<generated>
-	^ self instancedClasses add: anObject
-]
-
 { #category : 'accessing' }
-FamixPythonClass >> instancedClasses [
-	"Relation named: #instancedClasses type: #FamixPythonClass opposite: #metaclass"
+FamixPythonClass >> metaclassUsage [
+	"Relation named: #metaclassUsage type: #FamixPythonMetaclassUsage opposite: #user"
 
 	<generated>
 	<derived>
-	^ instancedClasses
+	^ metaclassUsage
 ]
 
 { #category : 'accessing' }
-FamixPythonClass >> instancedClasses: anObject [
+FamixPythonClass >> metaclassUsage: anObject [
 
 	<generated>
-	instancedClasses value: anObject
-]
-
-{ #category : 'accessing' }
-FamixPythonClass >> isMetaclass [
-
-	<FMProperty: #isMetaclass type: #Boolean>
-	<generated>
-	<FMComment: 'Whether this class is a metaclass'>
-	^ isMetaclass
-]
-
-{ #category : 'accessing' }
-FamixPythonClass >> isMetaclass: anObject [
-	<generated>
-	isMetaclass := anObject
-]
-
-{ #category : 'accessing' }
-FamixPythonClass >> metaclass [
-	"Relation named: #metaclass type: #FamixPythonClass opposite: #instancedClasses"
-
-	<generated>
-	^ metaclass
-]
-
-{ #category : 'accessing' }
-FamixPythonClass >> metaclass: anObject [
-
-	<generated>
-	metaclass := anObject
+	metaclassUsage := anObject
 ]

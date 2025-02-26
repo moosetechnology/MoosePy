@@ -154,6 +154,20 @@ FamixPythonTEntityCreator >> newLocalVariableNamed: aName [
 ]
 
 { #category : 'entity creation' }
+FamixPythonTEntityCreator >> newMetaclass [
+
+	<generated>
+	^ self add: FamixPythonMetaclass new
+]
+
+{ #category : 'entity creation' }
+FamixPythonTEntityCreator >> newMetaclassUsage [
+
+	<generated>
+	^ self add: FamixPythonMetaclassUsage new
+]
+
+{ #category : 'entity creation' }
 FamixPythonTEntityCreator >> newMethod [
 
 	<generated>

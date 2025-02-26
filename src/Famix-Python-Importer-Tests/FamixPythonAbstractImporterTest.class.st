@@ -51,6 +51,12 @@ FamixPythonAbstractImporterTest >> localVariableNamed: aName [
 ]
 
 { #category : 'accessing' }
+FamixPythonAbstractImporterTest >> metaclassNamed: aName [
+
+	^ self entityNamed: aName in: (self model allWithType: FamixPythonMetaclass)
+]
+
+{ #category : 'accessing' }
 FamixPythonAbstractImporterTest >> methodNamed: aName [
 
 	^ self entityNamed: aName in: self model allMethods

@@ -2656,6 +2656,16 @@ FamixPythonProject1Test >> testMergeFollowingSingleLineComments [
 ' } collect: [ :comment | comment withPlatformLineEndings ])
 ]
 
+{ #category : 'tests - metaclasses' }
+FamixPythonProject1Test >> testMetaclass [
+
+	| metaclass |
+	metaclass := self metaclassNamed: 'CustomMetaclass'.
+
+	self assert: metaclass class equals: FamixPythonMetaclass.
+	self assert: metaclass name equals: 'CustomMetaclass'
+]
+
 { #category : 'tests - from-import' }
 FamixPythonProject1Test >> testMethodImportsClassFromAModule [
 

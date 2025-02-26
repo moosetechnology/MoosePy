@@ -7,6 +7,13 @@ PyClassDefinitionNode >> isClassDefinition [
 ]
 
 { #category : '*Famix-Python-Importer' }
+PyClassDefinitionNode >> isMetaclass [
+	"A metaclass is a class inheriting from type"
+
+	^ self superClasses anySatisfy: [ :superclass | superclass name = 'type' ]
+]
+
+{ #category : '*Famix-Python-Importer' }
 PyClassDefinitionNode >> pythonClassName [
 
 	^ self cname value

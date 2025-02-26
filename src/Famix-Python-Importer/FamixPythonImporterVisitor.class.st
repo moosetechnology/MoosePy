@@ -66,7 +66,10 @@ FamixPythonImporterVisitor >> createClass: classDefinitionNode [
 	"If we are shadowing an entity, we need to mark is as shadowed."
 	shadowedEntity := self findSadowedEntityNamed: classDefinitionNode pythonClassName.
 
-	class := model newClassNamed: classDefinitionNode pythonClassName.
+	class := classDefinitionNode isMetaclass
+		         ifTrue: [ model newMetaclass ]
+		         ifFalse: [ model newClass ].
+	class name: classDefinitionNode pythonClassName.
 
 	self setSuperclassesOf: classDefinitionNode from: class.
 
@@ -787,7 +790,7 @@ FamixPythonImporterVisitor >> visitListParameter: aListParameter [
 FamixPythonImporterVisitor >> visitMetaclass: aMetaclass [
 
 	| metaClassName metaClassObject |
-	1halt.
+	"1halt."
 	metaClassName := aMetaclass superclass name.
 	metaClassObject := self classNamed: metaClassName.
 	metaClassObject ifNil: [
