@@ -323,7 +323,7 @@ FamixPythonImporterVisitor >> ensureStubPackagesFromPath: aPythonImportPath [
 
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> ensureStubUnknownEntityNamed: aString [
-	(aString = 'param1') ifTrue: [ 1halt. ].
+
 	^ (self unknownEntityNamed: aString) ifNil: [
 		  model newUnknownEntity
 			  name: aString;
@@ -789,15 +789,17 @@ FamixPythonImporterVisitor >> visitListParameter: aListParameter [
 { #category : 'visiting' }
 FamixPythonImporterVisitor >> visitMetaclass: aMetaclass [
 
-	| metaClassName metaClassObject |
-	"1halt."
-	metaClassName := aMetaclass superclass name.
-	metaClassObject := self classNamed: metaClassName.
-	metaClassObject ifNil: [
-		metaClassObject := model newClass
-			                   name: metaClassName;
-			                   stub: true ].
-	self currentEntity metaclass: metaClassObject
+	| metaclassUsage |
+	metaclassUsage := model newMetaclassUsage.
+	metaclassUsage user: self currentEntity.
+	self setSourceAnchor: metaclassUsage from: aMetaclass.
+	self
+		resolve: ((SRIdentifierWithNode identifier: aMetaclass name)
+				 expectedKind: FamixPythonMetaclass;
+				 notFoundReplacementEntity: [ :unresolvedMetaclass :currentEntity | self ensureStubMetaclassNamed: unresolvedMetaclass identifier ];
+				 yourself)
+		foundAction: [ :entity :currentEntity | metaclassUsage metaclass: entity ].
+	^ metaclassUsage
 ]
 
 { #category : 'visiting' }

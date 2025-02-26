@@ -432,33 +432,6 @@ def identity2():
 ]
 
 { #category : 'tests - metaclasses' }
-FamixPythonImporterTest >> testSingleClasSingleFQNMetaclass [
-
-	| classA classMeta classAMeta |
-	self parseCode: '
-class Meta(type):
-	pass
-class A(metaclass=pygame.sprite.Sprite):
-	def foo:
-		pass
-'.
-
-	self assert: (self model allWithType: FamixPythonClass) size equals: 5.
-
-	classA := self classNamed: 'A'.
-	self assert: classA isNotNil.
-	self assert: classA superInheritances first target name equals: 'object'.
-
-	classMeta := self classNamed: 'Meta'.
-	self assert: classMeta isNotNil.
-	self assert: classMeta superInheritances first target name equals: 'type'.
-
-	classAMeta := classA metaclass.
-	self assert: classAMeta isNotNil.
-	self assert: classAMeta name equals: 'Sprite'
-]
-
-{ #category : 'tests - metaclasses' }
 FamixPythonImporterTest >> testSingleClassExplicitSuperclass [
 
 	| classS classA |
@@ -510,7 +483,7 @@ class A(metaclass=Meta):
 		pass
 '.
 
-	self assert: (self model allWithType: FamixPythonClass) size equals: 4.
+	self assert: (self model allWithType: FamixPythonClass) size equals: 3.
 
 	classA := self classNamed: 'A'.
 	self assert: classA isNotNil.
@@ -520,7 +493,7 @@ class A(metaclass=Meta):
 	self assert: classMeta isNotNil.
 	self assert: classMeta superInheritances first target name equals: 'type'.
 
-	classAMeta := classA metaclass.
+	classAMeta := classA metaclassUsage metaclass.
 	self assert: classAMeta isNotNil.
 	self assert: classAMeta name equals: 'Meta'
 ]

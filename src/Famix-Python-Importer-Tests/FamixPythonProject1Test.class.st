@@ -2666,6 +2666,50 @@ FamixPythonProject1Test >> testMetaclass [
 	self assert: metaclass name equals: 'CustomMetaclass'
 ]
 
+{ #category : 'tests - metaclasses' }
+FamixPythonProject1Test >> testMetaclassSourceAnchor [
+
+	| metaclass |
+	metaclass := self metaclassNamed: 'CustomMetaclass'.
+
+	self assert: metaclass sourceAnchor isNotNil.
+	self assert: metaclass sourceText equals: 'class CustomMetaclass(type):
+
+    def __init__(cls, name, bases, dct):
+        cls.base = 100' withPlatformLineEndings
+]
+
+{ #category : 'tests - metaclasses' }
+FamixPythonProject1Test >> testMetaclassUsage [
+
+	| metaclass class metaclassUsage |
+	metaclass := self metaclassNamed: 'CustomMetaclass'.
+	class := self classNamed: 'ClassUsingMetaclass'.
+
+	metaclassUsage := class metaclassUsage.
+
+	self assert: metaclassUsage isNotNil.
+	self assert: metaclassUsage class equals: FamixPythonMetaclassUsage.
+	self assert: metaclassUsage source equals: class.
+	self assert: metaclassUsage user equals: class.
+	self assert: metaclassUsage target equals: metaclass.
+	self assert: metaclassUsage metaclass equals: metaclass.
+	self assert: (metaclass metaclassUsers anySatisfy: [ :aUsage | aUsage user = class ])
+]
+
+{ #category : 'tests - metaclasses' }
+FamixPythonProject1Test >> testMetaclassUsageSourceAnchor [
+
+	| metaclass class metaclassUsage |
+	metaclass := self metaclassNamed: 'CustomMetaclass'.
+	class := self classNamed: 'ClassUsingMetaclass'.
+
+	metaclassUsage := class metaclassUsage.
+
+	self assert: metaclassUsage sourceAnchor isNotNil.
+	self assert: metaclassUsage sourceText equals: 'metaclass=CustomMetaclass'
+]
+
 { #category : 'tests - from-import' }
 FamixPythonProject1Test >> testMethodImportsClassFromAModule [
 
