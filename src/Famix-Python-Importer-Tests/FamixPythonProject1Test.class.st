@@ -4787,6 +4787,26 @@ FamixPythonProject1Test >> testStubFunctionInvocationFromImportedModuleWithAlias
 	self assert: function parentPackage equals: (self packageNamed: 'pandas')
 ]
 
+{ #category : 'tests - metaclasses' }
+FamixPythonProject1Test >> testStubMetaclassUsage [
+
+	| metaclass class metaclassUsage |
+	metaclass := self metaclassNamed: 'StubMetaclass'.
+	class := self classNamed: 'ClassWithStubMetaclass'.
+
+	metaclassUsage := class metaclassUsage.
+
+	self assert: metaclassUsage isNotNil.
+	self assert: metaclassUsage class equals: FamixPythonMetaclassUsage.
+	self assert: metaclassUsage source equals: class.
+	self assert: metaclassUsage user equals: class.
+	self assert: metaclassUsage target equals: metaclass.
+	self assert: metaclassUsage metaclass equals: metaclass.
+	self assert: (metaclass metaclassUsers anySatisfy: [ :aUsage | aUsage user = class ]).
+	self assert: metaclass isStub.
+	self assert: metaclass name equals: 'StubMetaclass'
+]
+
 { #category : 'tests - packages' }
 FamixPythonProject1Test >> testSubPackage [
 

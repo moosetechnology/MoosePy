@@ -275,6 +275,18 @@ FamixPythonImporterVisitor >> ensureStubFunctionNamed: aName [
 				  yourself ]
 ]
 
+{ #category : 'as yet unclassified' }
+FamixPythonImporterVisitor >> ensureStubMetaclassNamed: aName [
+
+	^ (model allWithType: FamixPythonMetaclass)
+		  detect: [ :class | class isStub and: [ class name = aName ] ]
+		  ifNone: [
+			  model newMetaclass
+				  name: aName;
+				  isStub: true;
+				  yourself ]
+]
+
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> ensureStubMethodNamed: aName [
 
