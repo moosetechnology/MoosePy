@@ -4008,26 +4008,6 @@ FamixPythonProject1Test >> testReadAccessFromFunction [
 ]
 
 { #category : 'tests - accesses' }
-FamixPythonProject1Test >> testReadAccessFromImportedEntityWithNamespace [
-
-	| global module access |
-	self skip. "Cannot resolve this yet"
-	global := self globalVariableNamed: 'NameOfSubpackageOrClass'.
-	module := self moduleNamed: 'moduleAtRoot6'.
-
-	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
-
-	self assert: access class equals: FamixPythonAccess.
-	self assert: access source equals: module.
-	self assert: access accessor equals: module.
-	self assert: access target equals: global.
-	self assert: access variable equals: global.
-	self deny: access isWrite.
-	self assert: access isRead.
-	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
-]
-
-{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testReadAccessFromImportedGlobalWithNamespace [
 
 	| global module access |
