@@ -14,6 +14,12 @@ PyFunctionCallExpressionNode >> isFunctionCallExpression [
 ]
 
 { #category : '*Famix-Python-Importer' }
+PyFunctionCallExpressionNode >> isInstantiationOrInvocationWithReceiver: aPyVariableExpressionNode [
+
+	^ self receiver hasReceiver and: [ self receiver receiver = aPyVariableExpressionNode ]
+]
+
+{ #category : '*Famix-Python-Importer' }
 PyFunctionCallExpressionNode >> isLocalMethodInvocation [
 	"A local method invocation is a method invocation in the class defining the method. E.g `self.method(x)"
 
