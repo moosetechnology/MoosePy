@@ -4451,6 +4451,40 @@ FamixPythonProject1Test >> testRecursiveFunctionInvocation [
 	self assert: (function outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
 ]
 
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testReferenceFromImportedEntityWithNamespace [
+
+	| package module reference |
+	package := self packageNamed: 'NameOfSubpackageOrClass'.
+	module := self moduleNamed: 'moduleAtRoot6'.
+
+	reference := package incomingReferences detect: [ :aReference | aReference referencer = module ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: package.
+	self assert: reference referredEntity equals: package.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = package ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testReferenceFromImportedEntityWithoutNamespace [
+
+	| class module reference |
+	class := self classNamed: 'NameOfSubpackageOrClass'.
+	module := self moduleNamed: 'moduleAtRoot7'.
+
+	reference := class incomingReferences detect: [ :aReference | aReference referencer = module ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
+]
+
 { #category : 'tests - modules' }
 FamixPythonProject1Test >> testRootModule [
 
