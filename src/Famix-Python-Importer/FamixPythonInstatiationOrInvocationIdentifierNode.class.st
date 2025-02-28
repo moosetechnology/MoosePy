@@ -17,7 +17,7 @@ FamixPythonInstatiationOrInvocationIdentifierNode >> acceptVisitor: aRootVisitor
 	^ aRootVisitor visitInstantiationOrInvocationIdentifier: self
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'testing' }
 FamixPythonInstatiationOrInvocationIdentifierNode >> hasReceiver [
 
 	^ false

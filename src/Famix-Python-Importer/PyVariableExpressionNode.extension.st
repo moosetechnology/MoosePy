@@ -1,6 +1,12 @@
 Extension { #name : 'PyVariableExpressionNode' }
 
 { #category : '*Famix-Python-Importer' }
+PyVariableExpressionNode >> hasReceiver [
+
+	^ false
+]
+
+{ #category : '*Famix-Python-Importer' }
 PyVariableExpressionNode >> isArgumentKeyword [
 
 	^ self parent isArgumentNode
