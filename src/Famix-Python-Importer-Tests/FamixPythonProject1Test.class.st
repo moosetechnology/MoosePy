@@ -87,7 +87,7 @@ FamixPythonProject1Test >> testClassImportsClassFromAModule [
 	self denyEmpty: self model allImports.
 	class := self classNamed: 'Employee'.
 	class1 := self classNamed: 'Person'.
-	import := class outgoingImports detect: [ :pimport | pimport target name = 'Person' ].
+	import := class imports detect: [ :pimport | pimport target name = 'Person' ].
 
 	self assert: import importingEntity equals: class.
 	self assert: import importedEntity equals: class1.
@@ -102,7 +102,7 @@ FamixPythonProject1Test >> testClassImportsClassFromAPackage [
 	self denyEmpty: self model allImports.
 	class := self classNamed: 'Employee'.
 	class1 := self classNamed: 'Room'.
-	import := class outgoingImports detect: [ :pimport | pimport target name = 'Room' ].
+	import := class imports detect: [ :pimport | pimport target name = 'Room' ].
 
 	self assert: import importingEntity equals: class.
 	self assert: import importedEntity equals: class1.
@@ -117,7 +117,7 @@ FamixPythonProject1Test >> testClassImportsFunctionFromAModule [
 	self denyEmpty: self model allImports.
 	class := self classNamed: 'Employee'.
 	function := self functionNamed: 'sort_list'.
-	import := class outgoingImports detect: [ :pimport | pimport target name = 'sort_list' ].
+	import := class imports detect: [ :pimport | pimport target name = 'sort_list' ].
 
 	self assert: import importingEntity equals: class.
 	self assert: import importedEntity equals: function.
@@ -132,7 +132,7 @@ FamixPythonProject1Test >> testClassImportsFunctionFromAPackage [
 	self denyEmpty: self model allImports.
 	class := self classNamed: 'Employee'.
 	function := self functionNamed: 'return2'.
-	import := class outgoingImports detect: [ :pimport | pimport target name = 'return2' ].
+	import := class imports detect: [ :pimport | pimport target name = 'return2' ].
 
 	self assert: import importingEntity equals: class.
 	self assert: import importedEntity equals: function.
@@ -147,7 +147,7 @@ FamixPythonProject1Test >> testClassImportsGlobalVariableFromAModule [
 	self denyEmpty: self model allImports.
 	class := self classNamed: 'Employee'.
 	global := self globalVariableNamed: 'moduleAtRootVariable'.
-	import := class outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRootVariable' ].
+	import := class imports detect: [ :pimport | pimport target name = 'moduleAtRootVariable' ].
 
 	self assert: import importingEntity equals: class.
 	self assert: import importedEntity equals: global.
@@ -162,7 +162,7 @@ FamixPythonProject1Test >> testClassImportsGlobalVariableFromAPackage [
 	self denyEmpty: self model allImports.
 	class := self classNamed: 'Employee'.
 	global := self globalVariableNamed: 'rootPackageVariable'.
-	import := class outgoingImports detect: [ :pimport | pimport target name = 'rootPackageVariable' ].
+	import := class imports detect: [ :pimport | pimport target name = 'rootPackageVariable' ].
 
 	self assert: import importingEntity equals: class.
 	self assert: import importedEntity equals: global.
@@ -176,7 +176,7 @@ FamixPythonProject1Test >> testClassImportsModule [
 	| class import |
 	self denyEmpty: self model allImports.
 	class := self classNamed: 'Person'.
-	import := class outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRoot3' ].
+	import := class imports detect: [ :pimport | pimport target name = 'moduleAtRoot3' ].
 
 	self assert: import importingEntity equals: class.
 	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot3').
@@ -191,7 +191,7 @@ FamixPythonProject1Test >> testClassImportsModuleFrom [
 	self denyEmpty: self model allImports.
 	class := self classNamed: 'ClassImportingModule'.
 	module := self moduleNamed: 'moduleToTestSourceAnchor'.
-	import := class outgoingImports detect: [ :pimport | pimport target name = 'moduleToTestSourceAnchor' ].
+	import := class imports detect: [ :pimport | pimport target name = 'moduleToTestSourceAnchor' ].
 
 	self assert: import importingEntity equals: class.
 	self assert: import importedEntity equals: module.
@@ -206,7 +206,7 @@ FamixPythonProject1Test >> testClassImportsPackageFrom [
 	self denyEmpty: self model allImports.
 	class := self classNamed: 'ClassImportingPackage'.
 	package := self packageNamed: 'subpackageInRoot2'.
-	import := class outgoingImports detect: [ :pimport | pimport target name = 'subpackageInRoot2' ].
+	import := class imports detect: [ :pimport | pimport target name = 'subpackageInRoot2' ].
 
 	self assert: import importingEntity equals: class.
 	self assert: import importedEntity equals: package.
@@ -808,7 +808,7 @@ FamixPythonProject1Test >> testFileWithTwoIdenticalImportsProduceTwoImports [
 	| module |
 	self denyEmpty: self model allImports.
 	module := self moduleNamed: 'moduleAtRoot2'.
-	self assert: (module outgoingImports select: [ :pimport | pimport target name = 'moduleAtRoot' ]) size equals: 2
+	self assert: (module imports select: [ :pimport | pimport target name = 'moduleAtRoot' ]) size equals: 2
 ]
 
 { #category : 'tests - from-import' }
@@ -818,7 +818,7 @@ FamixPythonProject1Test >> testFromImportAGlobalWithAnAlias [
 	self denyEmpty: self model allImports.
 	module := self moduleNamed: 'moduleWithImportsAndAliases'.
 	global := self globalVariableNamed: 'moduleAtRoot2Variable'.
-	import := module outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRoot2Variable' ].
+	import := module imports detect: [ :pimport | pimport target name = 'moduleAtRoot2Variable' ].
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: global.
@@ -834,7 +834,7 @@ FamixPythonProject1Test >> testFromImportMultipleElementsWithAliases [
 	self denyEmpty: self model allImports.
 	module := self moduleNamed: 'moduleWithImportsAndAliases'.
 	class := self classNamed: 'Employee'.
-	import := module outgoingImports detect: [ :pimport | pimport target name = 'Employee' ].
+	import := module imports detect: [ :pimport | pimport target name = 'Employee' ].
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: class.
@@ -843,13 +843,13 @@ FamixPythonProject1Test >> testFromImportMultipleElementsWithAliases [
 	self assert: import sourceText equals: 'from root2.moduleInRootPackage2 import Employee as Emp, functionWithImportsInRoot2 as fwi, Employee2'.
 
 	function := self functionNamed: 'functionWithImportsInRoot2'.
-	import := module outgoingImports detect: [ :pimport | pimport target name = 'functionWithImportsInRoot2' ].
+	import := module imports detect: [ :pimport | pimport target name = 'functionWithImportsInRoot2' ].
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: function.
 	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root2.moduleInRootPackage2 import Employee as Emp, functionWithImportsInRoot2 as fwi, Employee2'.
-	
+
 	self assert: import alias equals: 'fwi'
 ]
 
@@ -860,7 +860,7 @@ FamixPythonProject1Test >> testFromImportStubPackages [
 	self denyEmpty: self model allImports.
 	module := self moduleNamed: 'moduleWithStubs2'.
 	plot := self unknownEntityNamed: 'plot'.
-	import := module outgoingImports detect: [ :pimport | pimport target name = 'plot' ].
+	import := module imports detect: [ :pimport | pimport target name = 'plot' ].
 
 	pyglot := self packageNamed: 'pyplot'.
 	matplotlib := pyglot parentPackage.
@@ -884,7 +884,7 @@ FamixPythonProject1Test >> testFunctionImportsClassFromAModule [
 	self denyEmpty: self model allImports.
 	function := self functionNamed: 'functionWithImportsInRoot2'.
 	class := self classNamed: 'Person'.
-	import := function outgoingImports detect: [ :pimport | pimport target name = 'Person' ].
+	import := function imports detect: [ :pimport | pimport target name = 'Person' ].
 
 	self assert: import importingEntity equals: function.
 	self assert: import importedEntity equals: class.
@@ -899,7 +899,7 @@ FamixPythonProject1Test >> testFunctionImportsClassFromAPackage [
 	self denyEmpty: self model allImports.
 	function := self functionNamed: 'functionWithImportsInRoot2'.
 	class := self classNamed: 'Room'.
-	import := function outgoingImports detect: [ :pimport | pimport target name = 'Room' ].
+	import := function imports detect: [ :pimport | pimport target name = 'Room' ].
 
 	self assert: import importingEntity equals: function.
 	self assert: import importedEntity equals: class.
@@ -914,7 +914,7 @@ FamixPythonProject1Test >> testFunctionImportsFunctionFromAModule [
 	self denyEmpty: self model allImports.
 	function := self functionNamed: 'functionWithImportsInRoot2'.
 	function1 := self functionNamed: 'sort_list'.
-	import := function outgoingImports detect: [ :pimport | pimport target name = 'sort_list' ].
+	import := function imports detect: [ :pimport | pimport target name = 'sort_list' ].
 
 	self assert: import importingEntity equals: function.
 	self assert: import importedEntity equals: function1.
@@ -929,7 +929,7 @@ FamixPythonProject1Test >> testFunctionImportsFunctionFromAPackage [
 	self denyEmpty: self model allImports.
 	function := self functionNamed: 'functionWithImportsInRoot2'.
 	function1 := self functionNamed: 'return2'.
-	import := function outgoingImports detect: [ :pimport | pimport target name = 'return2' ].
+	import := function imports detect: [ :pimport | pimport target name = 'return2' ].
 
 	self assert: import importingEntity equals: function.
 	self assert: import importedEntity equals: function1.
@@ -944,7 +944,7 @@ FamixPythonProject1Test >> testFunctionImportsGlobalVariableFromAModule [
 	self denyEmpty: self model allImports.
 	function := self functionNamed: 'functionWithImportsInRoot2'.
 	global := self globalVariableNamed: 'moduleAtRootVariable'.
-	import := function outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRootVariable' ].
+	import := function imports detect: [ :pimport | pimport target name = 'moduleAtRootVariable' ].
 
 	self assert: import importingEntity equals: function.
 	self assert: import importedEntity equals: global.
@@ -959,7 +959,7 @@ FamixPythonProject1Test >> testFunctionImportsGlobalVariableFromAPackage [
 	self denyEmpty: self model allImports.
 	function := self functionNamed: 'functionWithImportsInRoot2'.
 	global := self globalVariableNamed: 'rootPackageVariable'.
-	import := function outgoingImports detect: [ :pimport | pimport target name = 'rootPackageVariable' ].
+	import := function imports detect: [ :pimport | pimport target name = 'rootPackageVariable' ].
 
 	self assert: import importingEntity equals: function.
 	self assert: import importedEntity equals: global.
@@ -973,7 +973,7 @@ FamixPythonProject1Test >> testFunctionImportsModule [
 	| function import |
 	self denyEmpty: self model allImports.
 	function := self functionNamed: 'functionWithImport'.
-	import := function outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRoot3' ].
+	import := function imports detect: [ :pimport | pimport target name = 'moduleAtRoot3' ].
 
 	self assert: import importingEntity equals: function.
 	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot3').
@@ -988,7 +988,7 @@ FamixPythonProject1Test >> testFunctionImportsModuleFrom [
 	self denyEmpty: self model allImports.
 	function := self functionNamed: 'function_importing_module'.
 	module := self moduleNamed: 'moduleInSubPackage1'.
-	import := function outgoingImports detect: [ :pimport | pimport target name = 'moduleInSubPackage1' ].
+	import := function imports detect: [ :pimport | pimport target name = 'moduleInSubPackage1' ].
 
 	self assert: import importingEntity equals: function.
 	self assert: import importedEntity equals: module.
@@ -1003,7 +1003,7 @@ FamixPythonProject1Test >> testFunctionImportsPackageFrom [
 	self denyEmpty: self model allImports.
 	function := self functionNamed: 'function_importing_package'.
 	package := self packageNamed: 'subpackageInRoot2'.
-	import := function outgoingImports detect: [ :pimport | pimport target name = 'subpackageInRoot2' ].
+	import := function imports detect: [ :pimport | pimport target name = 'subpackageInRoot2' ].
 
 	self assert: import importingEntity equals: function.
 	self assert: import importedEntity equals: package.
@@ -1839,7 +1839,7 @@ FamixPythonProject1Test >> testImportAClassThatHasTheSameNameAsSubpackage [
 	self denyEmpty: self model allImports.
 	module := self moduleNamed: 'moduleAtRoot7'.
 	class := self classNamed: 'NameOfSubpackageOrClass'.
-	import := module outgoingImports detect: [ :pimport | pimport target name = 'NameOfSubpackageOrClass' ].
+	import := module imports detect: [ :pimport | pimport target name = 'NameOfSubpackageOrClass' ].
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: class.
@@ -1854,7 +1854,7 @@ FamixPythonProject1Test >> testImportAModuleWithAnAlias [
 	self denyEmpty: self model allImports.
 	module := self moduleNamed: 'moduleWithImportsAndAliases'.
 	module2 := self moduleNamed: 'moduleAtRoot'.
-	import := module outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRoot' ].
+	import := module imports detect: [ :pimport | pimport target name = 'moduleAtRoot' ].
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: module2.
@@ -1871,7 +1871,7 @@ FamixPythonProject1Test >> testImportASubpackageThatHasTheSameNameAsAClass [
 	self denyEmpty: self model allImports.
 	module := self moduleNamed: 'moduleAtRoot6'.
 	package := self packageNamed: 'NameOfSubpackageOrClass'.
-	import := module outgoingImports detect: [ :pimport | pimport target name = 'NameOfSubpackageOrClass' ].
+	import := module imports detect: [ :pimport | pimport target name = 'NameOfSubpackageOrClass' ].
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: package.
@@ -1886,7 +1886,7 @@ FamixPythonProject1Test >> testImportASubpackageWithAnAlias [
 	self denyEmpty: self model allImports.
 	module := self moduleNamed: 'moduleWithImportsAndAliases'.
 	package := self packageNamed: 'subsubpackage1'.
-	import := module outgoingImports detect: [ :pimport | pimport target name = 'subsubpackage1' ].
+	import := module imports detect: [ :pimport | pimport target name = 'subsubpackage1' ].
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: package.
@@ -1903,7 +1903,7 @@ FamixPythonProject1Test >> testImportAnEntityThatIsShadowed [
 	self denyEmpty: self model allImports.
 	module := self moduleNamed: 'moduleInRootPackage21'.
 	function := self functionNamed: 'shadowedName'.
-	import := module outgoingImports detect: [ :pimport | pimport target name = 'shadowedName' ].
+	import := module imports detect: [ :pimport | pimport target name = 'shadowedName' ].
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: function.
@@ -1919,11 +1919,11 @@ FamixPythonProject1Test >> testImportSourceAnchor [
 	self denyEmpty: self model allImports.
 	rootModule1 := self moduleNamed: 'moduleAtRoot'.
 	rootModule2 := self moduleNamed: 'moduleAtRoot2'.
-	import := rootModule2 outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRoot' ].
+	import := rootModule2 imports detect: [ :pimport | pimport target name = 'moduleAtRoot' ].
 
 	self assert: import importingEntity equals: rootModule2.
 	self assert: import importedEntity equals: rootModule1.
-	
+
 	self assert: import sourceAnchor isNotNil.
 	self assert: import sourceText equals: 'import moduleAtRoot'
 ]
@@ -1935,7 +1935,7 @@ FamixPythonProject1Test >> testImportStubPackages [
 	| matplotlib pyglot module import |
 	self denyEmpty: self model allImports.
 	module := self moduleNamed: 'moduleWithStubs'.
-	import := module outgoingImports detect: [ :pimport | pimport target name = 'pyplot' ].
+	import := module imports detect: [ :pimport | pimport target name = 'pyplot' ].
 
 	self deny: import isFromImport.
 
@@ -1961,7 +1961,7 @@ FamixPythonProject1Test >> testImportThatIsNotAtTheRootOfAFile [
 	| moduleAtRoot import |
 	self denyEmpty: self model allImports.
 	moduleAtRoot := self moduleNamed: 'moduleAtRoot'.
-	import := moduleAtRoot outgoingImports detect: [ :pimport | pimport target name = 'root2' ].
+	import := moduleAtRoot imports detect: [ :pimport | pimport target name = 'root2' ].
 
 	self assert: import importingEntity equals: moduleAtRoot.
 	self assert: import importedEntity equals: (self packageNamed: 'root2').
@@ -1982,11 +1982,11 @@ FamixPythonProject1Test >> testImportTwoStubPackagesOfTheSameName [
 	numpy := self packageNamed: 'numpy'.
 
 	"We ensure that those two are imported by more than 1 module"
-	self assert: ((self moduleNamed: 'moduleAtRoot4') outgoingImports anySatisfy: [ :import | import importedEntity = pyplot ]).
-	self assert: ((self moduleNamed: 'moduleAtRoot4') outgoingImports anySatisfy: [ :import | import importedEntity = numpy ]).
+	self assert: ((self moduleNamed: 'moduleAtRoot4') imports anySatisfy: [ :import | import importedEntity = pyplot ]).
+	self assert: ((self moduleNamed: 'moduleAtRoot4') imports anySatisfy: [ :import | import importedEntity = numpy ]).
 
-	self assert: ((self moduleNamed: 'moduleWithStubs') outgoingImports anySatisfy: [ :import | import importedEntity = pyplot ]).
-	self assert: ((self moduleNamed: 'moduleWithStubs') outgoingImports anySatisfy: [ :import | import importedEntity = numpy ])
+	self assert: ((self moduleNamed: 'moduleWithStubs') imports anySatisfy: [ :import | import importedEntity = pyplot ]).
+	self assert: ((self moduleNamed: 'moduleWithStubs') imports anySatisfy: [ :import | import importedEntity = numpy ])
 ]
 
 { #category : 'tests - imports' }
@@ -1995,7 +1995,7 @@ FamixPythonProject1Test >> testImportWithTheNameOfAStubClass [
 	| module |
 	module := self moduleNamed: 'moduleWithStubImport'.
 
-	module outgoingImports do: [ :import | self deny: (import importedEntity isKindOf: FamixPythonClass) ]
+	module imports do: [ :import | self deny: (import importedEntity isKindOf: FamixPythonClass) ]
 ]
 
 { #category : 'tests - inheritances' }
@@ -2735,7 +2735,7 @@ FamixPythonProject1Test >> testMethodImportsClassFromAModule [
 	self denyEmpty: self model allImports.
 	method := self methodNamed: 'print_info_2'.
 	class := self classNamed: 'Person'.
-	import := method outgoingImports detect: [ :pimport | pimport target name = 'Person' ].
+	import := method imports detect: [ :pimport | pimport target name = 'Person' ].
 
 	self assert: import importingEntity equals: method.
 	self assert: import importedEntity equals: class.
@@ -2750,7 +2750,7 @@ FamixPythonProject1Test >> testMethodImportsClassFromAPackage [
 	self denyEmpty: self model allImports.
 	method := self methodNamed: 'print_info_2'.
 	class := self classNamed: 'Room'.
-	import := method outgoingImports detect: [ :pimport | pimport target name = 'Room' ].
+	import := method imports detect: [ :pimport | pimport target name = 'Room' ].
 
 	self assert: import importingEntity equals: method.
 	self assert: import importedEntity equals: class.
@@ -2765,7 +2765,7 @@ FamixPythonProject1Test >> testMethodImportsFunctionFromAModule [
 	self denyEmpty: self model allImports.
 	method := self methodNamed: 'print_info_2'.
 	function := self functionNamed: 'sort_list'.
-	import := method outgoingImports detect: [ :pimport | pimport target name = 'sort_list' ].
+	import := method imports detect: [ :pimport | pimport target name = 'sort_list' ].
 
 	self assert: import importingEntity equals: method.
 	self assert: import importedEntity equals: function.
@@ -2780,7 +2780,7 @@ FamixPythonProject1Test >> testMethodImportsFunctionFromAPackage [
 	self denyEmpty: self model allImports.
 	method := self methodNamed: 'print_info_2'.
 	function := self functionNamed: 'return2'.
-	import := method outgoingImports detect: [ :pimport | pimport target name = 'return2' ].
+	import := method imports detect: [ :pimport | pimport target name = 'return2' ].
 
 	self assert: import importingEntity equals: method.
 	self assert: import importedEntity equals: function.
@@ -2795,7 +2795,7 @@ FamixPythonProject1Test >> testMethodImportsGlobalVariableFromAModule [
 	self denyEmpty: self model allImports.
 	method := self methodNamed: 'print_info_2'.
 	global := self globalVariableNamed: 'moduleAtRootVariable'.
-	import := method outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRootVariable' ].
+	import := method imports detect: [ :pimport | pimport target name = 'moduleAtRootVariable' ].
 
 	self assert: import importingEntity equals: method.
 	self assert: import importedEntity equals: global.
@@ -2810,7 +2810,7 @@ FamixPythonProject1Test >> testMethodImportsGlobalVariableFromAPackage [
 	self denyEmpty: self model allImports.
 	method := self methodNamed: 'print_info_2'.
 	global := self globalVariableNamed: 'rootPackageVariable'.
-	import := method outgoingImports detect: [ :pimport | pimport target name = 'rootPackageVariable' ].
+	import := method imports detect: [ :pimport | pimport target name = 'rootPackageVariable' ].
 
 	self assert: import importingEntity equals: method.
 	self assert: import importedEntity equals: global.
@@ -2824,7 +2824,7 @@ FamixPythonProject1Test >> testMethodImportsModule [
 	| method import |
 	self denyEmpty: self model allImports.
 	method := self methodNamed: 'printInfos'.
-	import := method outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRoot4' ].
+	import := method imports detect: [ :pimport | pimport target name = 'moduleAtRoot4' ].
 
 	self assert: import importingEntity equals: method.
 	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot4').
@@ -2839,7 +2839,7 @@ FamixPythonProject1Test >> testMethodImportsModuleFrom [
 	self denyEmpty: self model allImports.
 	method := self methodNamed: 'method_importing_module'.
 	module := self moduleNamed: 'moduleInSubPackage1'.
-	import := method outgoingImports detect: [ :pimport | pimport target name = 'moduleInSubPackage1' ].
+	import := method imports detect: [ :pimport | pimport target name = 'moduleInSubPackage1' ].
 
 	self assert: import importingEntity equals: method.
 	self assert: import importedEntity equals: module.
@@ -2854,7 +2854,7 @@ FamixPythonProject1Test >> testMethodImportsPackageFrom [
 	self denyEmpty: self model allImports.
 	method := self methodNamed: 'method_importing_package'.
 	package := self packageNamed: 'subsubpackage1'.
-	import := method outgoingImports detect: [ :pimport | pimport target name = 'subsubpackage1' ].
+	import := method imports detect: [ :pimport | pimport target name = 'subsubpackage1' ].
 
 	self assert: import importingEntity equals: method.
 	self assert: import importedEntity equals: package.
@@ -2928,7 +2928,7 @@ FamixPythonProject1Test >> testModuleImportsClassFromAModule [
 	self denyEmpty: self model allImports.
 	rootModule := self moduleNamed: 'moduleAtRoot5'.
 	class := self classNamed: 'Person'.
-	import := rootModule outgoingImports detect: [ :pimport | pimport target name = 'Person' ].
+	import := rootModule imports detect: [ :pimport | pimport target name = 'Person' ].
 
 	self assert: import importingEntity equals: rootModule.
 	self assert: import importedEntity equals: class.
@@ -2943,7 +2943,7 @@ FamixPythonProject1Test >> testModuleImportsClassFromAPackage [
 	self denyEmpty: self model allImports.
 	rootModule := self moduleNamed: 'moduleAtRoot5'.
 	class := self classNamed: 'Room'.
-	import := rootModule outgoingImports detect: [ :pimport | pimport target name = 'Room' ].
+	import := rootModule imports detect: [ :pimport | pimport target name = 'Room' ].
 
 	self assert: import importingEntity equals: rootModule.
 	self assert: import importedEntity equals: class.
@@ -2958,7 +2958,7 @@ FamixPythonProject1Test >> testModuleImportsFunctionFromAModule [
 	self denyEmpty: self model allImports.
 	rootModule := self moduleNamed: 'moduleAtRoot5'.
 	function := self functionNamed: 'sort_list'.
-	import := rootModule outgoingImports detect: [ :pimport | pimport target name = 'sort_list' ].
+	import := rootModule imports detect: [ :pimport | pimport target name = 'sort_list' ].
 
 	self assert: import importingEntity equals: rootModule.
 	self assert: import importedEntity equals: function.
@@ -2973,7 +2973,7 @@ FamixPythonProject1Test >> testModuleImportsFunctionFromAPackage [
 	self denyEmpty: self model allImports.
 	rootModule := self moduleNamed: 'moduleAtRoot5'.
 	function := self functionNamed: 'return2'.
-	import := rootModule outgoingImports detect: [ :pimport | pimport target name = 'return2' ].
+	import := rootModule imports detect: [ :pimport | pimport target name = 'return2' ].
 
 	self assert: import importingEntity equals: rootModule.
 	self assert: import importedEntity equals: function.
@@ -2988,7 +2988,7 @@ FamixPythonProject1Test >> testModuleImportsGlobalVariableFromAModule [
 	self denyEmpty: self model allImports.
 	rootModule := self moduleNamed: 'moduleAtRoot5'.
 	global := self globalVariableNamed: 'moduleAtRootVariable'.
-	import := rootModule outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRootVariable' ].
+	import := rootModule imports detect: [ :pimport | pimport target name = 'moduleAtRootVariable' ].
 
 	self assert: import importingEntity equals: rootModule.
 	self assert: import importedEntity equals: global.
@@ -3003,7 +3003,7 @@ FamixPythonProject1Test >> testModuleImportsGlobalVariableFromAModuleInAPackageO
 	self denyEmpty: self model allImports.
 	module := self moduleNamed: 'moduleInSubPackage3'.
 	global := self globalVariableNamed: 'moduleInRoot3Variable'.
-	import := module outgoingImports detect: [ :pimport | pimport target name = 'moduleInRoot3Variable' ].
+	import := module imports detect: [ :pimport | pimport target name = 'moduleInRoot3Variable' ].
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: global.
@@ -3018,7 +3018,7 @@ FamixPythonProject1Test >> testModuleImportsGlobalVariableFromAModuleInASubpacka
 	self denyEmpty: self model allImports.
 	module := self moduleNamed: 'moduleInRootPackage3-2'.
 	global := self globalVariableNamed: 'moduleInSubpackage31Variable'.
-	import := module outgoingImports detect: [ :pimport | pimport target name = 'moduleInSubpackage31Variable' ].
+	import := module imports detect: [ :pimport | pimport target name = 'moduleInSubpackage31Variable' ].
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: global.
@@ -3033,7 +3033,7 @@ FamixPythonProject1Test >> testModuleImportsGlobalVariableFromAModuleRelatively 
 	self denyEmpty: self model allImports.
 	module := self moduleNamed: 'moduleInRootPackage3-2'.
 	global := self globalVariableNamed: 'moduleInRoot3Variable'.
-	import := module outgoingImports detect: [ :pimport | pimport target name = 'moduleInRoot3Variable' ].
+	import := module imports detect: [ :pimport | pimport target name = 'moduleInRoot3Variable' ].
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: global.
@@ -3048,7 +3048,7 @@ FamixPythonProject1Test >> testModuleImportsGlobalVariableFromAModuleRelativelyW
 	self denyEmpty: self model allImports.
 	module := self moduleNamed: 'moduleInSubSubPackage3'.
 	global := self globalVariableNamed: 'moduleInSubpackage31Variable'.
-	import := module outgoingImports detect: [ :pimport | pimport target name = 'moduleInSubpackage31Variable' ].
+	import := module imports detect: [ :pimport | pimport target name = 'moduleInSubpackage31Variable' ].
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: global.
@@ -3063,7 +3063,7 @@ FamixPythonProject1Test >> testModuleImportsGlobalVariableFromAPackage [
 	self denyEmpty: self model allImports.
 	rootModule := self moduleNamed: 'moduleAtRoot5'.
 	global := self globalVariableNamed: 'rootPackageVariable'.
-	import := rootModule outgoingImports detect: [ :pimport | pimport target name = 'rootPackageVariable' ].
+	import := rootModule imports detect: [ :pimport | pimport target name = 'rootPackageVariable' ].
 
 	self assert: import importingEntity equals: rootModule.
 	self assert: import importedEntity equals: global.
@@ -3078,7 +3078,7 @@ FamixPythonProject1Test >> testModuleImportsModule [
 	self denyEmpty: self model allImports.
 	rootModule1 := self moduleNamed: 'moduleAtRoot'.
 	rootModule2 := self moduleNamed: 'moduleAtRoot2'.
-	import := rootModule2 outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRoot' ].
+	import := rootModule2 imports detect: [ :pimport | pimport target name = 'moduleAtRoot' ].
 
 	self assert: import importingEntity equals: rootModule2.
 	self assert: import importedEntity equals: rootModule1.
@@ -3093,7 +3093,7 @@ FamixPythonProject1Test >> testModuleImportsModuleFrom [
 	self denyEmpty: self model allImports.
 	rootModule := self moduleNamed: 'moduleWithModulesAndPackageImport'.
 	module := self moduleNamed: 'moduleInRootPackage'.
-	import := rootModule outgoingImports detect: [ :pimport | pimport target name = 'moduleInRootPackage' ].
+	import := rootModule imports detect: [ :pimport | pimport target name = 'moduleInRootPackage' ].
 
 	self assert: import importingEntity equals: rootModule.
 	self assert: import importedEntity equals: module.
@@ -3108,7 +3108,7 @@ FamixPythonProject1Test >> testModuleImportsModuleInPackage [
 	self denyEmpty: self model allImports.
 	importingModule := self moduleNamed: 'moduleInRootPackage2'.
 	importedModule := self moduleNamed: 'moduleInSubPackage1'.
-	import := importingModule outgoingImports detect: [ :pimport | pimport target name = 'moduleInSubPackage1' ].
+	import := importingModule imports detect: [ :pimport | pimport target name = 'moduleInSubPackage1' ].
 
 	self assert: import importingEntity equals: importingModule.
 	self assert: import importedEntity equals: importedModule.
@@ -3123,11 +3123,11 @@ FamixPythonProject1Test >> testModuleImportsMultipleElements [
 	self denyEmpty: self model allImports.
 	module := self moduleNamed: 'moduleImportingMultipleItems'.
 	global := self globalVariableNamed: 'moduleInRoot3Variable'.
-	import := module outgoingImports detect: [ :pimport | pimport target name = 'moduleInRoot3Variable' ].
+	import := module imports detect: [ :pimport | pimport target name = 'moduleInRoot3Variable' ].
 	class := self classNamed: 'ClassInModuleInRoot3'.
-	import2 := module outgoingImports detect: [ :pimport | pimport target name = 'ClassInModuleInRoot3' ].
+	import2 := module imports detect: [ :pimport | pimport target name = 'ClassInModuleInRoot3' ].
 	function := self functionNamed: 'function_in_module_in_root3'.
-	import3 := module outgoingImports detect: [ :pimport | pimport target name = 'function_in_module_in_root3' ].
+	import3 := module imports detect: [ :pimport | pimport target name = 'function_in_module_in_root3' ].
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: global.
@@ -3150,9 +3150,9 @@ FamixPythonProject1Test >> testModuleImportsMultipleModule [
 	self denyEmpty: self model allImports.
 	module1 := self moduleNamed: 'moduleImportingMultipleItems'.
 	module2 := self moduleNamed: 'moduleAtRoot'.
-	import := module1 outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRoot' ].
+	import := module1 imports detect: [ :pimport | pimport target name = 'moduleAtRoot' ].
 	module3 := self moduleNamed: 'moduleAtRoot3'.
-	import2 := module1 outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRoot3' ].
+	import2 := module1 imports detect: [ :pimport | pimport target name = 'moduleAtRoot3' ].
 
 	self assert: import importingEntity equals: module1.
 	self assert: import importedEntity equals: module2.
@@ -3170,7 +3170,7 @@ FamixPythonProject1Test >> testModuleImportsPackage [
 	| moduleAtRoot import |
 	self denyEmpty: self model allImports.
 	moduleAtRoot := self moduleNamed: 'moduleAtRoot'.
-	import := moduleAtRoot outgoingImports detect: [ :pimport | pimport target name = 'root' ].
+	import := moduleAtRoot imports detect: [ :pimport | pimport target name = 'root' ].
 
 	self assert: import importingEntity equals: moduleAtRoot.
 	self assert: import importedEntity equals: (self packageNamed: 'root').
@@ -3185,7 +3185,7 @@ FamixPythonProject1Test >> testModuleImportsPackageFrom [
 	self denyEmpty: self model allImports.
 	module := self moduleNamed: 'moduleWithModulesAndPackageImport'.
 	package := self packageNamed: 'subpackage1'.
-	import := module outgoingImports detect: [ :pimport | pimport target name = 'subpackage1' ].
+	import := module imports detect: [ :pimport | pimport target name = 'subpackage1' ].
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: package.
@@ -3199,7 +3199,7 @@ FamixPythonProject1Test >> testModuleImportsSubPackage [
 	| moduleAtRoot import |
 	self denyEmpty: self model allImports.
 	moduleAtRoot := self moduleNamed: 'moduleAtRoot'.
-	import := moduleAtRoot outgoingImports detect: [ :pimport | pimport target name = 'subpackage1' ].
+	import := moduleAtRoot imports detect: [ :pimport | pimport target name = 'subpackage1' ].
 
 	self assert: import importingEntity equals: moduleAtRoot.
 	self assert: import importedEntity equals: (self packageNamed: 'subpackage1').
@@ -3213,7 +3213,7 @@ FamixPythonProject1Test >> testModuleImportsSubPackageWithSpacesInThePath [
 	| moduleAtRoot import |
 	self denyEmpty: self model allImports.
 	moduleAtRoot := self moduleNamed: 'moduleWithSpacedImports'.
-	import := moduleAtRoot outgoingImports detect: [ :pimport | pimport target name = 'subsubpackage1' ].
+	import := moduleAtRoot imports detect: [ :pimport | pimport target name = 'subsubpackage1' ].
 
 	self assert: import importingEntity equals: moduleAtRoot.
 	self assert: import importedEntity equals: (self packageNamed: 'subsubpackage1').
@@ -3256,7 +3256,7 @@ FamixPythonProject1Test >> testModuleInSubpackageImportsGlobalVariableFromAModul
 	self denyEmpty: self model allImports.
 	module := self moduleNamed: 'moduleInSubPackage3-2'.
 	global := self globalVariableNamed: 'moduleInSubpackage31Variable'.
-	import := module outgoingImports detect: [ :pimport | pimport target name = 'moduleInSubpackage31Variable' ].
+	import := module imports detect: [ :pimport | pimport target name = 'moduleInSubpackage31Variable' ].
 
 	self assert: import importingEntity equals: module.
 	self assert: import importedEntity equals: global.
@@ -3603,7 +3603,7 @@ FamixPythonProject1Test >> testPackageImportsClassFromAModule [
 	self denyEmpty: self model allImports.
 	package := self packageNamed: 'subpackageInRoot2'.
 	class := self classNamed: 'Person'.
-	import := package outgoingImports detect: [ :pimport | pimport target name = 'Person' ].
+	import := package imports detect: [ :pimport | pimport target name = 'Person' ].
 
 	self assert: import importingEntity equals: package.
 	self assert: import importedEntity equals: class.
@@ -3618,7 +3618,7 @@ FamixPythonProject1Test >> testPackageImportsClassFromAPackage [
 	self denyEmpty: self model allImports.
 	package := self packageNamed: 'subpackageInRoot2'.
 	class := self classNamed: 'Room'.
-	import := package outgoingImports detect: [ :pimport | pimport target name = 'Room' ].
+	import := package imports detect: [ :pimport | pimport target name = 'Room' ].
 
 	self assert: import importingEntity equals: package.
 	self assert: import importedEntity equals: class.
@@ -3633,7 +3633,7 @@ FamixPythonProject1Test >> testPackageImportsFunctionFromAModule [
 	self denyEmpty: self model allImports.
 	package := self packageNamed: 'subpackageInRoot2'.
 	function := self functionNamed: 'sort_list'.
-	import := package outgoingImports detect: [ :pimport | pimport target name = 'sort_list' ].
+	import := package imports detect: [ :pimport | pimport target name = 'sort_list' ].
 
 	self assert: import importingEntity equals: package.
 	self assert: import importedEntity equals: function.
@@ -3648,7 +3648,7 @@ FamixPythonProject1Test >> testPackageImportsFunctionFromAPackage [
 	self denyEmpty: self model allImports.
 	package := self packageNamed: 'subpackageInRoot2'.
 	function := self functionNamed: 'return2'.
-	import := package outgoingImports detect: [ :pimport | pimport target name = 'return2' ].
+	import := package imports detect: [ :pimport | pimport target name = 'return2' ].
 
 	self assert: import importingEntity equals: package.
 	self assert: import importedEntity equals: function.
@@ -3663,7 +3663,7 @@ FamixPythonProject1Test >> testPackageImportsGlobalVariableFromAModule [
 	self denyEmpty: self model allImports.
 	package := self packageNamed: 'subpackageInRoot2'.
 	global := self globalVariableNamed: 'moduleAtRootVariable'.
-	import := package outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRootVariable' ].
+	import := package imports detect: [ :pimport | pimport target name = 'moduleAtRootVariable' ].
 
 	self assert: import importingEntity equals: package.
 	self assert: import importedEntity equals: global.
@@ -3678,7 +3678,7 @@ FamixPythonProject1Test >> testPackageImportsGlobalVariableFromAModuleInAPackage
 	self denyEmpty: self model allImports.
 	package := self packageNamed: 'subsubpackage3'.
 	global := self globalVariableNamed: 'moduleInRoot3Variable'.
-	import := package outgoingImports detect: [ :pimport | pimport target name = 'moduleInRoot3Variable' ].
+	import := package imports detect: [ :pimport | pimport target name = 'moduleInRoot3Variable' ].
 
 	self assert: import importingEntity equals: package.
 	self assert: import importedEntity equals: global.
@@ -3693,7 +3693,7 @@ FamixPythonProject1Test >> testPackageImportsGlobalVariableFromAModuleInaPackage
 	self denyEmpty: self model allImports.
 	package := self packageNamed: 'subpackage3'.
 	global := self globalVariableNamed: 'moduleInRoot3Variable'.
-	import := package outgoingImports detect: [ :pimport | pimport target name = 'moduleInRoot3Variable' ].
+	import := package imports detect: [ :pimport | pimport target name = 'moduleInRoot3Variable' ].
 
 	self assert: import importingEntity equals: package.
 	self assert: import importedEntity equals: global.
@@ -3708,7 +3708,7 @@ FamixPythonProject1Test >> testPackageImportsGlobalVariableFromAModuleRelatively
 	self denyEmpty: self model allImports.
 	package := self packageNamed: 'subpackage3'.
 	global := self globalVariableNamed: 'moduleInSubpackage31Variable'.
-	import := package outgoingImports detect: [ :pimport | pimport target name = 'moduleInSubpackage31Variable' ].
+	import := package imports detect: [ :pimport | pimport target name = 'moduleInSubpackage31Variable' ].
 
 	self assert: import importingEntity equals: package.
 	self assert: import importedEntity equals: global.
@@ -3723,7 +3723,7 @@ FamixPythonProject1Test >> testPackageImportsGlobalVariableFromAPackage [
 	self denyEmpty: self model allImports.
 	package := self packageNamed: 'subpackageInRoot2'.
 	global := self globalVariableNamed: 'rootPackageVariable'.
-	import := package outgoingImports detect: [ :pimport | pimport target name = 'rootPackageVariable' ].
+	import := package imports detect: [ :pimport | pimport target name = 'rootPackageVariable' ].
 
 	self assert: import importingEntity equals: package.
 	self assert: import importedEntity equals: global.
@@ -3737,7 +3737,7 @@ FamixPythonProject1Test >> testPackageImportsModule [
 	| rootPackage import |
 	self denyEmpty: self model allImports.
 	rootPackage := self packageNamed: 'root2'.
-	import := rootPackage outgoingImports detect: [ :pimport | pimport target name = 'moduleAtRoot3' ].
+	import := rootPackage imports detect: [ :pimport | pimport target name = 'moduleAtRoot3' ].
 
 	self assert: import importingEntity equals: rootPackage.
 	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot3').
@@ -3752,7 +3752,7 @@ FamixPythonProject1Test >> testPackageImportsModuleFrom [
 	self denyEmpty: self model allImports.
 	package := self packageNamed: 'root3'.
 	module := self moduleNamed: 'moduleInRootPackage2'.
-	import := package outgoingImports detect: [ :pimport | pimport target name = 'moduleInRootPackage2' ].
+	import := package imports detect: [ :pimport | pimport target name = 'moduleInRootPackage2' ].
 
 	self assert: import importingEntity equals: package.
 	self assert: import importedEntity equals: module.
@@ -3766,7 +3766,7 @@ FamixPythonProject1Test >> testPackageImportsPackage [
 	| rootPackage import |
 	self denyEmpty: self model allImports.
 	rootPackage := self packageNamed: 'root2'.
-	import := rootPackage outgoingImports detect: [ :pimport | pimport target name = 'root' ].
+	import := rootPackage imports detect: [ :pimport | pimport target name = 'root' ].
 
 	self assert: import importingEntity equals: rootPackage.
 	self assert: import importedEntity equals: (self packageNamed: 'root').
@@ -3781,7 +3781,7 @@ FamixPythonProject1Test >> testPackageImportsPackageFrom [
 	self denyEmpty: self model allImports.
 	package := self packageNamed: 'root3'.
 	package2 := self packageNamed: 'subpackageInRoot2'.
-	import := package outgoingImports detect: [ :pimport | pimport target name = 'subpackageInRoot2' ].
+	import := package imports detect: [ :pimport | pimport target name = 'subpackageInRoot2' ].
 
 	self assert: import importingEntity equals: package.
 	self assert: import importedEntity equals: package2.
@@ -3795,7 +3795,7 @@ FamixPythonProject1Test >> testPackageImportsSubSubPackage [
 	| rootPackage import |
 	self denyEmpty: self model allImports.
 	rootPackage := self packageNamed: 'root2'.
-	import := rootPackage outgoingImports detect: [ :pimport | pimport target name = 'subsubpackage1' ].
+	import := rootPackage imports detect: [ :pimport | pimport target name = 'subsubpackage1' ].
 
 	self assert: import importingEntity equals: rootPackage.
 	self assert: import importedEntity equals: (self packageNamed: 'subsubpackage1').

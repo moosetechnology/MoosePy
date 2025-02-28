@@ -149,7 +149,7 @@ FamixPythonImporterWithClassesTest >> testModuleKnowsItsImport [
 
 	| module |
 	module := self moduleNamed: self moduleName.
-	self assert: module outgoingImports size equals: 2
+	self assert: module imports size equals: 2
 	"does not work probably because of the bidirectional slots 
 		self assert: module incomingImports size equals: 2."
 ]

@@ -105,11 +105,11 @@ FamixPythonImporterVisitor >> createImport: anImport ofName: aName from: fromNam
 
 	self setSourceAnchor: import from: anImport.
 
-	self currentEntity addOutgoingImport: import.
+	self currentEntity addImport: import.
 
 	importPaths at: import put: ((fromName
-	 ifNil: [ aName ]
-	 ifNotNil: [ fromName ]) copyWithout: Character space).
+			  ifNil: [ aName ]
+			  ifNotNil: [ fromName ]) copyWithout: Character space).
 
 	self solver
 		resolve: (fromName
@@ -123,9 +123,9 @@ FamixPythonImporterVisitor >> createImport: anImport ofName: aName from: fromNam
 							 | package |
 							 package := self ensureStubPackagesFromPath: unresolvedImport path.
 
-							 (self ensureStubUnknownEntityNamed: unresolvedImport entityName) "This entity can be a package on a module."
+							 (self ensureStubUnknownEntityNamed: unresolvedImport entityName)
 								 parentPackage: package;
-								 yourself ];
+								 yourself "This entity can be a package on a module." ];
 						 yourself ])
 		foundAction: [ :entity :currentEntity | entity addIncomingImport: import ].
 
