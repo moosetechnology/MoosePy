@@ -1103,6 +1103,23 @@ FamixPythonProject1Test >> testFunctionInvocationFromFunction [
 ]
 
 { #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationFromImportAll [
+
+	| module function invocation |
+	function := self functionNamed: 'sort_list'.
+	module := self moduleNamed: 'moduleWithImportAll'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation invokedEntity equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
+]
+
+{ #category : 'tests - invocations' }
 FamixPythonProject1Test >> testFunctionInvocationFromImportedModule [
 
 	| invokerFunction function invocation |
@@ -4020,6 +4037,25 @@ FamixPythonProject1Test >> testReadAccessFromFunction [
 	self deny: access isWrite.
 	self assert: access isRead.
 	self assert: (function accesses anySatisfy: [ :anAccess | anAccess variable = temporary ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessFromImportAll [
+
+	| global module access |
+	global := self globalVariableNamed: 'moduleAtRootVariable'.
+	module := self moduleNamed: 'moduleWithImportAll'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
 ]
 
 { #category : 'tests - accesses' }
