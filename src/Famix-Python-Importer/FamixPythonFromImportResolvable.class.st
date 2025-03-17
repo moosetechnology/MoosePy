@@ -38,7 +38,7 @@ FamixPythonFromImportResolvable >> identifier [
 FamixPythonFromImportResolvable >> resolveInScope: aScope currentEntity: currentEntity [
 	"If we have a dot at first, we have a relative path. Else it's an absolute path"
 
-	| possibleEntities remainingPath |
+	| possibleEntities remainingPath targetModule |
 	(path beginsWith: '.')
 		ifTrue: [
 			| currentPackage |
@@ -54,8 +54,12 @@ FamixPythonFromImportResolvable >> resolveInScope: aScope currentEntity: current
 			possibleEntities := currentEntity mooseModel modelRootEntities ].
 
 	"We trim the path because we can have spaces after the dots in relativ paths."
-	possibleEntities := (self findTargetEntityFor: remainingPath trim from: possibleEntities) allChildren select: [ :child |
-		                    child isNamedEntity and: [ child name = entityName ] ].
+	targetModule := self findTargetEntityFor: remainingPath trim from: possibleEntities.
+
+	"If we have an import all then we import the targeted module directly."
+	possibleEntities := entityName = '*'
+		                    ifTrue: [ { targetModule } ]
+		                    ifFalse: [ targetModule allChildren select: [ :child | child isNamedEntity and: [ child name = entityName ] ] ].
 
 	"It is possible that we have multiple entities with the same name and in that case, python select the last one declared. So we sort by source anchor position to find this one."
 	entity := possibleEntities detectMax: [ :possibleEntity | possibleEntity sourceAnchor startPos ]

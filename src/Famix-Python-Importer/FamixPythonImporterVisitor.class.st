@@ -743,7 +743,10 @@ FamixPythonImporterVisitor >> visitImportPath: anImportPath [
 FamixPythonImporterVisitor >> visitImportStatement: anImport [
 
 	| importedEntities aliases |
-	importedEntities := anImport names collect: [ :name | self acceptNode: name ].
+	importedEntities := anImport starToken
+		                    ifNotNil: [ #( #* ) ]
+		                    ifNil: [ anImport names collect: [ :name | self acceptNode: name ] ].
+
 	aliases := anImport from
 		           ifNil: [ anImport renames collect: [ :alias | self acceptNode: alias ] ]
 		           ifNotNil: [ anImport names collect: [ :name | name alias ] ].

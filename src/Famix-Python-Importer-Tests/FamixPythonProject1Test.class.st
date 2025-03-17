@@ -828,6 +828,21 @@ FamixPythonProject1Test >> testFromImportAGlobalWithAnAlias [
 ]
 
 { #category : 'tests - from-import' }
+FamixPythonProject1Test >> testFromImportAll [
+
+	| rootModule module import |
+	self denyEmpty: self model allImports.
+	rootModule := self moduleNamed: 'moduleWithImportAll'.
+	module := self moduleNamed: 'moduleAtRoot'.
+	import := rootModule imports detect: [ :pimport | pimport target name = 'moduleAtRoot' ].
+
+	self assert: import importingEntity equals: rootModule.
+	self assert: import importedEntity equals: module.
+	self assert: import isFromImport.
+	self assert: import sourceText equals: 'from moduleAtRoot import *'
+]
+
+{ #category : 'tests - from-import' }
 FamixPythonProject1Test >> testFromImportMultipleElementsWithAliases [
 
 	| module class function import |
