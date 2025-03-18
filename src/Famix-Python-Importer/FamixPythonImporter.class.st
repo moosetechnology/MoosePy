@@ -8,13 +8,20 @@ FamixPythonImporter import: '/Users/cyril/testPython/reader' asFileReference
 ```
 
 It will return a Famix python model generated from the .py files in this folder and if there are errors during the parsing, it'll open an inspector with the list of errors.
+
+In case of absolute imports, we resolve them by starting in the first folder containing .py files. If the user wants to configure another path, the variable `rootPackagePath` can be used. 
+
+```st
+FamixPythonImporter import: '/Users/cyril/testPython/reader' asFileReference rootPackagePath: 'project/src/'
+```
 "
 Class {
 	#name : 'FamixPythonImporter',
 	#superclass : 'Object',
 	#instVars : [
 		'visitor',
-		'errorReport'
+		'errorReport',
+		'rootPackagePath'
 	],
 	#category : 'Famix-Python-Importer-Importer',
 	#package : 'Famix-Python-Importer',
@@ -28,11 +35,26 @@ FamixPythonImporter class >> import: aFileName [
 		import: aFileName
 ]
 
+{ #category : 'api' }
+FamixPythonImporter class >> import: aFileName rootPackagePath: aString [
+
+	^ self new
+		  rootPackagePath: aString;
+		  import: aFileName
+]
+
 { #category : 'dev-utils' }
 FamixPythonImporter class >> importBeerTradingBot [
 
 	<script>
 	(self import: '/Users/cyril/testPython/beer-trading-bot-main' asFileReference) inspect
+]
+
+{ #category : 'dev-utils' }
+FamixPythonImporter class >> importPreferentialSampling [
+
+	<script>
+	(self import: '/Users/cyril/testPython/preferential_sampling' asFileReference) inspect
 ]
 
 { #category : 'dev-utils' }
@@ -73,9 +95,39 @@ FamixPythonImporter >> import: aFileName [
 
 { #category : 'api' }
 FamixPythonImporter >> importFileReference: aFileReference [
+	"We can have multiple cases here. 
+	
+	The file reference can be a directory or a file. 
+	
+	## Directory 
+		If we have a directory, the may to manage it will depend if we are already in a python package or not. 
+		
+		## We are not in a python package
+			If we are not in a package, we will check if the folder is the root folder of the project. It will be if the user provided a root package path matching the folder. If the user did not set it, then we will check if the folder contains .py files and consider it is the root if yes.
+			
+		## We are already in a python package
+			The folder will be considered as a package if it contains recursively at least one .py file. Since python 3.3 we do not need to have an __init__.py file.
+			Else we will ignore it 
+		
+	## File
+		Either it is an __init__.py that will be the content of the current package. 
+		Or any other .py files are modules.
+	"
 
-	aFileReference isDirectory ifTrue: [ "I'm not sure we should have this escape but venv is a python interpreter and we are not able to parse it currently. This clause should probably be removed in the future."
-		aFileReference basename = 'venv' ifTrue: [ ^ self ].
+	"I'm not sure we should have this escape but venv is a python interpreter and we are not able to parse it currently. This clause should probably be removed in the future."
+
+	aFileReference basename = 'venv' ifTrue: [ ^ self ].
+
+	aFileReference isDirectory ifTrue: [
+		visitor hasCurrentEntity
+			ifTrue: [ 1 halt ]
+			ifFalse: [
+				(aFileReference files anySatisfy: [ :file | file extension = 'py' ])
+					ifTrue: [ 1 halt ]
+					ifFalse: [ aFileReference directories do: [ :directory | self importFileReference: directory ] ] ].
+
+
+
 
 		"If we have an __init__.py file, this is a package. To have it at the top of the context we need to parse it first so that the sub packages and modules go in it."
 		(aFileReference children sorted: [ :fileA :fileB | fileA isPythonPackageDeclaration or: [ fileB isPythonPackageDeclaration not ] ]) ifNotEmpty: [ :files |
@@ -86,6 +138,10 @@ FamixPythonImporter >> importFileReference: aFileReference [
 		^ self ].
 
 	aFileReference extension = 'py' ifFalse: [ ^ self ].
+	
+	
+
+	1 halt.
 
 	self importPythonFile: aFileReference
 ]
@@ -96,6 +152,18 @@ FamixPythonImporter >> importPythonFile: aFileReference [
 	('Importing ' , aFileReference pathString) traceCr.
 	"(aFileReference basename = #'moduleAtRoot2.py') ifTrue: [ 1halt ]."
 	(PythonParser parseFileWithErrors: aFileReference) acceptVisitor: visitor
+]
+
+{ #category : 'accessing' }
+FamixPythonImporter >> rootPackagePath [
+
+	^ rootPackagePath
+]
+
+{ #category : 'accessing' }
+FamixPythonImporter >> rootPackagePath: anObject [
+
+	rootPackagePath := anObject
 ]
 
 { #category : 'accessing' }

@@ -4029,6 +4029,21 @@ In package
 """' withPlatformLineEndings
 ]
 
+{ #category : 'tests - packages' }
+FamixPythonProject1Test >> testPackageWithoutInitFile [
+	"Since Python 3.3 it's not mandatory to have an init file in a package."
+
+	| rootPackage |
+	self denyEmpty: self model allPackages.
+
+	rootPackage := self packageNamed: 'root4'.
+
+	self assert: rootPackage class equals: FamixPythonPackage.
+	self assert: rootPackage name equals: 'root4'.
+	self assert: rootPackage isRoot.
+	self assert: (rootPackage query descendants ofType: FamixTModule) size equals: 2
+]
+
 { #category : 'tests' }
 FamixPythonProject1Test >> testPlaceholderVariablesDoNotCreateStubs [
 	"Regression test: having a placeholder variable `_` was creating a stub named `_` but we should just ignore those."
