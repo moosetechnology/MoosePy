@@ -120,28 +120,35 @@ FamixPythonImporter >> importFileReference: aFileReference [
 
 	aFileReference isDirectory ifTrue: [
 		visitor hasCurrentEntity
-			ifTrue: [ 1 halt ]
+			ifTrue: [
+				(aFileReference allFiles anySatisfy: [ :file | file extension = 'py' ]) ifTrue: [
+					| package |
+					package := visitor model newPackageNamed: aFileReference basename.
+					visitor hasCurrentEntity ifTrue: [ package parentPackage: visitor currentEntity ].
+					(visitor currentEntity: package) isMainEntity: true.
+
+					"If we have an __init__.py file, this is a package. To have it at the top of the context we need to parse it first so that the sub packages and modules go in it."
+					(aFileReference children sorted: [ :fileA :fileB | fileA isPythonPackageDeclaration or: [ fileB isPythonPackageDeclaration not ] ]) ifNotEmpty: [ :files |
+						files do: [ :child | self importFileReference: child ] ].
+					visitor popScope ] ]
 			ifFalse: [
 				(aFileReference files anySatisfy: [ :file | file extension = 'py' ])
-					ifTrue: [ 1 halt ]
+					ifTrue: [
+						| package |
+						package := visitor model newPackageNamed: aFileReference basename.
+						visitor hasCurrentEntity ifTrue: [ package parentPackage: visitor currentEntity ].
+						(visitor currentEntity: package) isMainEntity: true.
+
+						"If we have an __init__.py file, this is a package. To have it at the top of the context we need to parse it first so that the sub packages and modules go in it."
+						(aFileReference children sorted: [ :fileA :fileB | fileA isPythonPackageDeclaration or: [ fileB isPythonPackageDeclaration not ] ]) ifNotEmpty: [ :files |
+							files do: [ :child | self importFileReference: child ] ].
+						visitor popScope ]
 					ifFalse: [ aFileReference directories do: [ :directory | self importFileReference: directory ] ] ].
 
 
-
-
-		"If we have an __init__.py file, this is a package. To have it at the top of the context we need to parse it first so that the sub packages and modules go in it."
-		(aFileReference children sorted: [ :fileA :fileB | fileA isPythonPackageDeclaration or: [ fileB isPythonPackageDeclaration not ] ]) ifNotEmpty: [ :files |
-			files do: [ :child | self importFileReference: child ].
-
-			"If the directory is a package, we need to remove it from the context after visiting all files of the package."
-			files first isPythonPackageDeclaration ifTrue: [ visitor popScope ] ].
 		^ self ].
 
 	aFileReference extension = 'py' ifFalse: [ ^ self ].
-	
-	
-
-	1 halt.
 
 	self importPythonFile: aFileReference
 ]

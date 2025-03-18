@@ -654,7 +654,7 @@ FamixPythonImporterVisitor >> visitFile: aFileNode [
 	"If the file is name __init__.py this means that we have the declaration of a package. Else we have a module that can be in a package."
 	isPackageDeclaration := aFileNode fileReference basename = '__init__.py'.
 	entity := isPackageDeclaration
-		          ifTrue: [ model newPackageNamed: aFileNode packageName ]
+		          ifTrue: [ self currentEntity ]
 		          ifFalse: [ model newModuleNamed: aFileNode moduleName ].
 
 	self setSourceAnchor: entity from: aFileNode.
@@ -664,11 +664,12 @@ FamixPythonImporterVisitor >> visitFile: aFileNode [
 		startPos: 1;
 		endPos: aFileNode fileReference size.
 
-	self solver scopeIsEmpty ifFalse: [
-		self assert: self currentEntity isPackage.
-		entity parentPackage: self currentEntity ].
+	isPackageDeclaration ifFalse: [
+		self solver scopeIsEmpty ifFalse: [
+			self assert: self currentEntity isPackage.
+			entity parentPackage: self currentEntity ].
 
-	(self currentEntity: entity) isMainEntity: true.
+		(self currentEntity: entity) isMainEntity: true ].
 
 	self acceptNodes: aFileNode statements.
 

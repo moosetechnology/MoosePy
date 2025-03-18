@@ -3462,11 +3462,10 @@ FamixPythonProject1Test >> testModulesWithTheSameNameAreDifferent [
 
 	| modules rootModule moduleInPackage |
 	modules := self model allModules select: [ :module | module name = 'moduleWithCommonName' ].
-	rootModule := modules detect: [ :module | module isRoot ].
+	rootModule := modules detect: [ :module | module parentPackage name = 'src' ].
 	moduleInPackage := modules detect: [ :module | module isRoot not ].
 
 	self assert: modules size equals: 2.
-	self assert: rootModule isRoot.
 	self assert: moduleInPackage parentPackage name equals: 'root'.
 	self deny: rootModule identicalTo: moduleInPackage
 ]
