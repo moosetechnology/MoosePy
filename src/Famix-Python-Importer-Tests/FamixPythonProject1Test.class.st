@@ -4044,6 +4044,13 @@ FamixPythonProject1Test >> testPackageWithoutInitFile [
 	self assert: (rootPackage query descendants ofType: FamixTModule) size equals: 2
 ]
 
+{ #category : 'tests - packages' }
+FamixPythonProject1Test >> testPackagesWithSameName [
+
+	self denyEmpty: self model allPackages.
+	self assert: (self model allPackages select: [ :package | package name = 'commonPackageName' ]) size equals: 2
+]
+
 { #category : 'tests' }
 FamixPythonProject1Test >> testPlaceholderVariablesDoNotCreateStubs [
 	"Regression test: having a placeholder variable `_` was creating a stub named `_` but we should just ignore those."

@@ -189,23 +189,6 @@ FamixPythonImporterVisitor >> createMethod: aMethodNode [
 ]
 
 { #category : 'private-entity-creation' }
-FamixPythonImporterVisitor >> createModule: aModuleNode named: aName [
-
-	| module |
-	module := model newModule.
-	module name: aName.
-
-	self setSourceAnchor: module from: aModuleNode.
-
-	"The FileNode exclude things such as the comments at the beginning of files so we just put again manually the whole file"
-	module sourceAnchor
-		startPos: 1;
-		endPos: aModuleNode fileReference size.
-
-	^ module
-]
-
-{ #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> createParameter: aParameter inBehavioural: aFamixContainer [
 
 	| parameterName parameter |
@@ -234,16 +217,6 @@ FamixPythonImporterVisitor >> createWriteAccessTo: variable from: anAssignmentNo
 FamixPythonImporterVisitor >> ensureMethod: aMethodNode [
 
 	^ (self methodNamed: aMethodNode fname value inClassNamed: self currentEntity name) ifNil: [ self createMethod: aMethodNode ]
-]
-
-{ #category : 'private-entity-creation' }
-FamixPythonImporterVisitor >> ensurePackageFromNode: aFileNode [
-
-	^ (self packageNamed: aFileNode packageName) ifNil: [
-		  | package |
-		  package := model newPackageNamed: aFileNode packageName.
-		  self setSourceAnchor: package from: aFileNode.
-		  package ]
 ]
 
 { #category : 'private-entity-creation' }
@@ -418,17 +391,6 @@ FamixPythonImporterVisitor >> methodNamed: aString inClassNamed: aClassName [
 { #category : 'accessing' }
 FamixPythonImporterVisitor >> model [
 	^ model
-]
-
-{ #category : 'accessing - modules' }
-FamixPythonImporterVisitor >> moduleNameStringOf: aModuleNode [
-	"should push that to the PyInputFileNode"
-
-	aModuleNode isString ifTrue: [ ^aModuleNode ].
-
-	aModuleNode 	filename ifNil: [ ^'Main Module' ].
-
-	^aModuleNode filename basenameWithoutExtension
 ]
 
 { #category : 'private - searching' }
@@ -687,16 +649,20 @@ FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression
 FamixPythonImporterVisitor >> visitFile: aFileNode [
 
 	| isPackageDeclaration entity |
-	"If a package or module starts by a comment, the comment is ignored by SmaCC but we don't want to ignore it so we ensure the start pos is at the beginning of the file."
-	aFileNode startPosition: 1.
-
 	FamixPythonSmaCCASTSpecializer new acceptNode: aFileNode.
 
 	"If the file is name __init__.py this means that we have the declaration of a package. Else we have a module that can be in a package."
 	isPackageDeclaration := aFileNode fileReference basename = '__init__.py'.
 	entity := isPackageDeclaration
-		          ifTrue: [ self ensurePackageFromNode: aFileNode ]
-		          ifFalse: [ self createModule: aFileNode named: (self moduleNameStringOf: aFileNode) ].
+		          ifTrue: [ model newPackageNamed: aFileNode packageName ]
+		          ifFalse: [ model newModuleNamed: aFileNode moduleName ].
+
+	self setSourceAnchor: entity from: aFileNode.
+
+	"The FileNode exclude things such as the comments at the beginning of files so we just put again manually the whole file"
+	entity sourceAnchor
+		startPos: 1;
+		endPos: aFileNode fileReference size.
 
 	self solver scopeIsEmpty ifFalse: [
 		self assert: self currentEntity isPackage.

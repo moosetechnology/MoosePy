@@ -189,6 +189,13 @@ FamixPythonTEntityCreator >> newModule [
 ]
 
 { #category : 'entity creation' }
+FamixPythonTEntityCreator >> newModuleNamed: aName [
+
+	<generated>
+	^ self add: (FamixPythonModule named: aName)
+]
+
+{ #category : 'entity creation' }
 FamixPythonTEntityCreator >> newPackage [
 
 	<generated>
