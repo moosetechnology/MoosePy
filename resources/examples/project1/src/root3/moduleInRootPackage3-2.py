@@ -1,5 +1,7 @@
 from .moduleInRootPackage3 import moduleInRoot3Variable
 from .subpackage3.moduleInSubPackage3 import moduleInSubpackage31Variable
+from . import moduleInRootPackage33 as mip33
 
 print(moduleInSubpackage31Variable)
 print(moduleInRoot3Variable)
+print(mip33.variableInModuleInRootPackage33)
