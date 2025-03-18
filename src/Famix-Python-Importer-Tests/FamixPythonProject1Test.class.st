@@ -2953,6 +2953,22 @@ FamixPythonProject1Test >> testModelSourceLanguage [
 	self assert: self model sourceLanguage class equals: FamixPythonSourceLanguage
 ]
 
+{ #category : 'tests - from-import relative' }
+FamixPythonProject1Test >> testModuleFromImportsModuleWithAlias [
+
+	| module module2 import |
+	self denyEmpty: self model allImports.
+	module := self moduleNamed: 'moduleInRootPackage3-2'.
+	module2 := self moduleNamed: 'moduleInRootPackage33'.
+	import := module imports detect: [ :pimport | pimport target name = 'moduleInRootPackage33' ].
+
+	self assert: import importingEntity equals: module.
+	self assert: import importedEntity equals: module2.
+	self assert: import isFromImport.
+	self assert: import alias equals: 'mip33'.
+	self assert: import sourceText equals: 'from . import moduleInRootPackage33 as mip33'
+]
+
 { #category : 'tests - from-import' }
 FamixPythonProject1Test >> testModuleImportsClassFromAModule [
 
