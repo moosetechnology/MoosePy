@@ -39,7 +39,6 @@ FamixPythonFromImportResolvable >> resolveInScope: aScope currentEntity: current
 	"If we have a dot at first, we have a relative path. Else it's an absolute path"
 
 	| possibleEntities targetModule |
-
 	"If the path is '.' then we are in the parent of the current entity.
 	Else we will need to resolve the path."
 	targetModule := path = '.'
@@ -58,7 +57,7 @@ FamixPythonFromImportResolvable >> resolveInScope: aScope currentEntity: current
 					                possibleEntities := currentPackage children ]
 				                ifFalse: [ "If we have an absolute path we just start at the root."
 					                remainingPath := path.
-					                possibleEntities := currentEntity mooseModel modelRootEntities ].
+					                possibleEntities := currentEntity rootParents flatCollect: #children ].
 
 			                "We trim the path because we can have spaces after the dots in relativ paths."
 			                self findTargetEntityFor: remainingPath trim from: possibleEntities ].
@@ -70,5 +69,8 @@ FamixPythonFromImportResolvable >> resolveInScope: aScope currentEntity: current
 		                    ifFalse: [ targetModule allChildren select: [ :child | child isNamedEntity and: [ child name = entityName ] ] ].
 
 	"It is possible that we have multiple entities with the same name and in that case, python select the last one declared. So we sort by source anchor position to find this one."
-	entity := possibleEntities detectMax: [ :possibleEntity | possibleEntity sourceAnchor startPos ]
+	entity := possibleEntities detectMax: [ :possibleEntity |
+		          possibleEntity sourceAnchor
+			          ifNil: [ 1 "Packages might not have sources." ]
+			          ifNotNil: #startPos ]
 ]

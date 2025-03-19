@@ -66,15 +66,6 @@ FamixPythonProject1Test >> testAccessesOfrnstate [
 ]
 
 { #category : 'tests' }
-FamixPythonProject1Test >> testAllSourcedEntitiesNotSubHaveSourceAnchor [
-	"We have no source in case we inherit from Object."
-
-	(self model allUsing: FamixTSourceEntity)
-		reject: [ :entity | entity isStub or: [ entity isInheritance and: [ entity target name = 'object' ] ] ]
-		thenDo: [ :entity | self assert: entity sourceAnchor isNotNil ]
-]
-
-{ #category : 'tests' }
 FamixPythonProject1Test >> testAssociationsSourcesAreNeverStub [
 
 	(self model allUsing: FamixTAssociation) do: [ :association | self deny: association source isStub ]
@@ -3462,11 +3453,10 @@ FamixPythonProject1Test >> testModulesWithTheSameNameAreDifferent [
 
 	| modules rootModule moduleInPackage |
 	modules := self model allModules select: [ :module | module name = 'moduleWithCommonName' ].
-	rootModule := modules detect: [ :module | module isRoot ].
-	moduleInPackage := modules detect: [ :module | module isRoot not ].
+	rootModule := modules detect: [ :module | module parentPackage name = 'src' ].
+	moduleInPackage := modules detect: [ :module | module parentPackage name = 'root' ].
 
 	self assert: modules size equals: 2.
-	self assert: rootModule isRoot.
 	self assert: moduleInPackage parentPackage name equals: 'root'.
 	self deny: rootModule identicalTo: moduleInPackage
 ]
@@ -4030,6 +4020,20 @@ In package
 ]
 
 { #category : 'tests - packages' }
+FamixPythonProject1Test >> testPackageWithoutInitFile [
+	"Since Python 3.3 it's not mandatory to have an init file in a package."
+
+	| rootPackage |
+	self denyEmpty: self model allPackages.
+
+	rootPackage := self packageNamed: 'root4'.
+
+	self assert: rootPackage class equals: FamixPythonPackage.
+	self assert: rootPackage name equals: 'root4'.
+	self assert: (rootPackage query descendants ofType: FamixTModule) size equals: 2
+]
+
+{ #category : 'tests - packages' }
 FamixPythonProject1Test >> testPackagesWithSameName [
 
 	self denyEmpty: self model allPackages.
@@ -4539,29 +4543,15 @@ FamixPythonProject1Test >> testReferenceFromImportedEntityWithoutNamespace [
 	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
 ]
 
-{ #category : 'tests - modules' }
-FamixPythonProject1Test >> testRootModule [
-
-	| rootModule |
-	self denyEmpty: self model allModules.
-
-	rootModule := self moduleNamed: 'moduleAtRoot'.
-
-	self assert: rootModule class equals: FamixPythonModule.
-	self assert: rootModule name equals: 'moduleAtRoot'.
-	self assert: rootModule isRoot.
-	self assert: rootModule parentPackage isNil
-]
-
 { #category : 'tests - packages' }
 FamixPythonProject1Test >> testRootPackage [
 	| rootPackage |
 	self denyEmpty: self model allPackages.
 	
-	rootPackage := self packageNamed: 'root'.
+	rootPackage := self packageNamed: 'src'.
 	
 	self assert: rootPackage class equals: FamixPythonPackage.
-	self assert: rootPackage name equals: 'root'.
+	self assert: rootPackage name equals: 'src'.
 	self assert: rootPackage isRoot
 ]
 
