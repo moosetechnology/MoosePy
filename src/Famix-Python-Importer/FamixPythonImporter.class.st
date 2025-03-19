@@ -1,5 +1,7 @@
 "
-An importer for Python projects
+An importer for Python projects.
+
+## Use the importer
 
 You can launch the import of a project like this:
 
@@ -9,10 +11,42 @@ FamixPythonImporter import: '/Users/cyril/testPython/reader' asFileReference
 
 It will return a Famix python model generated from the .py files in this folder and if there are errors during the parsing, it'll open an inspector with the list of errors.
 
-In case of absolute imports, we resolve them by starting in the first folder containing .py files. If the user wants to configure another path, the variable `rootPackagePath` can be used. 
+## Root package determination
+
+The root package path variable allows one to specify from which directory in the sources start the parsing.
+	
+Let's take this example:
+
+```	
+	/project
+		/src
+			/package
+				__initi__.py
+			module.py
+		/resources
+			/example
+				example.py
+```			
+
+If no root package path is specify, `project` will be considered the root directory and will be the start point for the absolute import resolution. But it's highly possible that the real working directory here is /src. 
+	
+It is possible to do:
+
+```st	
+	FamixPythonImporter import: 'path/to/project' asFileReference rootPackagePath: 'src' 
+```
+
+## Ignore files
+
+It as also possible to indicate that we want to ignore files or folder. In order to do that, the variable #filesToIgnoreBlock should be used. It should be a valuable (like a block) taking file references as parameter and returning true if we should ignore those files/folders.
+By default I'm excluding folders named `venv` because it is common to have a python interpreter of this name in projects if we develop them on the computer and files setup.py.
+
+For the example above we could do:
 
 ```st
-FamixPythonImporter import: '/Users/cyril/testPython/reader' asFileReference rootPackagePath: 'project/src/'
+	FamixPythonImporter new
+		filesToIgnoreBlock: [ :file | #('venv' 'setup.py' 'resources') includes: file basename ] ];
+		import: 'path/to/project'
 ```
 "
 Class {
@@ -21,7 +55,8 @@ Class {
 	#instVars : [
 		'visitor',
 		'errorReport',
-		'rootPackagePath'
+		'rootPackagePath',
+		'filesToIgnoreBlock'
 	],
 	#category : 'Famix-Python-Importer-Importer',
 	#package : 'Famix-Python-Importer',
@@ -37,6 +72,24 @@ FamixPythonImporter class >> import: aFileName [
 
 { #category : 'api' }
 FamixPythonImporter class >> import: aFileName rootPackagePath: aString [
+	"The root package path variable allows one to specify from which directory in the sources start the parsing.
+	
+	Let's take this example:
+	
+	/project
+		/src
+			/package
+				__initi__.py
+			module.py
+		/resources
+			/example
+				example.py
+				
+	If no root package path is specify, `project` will be considered the root directory and will be the start point for the absolute import resolution. But it's highly possible that the real working directory here is /src. 
+	
+	It is possible to do:
+	
+	FamixPythonImporter import: 'path/to/project' asFileReference rootPackagePath: 'src' "
 
 	^ self new
 		  rootPackagePath: aString;
@@ -64,10 +117,48 @@ FamixPythonImporter class >> importReader [
 	(self import: '/Users/cyril/testPython/reader' asFileReference) inspect
 ]
 
+{ #category : 'api' }
+FamixPythonImporter >> determineSourceRootFolderFrom: fileReference [
+	"We decided in the parser to define a folder as the root of the project to be used as the base of relative imports. This folder will be the first package of the project. 
+	To find it we have two solutions:
+		- The user specified the rootPackagePath and we use this (see class comment)
+		- The variable is nil and in the case we take the first comment parent folder to all .py files."
+
+	^ self rootPackagePath
+		  ifNil: [
+			  | filesToParse foldersToVisit |
+			  "We will collect all .py to parse and find their common parents."
+			  filesToParse := OrderedCollection new.
+			  foldersToVisit := { fileReference }.
+
+			  [
+			  foldersToVisit do: [ :folder |
+				  folder files do: [ :file | (file isPythonFile and: [ (self filesToIgnoreBlock value: file) not ]) ifTrue: [ filesToParse add: file ] ] ].
+			  foldersToVisit := foldersToVisit flatCollect: [ :folder | folder directories reject: [ :subFolder | filesToIgnoreBlock value: subFolder ] ].
+			  foldersToVisit isNotEmpty ] whileTrue.
+
+			  "Now that we have all files to parse, we need to find the common parent.
+			To do that, I'l taking all parents of all files and I check the ones present everywhere. Then I'm using the one with the longest path."
+			  (((filesToParse collect: #allParents) reduce: [ :a :b | a intersection: b ]) sort: [ :file | file pathString size ] descending) first ]
+		  ifNotNil: [ :path | fileReference / path ]
+]
+
 { #category : 'accessing' }
 FamixPythonImporter >> errorReport [
 
 	^ visitor errorReport
+]
+
+{ #category : 'accessing' }
+FamixPythonImporter >> filesToIgnoreBlock [
+
+	^ filesToIgnoreBlock
+]
+
+{ #category : 'accessing' }
+FamixPythonImporter >> filesToIgnoreBlock: anObject [
+
+	filesToIgnoreBlock := anObject
 ]
 
 { #category : 'api' }
@@ -83,6 +174,8 @@ FamixPythonImporter >> import: aFileName [
 				 ifTrue: [ fileReference parent ]
 				 ifFalse: [ aFileName ]). "If we parse a folder, it will be the root. If it's just a file, we consider that the root is its parent"
 
+	"If we parse a unique file, we do nothing. If we have a folder, we check what is the source root to start creating our packages."
+	fileReference isPythonFile ifFalse: [ fileReference := self determineSourceRootFolderFrom: fileReference ].
 	self importFileReference: fileReference.
 
 	visitor resolveUnresolvedSymbols.
@@ -99,56 +192,25 @@ FamixPythonImporter >> importFileReference: aFileReference [
 	
 	The file reference can be a directory or a file. 
 	
-	## Directory 
-		If we have a directory, the may to manage it will depend if we are already in a python package or not. 
-		
-		## We are not in a python package
-			If we are not in a package, we will check if the folder is the root folder of the project. It will be if the user provided a root package path matching the folder. If the user did not set it, then we will check if the folder contains .py files and consider it is the root if yes.
-			
-		## We are already in a python package
-			The folder will be considered as a package if it contains recursively at least one .py file. Since python 3.3 we do not need to have an __init__.py file.
-			Else we will ignore it 
-		
-	## File
-		Either it is an __init__.py that will be the content of the current package. 
-		Or any other .py files are modules.
+	If it is a directory, we check if it contains .py files to know if it is a folder or a package. If it is a package, we create the entity and visit its content.
+	If it is a file, we parse it if it is a python file.
 	"
 
-	"I'm not sure we should have this escape but venv is a python interpreter and we are not able to parse it currently. This clause should probably be removed in the future."
-
-	aFileReference basename = 'venv' ifTrue: [ ^ self ].
-
 	aFileReference isDirectory ifTrue: [
-		visitor hasCurrentEntity
-			ifTrue: [
-				(aFileReference allFiles anySatisfy: [ :file | file extension = 'py' ]) ifTrue: [
-					| package |
-					package := visitor model newPackageNamed: aFileReference basename.
-					visitor hasCurrentEntity ifTrue: [ package parentPackage: visitor currentEntity ].
-					(visitor currentEntity: package) isMainEntity: true.
+		(aFileReference allFiles anySatisfy: [ :file | file isPythonFile ]) ifTrue: [
+			| package |
+			package := visitor model newPackageNamed: aFileReference basename.
+			visitor hasCurrentEntity ifTrue: [ package parentPackage: visitor currentEntity ].
+			(visitor currentEntity: package) isMainEntity: true.
 
-					"If we have an __init__.py file, this is a package. To have it at the top of the context we need to parse it first so that the sub packages and modules go in it."
-					(aFileReference children sorted: [ :fileA :fileB | fileA isPythonPackageDeclaration or: [ fileB isPythonPackageDeclaration not ] ]) ifNotEmpty: [ :files |
-						files do: [ :child | self importFileReference: child ] ].
-					visitor popScope ] ]
-			ifFalse: [
-				(aFileReference files anySatisfy: [ :file | file extension = 'py' ])
-					ifTrue: [
-						| package |
-						package := visitor model newPackageNamed: aFileReference basename.
-						visitor hasCurrentEntity ifTrue: [ package parentPackage: visitor currentEntity ].
-						(visitor currentEntity: package) isMainEntity: true.
-
-						"If we have an __init__.py file, this is a package. To have it at the top of the context we need to parse it first so that the sub packages and modules go in it."
-						(aFileReference children sorted: [ :fileA :fileB | fileA isPythonPackageDeclaration or: [ fileB isPythonPackageDeclaration not ] ]) ifNotEmpty: [ :files |
-							files do: [ :child | self importFileReference: child ] ].
-						visitor popScope ]
-					ifFalse: [ aFileReference directories do: [ :directory | self importFileReference: directory ] ] ].
-
+			"If we have an __init__.py file, this is a package. To have it at the top of the context we need to parse it first so that the sub packages and modules go in it."
+			(aFileReference children sorted: [ :fileA :fileB | fileA isPythonPackageDeclaration or: [ fileB isPythonPackageDeclaration not ] ]) ifNotEmpty: [ :files |
+				files do: [ :child | self importFileReference: child ] ].
+			visitor popScope ].
 
 		^ self ].
 
-	aFileReference extension = 'py' ifFalse: [ ^ self ].
+	aFileReference isPythonFile ifFalse: [ ^ self ].
 
 	self importPythonFile: aFileReference
 ]
@@ -161,8 +223,16 @@ FamixPythonImporter >> importPythonFile: aFileReference [
 	(PythonParser parseFileWithErrors: aFileReference) acceptVisitor: visitor
 ]
 
+{ #category : 'initialization' }
+FamixPythonImporter >> initialize [
+
+	super initialize.
+	filesToIgnoreBlock := [ :file | file basename = 'venv' or: [ file basename = 'setup.py' ] ]
+]
+
 { #category : 'accessing' }
 FamixPythonImporter >> rootPackagePath [
+	"See comment of FamixPythonImporter class>>#import:rootPackagePath:"
 
 	^ rootPackagePath
 ]
