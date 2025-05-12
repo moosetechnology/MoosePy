@@ -5161,6 +5161,20 @@ FamixPythonProject1Test >> testWriteAccessSourceAnchorInTupleAssignation [
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testWriteAccessToArrayContent [
+	"In reallity this should not be a write acces but until we have a nice FASTPython it helps Marius for his work to consider `array[i] = 1` as a write access."
+
+	| array module accesses |
+	array := self globalVariableNamed: 'data'.
+	module := self moduleNamed: 'moduleAtRoot11'.
+
+	accesses := array incomingAccesses select: [ :anAccess | anAccess accessor = module ].
+
+	self assert: (accesses select: #isRead) size equals: 2.
+	self assert: (accesses select: #isWrite) size equals: 2
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testWriteAccessToCVar [
 
 	| cvar class access |

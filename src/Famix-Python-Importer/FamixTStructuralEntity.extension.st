@@ -6,6 +6,6 @@ FamixTStructuralEntity >> createAccessOrReferenceFrom: anEntity node: aNode [
 	^ anEntity mooseModel newAccess
 		  variable: self;
 		  accessor: anEntity;
-		  isWrite: false;
+		  isWrite: (aNode isLeftSideOfAssignation);
 		  yourself
 ]

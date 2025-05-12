@@ -66,6 +66,12 @@ PyRootNode >> isInstantiationOrInvocationWithReceiver: aPyVariableExpressionNode
 ]
 
 { #category : '*Famix-Python-Importer' }
+PyRootNode >> isLeftSideOfAssignation [
+
+	^ false
+]
+
+{ #category : '*Famix-Python-Importer' }
 PyRootNode >> isLeftSideOfAssignation: aNode [
 
 	^ false
