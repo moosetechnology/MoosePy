@@ -4318,6 +4318,24 @@ FamixPythonProject1Test >> testReadAccessSourceAnchor [
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessToArrayContentIndex [
+	"data = pd.DataFrame({ 'Price': ['$1,000.00', '$2,500.50', '$3,750.99'] })
+	curr_col = 'Price'
+	data[curr_col] = data[curr_col].replace('[\$,]', '', regex=True)
+	
+	curr_col should have 2 read and 1 write access"
+
+	| array module accesses |
+	array := self globalVariableNamed: 'curr_col'.
+	module := self moduleNamed: 'moduleAtRoot11'.
+
+	accesses := array incomingAccesses select: [ :anAccess | anAccess accessor = module ].
+
+	self assert: (accesses select: #isRead) size equals: 2.
+	self assert: (accesses select: #isWrite) size equals: 1
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testReadAccessToCVar [
 
 	| cvar module access |
