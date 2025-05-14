@@ -202,6 +202,14 @@ FamixPythonImporterVisitor >> createParameter: aParameter inBehavioural: aFamixC
 ]
 
 { #category : 'private-entity-creation' }
+FamixPythonImporterVisitor >> createStubPackageNamed: aString [
+
+	^ (model newPackageNamed: aString)
+		  isStub: true;
+		  yourself
+]
+
+{ #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> createWriteAccessTo: variable from: anAssignmentNode [
 
 	| access |
@@ -276,10 +284,7 @@ FamixPythonImporterVisitor >> ensureStubPackageNamed: aString [
 
 	^ model allPackages
 		  detect: [ :class | class isStub and: [ class name = aString ] ]
-		  ifNone: [
-			  (model newPackageNamed: aString)
-				  isStub: true;
-				  yourself ]
+		  ifNone: [ self createStubPackageNamed: aString ]
 ]
 
 { #category : 'private-entity-creation' }
@@ -294,14 +299,14 @@ FamixPythonImporterVisitor >> ensureStubPackagesFromPath: aPythonImportPath [
 	splitted removeFirst.
 
 	[ splitted isEmpty ] whileFalse: [
-		package := package childEntities
-			           detect: [ :entity | entity isPackage and: [ entity name = splitted first ] ]
-			           ifNone: [
-				           (self ensureStubPackageNamed: splitted first)
-					           parentPackage: package;
-					           yourself ].
+			package := package childEntities
+				           detect: [ :entity | entity isPackage and: [ entity name = splitted first ] ]
+				           ifNone: [
+						           (self createStubPackageNamed: splitted first)
+							           parentPackage: package;
+							           yourself ].
 
-		splitted removeFirst ].
+			splitted removeFirst ].
 
 	^ package
 ]
