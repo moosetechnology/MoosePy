@@ -12,3 +12,9 @@ curr_col = 'Price'
 data[curr_col] = data[curr_col].replace('[\$,]', '', regex=True)
 
 print(data)
+
+from scipy.stats import skew
+from scipy.stats.stats import pearsonr
+
+print(skew)
+print(pearsonr)
