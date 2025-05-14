@@ -884,6 +884,40 @@ FamixPythonProject1Test >> testFromImportStubPackages [
 ]
 
 { #category : 'tests - from-import' }
+FamixPythonProject1Test >> testFromImportWithStubPackagesOfTheSameName [
+	"Regression test.
+	from scipy.stats.stats import pearsonr => This was causing stats to be its own parent package."
+
+	| scipy stats1 stats2 pearsonr module import |
+	self denyEmpty: self model allImports.
+	module := self moduleNamed: 'moduleAtRoot11'.
+	pearsonr := self unknownEntityNamed: 'pearsonr'.
+	import := module imports detect: [ :pimport | pimport target name = 'pearsonr' ].
+
+	stats2 := pearsonr parentPackage.
+	stats1 := stats2 parentPackage.
+	scipy := stats1 parentPackage.
+
+	self assert: stats2 name equals: 'stats'.
+	self assert: stats1 name equals: 'stats'.
+	self assert: scipy name equals: 'scipy'.
+
+	self assert: import importingEntity equals: module.
+	self assert: import importedEntity equals: pearsonr.
+	self assert: import importedEntity class equals: FamixPythonUnknownEntity.
+	self assert: import importedEntity parentPackage equals: stats2.
+	self assert: import importedEntity parentPackage parentPackage equals: stats1.
+	self assert: import importedEntity parentPackage parentPackage parentPackage equals: scipy.
+	self assert: import importedEntity isStub.
+	self assert: import importedEntity parentPackage isStub.
+	self assert: import importedEntity parentPackage parentPackage isStub.
+	self assert: import importedEntity parentPackage parentPackage parentPackage isStub.
+	self deny: stats1 identicalTo: stats2.
+	self assert: import isFromImport.
+	self assert: import sourceText equals: 'from scipy.stats.stats import pearsonr'
+]
+
+{ #category : 'tests - from-import' }
 FamixPythonProject1Test >> testFunctionImportsClassFromAModule [
 
 	| function class import |
