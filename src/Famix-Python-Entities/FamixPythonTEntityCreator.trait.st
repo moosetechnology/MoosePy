@@ -140,6 +140,13 @@ FamixPythonTEntityCreator >> newLambda [
 ]
 
 { #category : 'entity creation' }
+FamixPythonTEntityCreator >> newLambdaNamed: aName [
+
+	<generated>
+	^ self add: (FamixPythonLambda named: aName)
+]
+
+{ #category : 'entity creation' }
 FamixPythonTEntityCreator >> newLocalVariable [
 
 	<generated>
@@ -158,6 +165,13 @@ FamixPythonTEntityCreator >> newMetaclass [
 
 	<generated>
 	^ self add: FamixPythonMetaclass new
+]
+
+{ #category : 'entity creation' }
+FamixPythonTEntityCreator >> newMetaclassNamed: aName [
+
+	<generated>
+	^ self add: (FamixPythonMetaclass named: aName)
 ]
 
 { #category : 'entity creation' }
