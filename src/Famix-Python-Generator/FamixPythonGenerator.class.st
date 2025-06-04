@@ -238,3 +238,11 @@ FamixPythonGenerator >> defineRelations [
 	(metaclassUsage property: #user) source - (class property: #metaclassUsage).
 	(metaclassUsage property: #metaclass) target *- (metaclass property: #metaclassUsers)
 ]
+
+{ #category : 'definition' }
+FamixPythonGenerator >> newBuilder [
+
+	^ super newBuilder
+		  withFileImport;
+		  yourself
+]

@@ -20,3 +20,16 @@ FamixPythonModel class >> annotation [
 	<package: #'Famix-Python-Entities'>
 	<generated>
 ]
+
+{ #category : 'testing' }
+FamixPythonModel class >> canBeImportedFromFile [
+	<generated>
+	^true
+]
+
+{ #category : 'accessing' }
+FamixPythonModel class >> importingContextClass [
+
+	<generated>
+	^ FamixPythonImportingContext
+]
