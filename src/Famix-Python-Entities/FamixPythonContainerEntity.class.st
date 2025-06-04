@@ -10,7 +10,7 @@
 ### Outgoing dependencies
 | Relation | Origin | Opposite | Type | Comment |
 |---|
-| `outgoingImports` | `FamixTWithImports` | `importingEntity` | `FamixTImport` | |
+| `imports` | `FamixTWithImports` | `importingEntity` | `FamixTImport` | |
 | `unknowAccessesOrReferences` | `FamixPythonContainerEntity` | `accessorOrReferencer` | `FamixPythonUnknowAccessOrReference` | |
 
 
