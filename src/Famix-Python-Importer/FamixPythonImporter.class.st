@@ -165,7 +165,7 @@ FamixPythonImporter >> filesToIgnoreBlock: anObject [
 FamixPythonImporter >> import: aFileName [
 
 	| fileReference |
-	visitor := FamixPythonImporterVisitor new.
+	visitor := self visitorClass new.
 	fileReference := aFileName asFileReference.
 
 	visitor model
@@ -247,4 +247,10 @@ FamixPythonImporter >> rootPackagePath: anObject [
 FamixPythonImporter >> visitor [
 
 	^ visitor
+]
+
+{ #category : 'accessing' }
+FamixPythonImporter >> visitorClass [
+
+	^ FamixPythonImporterVisitor
 ]

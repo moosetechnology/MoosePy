@@ -1,6 +1,6 @@
 Class {
 	#name : 'FamixPythonImporterVisitor',
-	#superclass : 'PyRootNodeVisitor',
+	#superclass : 'TSVisitor',
 	#traits : 'SRTSolverUserVisitor',
 	#classTraits : 'SRTSolverUserVisitor classTrait',
 	#instVars : [
