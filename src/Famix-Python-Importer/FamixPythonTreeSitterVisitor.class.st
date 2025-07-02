@@ -4,13 +4,100 @@ Class {
 	#traits : 'SRTSolverUserVisitor',
 	#classTraits : 'SRTSolverUserVisitor classTrait',
 	#instVars : [
-		'model',
-		'fileReference'
+		'fileReference',
+		'model'
 	],
 	#category : 'Famix-Python-Importer-Visitors',
 	#package : 'Famix-Python-Importer',
 	#tag : 'Visitors'
 }
+
+{ #category : 'private' }
+FamixPythonTreeSitterVisitor >> createImport: anImport ofName: aName from: fromName alias: alias [
+
+	| import |
+	import := model newImport
+		          alias: alias;
+		          isFromImport: fromName isNotNil;
+		          yourself.
+
+	self setSourceAnchor: import from: anImport.
+
+	self currentEntity addImport: import.
+
+	"importPaths at: import put: ((fromName
+			  ifNil: [ aName ]
+			  ifNotNil: [ fromName ]) copyWithout: Character space)."
+
+	self solver
+		resolve: (fromName
+				 ifNil: [
+						 (FamixPythonImportResolvable path: aName)
+							 notFoundReplacementEntity: [ :unresolvedImport :currentEntity | self ensureStubPackagesFromPath: unresolvedImport path ];
+							 yourself ]
+				 ifNotNil: [
+						 (FamixPythonFromImportResolvable path: fromName entityName: aName)
+							 notFoundReplacementEntity: [ :unresolvedImport :currentEntity |
+									 | package |
+									 package := self ensureStubPackagesFromPath: unresolvedImport path.
+
+									 (self ensureStubUnknownEntityNamed: unresolvedImport entityName)
+										 parentPackage: package;
+										 "This entity can be a package on a module."yourself ];
+							 yourself ])
+		foundAction: [ :entity :currentEntity | entity addIncomingImport: import ].
+
+	^ import
+]
+
+{ #category : 'private' }
+FamixPythonTreeSitterVisitor >> createStubPackageNamed: aString [
+
+	^ (model newPackageNamed: aString)
+		  isStub: true;
+		  yourself
+]
+
+{ #category : 'private' }
+FamixPythonTreeSitterVisitor >> ensureStubPackageNamed: aString [
+
+	^ model allPackages
+		  detect: [ :class | class isStub and: [ class name = aString ] ]
+		  ifNone: [ self createStubPackageNamed: aString ]
+]
+
+{ #category : 'private' }
+FamixPythonTreeSitterVisitor >> ensureStubPackagesFromPath: aPythonImportPath [
+	"This method takes a python import path and should ensure we have a stub entity for each. It should return the stub package for the last element of the path too."
+
+	| splitted package |
+	splitted := aPythonImportPath splitOn: $..
+	package := self model rootEntities
+		           detect: [ :entity | entity isPackage and: [ entity name = splitted first ] ]
+		           ifNone: [ self ensureStubPackageNamed: splitted first ].
+	splitted removeFirst.
+
+	[ splitted isEmpty ] whileFalse: [
+			package := package childEntities
+				           detect: [ :entity | entity isPackage and: [ entity name = splitted first ] ]
+				           ifNone: [
+						           (self createStubPackageNamed: splitted first)
+							           parentPackage: package;
+							           yourself ].
+
+			splitted removeFirst ].
+
+	^ package
+]
+
+{ #category : 'private' }
+FamixPythonTreeSitterVisitor >> ensureStubUnknownEntityNamed: aString [
+
+	^ (self unknownEntityNamed: aString) ifNil: [
+			  model newUnknownEntity
+				  name: aString;
+				  yourself ]
+]
 
 { #category : 'accessing' }
 FamixPythonTreeSitterVisitor >> fileReference [
@@ -76,6 +163,28 @@ FamixPythonTreeSitterVisitor >> sourceText [
 	^ self fileReference contents
 ]
 
+{ #category : 'private' }
+FamixPythonTreeSitterVisitor >> unknownEntityNamed: aString [
+
+	^ (self model allWithType: FamixPythonUnknownEntity)
+		  detect: [ :e | e name = aString ]
+		  ifNone: [ nil ]
+]
+
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visit: anObject [
+
+	anObject isTSNode ifTrue: [ ^ self visitNode: anObject ].
+	anObject isCollection ifTrue: [ ^ self visitNodes: anObject ].
+	^ anObject
+]
+
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitAliasedImport: anAliasImport [
+
+	^ (self visit: (anAliasImport nodeChildByFieldName: 'name')) -> (self visit: (anAliasImport nodeChildByFieldName: 'alias'))
+]
+
 { #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> visitDottedName: aDottedNameNode [
 
@@ -90,8 +199,27 @@ FamixPythonTreeSitterVisitor >> visitIdentifier: anIdentifierNode [
 { #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> visitImportFromStatement: anImportFromStatement [
 
-	| moduleName identifier |
-	moduleName := (anImportFromStatement nodeChildByFieldName: 'module_name') accept: self
+	| moduleName identifiers |
+	moduleName := (anImportFromStatement nodeChildByFieldName: 'module_name') accept: self.
+
+	identifiers := self visit: (anImportFromStatement
+			                nodeChildByFieldName: 'name'
+			                ifAbsent: [ anImportFromStatement detectNamedChild: 'wildcard_import' ifNone: [ self error: 'We should have at least one of them.' ] ]).
+	identifiers isAssociation ifTrue: [ identifiers := { identifiers } asDictionary ].
+	identifiers isString ifTrue: [ identifiers := { identifiers } ].
+	identifiers isDictionary ifFalse: [
+			identifiers := (identifiers collect: [ :name |
+					                name isAssociation
+						                ifTrue: [ name ]
+						                ifFalse: [ name -> nil ] ]) asDictionary ].
+
+
+	identifiers keysAndValuesDo: [ :identifier :alias |
+			self
+				createImport: anImportFromStatement
+				ofName: identifier
+				from: moduleName
+				alias: alias ]
 ]
 
 { #category : 'visiting' }
@@ -126,15 +254,34 @@ FamixPythonTreeSitterVisitor >> visitModule: aModuleNode [
 { #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> visitNode: aTSNode [
 
-	| visitMethod |
-	visitMethod := (String streamContents: [ :aStream |
-			                aStream nextPutAll: 'visit'.
-			                ($_ split: aTSNode type) do: [ :word | aStream nextPutAll: word capitalized ].
-			                aStream nextPut: $: ]) asSymbol.
+	^ self errorReport catch: Exception during: [
+			  | visitMethod |
+			  visitMethod := (String streamContents: [ :aStream |
+					                  aStream nextPutAll: 'visit'.
+					                  ($_ split: aTSNode type) do: [ :word | aStream nextPutAll: word capitalized ].
+					                  aStream nextPut: $: ]) asSymbol.
 
-	^ (self respondsTo: visitMethod)
-		  ifTrue: [ self perform: visitMethod with: aTSNode ]
-		  ifFalse: [
-				  visitMethod traceCr.
-				  super visitNode: aTSNode ]
+			  (self respondsTo: visitMethod)
+				  ifTrue: [ self perform: visitMethod with: aTSNode ]
+				  ifFalse: [
+						  visitMethod traceCr.
+						  super visitNode: aTSNode ] ]
+]
+
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitNodes: aCollection [
+
+	^ aCollection collect: [ :node | self visit: node ]
+]
+
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitRelativeImport: aRelativeImportNode [
+
+	^ aRelativeImportNode sourceText
+]
+
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitWildcardImport: aWildcarImportNode [
+
+	^ #( #* )
 ]

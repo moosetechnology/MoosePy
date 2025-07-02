@@ -52,6 +52,14 @@ FamixPythonTSNodeWrapper >> completeSource [
 	^ self rootNode source
 ]
 
+{ #category : 'collection' }
+FamixPythonTSNodeWrapper >> detectNamedChild: name ifNone: aConstantBlockClosure [
+
+	^ self collectNamedChild
+		  detect: [ :node | node type = name ]
+		  ifNone: aConstantBlockClosure
+]
+
 { #category : 'reflective operations' }
 FamixPythonTSNodeWrapper >> doesNotUnderstand: aMessage [
 	"Forward message to decoree"
@@ -79,10 +87,31 @@ FamixPythonTSNodeWrapper >> fullSourceInspectorExtension: aBuilder [
 		  beNotEditable
 ]
 
+{ #category : 'testing' }
+FamixPythonTSNodeWrapper >> isTSNode [
+
+	^ true
+]
+
 { #category : 'accessing' }
 FamixPythonTSNodeWrapper >> nodeChildByFieldName: aName [
 
 	^ self collectFieldNameOfNamedChild at: aName
+]
+
+{ #category : 'accessing' }
+FamixPythonTSNodeWrapper >> nodeChildByFieldName: aName ifAbsent: aBlock [
+
+	^ self collectFieldNameOfNamedChild at: aName ifAbsent: aBlock
+]
+
+{ #category : 'accessing' }
+FamixPythonTSNodeWrapper >> nodeChildByFieldName: aName ifPresent: block ifAbsent: aBlock [
+
+	^ self collectFieldNameOfNamedChild
+		  at: aName
+		  ifPresent: block
+		  ifAbsent: aBlock
 ]
 
 { #category : 'accessing' }
@@ -159,5 +188,6 @@ FamixPythonTSNodeWrapper >> tsTreeExtension: builder [
 				   yourself);
 		  children: [ :aTSNode | aTSNode collectNamedChild ];
 		  roots: { self };
-		  beResizable
+		  beResizable;
+		expandAll
 ]
