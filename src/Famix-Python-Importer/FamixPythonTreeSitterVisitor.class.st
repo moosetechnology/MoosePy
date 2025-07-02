@@ -13,6 +13,28 @@ Class {
 }
 
 { #category : 'private' }
+FamixPythonTreeSitterVisitor >> createFunction: aFunctionDefinition [
+
+	| function name shadowedEntity signature |
+	name := self visit: aFunctionDefinition _name.
+	signature := aFunctionDefinition completeSource copyFrom: aFunctionDefinition _name startPosition to: aFunctionDefinition _parameters endPosition.
+
+	"If we are shadowing an entity, we need to mark is as shadowed."
+	self flag: #todo.
+	"shadowedEntity := self findSadowedEntityNamed: aFunctionDefinition pythonFunctionName."
+
+	function := model newFunction
+		            name: name;
+		            signature: signature;
+		            functionOwner: self currentEntity;
+		            yourself.
+
+	shadowedEntity ifNotNil: [ function shadowedEntity: shadowedEntity ].
+
+	^ self setSourceAnchor: function from: aFunctionDefinition
+]
+
+{ #category : 'private' }
 FamixPythonTreeSitterVisitor >> createImport: anImport ofName: aName from: fromName alias: alias [
 
 	| import |
@@ -51,11 +73,52 @@ FamixPythonTreeSitterVisitor >> createImport: anImport ofName: aName from: fromN
 ]
 
 { #category : 'private' }
+FamixPythonTreeSitterVisitor >> createMethod: aMethodNode [
+
+	| method name signature |
+	name := self visit: aMethodNode _name.
+	signature := aMethodNode completeSource copyFrom: aMethodNode _name startPosition to: aMethodNode _parameters endPosition.
+	method := model newMethod
+		          name: name;
+		          isStub: true;
+		          signature: signature;
+		          yourself.
+
+	method parentType: self currentEntity.
+
+	name = '__init__' ifTrue: [ method isConstructor: true ].
+
+	(name beginsWith: 'get_') ifTrue: [
+			self
+				resolve: ((SRIdentifierWithNode identifier: (name withoutPrefix: 'get_'))
+						 expectedKind: FamixPythonAttribute;
+						 yourself)
+				foundAction: [ :entity :currentEntity | method beGetter ]
+				ifNone: [ "We do nothing" ] ].
+
+	(name beginsWith: 'set_') ifTrue: [
+			self
+				resolve: ((SRIdentifierWithNode identifier: (name withoutPrefix: 'set_'))
+						 expectedKind: FamixPythonAttribute;
+						 yourself)
+				foundAction: [ :entity :currentEntity | method beSetter ]
+				ifNone: [ "We do nothing" ] ].
+
+	^ self setSourceAnchor: method from: aMethodNode
+]
+
+{ #category : 'private' }
 FamixPythonTreeSitterVisitor >> createStubPackageNamed: aString [
 
 	^ (model newPackageNamed: aString)
 		  isStub: true;
 		  yourself
+]
+
+{ #category : 'private' }
+FamixPythonTreeSitterVisitor >> ensureMethod: aMethodNode [
+
+	^ (self methodNamed: aMethodNode _name inClassNamed: self currentEntity name) ifNil: [ self createMethod: aMethodNode ]
 ]
 
 { #category : 'private' }
@@ -116,6 +179,14 @@ FamixPythonTreeSitterVisitor >> initialize [
 	model := FamixPythonModel new name: 'default Python Model'.
 	model sourceLanguage: model newSourceLanguage.
 	self initialiseSolver
+]
+
+{ #category : 'accessing' }
+FamixPythonTreeSitterVisitor >> methodNamed: aString inClassNamed: aClassName [
+
+	^ (self model allWithType: FamixPythonMethod)
+		  detect: [ :e | e name = aString and: [ e parentType name = aClassName ] ]
+		  ifNone: [ nil ]
 ]
 
 { #category : 'accessing' }
@@ -182,13 +253,50 @@ FamixPythonTreeSitterVisitor >> visit: anObject [
 { #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> visitAliasedImport: anAliasImport [
 
-	^ (self visit: (anAliasImport nodeChildByFieldName: 'name')) -> (self visit: (anAliasImport nodeChildByFieldName: 'alias'))
+	^ (self visit: anAliasImport _name) -> (self visit: anAliasImport _alias)
+]
+
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitClassDefinition: aClassDefinitionNode [
+
+	| class shadowedEntity |
+	"If we are shadowing an entity, we need to mark is as shadowed."
+	self flag: #todo.
+	"shadowedEntity := self findSadowedEntityNamed: classDefinitionNode pythonClassName."
+
+	self flag: #todo.
+	class := model newClass. "classDefinitionNode isMetaclass
+		         ifTrue: [ model newMetaclass ]
+		         ifFalse: [" "]"
+	class name: (self visit: aClassDefinitionNode _name).
+
+	self flag: #todo.
+	"self setSuperclassesOf: classDefinitionNode from: class."
+
+	shadowedEntity ifNotNil: [ class shadowedEntity: shadowedEntity ].
+	class typeContainer: self currentEntity.
+
+	self setSourceAnchor: class from: aClassDefinitionNode.
+
+	^ self useCurrentEntity: class during: [ super visitNode: aClassDefinitionNode ]
 ]
 
 { #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> visitDottedName: aDottedNameNode [
 
 	^ aDottedNameNode sourceText
+]
+
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitFunctionDefinition: aFunctionDefinition [
+	"the parser does not make a difference between function and method, but a method is defined in a class and its first parameter is self."
+
+	| entity |
+	entity := self currentEntity isClass
+		          ifTrue: [ self ensureMethod: aFunctionDefinition ]
+		          ifFalse: [ self createFunction: aFunctionDefinition ].
+
+	^ self useCurrentEntity: entity during: [ super visitNode: aFunctionDefinition ]
 ]
 
 { #category : 'visiting' }
@@ -200,7 +308,7 @@ FamixPythonTreeSitterVisitor >> visitIdentifier: anIdentifierNode [
 FamixPythonTreeSitterVisitor >> visitImportFromStatement: anImportFromStatement [
 
 	| moduleName identifiers |
-	moduleName := (anImportFromStatement nodeChildByFieldName: 'module_name') accept: self.
+	moduleName := anImportFromStatement _module_name accept: self.
 
 	identifiers := self visit: (anImportFromStatement
 			                nodeChildByFieldName: 'name'

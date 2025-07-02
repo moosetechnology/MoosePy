@@ -62,7 +62,9 @@ FamixPythonTSNodeWrapper >> detectNamedChild: name ifNone: aConstantBlockClosure
 
 { #category : 'reflective operations' }
 FamixPythonTSNodeWrapper >> doesNotUnderstand: aMessage [
-	"Forward message to decoree"
+	"Forward message to decoree except if it's a node by field access"
+
+	aMessage selector first = $_ ifTrue: [ ^ self nodeChildByFieldName: aMessage selector allButFirst ].
 
 	^ aMessage sendTo: tsNode
 ]
