@@ -50,8 +50,8 @@ FamixPythonTreeSitterVisitor >> setSourceAnchor: aFamixEntity from: aTSNode [
 	^ self
 		  setSourceAnchorTo: aFamixEntity
 		  fileName: self relativeFilePath
-		  start: (self sourceText positionFromTSPoint: aTSNode startPoint) + 1
-		  end: (self sourceText positionFromTSPoint: aTSNode endPoint)
+		  start: aTSNode startPosition
+		  end: aTSNode endPosition
 ]
 
 { #category : 'private' }

@@ -17,7 +17,10 @@ FamixTreeSitterPythonImporter >> importPythonFile: aFileReference [
 	parser language: TSLanguage python.
 	visitor fileReference: aFileReference.
 	tree := parser parseString: visitor sourceText.
-	tree rootNode accept: visitor
+	FamixPythonTSRootNodeWrapper new
+		tsNode: tree rootNode;
+		source: visitor sourceText;
+		accept: visitor
 ]
 
 { #category : 'accessing' }
