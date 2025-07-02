@@ -18,6 +18,13 @@ FamixPythonImporterVisitor >> acceptNode: aNode [
 	^ self errorReport catch: Exception during: [ super acceptNode: aNode ]
 ]
 
+{ #category : 'visiting' }
+FamixPythonImporterVisitor >> acceptNodes: aCollection [
+
+	aCollection do: [ :each | self acceptNode: each ].
+	^ aCollection
+]
+
 { #category : 'private-entity-creation' }
 FamixPythonImporterVisitor >> basicCreateFunction: aSelector withSignature: aSignature [
 

@@ -77,6 +77,24 @@ FamixPythonTreeSitterVisitor >> sourceText [
 ]
 
 { #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitDottedName: aDottedNameNode [
+
+	^ aDottedNameNode sourceText
+]
+
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitIdentifier: anIdentifierNode [
+	^ anIdentifierNode sourceText
+]
+
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitImportFromStatement: anImportFromStatement [
+
+	| moduleName identifier |
+	moduleName := (anImportFromStatement nodeChildByFieldName: 'module_name') accept: self
+]
+
+{ #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> visitModule: aModuleNode [
 
 	| isPackageDeclaration entity |
@@ -88,11 +106,6 @@ FamixPythonTreeSitterVisitor >> visitModule: aModuleNode [
 
 	self setSourceAnchor: entity from: aModuleNode.
 
-	"The FileNode exclude things such as the comments at the beginning of files so we just put again manually the whole file"
-	"entity sourceAnchor
-		startPos: 1;
-		endPos: aModuleNode fileReference size."
-
 	isPackageDeclaration ifFalse: [
 			self solver scopeIsEmpty ifFalse: [
 					self assert: self currentEntity isPackage.
@@ -100,7 +113,7 @@ FamixPythonTreeSitterVisitor >> visitModule: aModuleNode [
 
 			(self currentEntity: entity) isMainEntity: true ].
 
-	"self acceptNodes: aModuleNode statements."
+	aModuleNode collectNamedChild do: [ :child | child accept: self ].
 
 	"FamixPythonCommentsImporter importCommentsOf: aModuleNode visitor: self."
 
@@ -115,12 +128,13 @@ FamixPythonTreeSitterVisitor >> visitNode: aTSNode [
 
 	| visitMethod |
 	visitMethod := (String streamContents: [ :aStream |
-			                aStream
-				                nextPutAll: 'visit';
-				                nextPutAll: aTSNode type capitalized;
-				                nextPut: $: ]) asSymbol.
+			                aStream nextPutAll: 'visit'.
+			                ($_ split: aTSNode type) do: [ :word | aStream nextPutAll: word capitalized ].
+			                aStream nextPut: $: ]) asSymbol.
 
 	^ (self respondsTo: visitMethod)
 		  ifTrue: [ self perform: visitMethod with: aTSNode ]
-		  ifFalse: [ 1 halt ]
+		  ifFalse: [
+				  visitMethod traceCr.
+				  super visitNode: aTSNode ]
 ]
