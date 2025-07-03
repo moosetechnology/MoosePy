@@ -257,6 +257,36 @@ FamixPythonTreeSitterVisitor >> visitAliasedImport: anAliasImport [
 ]
 
 { #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitAssignment: anAssignmentNode [
+
+	| names |
+	self flag: #todo. "Manage attributes"
+	anAssignmentNode _left type = #attribute ifTrue: [ ^ self ].
+	(anAssignmentNode _left collectNamedChild anySatisfy: [ :node | node type = #attribute ]) ifTrue: [ ^ self ].
+	anAssignmentNode _left type = #subscript ifTrue: [ ^ self ].
+	names := self visit: anAssignmentNode _left. "Could return a string or a collection of strings in case of multiple assignations. We need to manage this."
+	names isString ifTrue: [ names := { names } ].
+
+	^ names collect: [ :name |
+			  | variable |
+			  "If we have a variable of this name already, we should not recreate it. Except if this variable got shadowed! In that case, we should recreate it."
+			  (self currentEntity query descendants ofType: FamixTStructuralEntity)
+				  detect: [ :child | child name = name and: [ child isShadowable not or: [ child isShadowed not ] ] ]
+				  ifFound: [ :var | variable := var ]
+				  ifNone: [
+						  | shadowedEntity |
+						  self flag: #todo.
+						  "shadowedEntity := self findSadowedEntityNamed:  name."
+						  variable := self currentEntity createLocalVariable: name.
+						  shadowedEntity ifNotNil: [ variable shadowedEntity: shadowedEntity ].
+						  "We select the lhs node because the source anchor should not be the full assignation."
+						  self setSourceAnchor: variable from: anAssignmentNode ].
+			  self flag: #todo.
+			  "self createWriteAccessTo: variable from: anAssignmentNode assignationNode."
+			  variable ]
+]
+
+{ #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> visitClassDefinition: aClassDefinitionNode [
 
 	| class shadowedEntity |
@@ -380,6 +410,12 @@ FamixPythonTreeSitterVisitor >> visitNode: aTSNode [
 FamixPythonTreeSitterVisitor >> visitNodes: aCollection [
 
 	^ aCollection collect: [ :node | self visit: node ]
+]
+
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitPatternList: aPatternListNode [
+
+	^ self visit: aPatternListNode collectNamedChild
 ]
 
 { #category : 'visiting' }
