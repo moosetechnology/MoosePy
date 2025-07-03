@@ -315,6 +315,17 @@ FamixPythonTreeSitterVisitor >> visitClassDefinition: aClassDefinitionNode [
 ]
 
 { #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitComment: aCommentNode [
+
+	| comment |
+	comment := model newComment.
+	self flag: #todo. "not good enough"
+	comment commentedEntity: self currentEntity.
+	self setSourceAnchor: comment from: aCommentNode.
+	^ comment
+]
+
+{ #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> visitDottedName: aDottedNameNode [
 
 	^ aDottedNameNode sourceText
