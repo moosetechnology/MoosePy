@@ -267,23 +267,26 @@ FamixPythonTreeSitterVisitor >> visitAssignment: anAssignmentNode [
 	names := self visit: anAssignmentNode _left. "Could return a string or a collection of strings in case of multiple assignations. We need to manage this."
 	names isString ifTrue: [ names := { names } ].
 
-	^ names collect: [ :name |
-			  | variable |
-			  "If we have a variable of this name already, we should not recreate it. Except if this variable got shadowed! In that case, we should recreate it."
-			  (self currentEntity query descendants ofType: FamixTStructuralEntity)
-				  detect: [ :child | child name = name and: [ child isShadowable not or: [ child isShadowed not ] ] ]
-				  ifFound: [ :var | variable := var ]
-				  ifNone: [
-						  | shadowedEntity |
-						  self flag: #todo.
-						  "shadowedEntity := self findSadowedEntityNamed:  name."
-						  variable := self currentEntity createLocalVariable: name.
-						  shadowedEntity ifNotNil: [ variable shadowedEntity: shadowedEntity ].
-						  "We select the lhs node because the source anchor should not be the full assignation."
-						  self setSourceAnchor: variable from: anAssignmentNode _left ].
-			  self flag: #todo.
-			  "self createWriteAccessTo: variable from: anAssignmentNode assignationNode."
-			  variable ]
+	names := names collect: [ :name |
+			         | variable |
+			         "If we have a variable of this name already, we should not recreate it. Except if this variable got shadowed! In that case, we should recreate it."
+			         (self currentEntity query descendants ofType: FamixTStructuralEntity)
+				         detect: [ :child | child name = name and: [ child isShadowable not or: [ child isShadowed not ] ] ]
+				         ifFound: [ :var | variable := var ]
+				         ifNone: [
+						         | shadowedEntity |
+						         self flag: #todo.
+						         "shadowedEntity := self findSadowedEntityNamed:  name."
+						         variable := self currentEntity createLocalVariable: name.
+						         shadowedEntity ifNotNil: [ variable shadowedEntity: shadowedEntity ].
+						         "We select the lhs node because the source anchor should not be the full assignation."
+						         self setSourceAnchor: variable from: anAssignmentNode _left ].
+			         self flag: #todo.
+			         "self createWriteAccessTo: variable from: anAssignmentNode assignationNode."
+			         variable ].
+
+	super visitNode: anAssignmentNode.
+	^ names
 ]
 
 { #category : 'visiting' }
@@ -380,6 +383,20 @@ FamixPythonTreeSitterVisitor >> visitImportStatement: anImportStatement [
 				ofName: identifier
 				from: nil
 				alias: alias ]
+]
+
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitLambda: aLambdaNode [
+
+	| lambda |
+	lambda := model newLambda.
+	lambda signature: ([ aLambdaNode completeSource copyFrom: aLambdaNode _parameters startPosition to: aLambdaNode _parameters endPosition ]
+			 on: KeyNotFound
+			 do: [ '' ]).
+	lambda lambdaContainer: self currentEntity.
+
+	self setSourceAnchor: lambda from: aLambdaNode.
+	^ self useCurrentEntity: lambda during: [ super visitNode: aLambdaNode ]
 ]
 
 { #category : 'visiting' }
