@@ -361,6 +361,28 @@ FamixPythonTreeSitterVisitor >> visitImportFromStatement: anImportFromStatement 
 ]
 
 { #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitImportStatement: anImportStatement [
+
+	| identifiers |
+	identifiers := self visit: anImportStatement _name.
+
+	identifiers isAssociation ifTrue: [ identifiers := { identifiers } asDictionary ].
+	identifiers isString ifTrue: [ identifiers := { identifiers } ].
+	identifiers isDictionary ifFalse: [
+			identifiers := (identifiers collect: [ :name |
+					                name isAssociation
+						                ifTrue: [ name ]
+						                ifFalse: [ name -> nil ] ]) asDictionary ].
+
+	identifiers keysAndValuesDo: [ :identifier :alias |
+			self
+				createImport: anImportStatement
+				ofName: identifier
+				from: nil
+				alias: alias ]
+]
+
+{ #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> visitModule: aModuleNode [
 
 	| isPackageDeclaration entity |
