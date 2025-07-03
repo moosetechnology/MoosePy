@@ -11,7 +11,7 @@ FamixTreeSitterPythonImporter >> importPythonFile: aFileReference [
 
 	| parser tree |
 	('Importing ' , aFileReference pathString) traceCr.
-	"(aFileReference basename = #'moduleAtRoot11.py') ifTrue: [ 1halt ]."
+	"(aFileReference basename = #'moduleWithLambdas.py') ifTrue: [ 1halt ]."
 
 	parser := TSParser new.
 	parser language: TSLanguage python.

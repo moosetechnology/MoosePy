@@ -429,6 +429,32 @@ FamixPythonTreeSitterVisitor >> visitModule: aModuleNode [
 ]
 
 { #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitNamedExpression: aNamedExpressionNode [
+
+	| name variable |
+	name := self visit: aNamedExpressionNode _name.
+
+
+	"If we have a variable of this name already, we should not recreate it. Except if this variable got shadowed! In that case, we should recreate it."
+	(self currentEntity query descendants ofType: FamixPythonLocalVariable)
+		detect: [ :child | child name = name and: [ child isShadowable not or: [ child isShadowed not ] ] ]
+		ifFound: [ :var | variable := var ]
+		ifNone: [
+				| shadowedEntity |
+				self flag: #todo.
+				"shadowedEntity := self findSadowedEntityNamed:  name."
+				variable := self currentEntity createLocalVariable: name.
+				shadowedEntity ifNotNil: [ variable shadowedEntity: shadowedEntity ].
+				"We select the lhs node because the source anchor should not be the full assignation."
+				self setSourceAnchor: variable from: aNamedExpressionNode _name ].
+	self flag: #todo.
+	"self createWriteAccessTo: variable from: anAssignmentNode assignationNode."
+
+	super visitNode: aNamedExpressionNode.
+	^ variable
+]
+
+{ #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> visitNode: aTSNode [
 
 	^ self errorReport catch: Exception during: [
