@@ -280,7 +280,7 @@ FamixPythonTreeSitterVisitor >> visitAssignment: anAssignmentNode [
 						  variable := self currentEntity createLocalVariable: name.
 						  shadowedEntity ifNotNil: [ variable shadowedEntity: shadowedEntity ].
 						  "We select the lhs node because the source anchor should not be the full assignation."
-						  self setSourceAnchor: variable from: anAssignmentNode ].
+						  self setSourceAnchor: variable from: anAssignmentNode _left ].
 			  self flag: #todo.
 			  "self createWriteAccessTo: variable from: anAssignmentNode assignationNode."
 			  variable ]
