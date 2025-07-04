@@ -501,6 +501,14 @@ FamixPythonTreeSitterVisitor >> visitRelativeImport: aRelativeImportNode [
 ]
 
 { #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitString: aStringNode [
+
+	aStringNode parent type = #expression_statement ifTrue: [ commentsImporter addStringNode: aStringNode ].
+
+	^ super visitNode: aStringNode
+]
+
+{ #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> visitWildcardImport: aWildcarImportNode [
 
 	^ #( #* )

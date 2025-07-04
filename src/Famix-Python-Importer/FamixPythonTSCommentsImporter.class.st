@@ -41,6 +41,14 @@ FamixPythonTSCommentsImporter >> addCommentNode: aNode [
 			(aNode endPosition + 1) }
 ]
 
+{ #category : 'accessing' }
+FamixPythonTSCommentsImporter >> addStringNode: aNode [
+
+	stringCommentIntervals add: {
+			aNode startPosition.
+			(aNode endPosition + 1) }
+]
+
 { #category : 'actions' }
 FamixPythonTSCommentsImporter >> createCommentFor: anEntity from: start to: stop [
 
