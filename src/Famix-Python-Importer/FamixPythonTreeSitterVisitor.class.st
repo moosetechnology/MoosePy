@@ -5,7 +5,8 @@ Class {
 	#classTraits : 'SRTSolverUserVisitor classTrait',
 	#instVars : [
 		'fileReference',
-		'model'
+		'model',
+		'commentsImporter'
 	],
 	#category : 'Famix-Python-Importer-Visitors',
 	#package : 'Famix-Python-Importer',
@@ -317,12 +318,7 @@ FamixPythonTreeSitterVisitor >> visitClassDefinition: aClassDefinitionNode [
 { #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> visitComment: aCommentNode [
 
-	| comment |
-	comment := model newComment.
-	self flag: #todo. "not good enough"
-	comment commentedEntity: self currentEntity.
-	self setSourceAnchor: comment from: aCommentNode.
-	^ comment
+	commentsImporter addCommentNode: aCommentNode
 ]
 
 { #category : 'visiting' }
@@ -414,6 +410,9 @@ FamixPythonTreeSitterVisitor >> visitLambda: aLambdaNode [
 FamixPythonTreeSitterVisitor >> visitModule: aModuleNode [
 
 	| isPackageDeclaration entity |
+	"Reset the comment presenter for the current module."
+	commentsImporter := FamixPythonTSCommentsImporter visitor: self.
+	
 	"If the file is name __init__.py this means that we have the declaration of a package. Else we have a module that can be in a package."
 	isPackageDeclaration := self fileReference basename = '__init__.py'.
 	entity := isPackageDeclaration
@@ -430,7 +429,8 @@ FamixPythonTreeSitterVisitor >> visitModule: aModuleNode [
 			(self currentEntity: entity) isMainEntity: true ].
 
 	aModuleNode collectNamedChild do: [ :child | child accept: self ].
-
+	
+	commentsImporter import.
 	"FamixPythonCommentsImporter importCommentsOf: aModuleNode visitor: self."
 
 	"If we are in a package declaration we need to keep the package in the context for the modules in the package. The package will be pop later by the importer."
