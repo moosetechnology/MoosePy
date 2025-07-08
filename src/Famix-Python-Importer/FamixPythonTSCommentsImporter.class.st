@@ -16,8 +16,6 @@ Class {
 		'visitor',
 		'commentIntervals',
 		'stringCommentIntervals',
-		'source',
-		'topEntity',
 		'entitiesInFile'
 	],
 	#category : 'Famix-Python-Importer-Importer',
@@ -36,17 +34,13 @@ FamixPythonTSCommentsImporter class >> visitor: aPythonImporterVisitor [
 { #category : 'accessing' }
 FamixPythonTSCommentsImporter >> addCommentNode: aNode [
 
-	commentIntervals add: {
-			aNode startPosition.
-			(aNode endPosition + 1) }
+	commentIntervals add: (self intervalOf: aNode)
 ]
 
 { #category : 'accessing' }
 FamixPythonTSCommentsImporter >> addStringNode: aNode [
 
-	stringCommentIntervals add: {
-			aNode startPosition.
-			(aNode endPosition + 1) }
+	stringCommentIntervals add: (self intervalOf: aNode)
 ]
 
 { #category : 'actions' }
@@ -64,7 +58,7 @@ FamixPythonTSCommentsImporter >> createCommentFor: anEntity from: start to: stop
 ]
 
 { #category : 'actions' }
-FamixPythonTSCommentsImporter >> createMultilineCommentFromInterval: commentInterval [
+FamixPythonTSCommentsImporter >> createMultilineCommentFromInterval: commentInterval [ 
 
 	"Before checking if the comment is inside an entity, we check that it is not right before the declaration of an entity."
 	(self entityFollowingComment: commentInterval) ifNotNil: [ :entity | ^ self createCommentFor: entity from: commentInterval first to: commentInterval second ].
@@ -155,6 +149,14 @@ FamixPythonTSCommentsImporter >> initialize [
 	super initialize.
 	commentIntervals := OrderedCollection new.
 	stringCommentIntervals := OrderedCollection new
+]
+
+{ #category : 'accessing' }
+FamixPythonTSCommentsImporter >> intervalOf: aNode [
+
+	^ {
+		  aNode startPosition.
+		  (aNode rootNode endPosition min: aNode endPosition + 1) "Take the line return. This might not work on files from windows since it's CRLF also we can have spaces before the line return. We should maybe do something more robust. Also, do not take it of we are at the end of the file." }
 ]
 
 { #category : 'accessing' }
