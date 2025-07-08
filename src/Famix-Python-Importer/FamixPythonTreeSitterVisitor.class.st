@@ -505,7 +505,8 @@ FamixPythonTreeSitterVisitor >> visitString: aStringNode [
 
 	aStringNode parent type = #expression_statement ifTrue: [ commentsImporter addStringNode: aStringNode ].
 
-	^ super visitNode: aStringNode
+	"No need to visit children, we do nothing with them currently."
+	^ self
 ]
 
 { #category : 'visiting' }
