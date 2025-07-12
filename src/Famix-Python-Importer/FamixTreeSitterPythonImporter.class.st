@@ -11,12 +11,14 @@ FamixTreeSitterPythonImporter >> importPythonFile: aFileReference [
 
 	| parser tree |
 	('Importing ' , aFileReference pathString) traceCr.
-	"(aFileReference basename = #'moduleAtRoot2.py') ifTrue: [ 1halt ]."
 
 	parser := TSParser new.
 	parser language: TSLanguage python.
 	visitor fileReference: aFileReference.
 	tree := parser parseString: visitor sourceText.
+	
+	"(aFileReference basename = #'moduleInRootPackage2.py') ifTrue: [ 1halt ]."
+	
 	FamixPythonTSRootNodeWrapper new
 		tsNode: tree rootNode;
 		source: visitor sourceText;

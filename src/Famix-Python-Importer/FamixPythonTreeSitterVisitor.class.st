@@ -254,6 +254,23 @@ FamixPythonTreeSitterVisitor >> relativeFilePath [
 	^ (self fileReference relativeTo: self model rootFolder asPath) pathString
 ]
 
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> resolveInvocationOrInstantiationFrom: aCallNode [
+
+	"No receiver"
+	aCallNode _function type = #identifier ifTrue: [
+			^ self
+				  resolve: ((FamixPythonInvocationOrInstantiationResolvable identifier: (self visit: aCallNode _function))
+						   expectedKind: {
+								   FamixPythonFunction.
+								   FamixPythonClass };
+						   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one can be a function or a class"
+							   { (self ensureStubUnknownEntityNamed: unresolved identifier) } ];
+						   yourself)
+				  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aCallNode forResult: result in: currentEntity ] ].
+	super visitNode: aCallNode
+]
+
 { #category : 'private' }
 FamixPythonTreeSitterVisitor >> setSourceAnchor: aFamixEntity from: aTSNode [
 
@@ -342,19 +359,10 @@ FamixPythonTreeSitterVisitor >> visitAssignment: anAssignmentNode [
 
 { #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> visitCall: aCallNode [
-	"No receiver"
 
-	aCallNode _function type = #identifier ifTrue: [
-			^ self
-				  resolve: ((FamixPythonInvocationOrInstantiationResolvable identifier: (self visit: aCallNode _function))
-						   expectedKind: {
-								   FamixPythonFunction.
-								   FamixPythonClass };
-						   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one can be a function or a class"
-							   { (self ensureStubUnknownEntityNamed: unresolved identifier) } ];
-						   yourself)
-				  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aCallNode forResult: result in: currentEntity ] ].
-	super visitNode: aCallNode
+	self resolveInvocationOrInstantiationFrom: aCallNode.
+
+	^ super visitNode: aCallNode
 ]
 
 { #category : 'visiting' }
@@ -392,6 +400,13 @@ FamixPythonTreeSitterVisitor >> visitComment: aCommentNode [
 FamixPythonTreeSitterVisitor >> visitDottedName: aDottedNameNode [
 
 	^ aDottedNameNode sourceText
+]
+
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitFalse: aNode [
+	"noop"
+
+	
 ]
 
 { #category : 'visiting' }
@@ -457,6 +472,13 @@ FamixPythonTreeSitterVisitor >> visitImportStatement: anImportStatement [
 				ofName: identifier
 				from: nil
 				alias: alias ]
+]
+
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitInteger: aNode [
+	"noop"
+
+	
 ]
 
 { #category : 'visiting' }
@@ -574,6 +596,13 @@ FamixPythonTreeSitterVisitor >> visitString: aStringNode [
 
 	"No need to visit children, we do nothing with them currently."
 	^ self
+]
+
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitTrue: aNode [
+	"noop"
+
+	
 ]
 
 { #category : 'visiting' }
