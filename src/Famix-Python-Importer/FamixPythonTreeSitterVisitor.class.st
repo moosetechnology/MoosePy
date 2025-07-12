@@ -454,7 +454,7 @@ FamixPythonTreeSitterVisitor >> visitAssignment: anAssignmentNode [
 FamixPythonTreeSitterVisitor >> visitAttribute: anAttributeNode [
 
 	^ {
-		  anAttributeNode _object sourceText.
+		  (anAttributeNode _object sourceText copyWithout: Character space).
 		  (self visit: anAttributeNode _attribute) }
 ]
 
