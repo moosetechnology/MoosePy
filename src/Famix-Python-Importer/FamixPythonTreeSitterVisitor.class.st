@@ -96,6 +96,7 @@ FamixPythonTreeSitterVisitor >> createInvocationOf: target from: currentEntity n
 	target isCollection
 		ifTrue: [ invocation candidates: target ]
 		ifFalse: [ invocation invokedEntity: target ].
+
 	self setSourceAnchor: invocation from: aNode.
 	^ invocation
 ]
@@ -257,10 +258,14 @@ FamixPythonTreeSitterVisitor >> relativeFilePath [
 { #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> resolveInvocationOrInstantiationFrom: aCallNode [
 
-	"No receiver"
-	aCallNode _function type = #identifier ifTrue: [
+	| receiver |
+	(#( subscript call ) includes: aCallNode _function type) ifTrue: [ ^ self ].
+
+	receiver := self visit: aCallNode _function.
+
+	receiver isString ifTrue: [
 			^ self
-				  resolve: ((FamixPythonInvocationOrInstantiationResolvable identifier: (self visit: aCallNode _function))
+				  resolve: ((FamixPythonInvocationOrInstantiationResolvable identifier: receiver)
 						   expectedKind: {
 								   FamixPythonFunction.
 								   FamixPythonClass };
@@ -268,7 +273,11 @@ FamixPythonTreeSitterVisitor >> resolveInvocationOrInstantiationFrom: aCallNode 
 							   { (self ensureStubUnknownEntityNamed: unresolved identifier) } ];
 						   yourself)
 				  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aCallNode forResult: result in: currentEntity ] ].
-	super visitNode: aCallNode
+
+	receiver first = 'self' ifTrue: [
+			^ self
+				  resolve: (FamixPythonLocalMethodInvocationResolvable identifier: receiver second)
+				  foundAction: [ :method :currentEntity | self createInvocationOf: method from: currentEntity node: aCallNode ] ]
 ]
 
 { #category : 'private' }
@@ -355,6 +364,14 @@ FamixPythonTreeSitterVisitor >> visitAssignment: anAssignmentNode [
 
 	super visitNode: anAssignmentNode.
 	^ names
+]
+
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitAttribute: anAttributeNode [
+
+	^ {
+		  anAttributeNode _object sourceText.
+		  (self visit: anAttributeNode _attribute) }
 ]
 
 { #category : 'visiting' }
