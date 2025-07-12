@@ -6,7 +6,8 @@ Class {
 	#instVars : [
 		'fileReference',
 		'model',
-		'commentsImporter'
+		'commentsImporter',
+		'importPaths'
 	],
 	#category : 'Famix-Python-Importer-Visitors',
 	#package : 'Famix-Python-Importer',
@@ -60,9 +61,9 @@ FamixPythonTreeSitterVisitor >> createImport: anImport ofName: aName from: fromN
 
 	self currentEntity addImport: import.
 
-	"importPaths at: import put: ((fromName
+	importPaths at: import put: ((fromName
 			  ifNil: [ aName ]
-			  ifNotNil: [ fromName ]) copyWithout: Character space)."
+			  ifNotNil: [ fromName ]) copyWithout: Character space).
 
 	self solver
 		resolve: (fromName
@@ -202,6 +203,36 @@ FamixPythonTreeSitterVisitor >> fileReference: anObject [
 ]
 
 { #category : 'private' }
+FamixPythonTreeSitterVisitor >> findImportMatchingSource: aString ifFound: aBlock [
+	"If I get a string such as `matplotlib.pyglot.array()`, I'll check if we have an import that is not a from import matching `matplotlib.pyglot` and execute the block as parameter if this is the case.
+	
+	I also manages the case of aliases like this:
+	
+	```python
+	import matplotlib.pyglot as mp
+	
+	mp.array()
+	```
+	
+	This method is useful to resolve accesses, invocations and references of imported entities.
+	"
+
+	| source |
+	source := aString copyWithoutAll: ' '.
+	^ self currentEntity allEffectiveSimpleImports
+		  detect: [ :import |
+				  | importPath |
+				  importPath := import hasAlias
+					                ifTrue: [ import alias ]
+					                ifFalse: [ importPaths at: import ].
+				  aString = importPath or: [
+						  importPath := importPath , '.'.
+						  importPath := importPath copyWithoutAll: ' '.
+						  (source beginsWith: importPath) and: [ ((source withoutPrefix: importPath) includes: $.) not ] ] ]
+		  ifFound: aBlock
+]
+
+{ #category : 'private' }
 FamixPythonTreeSitterVisitor >> findSadowedEntityNamed: name [
 	"If the same element already has a shadowable entity of the same name, we select the last one defined. If there is none, we return nil"
 
@@ -231,7 +262,8 @@ FamixPythonTreeSitterVisitor >> initialize [
 	super initialize.
 	model := FamixPythonModel new name: 'default Python Model'.
 	model sourceLanguage: model newSourceLanguage.
-	self initialiseSolver
+	self initialiseSolver.
+	importPaths := IdentityDictionary new
 ]
 
 { #category : 'accessing' }
@@ -277,7 +309,21 @@ FamixPythonTreeSitterVisitor >> resolveInvocationOrInstantiationFrom: aCallNode 
 	receiver first = 'self' ifTrue: [
 			^ self
 				  resolve: (FamixPythonLocalMethodInvocationResolvable identifier: receiver second)
-				  foundAction: [ :method :currentEntity | self createInvocationOf: method from: currentEntity node: aCallNode ] ]
+				  foundAction: [ :method :currentEntity | self createInvocationOf: method from: currentEntity node: aCallNode ] ].
+
+	"=> package.module.x()"
+	self findImportMatchingSource: receiver first ifFound: [ :import |
+			^ self
+				  resolve: ((FamixPythonInvocationOrInstantiationWithNamespaceResolvable identifier: receiver second import: import)
+						   expectedKind: {
+								   FamixPythonFunction.
+								   FamixPythonClass };
+						   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one can be a function or a class"
+								   (self ensureStubUnknownEntityNamed: unresolved identifier)
+									   parentPackage: import importedEntity;
+									   yourself ];
+						   yourself)
+				  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aCallNode forResult: result in: currentEntity ] ]
 ]
 
 { #category : 'private' }
