@@ -369,7 +369,7 @@ FamixPythonTreeSitterVisitor >> setSourceAnchor: aFamixEntity from: aTSNode [
 
 	^ self
 		  setSourceAnchorTo: aFamixEntity
-		  fileName: self relativeFilePath
+		  fileName: aTSNode relativePath
 		  start: aTSNode startPosition
 		  end: aTSNode endPosition
 ]

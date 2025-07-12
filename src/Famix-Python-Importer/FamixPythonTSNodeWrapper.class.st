@@ -136,6 +136,12 @@ FamixPythonTSNodeWrapper >> printOn: aStream [
 ]
 
 { #category : 'accessing' }
+FamixPythonTSNodeWrapper >> relativePath [
+
+	^ self rootNode relativePath
+]
+
+{ #category : 'accessing' }
 FamixPythonTSNodeWrapper >> rootNode [
 	^ self parent rootNode
 ]
