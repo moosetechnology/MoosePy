@@ -21,8 +21,6 @@ FamixTreeSitterPythonImporter >> importPythonFile: aFileReference [
 
 	FamixPythonTSRootNodeWrapper new
 		tsNode: tree rootNode;
-		relativePath: visitor relativeFilePath;
-		source: visitor sourceText;
 		accept: visitor
 ]
 

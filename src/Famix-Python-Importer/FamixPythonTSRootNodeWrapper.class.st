@@ -10,6 +10,15 @@ Class {
 	#tag : 'Importer'
 }
 
+{ #category : 'visiting' }
+FamixPythonTSRootNodeWrapper >> accept: aVisitor [
+
+	self
+		relativePath: aVisitor relativeFilePath;
+		source: aVisitor sourceText.
+	super accept: aVisitor
+]
+
 { #category : 'accessing' }
 FamixPythonTSRootNodeWrapper >> relativePath [
 
