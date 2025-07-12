@@ -12,8 +12,7 @@ Class {
 	#name : 'FamixPythonInvocationOrInstantiationWithUnknownReceiverResolvable',
 	#superclass : 'FamixPythonAbstractInvocationOrInstantiationResolvable',
 	#instVars : [
-		'visitor',
-		'node',
+		'receiver',
 		'correspondingImport'
 	],
 	#category : 'Famix-Python-Importer-SymbolResolution',
@@ -22,11 +21,10 @@ Class {
 }
 
 { #category : 'instance creation' }
-FamixPythonInvocationOrInstantiationWithUnknownReceiverResolvable class >> identifier: aString node: aNode visitor: aVisitor [
+FamixPythonInvocationOrInstantiationWithUnknownReceiverResolvable class >> identifier: aString receiver: anotherString [
 
 	^ (self identifier: aString)
-		  node: aNode;
-		  visitor: aVisitor;
+		  receiver: anotherString;
 		  yourself
 ]
 
@@ -42,17 +40,15 @@ FamixPythonInvocationOrInstantiationWithUnknownReceiverResolvable >> hasCorrespo
 ]
 
 { #category : 'accessing' }
-FamixPythonInvocationOrInstantiationWithUnknownReceiverResolvable >> node: anObject [
-	node := anObject
+FamixPythonInvocationOrInstantiationWithUnknownReceiverResolvable >> receiver: anObject [
+	receiver := anObject
 ]
 
 { #category : 'resolution' }
 FamixPythonInvocationOrInstantiationWithUnknownReceiverResolvable >> resolveInScope: aScope currentEntity: currentEntity [
 	"First we check if the receiver is an imported module or package. If it is not, we have a method invocation that we are treating later."
 
-	node receiver receiver isVariableExpression ifTrue: [
-		| receiverName |
-		receiverName := node receiver receiver name.
+	(receiver includes: $.) ifFalse: [
 		((currentEntity withAllParents flatCollect: [ :anEntity | anEntity query outgoing local dependenciesOfType: FamixPythonImport ]) select: [ :import |
 			 import importedEntity isNotNil "It's nil if we did not resolve it yet but that means the import is not relevent here." ])
 			detect: [ :import |
@@ -61,8 +57,8 @@ FamixPythonInvocationOrInstantiationWithUnknownReceiverResolvable >> resolveInSc
 					 FamixPythonPackage.
 					 FamixPythonUnknownEntity } anySatisfy: [ :class | import importedEntity isOfType: class ]) and: [
 					import hasAlias
-						ifTrue: [ import alias = receiverName ]
-						ifFalse: [ import importedEntity name = receiverName ] ] ]
+						ifTrue: [ import alias = receiver ]
+						ifFalse: [ import importedEntity name = receiver ] ] ]
 			ifFound: [ :import |
 				correspondingImport := import.
 				^ (import importedEntity definedEntitiesNamed: identifier ofKinds: {
@@ -85,9 +81,4 @@ FamixPythonInvocationOrInstantiationWithUnknownReceiverResolvable >> resolveInSc
 	^ (aScope entity withAllParents flatCollectAsSet: [ :anEntity | anEntity reachableEntitiesNamed: identifier ofKinds: { FamixPythonMethod } ])
 		  ifNotEmpty: [ :methods | entity := methods ]
 		  ifEmpty: [ SRNoResolutionPossible signal ]
-]
-
-{ #category : 'accessing' }
-FamixPythonInvocationOrInstantiationWithUnknownReceiverResolvable >> visitor: anObject [
-	visitor := anObject
 ]

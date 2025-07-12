@@ -152,6 +152,17 @@ FamixPythonTreeSitterVisitor >> ensureMethod: aMethodNode [
 ]
 
 { #category : 'private' }
+FamixPythonTreeSitterVisitor >> ensureStubMethodNamed: aName [
+
+	^ model allMethods
+		  detect: [ :method | method isStub and: [ method name = aName ] ]
+		  ifNone: [
+				  (model newMethodNamed: aName)
+					  isStub: true;
+					  yourself ]
+]
+
+{ #category : 'private' }
 FamixPythonTreeSitterVisitor >> ensureStubPackageNamed: aString [
 
 	^ model allPackages
@@ -323,7 +334,22 @@ FamixPythonTreeSitterVisitor >> resolveInvocationOrInstantiationFrom: aCallNode 
 									   parentPackage: import importedEntity;
 									   yourself ];
 						   yourself)
-				  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aCallNode forResult: result in: currentEntity ] ]
+				  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aCallNode forResult: result in: currentEntity ] ].
+
+	"=> c.x() or module.x() with `from package import module`"
+	^ self
+		  resolve: ((FamixPythonInvocationOrInstantiationWithUnknownReceiverResolvable identifier: receiver second receiver: receiver first)
+				   notFoundReplacementEntity: [ :unresolved :currentEntity | "Two case possible:
+						- The receiver is an import of a stub module or package and we should create an unknown entity that can be a function or a class invoked
+						- The receiver is not an imported module or package but an instance of a class and the entity is a stub method"
+						   unresolved hasCorrespondingImport
+							   ifTrue: [
+									   (self ensureStubUnknownEntityNamed: unresolved identifier)
+										   parentPackage: unresolved correspondingImport importedEntity;
+										   yourself ]
+							   ifFalse: [ { (self ensureStubMethodNamed: unresolved identifier) } ] ];
+				   yourself)
+		  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aCallNode forResult: result in: currentEntity ]
 ]
 
 { #category : 'private' }
