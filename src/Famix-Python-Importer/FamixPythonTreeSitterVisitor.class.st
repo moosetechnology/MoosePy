@@ -34,8 +34,7 @@ FamixPythonTreeSitterVisitor >> createFunction: aFunctionDefinition [
 	signature := aFunctionDefinition completeSource copyFrom: aFunctionDefinition _name startPosition to: aFunctionDefinition _parameters endPosition.
 
 	"If we are shadowing an entity, we need to mark is as shadowed."
-	self flag: #todo.
-	"shadowedEntity := self findSadowedEntityNamed: aFunctionDefinition pythonFunctionName."
+	shadowedEntity := self findSadowedEntityNamed: name.
 
 	function := model newFunction
 		            name: name;
@@ -201,6 +200,17 @@ FamixPythonTreeSitterVisitor >> fileReference: anObject [
 	fileReference := anObject
 ]
 
+{ #category : 'private' }
+FamixPythonTreeSitterVisitor >> findSadowedEntityNamed: name [
+	"If the same element already has a shadowable entity of the same name, we select the last one defined. If there is none, we return nil"
+
+	self withCurrentEntityDo: [ :entity |
+		((entity query descendants ofType: FamixTShadowable) select: [ :child | child name = name ]) ifNotEmpty: [ :entities |
+			^ entities detectMax: [ :anEntity | anEntity sourceAnchor startPos ] ] ].
+
+	^ nil
+]
+
 { #category : 'accessing' }
 FamixPythonTreeSitterVisitor >> getConstructorOf: aClass [
 
@@ -317,8 +327,7 @@ FamixPythonTreeSitterVisitor >> visitAssignment: anAssignmentNode [
 				         ifFound: [ :var | variable := var ]
 				         ifNone: [
 						         | shadowedEntity |
-						         self flag: #todo.
-						         "shadowedEntity := self findSadowedEntityNamed:  name."
+						         shadowedEntity := self findSadowedEntityNamed:  name.
 						         variable := self currentEntity createLocalVariable: name.
 						         shadowedEntity ifNotNil: [ variable shadowedEntity: shadowedEntity ].
 						         "We select the lhs node because the source anchor should not be the full assignation."
@@ -351,16 +360,16 @@ FamixPythonTreeSitterVisitor >> visitCall: aCallNode [
 { #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> visitClassDefinition: aClassDefinitionNode [
 
-	| class shadowedEntity |
+	| class shadowedEntity name |
+	name := self visit: aClassDefinitionNode _name.
 	"If we are shadowing an entity, we need to mark is as shadowed."
-	self flag: #todo.
-	"shadowedEntity := self findSadowedEntityNamed: classDefinitionNode pythonClassName."
+	shadowedEntity := self findSadowedEntityNamed: name.
 
 	self flag: #todo.
 	class := model newClass. "classDefinitionNode isMetaclass
 		         ifTrue: [ model newMetaclass ]
 		         ifFalse: [" "]"
-	class name: (self visit: aClassDefinitionNode _name).
+	class name: name.
 
 	self flag: #todo.
 	"self setSuperclassesOf: classDefinitionNode from: class."
@@ -510,8 +519,8 @@ FamixPythonTreeSitterVisitor >> visitNamedExpression: aNamedExpressionNode [
 		ifFound: [ :var | variable := var ]
 		ifNone: [
 				| shadowedEntity |
-				self flag: #todo.
-				"shadowedEntity := self findSadowedEntityNamed:  name."
+				self flag: #todo. "Add test on shadowing at this level. This is not yet covered by test. If you comment the next line the parser is still passing all tests."
+				shadowedEntity := self findSadowedEntityNamed:  name.
 				variable := self currentEntity createLocalVariable: name.
 				shadowedEntity ifNotNil: [ variable shadowedEntity: shadowedEntity ].
 				"We select the lhs node because the source anchor should not be the full assignation."
