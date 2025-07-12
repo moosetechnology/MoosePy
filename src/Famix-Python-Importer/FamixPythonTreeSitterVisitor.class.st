@@ -300,12 +300,23 @@ FamixPythonTreeSitterVisitor >> relativeFilePath [
 
 { #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> resolveInvocationOrInstantiationFrom: aCallNode [
+	"When we end up here we might have multiple cases to manage:
+	- x() => This is either a function invocation or instantiation. There should be no stub. 
+	- package.module.x() => Function invocation or instantiation comming from one of the import. Stub is an unknown entity.
+	- module.x() with `from package import module` => Function invecation or instantiation from an imported module. Stub is an unknown entity.
+	- self.x() => Method invocation. There should be no stub.
+	- c.x() => Method invocation. Can be a stub method
+	- x()() => Invocation or Instantiation of the result of another invocation. This we cannot really treat it here so for now I'll just ignore this case.
+	- table[x]() => Same as above but with the content of a table"
 
 	| receiver |
+	" => x()()/table[x]()
+	This is happening when we invoke the result of an invocation. The parser cannot know what is invoked. I'm ignoring it"
 	(#( subscript call ) includes: aCallNode _function type) ifTrue: [ ^ self ].
 
 	receiver := self visit: aCallNode _function.
 
+	"=> x()"
 	receiver isString ifTrue: [
 			^ self
 				  resolve: ((FamixPythonInvocationOrInstantiationResolvable identifier: receiver)
@@ -316,7 +327,8 @@ FamixPythonTreeSitterVisitor >> resolveInvocationOrInstantiationFrom: aCallNode 
 							   { (self ensureStubUnknownEntityNamed: unresolved identifier) } ];
 						   yourself)
 				  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aCallNode forResult: result in: currentEntity ] ].
-
+	"=> self.x()"
+	self flag: #todo. "Can be something different than self..."
 	receiver first = 'self' ifTrue: [
 			^ self
 				  resolve: (FamixPythonLocalMethodInvocationResolvable identifier: receiver second)
