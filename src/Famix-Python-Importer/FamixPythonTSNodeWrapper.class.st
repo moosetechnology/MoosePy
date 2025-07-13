@@ -90,6 +90,22 @@ FamixPythonTSNodeWrapper >> fullSourceInspectorExtension: aBuilder [
 ]
 
 { #category : 'testing' }
+FamixPythonTSNodeWrapper >> includesChild: aNode [
+
+	^ self collectNamedChild
+		  detect: [ :node | node = aNode or: [ node includesChild: aNode ] ]
+		  ifFound: [ :node | true ]
+		  ifNone: [ false ]
+]
+
+{ #category : 'testing' }
+FamixPythonTSNodeWrapper >> isLeftSideOfAssignation [
+
+	self parentsDo: [ :node | node type = #assignment ifTrue: [ ^ node _left includesChild: self ] ].
+	^ false
+]
+
+{ #category : 'testing' }
 FamixPythonTSNodeWrapper >> isTSNode [
 
 	^ true
@@ -126,6 +142,14 @@ FamixPythonTSNodeWrapper >> parent [
 FamixPythonTSNodeWrapper >> parent: anObject [
 
 	parent := anObject
+]
+
+{ #category : 'enumerating' }
+FamixPythonTSNodeWrapper >> parentsDo: aBlock [
+
+	^ self parent ifNotNil: [ :parentNode |
+			  aBlock value: parentNode.
+			  parentNode parentsDo: aBlock ]
 ]
 
 { #category : 'printing' }
