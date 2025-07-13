@@ -542,9 +542,12 @@ FamixPythonTreeSitterVisitor >> visitGlobalStatement: aNode [
 
 { #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> visitIdentifier: anIdentifierNode [
-	self flag: #todo. "review some like assignation"
-	(#( aliased_import attribute call function_definition class_definition parameters keyword_argument assignment lambda_parameters named_expression pattern_list) includes: anIdentifierNode parent type) ifTrue: [ ^ anIdentifierNode sourceText ].
-	(#( argument_list return_statement lambda if_statement comparison_operator binary_operator) includes: anIdentifierNode parent type) ifTrue: [
+
+	self flag: #todo. "review some + clean method"
+	(#( aliased_import attribute call function_definition class_definition parameters keyword_argument lambda_parameters named_expression pattern_list ) includes:
+		 anIdentifierNode parent type) ifTrue: [ ^ anIdentifierNode sourceText ].
+	anIdentifierNode isLeftSideOfAssignation ifTrue: [ ^ anIdentifierNode sourceText ].
+	(#( argument_list return_statement lambda if_statement comparison_operator binary_operator assignment ) includes: anIdentifierNode parent type) ifTrue: [
 			^ self
 				  resolve: ((SRIdentifierWithNode identifier: anIdentifierNode sourceText)
 						   expectedKind: {

@@ -99,6 +99,7 @@ FamixPythonTSNodeWrapper >> fullSourceInspectorExtension: aBuilder [
 { #category : 'testing' }
 FamixPythonTSNodeWrapper >> includesChild: aNode [
 
+	self = aNode ifTrue: [ ^ true ].
 	^ self collectNamedChild
 		  detect: [ :node | node = aNode or: [ node includesChild: aNode ] ]
 		  ifFound: [ :node | true ]
