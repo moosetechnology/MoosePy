@@ -1,6 +1,7 @@
 import moduleAtRoot
 import moduleAtRoot
 import moduleAtRoot3
+import moduleAtRoot8
 
 # Comment in module at root 2
 
@@ -225,3 +226,7 @@ class ClassWihtComments():
         In method
         """
         return self.ivar_commented
+
+
+class ClassUsingImportedMetaclass(metaclass=moduleAtRoot8.CustomMetaclass2):
+    pass
