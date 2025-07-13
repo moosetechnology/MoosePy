@@ -1,5 +1,5 @@
 Class {
-	#name : 'FamixPythonTSNodeWrapper',
+	#name : 'FamixTSNodeWrapper',
 	#superclass : 'Object',
 	#instVars : [
 		'tsNode',
@@ -12,20 +12,20 @@ Class {
 }
 
 { #category : 'visiting' }
-FamixPythonTSNodeWrapper >> accept: aTSVisitor [
+FamixTSNodeWrapper >> accept: aTSVisitor [
 
 	^ aTSVisitor visitNode: self
 ]
 
 { #category : 'testing' }
-FamixPythonTSNodeWrapper >> assignationNode [
+FamixTSNodeWrapper >> assignationNode [
 
 	self type = #assignment ifTrue: [ ^ self ].
 	^ self parent ifNotNil: [ self parent assignationNode ]
 ]
 
 { #category : 'api' }
-FamixPythonTSNodeWrapper >> collectFieldNameOfNamedChild [
+FamixTSNodeWrapper >> collectFieldNameOfNamedChild [
 
 	^ children ifNil: [
 			  children := tsNode collectFieldNameOfNamedChild.
@@ -36,12 +36,12 @@ FamixPythonTSNodeWrapper >> collectFieldNameOfNamedChild [
 					  association value: (value isCollection
 							   ifTrue: [
 									   value collect: [ :node |
-											   FamixPythonTSNodeWrapper new
+											   FamixTSNodeWrapper new
 												   tsNode: node;
 												   parent: self;
 												   yourself ] ]
 							   ifFalse: [
-									   FamixPythonTSNodeWrapper new
+									   FamixTSNodeWrapper new
 										   tsNode: value;
 										   parent: self;
 										   yourself ]) ].
@@ -49,18 +49,18 @@ FamixPythonTSNodeWrapper >> collectFieldNameOfNamedChild [
 ]
 
 { #category : 'api' }
-FamixPythonTSNodeWrapper >> collectNamedChild [
+FamixTSNodeWrapper >> collectNamedChild [
 
 	^ self collectFieldNameOfNamedChild values flattened
 ]
 
 { #category : 'accessing' }
-FamixPythonTSNodeWrapper >> completeSource [
+FamixTSNodeWrapper >> completeSource [
 	^ self rootNode source
 ]
 
 { #category : 'collection' }
-FamixPythonTSNodeWrapper >> detectNamedChild: name ifNone: aConstantBlockClosure [
+FamixTSNodeWrapper >> detectNamedChild: name ifNone: aConstantBlockClosure [
 
 	^ self collectNamedChild
 		  detect: [ :node | node type = name ]
@@ -68,22 +68,42 @@ FamixPythonTSNodeWrapper >> detectNamedChild: name ifNone: aConstantBlockClosure
 ]
 
 { #category : 'reflective operations' }
-FamixPythonTSNodeWrapper >> doesNotUnderstand: aMessage [
+FamixTSNodeWrapper >> doesNotUnderstand: aMessage [
 	"Forward message to decoree except if it's a node by field access"
 
-	aMessage selector first = $_ ifTrue: [ ^ self nodeChildByFieldName: aMessage selector allButFirst ].
+	aMessage selector first = $_ ifTrue: [ ^ self nodeChildByFieldName: aMessage selector allButFirst ifAbsent: [ nil ] ].
 
 	^ aMessage sendTo: tsNode
 ]
 
 { #category : 'accessing' }
-FamixPythonTSNodeWrapper >> endPosition [
+FamixTSNodeWrapper >> endPosition [
 
 	^ self source positionFromTSPoint: tsNode endPoint
 ]
 
 { #category : 'inspector' }
-FamixPythonTSNodeWrapper >> fullSourceInspectorExtension: aBuilder [
+FamixTSNodeWrapper >> fieldsInspectorExtension: aBuilder [
+
+	<inspectorPresentationOrder: 900.5 title: 'Fields'>
+	^ aBuilder newTable
+		  addStyle: 'stList';
+		  addColumn: (SpStringTableColumn new
+				   title: 'Key';
+				   evaluated: [ :each | each key ];
+				   formatted: [ :key | StObjectPrinter asTruncatedTextFrom: key ];
+				   beSortable);
+		  addColumn: (SpStringTableColumn new
+				   title: 'Value';
+				   evaluated: [ :each | each value ];
+				   formatted: [ :value | StObjectPrinter asTruncatedTextFrom: value ];
+				   beSortable);
+		  items: (self collectFieldNameOfNamedChild associations collect: [ :e | StInspectorAssociationNode hostObject: e ]);
+		  yourself
+]
+
+{ #category : 'inspector' }
+FamixTSNodeWrapper >> fullSourceInspectorExtension: aBuilder [
 
 	<inspectorPresentationOrder: 902 title: 'Full source'>
 	^ aBuilder newCode
@@ -97,7 +117,7 @@ FamixPythonTSNodeWrapper >> fullSourceInspectorExtension: aBuilder [
 ]
 
 { #category : 'testing' }
-FamixPythonTSNodeWrapper >> includesChild: aNode [
+FamixTSNodeWrapper >> includesChild: aNode [
 
 	self = aNode ifTrue: [ ^ true ].
 	^ self collectNamedChild
@@ -107,32 +127,32 @@ FamixPythonTSNodeWrapper >> includesChild: aNode [
 ]
 
 { #category : 'testing' }
-FamixPythonTSNodeWrapper >> isLeftSideOfAssignation [
+FamixTSNodeWrapper >> isLeftSideOfAssignation [
 
 	self parentsDo: [ :node | node type = #assignment ifTrue: [ ^ node _left includesChild: self ] ].
 	^ false
 ]
 
 { #category : 'testing' }
-FamixPythonTSNodeWrapper >> isTSNode [
+FamixTSNodeWrapper >> isTSNode [
 
 	^ true
 ]
 
 { #category : 'accessing' }
-FamixPythonTSNodeWrapper >> nodeChildByFieldName: aName [
+FamixTSNodeWrapper >> nodeChildByFieldName: aName [
 
 	^ self collectFieldNameOfNamedChild at: aName
 ]
 
 { #category : 'accessing' }
-FamixPythonTSNodeWrapper >> nodeChildByFieldName: aName ifAbsent: aBlock [
+FamixTSNodeWrapper >> nodeChildByFieldName: aName ifAbsent: aBlock [
 
 	^ self collectFieldNameOfNamedChild at: aName ifAbsent: aBlock
 ]
 
 { #category : 'accessing' }
-FamixPythonTSNodeWrapper >> nodeChildByFieldName: aName ifPresent: block ifAbsent: aBlock [
+FamixTSNodeWrapper >> nodeChildByFieldName: aName ifPresent: block ifAbsent: aBlock [
 
 	^ self collectFieldNameOfNamedChild
 		  at: aName
@@ -141,19 +161,19 @@ FamixPythonTSNodeWrapper >> nodeChildByFieldName: aName ifPresent: block ifAbsen
 ]
 
 { #category : 'accessing' }
-FamixPythonTSNodeWrapper >> parent [
+FamixTSNodeWrapper >> parent [
 
 	^ parent
 ]
 
 { #category : 'accessing' }
-FamixPythonTSNodeWrapper >> parent: anObject [
+FamixTSNodeWrapper >> parent: anObject [
 
 	parent := anObject
 ]
 
 { #category : 'enumerating' }
-FamixPythonTSNodeWrapper >> parentsDo: aBlock [
+FamixTSNodeWrapper >> parentsDo: aBlock [
 
 	^ self parent ifNotNil: [ :parentNode |
 			  aBlock value: parentNode.
@@ -161,30 +181,30 @@ FamixPythonTSNodeWrapper >> parentsDo: aBlock [
 ]
 
 { #category : 'printing' }
-FamixPythonTSNodeWrapper >> printOn: aStream [
+FamixTSNodeWrapper >> printOn: aStream [
 
-	aStream nextPutAll: 'Wrapped '.
+	aStream nextPutAll: 'Wrapped: '.
 	tsNode printOn: aStream
 ]
 
 { #category : 'accessing' }
-FamixPythonTSNodeWrapper >> relativePath [
+FamixTSNodeWrapper >> relativePath [
 
 	^ self rootNode relativePath
 ]
 
 { #category : 'accessing' }
-FamixPythonTSNodeWrapper >> rootNode [
+FamixTSNodeWrapper >> rootNode [
 	^ self parent rootNode
 ]
 
 { #category : 'accessing' }
-FamixPythonTSNodeWrapper >> source [
+FamixTSNodeWrapper >> source [
 	^ self rootNode source
 ]
 
 { #category : 'inspector' }
-FamixPythonTSNodeWrapper >> sourceInspectorExtension: builder [
+FamixTSNodeWrapper >> sourceInspectorExtension: builder [
 
 	<inspectorPresentationOrder: 901 title: 'Source'>
 	^ builder newCode
@@ -195,31 +215,31 @@ FamixPythonTSNodeWrapper >> sourceInspectorExtension: builder [
 ]
 
 { #category : 'accessing' }
-FamixPythonTSNodeWrapper >> sourceText [
+FamixTSNodeWrapper >> sourceText [
 
 	^ tsNode textFromSourceText: self completeSource
 ]
 
 { #category : 'accessing' }
-FamixPythonTSNodeWrapper >> startPosition [
+FamixTSNodeWrapper >> startPosition [
 
 	^ (self source positionFromTSPoint: tsNode startPoint) + 1
 ]
 
 { #category : 'accessing' }
-FamixPythonTSNodeWrapper >> tsNode [
+FamixTSNodeWrapper >> tsNode [
 
 	^ tsNode
 ]
 
 { #category : 'accessing' }
-FamixPythonTSNodeWrapper >> tsNode: anObject [
+FamixTSNodeWrapper >> tsNode: anObject [
 
 	tsNode := anObject
 ]
 
 { #category : 'inspector' }
-FamixPythonTSNodeWrapper >> tsTreeExtension: builder [
+FamixTSNodeWrapper >> tsTreeExtension: builder [
 
 	<inspectorPresentationOrder: 15 title: 'TS Tree'>
 	^ (builder instantiate: SpTreeTablePresenter)

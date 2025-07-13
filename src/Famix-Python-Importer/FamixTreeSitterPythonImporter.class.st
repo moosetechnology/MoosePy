@@ -19,7 +19,8 @@ FamixTreeSitterPythonImporter >> importPythonFile: aFileReference [
 
 	"(aFileReference basename = #'modulesReferencingThings.py') ifTrue: [ 1halt ]."
 
-	FamixPythonTSRootNodeWrapper new
+	self flag: #todo. "A tool to list possible nodes, possible parents and possible children"
+	FamixTSRootNodeWrapper new
 		tsNode: tree rootNode;
 		accept: visitor
 ]

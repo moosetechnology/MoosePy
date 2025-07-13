@@ -666,9 +666,9 @@ FamixPythonTreeSitterVisitor >> visitLambda: aLambdaNode [
 
 	| lambda |
 	lambda := model newLambda.
-	lambda signature: ([ aLambdaNode completeSource copyFrom: aLambdaNode _parameters startPosition to: aLambdaNode _parameters endPosition ]
-			 on: KeyNotFound
-			 do: [ '' ]).
+	lambda signature: (aLambdaNode _parameters
+			 ifNotNil: [ :node | aLambdaNode completeSource copyFrom: node startPosition to: node endPosition ]
+			 ifNil: [ '' ]).
 	lambda lambdaContainer: self currentEntity.
 
 	self setSourceAnchor: lambda from: aLambdaNode.

@@ -1,6 +1,6 @@
 Class {
-	#name : 'FamixPythonTSRootNodeWrapper',
-	#superclass : 'FamixPythonTSNodeWrapper',
+	#name : 'FamixTSRootNodeWrapper',
+	#superclass : 'FamixTSNodeWrapper',
 	#instVars : [
 		'source',
 		'relativePath'
@@ -11,7 +11,7 @@ Class {
 }
 
 { #category : 'visiting' }
-FamixPythonTSRootNodeWrapper >> accept: aVisitor [
+FamixTSRootNodeWrapper >> accept: aVisitor [
 
 	self
 		relativePath: aVisitor relativeFilePath;
@@ -20,30 +20,30 @@ FamixPythonTSRootNodeWrapper >> accept: aVisitor [
 ]
 
 { #category : 'accessing' }
-FamixPythonTSRootNodeWrapper >> relativePath [
+FamixTSRootNodeWrapper >> relativePath [
 
 	^ relativePath
 ]
 
 { #category : 'accessing' }
-FamixPythonTSRootNodeWrapper >> relativePath: anObject [
+FamixTSRootNodeWrapper >> relativePath: anObject [
 
 	relativePath := anObject
 ]
 
 { #category : 'accessing' }
-FamixPythonTSRootNodeWrapper >> rootNode [
+FamixTSRootNodeWrapper >> rootNode [
 
 	^ self
 ]
 
 { #category : 'accessing' }
-FamixPythonTSRootNodeWrapper >> source [
+FamixTSRootNodeWrapper >> source [
 
 	^ source
 ]
 
 { #category : 'accessing' }
-FamixPythonTSRootNodeWrapper >> source: anObject [
+FamixTSRootNodeWrapper >> source: anObject [
 	source := anObject
 ]
