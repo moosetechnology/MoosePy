@@ -300,6 +300,14 @@ FamixPythonTreeSitterVisitor >> initialize [
 	importPaths := IdentityDictionary new
 ]
 
+{ #category : 'testing' }
+FamixPythonTreeSitterVisitor >> isMetaclassDefinition: aClassDefinitionNode [
+
+	^ aClassDefinitionNode _superclasses
+		  ifNil: [ false ]
+		  ifNotNil: [ :argumentList | argumentList collectNamedChild anySatisfy: [ :node | node type = #identifier and: [ node sourceText = 'type' ] ] ]
+]
+
 { #category : 'accessing' }
 FamixPythonTreeSitterVisitor >> methodNamed: aString inClassNamed: aClassName [
 
@@ -564,10 +572,10 @@ FamixPythonTreeSitterVisitor >> visitClassDefinition: aClassDefinitionNode [
 	"If we are shadowing an entity, we need to mark is as shadowed."
 	shadowedEntity := self findSadowedEntityNamed: name.
 
-	self flag: #todo.
-	class := model newClass. "classDefinitionNode isMetaclass
+	class := (self isMetaclassDefinition: aClassDefinitionNode)
 		         ifTrue: [ model newMetaclass ]
-		         ifFalse: [" "]"
+		         ifFalse: [ model newClass ].
+
 	class name: name.
 
 	self setSuperclassesOf: aClassDefinitionNode from: class.
