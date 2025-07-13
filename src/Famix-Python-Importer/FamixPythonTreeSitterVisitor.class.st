@@ -464,10 +464,41 @@ FamixPythonTreeSitterVisitor >> visitAssignment: anAssignmentNode [
 
 { #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> visitAttribute: anAttributeNode [
+	"An attribute can signify two things:
+		- It's the receiver of a method or function call so we use it to produce an invocation or instantiation
+		- Else it is probably a reference or access to something imported with a simple import."
 
-	^ {
-		  (anAttributeNode _object sourceText copyWithout: Character space).
-		  (self visit: anAttributeNode _attribute) }
+	| source name |
+	source := anAttributeNode _object sourceText copyWithout: Character space.
+	name := self visit: anAttributeNode _attribute.
+
+	"If the parent is a call, we return info to resolve the call"
+	anAttributeNode parent type = #call ifTrue: [
+			^ {  source .  name } ].
+
+	"Symbol resolution of accesses and references to imported entities.
+	Example:
+	
+	import moduleAtRoot
+	print(moduleAtRoot.moduleVariable)
+	"
+	self flag: #todo. "Add test with reference and spaces in the namespace."
+	source := anAttributeNode sourceText.
+	self findImportMatchingSource: source ifFound: [ :import |
+			self
+				resolve: ((FamixPythonImportedAccessOrReferenceResolvable identifier: name import: import)
+						 notFoundReplacementEntity: [ :unresolved :currentEntity | "This unknown entity can be a variable or a class."
+							 self ensureStubUnknownEntityNamed: unresolved identifier ];
+						 yourself)
+				foundAction: [ :entity :currentEntity |
+						| association |
+						association := entity createAccessOrReferenceFrom: currentEntity node: anAttributeNode.
+						self setSourceAnchor: association from: anAttributeNode ].
+			^ source ].
+		
+	self flag: #todo. "We are missing instance variable accesses here"
+	"1halt"
+	^ source
 ]
 
 { #category : 'visiting' }

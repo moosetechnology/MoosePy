@@ -17,7 +17,7 @@ FamixTreeSitterPythonImporter >> importPythonFile: aFileReference [
 	visitor fileReference: aFileReference.
 	tree := parser parseString: visitor sourceText.
 
-	"(aFileReference basename = #'moduleInRootPackage2.py') ifTrue: [ 1halt ]."
+	"(aFileReference basename = #'modulesReferencingThings.py') ifTrue: [ 1halt ]."
 
 	FamixPythonTSRootNodeWrapper new
 		tsNode: tree rootNode;
