@@ -164,6 +164,17 @@ FamixPythonTreeSitterVisitor >> ensureMethod: aMethodNode [
 ]
 
 { #category : 'private' }
+FamixPythonTreeSitterVisitor >> ensureStubClassNamed: aName [
+
+	^ model allClasses
+		  detect: [ :class | class isStub and: [ class name = aName ] ]
+		  ifNone: [
+				  (model newClassNamed: aName)
+					  isStub: true;
+					  yourself ]
+]
+
+{ #category : 'private' }
 FamixPythonTreeSitterVisitor >> ensureStubMethodNamed: aName [
 
 	^ model allMethods
@@ -401,6 +412,32 @@ FamixPythonTreeSitterVisitor >> setSourceAnchorTo: aFamixEntity fileName: aStrin
 	^ aFamixEntity
 ]
 
+{ #category : 'private' }
+FamixPythonTreeSitterVisitor >> setSuperclassesOf: classDefinitionNode from: class [
+
+	self flag: #todo. "Add test of a class with a superclass and a metaclass"
+	self flag: #todo. "Add test on multiple inheritance"
+	self flag: #todo. "The code can be cleaned... Maybe we don't need the visit here but inline the condition added in #argument_list?"
+	"We can either have identifiers representing superclasses or keywords representing for example the declaration of a metaclass"
+	^ (((self visit: classDefinitionNode _superclasses) ifNil: [ #(  ) ]) select: [ :each | each type = #identifier ])
+		  ifEmpty: [
+				  model newInheritance
+					  superclass: (self ensureStubClassNamed: 'object');
+					  subclass: class ]
+		  ifNotEmpty: [ :superclasses |
+				  superclasses do: [ :superclass |
+						  | inheritance |
+						  inheritance := model newInheritance.
+						  inheritance subclass: class.
+						  self setSourceAnchor: inheritance from: superclass.
+						  self
+							  resolve: ((SRIdentifierWithNode identifier: superclass sourceText)
+									   expectedKind: FamixPythonClass;
+									   notFoundReplacementEntity: [ :unresolvedSuperclass :currentEntity | self ensureStubClassNamed: unresolvedSuperclass identifier ];
+									   yourself)
+							  foundAction: [ :entity :currentEntity | inheritance superclass: entity ] ] ]
+]
+
 { #category : 'accessing' }
 FamixPythonTreeSitterVisitor >> sourceText [
 
@@ -428,6 +465,16 @@ FamixPythonTreeSitterVisitor >> visit: anObject [
 FamixPythonTreeSitterVisitor >> visitAliasedImport: anAliasImport [
 
 	^ (self visit: anAliasImport _name) -> (self visit: anAliasImport _alias)
+]
+
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitArgumentList: anArgumentListNode [
+	"An argument list can either be in a class definition to list superclasses and things like metaclass or in a call."
+
+	"In case of a class definition we let my caller handle the nodes"
+	anArgumentListNode parent type = #class_definition ifTrue: [ ^ anArgumentListNode collectNamedChild ].
+
+	^ super visitNode: anArgumentListNode
 ]
 
 { #category : 'visiting' }
@@ -523,8 +570,7 @@ FamixPythonTreeSitterVisitor >> visitClassDefinition: aClassDefinitionNode [
 		         ifFalse: [" "]"
 	class name: name.
 
-	self flag: #todo.
-	"self setSuperclassesOf: classDefinitionNode from: class."
+	self setSuperclassesOf: aClassDefinitionNode from: class.
 
 	shadowedEntity ifNotNil: [ class shadowedEntity: shadowedEntity ].
 	class typeContainer: self currentEntity.
