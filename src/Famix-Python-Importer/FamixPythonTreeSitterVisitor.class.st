@@ -146,6 +146,18 @@ FamixPythonTreeSitterVisitor >> createStubPackageNamed: aString [
 ]
 
 { #category : 'private' }
+FamixPythonTreeSitterVisitor >> createWriteAccessTo: variable from: anAssignmentNode [
+
+	| access |
+	access := model newAccess
+		          variable: variable;
+		          accessor: self currentEntity;
+		          isWrite: true;
+		          yourself.
+	self setSourceAnchor: access from: anAssignmentNode
+]
+
+{ #category : 'private' }
 FamixPythonTreeSitterVisitor >> ensureMethod: aMethodNode [
 
 	^ (self methodNamed: aMethodNode _name inClassNamed: self currentEntity name) ifNil: [ self createMethod: aMethodNode ]
@@ -442,8 +454,8 @@ FamixPythonTreeSitterVisitor >> visitAssignment: anAssignmentNode [
 						         shadowedEntity ifNotNil: [ variable shadowedEntity: shadowedEntity ].
 						         "We select the lhs node because the source anchor should not be the full assignation."
 						         self setSourceAnchor: variable from: anAssignmentNode _left ].
-			         self flag: #todo.
-			         "self createWriteAccessTo: variable from: anAssignmentNode assignationNode."
+	
+			         self createWriteAccessTo: variable from: anAssignmentNode assignationNode.
 			         variable ].
 
 	super visitNode: anAssignmentNode.

@@ -17,6 +17,13 @@ FamixPythonTSNodeWrapper >> accept: aTSVisitor [
 	^ aTSVisitor visitNode: self
 ]
 
+{ #category : 'testing' }
+FamixPythonTSNodeWrapper >> assignationNode [
+
+	self type = #assignment ifTrue: [ ^ self ].
+	^ self parent ifNotNil: [ self parent assignationNode ]
+]
+
 { #category : 'api' }
 FamixPythonTSNodeWrapper >> collectFieldNameOfNamedChild [
 
