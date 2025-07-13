@@ -523,8 +523,41 @@ FamixPythonTreeSitterVisitor >> visitFunctionDefinition: aFunctionDefinition [
 ]
 
 { #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitGlobalStatement: aNode [
+
+	self flag: #todo
+]
+
+{ #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> visitIdentifier: anIdentifierNode [
-	^ anIdentifierNode sourceText
+	self flag: #todo. "review some like assignation"
+	(#( aliased_import attribute call function_definition class_definition parameters keyword_argument assignment lambda_parameters named_expression pattern_list) includes: anIdentifierNode parent type) ifTrue: [ ^ anIdentifierNode sourceText ].
+	(#( argument_list return_statement lambda if_statement comparison_operator binary_operator) includes: anIdentifierNode parent type) ifTrue: [
+			^ self
+				  resolve: ((SRIdentifierWithNode identifier: anIdentifierNode sourceText)
+						   expectedKind: {
+								   FamixPythonClass.
+								   FamixPythonFunction.
+								   FamixPythonLocalVariable.
+								   FamixPythonGlobalVariable.
+								   FamixPythonAttribute.
+								   FamixPythonParameter };
+						   notFoundReplacementEntity: [ :unresolved :currentEntity | "If we are the receiver of an invocation and we did not find the associated entity it's because it's an instance of a class or the namespace from the import. In that case we should create nothing so we give a null entity.""]"
+								   self flag: #todo.
+								   "aVariableExpression isInvocationOrInstantiationReceiver
+						 ifTrue: [ FamixPythonNilEntity ]
+						 ifFalse: [" "This can be a structural entity or a class"
+								   self ensureStubUnknownEntityNamed: unresolved identifier ];
+						   yourself)
+				  foundAction: [ :entity :currentEntity | "See the comment in the notFoundReplacementEntity block to see why we do this."
+						  entity isMooseEntity ifTrue: [
+								  | association |
+								  association := entity createAccessOrReferenceFrom: currentEntity node: anIdentifierNode.
+								  self setSourceAnchor: association from: anIdentifierNode ] ] ].
+
+
+
+	1 halt
 ]
 
 { #category : 'visiting' }
@@ -594,6 +627,20 @@ FamixPythonTreeSitterVisitor >> visitLambda: aLambdaNode [
 
 	self setSourceAnchor: lambda from: aLambdaNode.
 	^ self useCurrentEntity: lambda during: [ super visitNode: aLambdaNode ]
+]
+
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitList: aNode [
+	"noop"
+
+	
+]
+
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitListComprehension: aNode [
+	"noop"
+
+	
 ]
 
 { #category : 'visiting' }
@@ -676,6 +723,13 @@ FamixPythonTreeSitterVisitor >> visitNode: aTSNode [
 FamixPythonTreeSitterVisitor >> visitNodes: aCollection [
 
 	^ aCollection collect: [ :node | self visit: node ]
+]
+
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitNotOperator: aNode [
+	"noop"
+
+	
 ]
 
 { #category : 'visiting' }
