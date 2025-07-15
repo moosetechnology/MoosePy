@@ -845,7 +845,6 @@ FamixPythonVisitor >> visitNamedExpression: aNamedExpressionNode [
 	| name variable |
 	name := self visit: aNamedExpressionNode _name.
 
-
 	"If we have a variable of this name already, we should not recreate it. Except if this variable got shadowed! In that case, we should recreate it."
 	(self currentEntity query descendants ofType: FamixPythonLocalVariable)
 		detect: [ :child | child name = name and: [ child isShadowable not or: [ child isShadowed not ] ] ]
@@ -858,8 +857,8 @@ FamixPythonVisitor >> visitNamedExpression: aNamedExpressionNode [
 				shadowedEntity ifNotNil: [ variable shadowedEntity: shadowedEntity ].
 				"We select the lhs node because the source anchor should not be the full assignation."
 				self setSourceAnchor: variable from: aNamedExpressionNode _name ].
-	self flag: #todo.
-	"self createWriteAccessTo: variable from: anAssignmentNode assignationNode."
+
+	self createWriteAccessTo: variable from: aNamedExpressionNode.
 
 	self visitChildren: aNamedExpressionNode.
 	^ variable
