@@ -648,6 +648,12 @@ FamixPythonTreeSitterVisitor >> visitAttribute: anAttributeNode [
 ]
 
 { #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitBlock: aNode [
+
+	^ super visitNode: aNode
+]
+
+{ #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> visitCall: aCallNode [
 
 	self resolveInvocationOrInstantiationFrom: aCallNode.
@@ -690,6 +696,12 @@ FamixPythonTreeSitterVisitor >> visitComment: aCommentNode [
 FamixPythonTreeSitterVisitor >> visitDottedName: aDottedNameNode [
 
 	^ aDottedNameNode sourceText
+]
+
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitExpressionStatement: aNode [
+
+	^ super visitNode: aNode
 ]
 
 { #category : 'visiting' }
@@ -934,6 +946,12 @@ FamixPythonTreeSitterVisitor >> visitPatternList: aPatternListNode [
 FamixPythonTreeSitterVisitor >> visitRelativeImport: aRelativeImportNode [
 
 	^ aRelativeImportNode sourceText
+]
+
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> visitReturnStatement: aNode [
+
+	^ super visitNode: aNode
 ]
 
 { #category : 'visiting' }
