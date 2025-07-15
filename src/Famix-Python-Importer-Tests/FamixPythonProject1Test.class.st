@@ -2070,6 +2070,17 @@ FamixPythonProject1Test >> testImportedSuperclass [
 ]
 
 { #category : 'tests - inheritances' }
+FamixPythonProject1Test >> testImportedSuperclassShouldNotCreateReference [
+	"Animal is used in moduleAtRoot6 for an inheritance and we should not have a reference."
+
+	| class module |
+	class := self classNamed: 'Cat'.
+	module := self moduleNamed: 'moduleAtRoot6'.
+
+	self assertEmpty: (class incomingReferences select: [ :aReference | aReference referencer = module ])
+]
+
+{ #category : 'tests - inheritances' }
 FamixPythonProject1Test >> testInheritanceDoesNotCreateReference [
 	"Regression test"
 
