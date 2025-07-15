@@ -51,9 +51,8 @@ For the example above we could do:
 "
 Class {
 	#name : 'FamixPythonImporter',
-	#superclass : 'Object',
+	#superclass : 'FamixTSAbstractImporter',
 	#instVars : [
-		'visitor',
 		'rootPackagePath',
 		'filesToIgnoreBlock'
 	],
@@ -61,13 +60,6 @@ Class {
 	#package : 'Famix-Python-Importer',
 	#tag : 'Importer'
 }
-
-{ #category : 'api' }
-FamixPythonImporter class >> import: aFileName [
-
-	^self new
-		import: aFileName
-]
 
 { #category : 'api' }
 FamixPythonImporter class >> import: aFileName rootPackagePath: aString [
@@ -143,12 +135,6 @@ FamixPythonImporter >> determineSourceRootFolderFrom: fileReference [
 ]
 
 { #category : 'accessing' }
-FamixPythonImporter >> errorReport [
-
-	^ visitor errorReport
-]
-
-{ #category : 'accessing' }
 FamixPythonImporter >> filesToIgnoreBlock [
 
 	^ filesToIgnoreBlock
@@ -161,20 +147,16 @@ FamixPythonImporter >> filesToIgnoreBlock: anObject [
 ]
 
 { #category : 'api' }
-FamixPythonImporter >> import: aFileName [
+FamixPythonImporter >> import: aFileReference [
 
 	| fileReference |
-	visitor := self visitorClass new.
-	fileReference := aFileName asFileReference.
+	fileReference := aFileReference asFileReference. "In case the user provided a file name instead of a file reference."
 
-	visitor model
-		name: fileReference basename;
-		rootFolder: (fileReference isFile
-				 ifTrue: [ fileReference parent ]
-				 ifFalse: [ aFileName ]). "If we parse a folder, it will be the root. If it's just a file, we consider that the root is its parent"
+	self initializeVisitorAndModelUsing: fileReference.
 
 	"If we parse a unique file, we do nothing. If we have a folder, we check what is the source root to start creating our packages."
 	fileReference isPythonFile ifFalse: [ fileReference := self determineSourceRootFolderFrom: fileReference ].
+
 	self importFileReference: fileReference.
 
 	visitor resolveUnresolvedSymbols.
@@ -211,26 +193,7 @@ FamixPythonImporter >> importFileReference: aFileReference [
 
 	aFileReference isPythonFile ifFalse: [ ^ self ].
 
-	self importPythonFile: aFileReference
-]
-
-{ #category : 'api' }
-FamixPythonImporter >> importPythonFile: aFileReference [
-
-	| parser tree |
-	('Importing ' , aFileReference pathString) traceCr.
-
-	parser := TSParser new.
-	parser language: TSLanguage python.
-	visitor fileReference: aFileReference.
-	tree := parser parseString: visitor sourceText.
-
-	"(aFileReference basename = #'modulesReferencingThings.py') ifTrue: [ 1halt ]."
-
-	self flag: #todo. "A tool to list possible nodes, possible parents and possible children"
-	FamixTSRootNodeWrapper new
-		tsNode: tree rootNode;
-		accept: visitor
+	self importFile: aFileReference
 ]
 
 { #category : 'initialization' }
@@ -254,9 +217,9 @@ FamixPythonImporter >> rootPackagePath: anObject [
 ]
 
 { #category : 'accessing' }
-FamixPythonImporter >> visitor [
+FamixPythonImporter >> treeSitterLanguage [
 
-	^ visitor
+	^ TSLanguage python
 ]
 
 { #category : 'accessing' }
