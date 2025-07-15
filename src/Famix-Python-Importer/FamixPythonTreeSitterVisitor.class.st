@@ -15,6 +15,12 @@ Class {
 }
 
 { #category : 'private' }
+FamixPythonTreeSitterVisitor >> attributeAsAssociation: anAttributeNode [
+
+	^ (anAttributeNode _object sourceText copyWithout: Character space) -> (self visit: anAttributeNode _attribute)
+]
+
+{ #category : 'private' }
 FamixPythonTreeSitterVisitor >> createAssociationsForFunctionCallNode: aCallNode forResult: result in: currentEntity [
 
 	^ (result isCollection not and: [ result isClass ])
@@ -431,22 +437,22 @@ FamixPythonTreeSitterVisitor >> setMetaclassOf: aClassDefinitionNode [
 										foundAction: [ :entity :currentEntity | metaclassUsage metaclass: entity ] ]
 							ifFalse: [
 									| definition |
-									definition := self visit: aMetaclass _value.
+									definition := self attributeAsAssociation: aMetaclass _value.
 
-									self findImportMatchingSource: definition first ifFound: [ :import |
+									self findImportMatchingSource: definition key ifFound: [ :import |
 											self
-												resolve: ((FamixPythonImportedEntityResolvable identifier: definition second import: import)
+												resolve: ((FamixPythonImportedEntityResolvable identifier: definition value import: import)
 														 expectedKind: FamixPythonMetaclass;
 														 notFoundReplacementEntity: [ :unresolved :currentEntity | "We should never end up here because this means we have the sources of the imported entities but I'm still bulletproofing the parser in case we have some code that cannot run"
 																 (self ensureStubMetaclassNamed: unresolved identifier)
-																	 typeContainer: (self ensureStubPackagesFromPath: definition first);
+																	 typeContainer: (self ensureStubPackagesFromPath: definition key);
 																	 yourself ];
 														 yourself)
 												foundAction: [ :entity :currentEntity | metaclassUsage metaclass: entity ].
 											^ metaclassUsage ].
 									"If we did not find an import, we have a stub."
-									metaclassUsage metaclass: ((self ensureStubMetaclassNamed: definition second)
-											 typeContainer: (self ensureStubPackagesFromPath: definition first);
+									metaclassUsage metaclass: ((self ensureStubMetaclassNamed: definition value)
+											 typeContainer: (self ensureStubPackagesFromPath: definition key);
 											 yourself) ] ] ]
 ]
 
@@ -480,10 +486,9 @@ FamixPythonTreeSitterVisitor >> setSuperclassesOf: classDefinitionNode [
 
 	self flag: #todo. "Add test of a class with a superclass and a metaclass"
 	self flag: #todo. "Add test on multiple inheritance"
-	self flag: #todo. "Imported superclass?"
 	self flag: #todo. "The code can be cleaned... Maybe we don't need the visit here but inline the condition added in #argument_list?"
-	"We can either have identifiers representing superclasses or keywords representing for example the declaration of a metaclass"
-	^ (((self visit: classDefinitionNode _superclasses) ifNil: [ #(  ) ]) select: [ :each | each type = #identifier ])
+	"If we have keyword arguments it's not superclass definition so we reject them. For now, we decided to not import them except the one to define a metaclass."
+	^ (((self visit: classDefinitionNode _superclasses) ifNil: [ #(  ) ]) reject: [ :each | each type = #keyword_argument ])
 		  ifEmpty: [
 				  model newInheritance
 					  superclass: (self ensureStubClassNamed: 'object');
@@ -494,12 +499,33 @@ FamixPythonTreeSitterVisitor >> setSuperclassesOf: classDefinitionNode [
 						  inheritance := model newInheritance.
 						  inheritance subclass: self currentEntity.
 						  self setSourceAnchor: inheritance from: superclass.
-						  self
-							  resolve: ((SRIdentifierWithNode identifier: superclass sourceText)
-									   expectedKind: FamixPythonClass;
-									   notFoundReplacementEntity: [ :unresolvedSuperclass :currentEntity | self ensureStubClassNamed: unresolvedSuperclass identifier ];
-									   yourself)
-							  foundAction: [ :entity :currentEntity | inheritance superclass: entity ] ] ]
+						  superclass type = #identifier
+							  ifTrue: [
+									  self
+										  resolve: ((SRIdentifierWithNode identifier: superclass sourceText)
+												   expectedKind: FamixPythonClass;
+												   notFoundReplacementEntity: [ :unresolvedSuperclass :currentEntity | self ensureStubClassNamed: unresolvedSuperclass identifier ];
+												   yourself)
+										  foundAction: [ :entity :currentEntity | inheritance superclass: entity ] ]
+							  ifFalse: [
+									  | definition |
+									  definition := self attributeAsAssociation: superclass.
+
+									  self findImportMatchingSource: definition key ifFound: [ :import |
+											  self
+												  resolve: ((FamixPythonImportedEntityResolvable identifier: definition value import: import)
+														   expectedKind: FamixPythonClass;
+														   notFoundReplacementEntity: [ :unresolved :currentEntity | "We should never end up here because this means we have the sources of the imported entities but I'm still bulletproofing the parser in case we have some code that cannot run"
+																   (self ensureStubClassNamed: unresolved identifier)
+																	   typeContainer: (self ensureStubPackagesFromPath: definition key);
+																	   yourself ];
+														   yourself)
+												  foundAction: [ :entity :currentEntity | inheritance superclass: entity ].
+											  ^ inheritance ].
+									  "If we did not find an import, we have a stub."
+									  inheritance superclass: ((self ensureStubClassNamed: definition value)
+											   typeContainer: (self ensureStubPackagesFromPath: definition key);
+											   yourself) ] ] ]
 ]
 
 { #category : 'accessing' }
@@ -583,8 +609,8 @@ FamixPythonTreeSitterVisitor >> visitAttribute: anAttributeNode [
 	source := anAttributeNode _object sourceText copyWithout: Character space.
 	name := self visit: anAttributeNode _attribute.
 
-	"If the parent is a call or keyword argument (in metaclass declaration), we return info to resolve the call"
-	(#(call keyword_argument ) includes: anAttributeNode parent type) ifTrue: [
+	"If the parent is a call , we return info to resolve the call"
+	( anAttributeNode parent type = #call) ifTrue: [
 			^ {
 				  source.
 				  name } ].

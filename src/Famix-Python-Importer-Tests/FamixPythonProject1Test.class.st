@@ -2056,6 +2056,20 @@ FamixPythonProject1Test >> testImportWithTheNameOfAStubClass [
 ]
 
 { #category : 'tests - inheritances' }
+FamixPythonProject1Test >> testImportedSuperclass [
+
+	| class |
+	class := self classNamed: 'Cat'.
+
+	self assert: class class equals: FamixPythonClass.
+	self assert: class name equals: 'Cat'.
+	self assert: class typeContainer equals: (self moduleNamed: 'moduleAtRoot6').
+	self assert: class superclass equals: (self classNamed: 'Animal').
+	self deny: class isStub.
+	self deny: class superclass isStub
+]
+
+{ #category : 'tests - inheritances' }
 FamixPythonProject1Test >> testInheritanceDoesNotCreateReference [
 	"Regression test"
 
