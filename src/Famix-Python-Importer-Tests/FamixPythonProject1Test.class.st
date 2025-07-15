@@ -1403,6 +1403,36 @@ FamixPythonProject1Test >> testFunctionInvocationWithNamespaceOfMultipleLevelSou
 	self assert: invocation sourceText equals: 'root.subpackage1.subsubpackage1.function_with_function_ref()'
 ]
 
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testFunctionParameters [
+
+	| function param1 param2 |
+	function := self functionNamed: 'sort_list'.
+	param1 := self parameterNamed: 'list1'.
+	param2 := self parameterNamed: 'list2'.
+
+	self assert: function parameters size equals: 2.
+	self assertCollection: function parameters hasSameElements: {
+			param1.
+			param2 }.
+	self assert: param1 name equals: 'list1'.
+	self assert: param2 name equals: 'list2'.
+	self assert: param1 class equals: FamixPythonParameter.
+	self assert: param2 class equals: FamixPythonParameter.
+	self assert: param1 parentBehaviouralEntity equals: function.
+	self assert: param2 parentBehaviouralEntity equals: function
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testFunctionParametersSourceAnchor [
+
+	| param |
+	param := self parameterNamed: 'list1'.
+
+	self assert: param sourceAnchor isNotNil.
+	self assert: param sourceText equals: 'list1'
+]
+
 { #category : 'tests - references' }
 FamixPythonProject1Test >> testFunctionReferenceFromClass [
 
@@ -2602,6 +2632,36 @@ FamixPythonProject1Test >> testLambdaInAPackage [
 	
 ]
 
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testLambdaParameters [
+
+	| lambda param1 param2 |
+	lambda := (self moduleNamed: 'moduleWithLambdas') lambdas anyOne.
+	param1 := lambda parameters first.
+	param2 := lambda parameters second.
+
+	self assert: lambda parameters size equals: 2.
+	self assertCollection: lambda parameters hasSameElements: {
+			param1.
+			param2 }.
+	self assert: param1 name equals: 'a'.
+	self assert: param2 name equals: 'b'.
+	self assert: param1 class equals: FamixPythonParameter.
+	self assert: param2 class equals: FamixPythonParameter.
+	self assert: param1 parentBehaviouralEntity equals: lambda.
+	self assert: param2 parentBehaviouralEntity equals: lambda
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testLambdaParametersSourceAnchor [
+
+	| param |
+	param := (self moduleNamed: 'moduleWithLambdas') lambdas anyOne parameters second.
+
+	self assert: param sourceAnchor isNotNil.
+	self assert: param sourceText equals: 'b'
+]
+
 { #category : 'tests - lambdas' }
 FamixPythonProject1Test >> testLambdaSourceAnchor [
 
@@ -3004,6 +3064,38 @@ FamixPythonProject1Test >> testMethodInvocationSourceAnchor [
 
 	self assert: invocation sourceAnchor isNotNil.
 	self assert: invocation sourceText equals: 'p1.printInfos()'
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testMethodParameters [
+
+	| method param1 param2 |
+	method := self methodNamed: 'set_tuples'.
+	param1 := method parameters first.
+	param2 := method parameters second.
+
+	self assert: method parameters size equals: 2.
+	self assertCollection: method parameters hasSameElements: {
+			param1.
+			param2 }.
+	self assert: param1 name equals: 'self'.
+	self assert: param2 name equals: 'tuple_attr'.
+	self assert: param1 isSelf.
+	self deny: param2 isSelf.
+	self assert: param1 class equals: FamixPythonParameter.
+	self assert: param2 class equals: FamixPythonParameter.
+	self assert: param1 parentBehaviouralEntity equals: method.
+	self assert: param2 parentBehaviouralEntity equals: method
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testMethodParametersSourceAnchor [
+
+	| param |
+	param := (self methodNamed: 'set_tuples') parameters second.
+
+	self assert: param sourceAnchor isNotNil.
+	self assert: param sourceText equals: 'tuple_attr'
 ]
 
 { #category : 'tests - methods' }

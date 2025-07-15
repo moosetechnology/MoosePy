@@ -55,3 +55,9 @@ FamixPythonParameter class >> annotation [
 	<generated>
 	^ self
 ]
+
+{ #category : 'testing' }
+FamixPythonParameter >> isSelf [
+
+	^ self parentBehaviouralEntity parameters first = self
+]

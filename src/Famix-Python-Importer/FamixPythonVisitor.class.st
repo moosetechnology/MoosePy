@@ -793,6 +793,12 @@ FamixPythonVisitor >> visitLambda: aLambdaNode [
 ]
 
 { #category : 'visiting' }
+FamixPythonVisitor >> visitLambdaParameters: aParameterNode [
+
+	^ self visitParameters: aParameterNode
+]
+
+{ #category : 'visiting' }
 FamixPythonVisitor >> visitList: aNode [
 	"noop"
 
@@ -869,6 +875,17 @@ FamixPythonVisitor >> visitNotOperator: aNode [
 	"noop"
 
 	
+]
+
+{ #category : 'visiting' }
+FamixPythonVisitor >> visitParameters: aParameterNode [
+
+	self flag: #todo. "Manage weird cases like \"
+	self flag: #todo. "Add test that first param not called self is still self"
+	^ aParameterNode collectNamedChild collect: [ :parameter |
+			  (model newParameterNamed: (self visit: parameter))
+				  parentBehaviouralEntity: self currentEntity;
+				  in: [ :param | self setSourceAnchor: param from: parameter ] ]
 ]
 
 { #category : 'visiting' }
