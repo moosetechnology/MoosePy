@@ -1,12 +1,7 @@
 Class {
 	#name : 'FamixPythonVisitor',
-	#superclass : 'TSVisitor',
-	#traits : 'SRTSolverUserVisitor',
-	#classTraits : 'SRTSolverUserVisitor classTrait',
+	#superclass : 'FamixTSAbstractVisitor',
 	#instVars : [
-		'fileReference',
-		'model',
-		'commentsImporter',
 		'importPaths'
 	],
 	#category : 'Famix-Python-Importer-Visitors',
@@ -244,16 +239,6 @@ FamixPythonVisitor >> ensureStubUnknownEntityNamed: aString [
 				  yourself ]
 ]
 
-{ #category : 'accessing' }
-FamixPythonVisitor >> fileReference [
-	^ fileReference
-]
-
-{ #category : 'accessing' }
-FamixPythonVisitor >> fileReference: anObject [
-	fileReference := anObject
-]
-
 { #category : 'private' }
 FamixPythonVisitor >> findImportMatchingSource: aString ifFound: aBlock [
 	"If I get a string such as `matplotlib.pyglot.array()`, I'll check if we have an import that is not a from import matching `matplotlib.pyglot` and execute the block as parameter if this is the case.
@@ -312,9 +297,6 @@ FamixPythonVisitor >> getConstructorOf: aClass [
 FamixPythonVisitor >> initialize [
 
 	super initialize.
-	model := FamixPythonModel new name: 'default Python Model'.
-	model sourceLanguage: model newSourceLanguage.
-	self initialiseSolver.
 	importPaths := IdentityDictionary new
 ]
 
@@ -326,7 +308,7 @@ FamixPythonVisitor >> isMetaclassDefinition: aClassDefinitionNode [
 		  ifNotNil: [ :argumentList | argumentList collectNamedChild anySatisfy: [ :node | node type = #identifier and: [ node sourceText = 'type' ] ] ]
 ]
 
-{ #category : 'visiting' }
+{ #category : 'private' }
 FamixPythonVisitor >> manageAssignationTo: aNode [
 
 	| variable |
@@ -379,19 +361,12 @@ FamixPythonVisitor >> methodNamed: aString inClassNamed: aClassName [
 ]
 
 { #category : 'accessing' }
-FamixPythonVisitor >> model [
-	^ model
+FamixPythonVisitor >> modelClass [
+
+	^ FamixPythonModel
 ]
 
 { #category : 'private' }
-FamixPythonVisitor >> relativeFilePath [
-
-	self model rootFolder ifNil: [ ^ self fileReference fullName removePrefix: '/' ].
-
-	^ (self fileReference relativeTo: self model rootFolder asPath) pathString
-]
-
-{ #category : 'visiting' }
 FamixPythonVisitor >> resolveInvocationOrInstantiationFrom: aCallNode [
 	"When we end up here we might have multiple cases to manage:
 	- x() => This is either a function invocation or instantiation. There should be no stub. 
@@ -457,7 +432,7 @@ FamixPythonVisitor >> resolveInvocationOrInstantiationFrom: aCallNode [
 		  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aCallNode forResult: result in: currentEntity ]
 ]
 
-{ #category : 'initialization' }
+{ #category : 'private' }
 FamixPythonVisitor >> setMetaclassOf: aClassDefinitionNode [
 
 	(self visit: aClassDefinitionNode _superclasses) ifNotNil: [ :nodes |
@@ -498,31 +473,6 @@ FamixPythonVisitor >> setMetaclassOf: aClassDefinitionNode [
 									metaclassUsage metaclass: ((self ensureStubMetaclassNamed: definition value)
 											 typeContainer: (self ensureStubPackagesFromPath: definition key);
 											 yourself) ] ] ]
-]
-
-{ #category : 'private' }
-FamixPythonVisitor >> setSourceAnchor: aFamixEntity from: aTSNode [
-
-	^ self
-		  setSourceAnchorTo: aFamixEntity
-		  fileName: aTSNode relativePath
-		  start: aTSNode startPosition
-		  end: aTSNode endPosition
-]
-
-{ #category : 'private' }
-FamixPythonVisitor >> setSourceAnchorTo: aFamixEntity fileName: aString start: aNumber end: anotherNumber [
-
-	aFamixEntity sourceAnchor: (FamixPythonIndexedFileAnchor new
-			 fileName: aString;
-			 startPos: aNumber;
-			 endPos: anotherNumber;
-			 mooseModel: self model;
-			 yourself).
-
-	(aFamixEntity class includesTrait: FamixTCanBeStub) ifTrue: [ aFamixEntity isStub: false ].
-
-	^ aFamixEntity
 ]
 
 { #category : 'private' }
@@ -572,27 +522,12 @@ FamixPythonVisitor >> setSuperclassesOf: classDefinitionNode [
 											   yourself) ] ] ]
 ]
 
-{ #category : 'accessing' }
-FamixPythonVisitor >> sourceText [
-
-	self flag: #todo. "Manage encorders."
-	^ self fileReference contents
-]
-
 { #category : 'private' }
 FamixPythonVisitor >> unknownEntityNamed: aString [
 
 	^ (self model allWithType: FamixPythonUnknownEntity)
 		  detect: [ :e | e name = aString ]
 		  ifNone: [ nil ]
-]
-
-{ #category : 'visiting' }
-FamixPythonVisitor >> visit: anObject [
-
-	anObject isTSNode ifTrue: [ ^ self visitNode: anObject ].
-	anObject isCollection ifTrue: [ ^ self visitNodes: anObject ].
-	^ anObject
 ]
 
 { #category : 'visiting' }
@@ -608,7 +543,7 @@ FamixPythonVisitor >> visitArgumentList: anArgumentListNode [
 	"In case of a class definition we let my caller handle the nodes"
 	anArgumentListNode parent type = #class_definition ifTrue: [ ^ anArgumentListNode collectNamedChild ].
 
-	^ super visitNode: anArgumentListNode
+	^ self visitChildren: anArgumentListNode
 ]
 
 { #category : 'visiting' }
@@ -620,7 +555,7 @@ FamixPythonVisitor >> visitAssignment: anAssignmentNode [
 		ifTrue: [ (self visit: anAssignmentNode _left) collect: [ :node | self manageAssignationTo: node ] ]
 		ifFalse: [ self manageAssignationTo: anAssignmentNode _left ].
 
-	super visitNode: anAssignmentNode
+	self visitChildren: anAssignmentNode
 ]
 
 { #category : 'visiting' }
@@ -674,7 +609,7 @@ FamixPythonVisitor >> visitAttribute: anAttributeNode [
 { #category : 'visiting' }
 FamixPythonVisitor >> visitBlock: aNode [
 
-	^ super visitNode: aNode
+	^ self visitChildren: aNode
 ]
 
 { #category : 'visiting' }
@@ -682,7 +617,7 @@ FamixPythonVisitor >> visitCall: aCallNode [
 
 	self resolveInvocationOrInstantiationFrom: aCallNode.
 
-	^ super visitNode: aCallNode
+	^ self visitChildren: aCallNode
 ]
 
 { #category : 'visiting' }
@@ -707,7 +642,7 @@ FamixPythonVisitor >> visitClassDefinition: aClassDefinitionNode [
 	^ self useCurrentEntity: class during: [
 			  self setSuperclassesOf: aClassDefinitionNode.
 			  self setMetaclassOf: aClassDefinitionNode.
-			  super visitNode: aClassDefinitionNode ]
+			  self visitChildren: aClassDefinitionNode ]
 ]
 
 { #category : 'visiting' }
@@ -725,7 +660,7 @@ FamixPythonVisitor >> visitDottedName: aDottedNameNode [
 { #category : 'visiting' }
 FamixPythonVisitor >> visitExpressionStatement: aNode [
 
-	^ super visitNode: aNode
+	^ self visitChildren: aNode
 ]
 
 { #category : 'visiting' }
@@ -744,7 +679,7 @@ FamixPythonVisitor >> visitFunctionDefinition: aFunctionDefinition [
 		          ifTrue: [ self ensureMethod: aFunctionDefinition ]
 		          ifFalse: [ self createFunction: aFunctionDefinition ].
 
-	^ self useCurrentEntity: entity during: [ super visitNode: aFunctionDefinition ]
+	^ self useCurrentEntity: entity during: [ self visitChildren: aFunctionDefinition ]
 ]
 
 { #category : 'visiting' }
@@ -854,7 +789,7 @@ FamixPythonVisitor >> visitLambda: aLambdaNode [
 	lambda lambdaContainer: self currentEntity.
 
 	self setSourceAnchor: lambda from: aLambdaNode.
-	^ self useCurrentEntity: lambda during: [ super visitNode: aLambdaNode ]
+	^ self useCurrentEntity: lambda during: [ self visitChildren: aLambdaNode ]
 ]
 
 { #category : 'visiting' }
@@ -918,7 +853,7 @@ FamixPythonVisitor >> visitNamedExpression: aNamedExpressionNode [
 		ifNone: [
 				| shadowedEntity |
 				self flag: #todo. "Add test on shadowing at this level. This is not yet covered by test. If you comment the next line the parser is still passing all tests."
-				shadowedEntity := self findSadowedEntityNamed:  name.
+				shadowedEntity := self findSadowedEntityNamed: name.
 				variable := self currentEntity createLocalVariable: name.
 				shadowedEntity ifNotNil: [ variable shadowedEntity: shadowedEntity ].
 				"We select the lhs node because the source anchor should not be the full assignation."
@@ -926,31 +861,8 @@ FamixPythonVisitor >> visitNamedExpression: aNamedExpressionNode [
 	self flag: #todo.
 	"self createWriteAccessTo: variable from: anAssignmentNode assignationNode."
 
-	super visitNode: aNamedExpressionNode.
+	self visitChildren: aNamedExpressionNode.
 	^ variable
-]
-
-{ #category : 'visiting' }
-FamixPythonVisitor >> visitNode: aTSNode [
-
-	^ self errorReport catch: Exception during: [
-			  | visitMethod |
-			  visitMethod := (String streamContents: [ :aStream |
-					                  aStream nextPutAll: 'visit'.
-					                  ($_ split: aTSNode type) do: [ :word | aStream nextPutAll: word capitalized ].
-					                  aStream nextPut: $: ]) asSymbol.
-
-			  (self respondsTo: visitMethod)
-				  ifTrue: [ self perform: visitMethod with: aTSNode ]
-				  ifFalse: [
-						  visitMethod traceCr.
-						  super visitNode: aTSNode ] ]
-]
-
-{ #category : 'visiting' }
-FamixPythonVisitor >> visitNodes: aCollection [
-
-	^ aCollection collect: [ :node | self visit: node ]
 ]
 
 { #category : 'visiting' }
@@ -975,7 +887,7 @@ FamixPythonVisitor >> visitRelativeImport: aRelativeImportNode [
 { #category : 'visiting' }
 FamixPythonVisitor >> visitReturnStatement: aNode [
 
-	^ super visitNode: aNode
+	^ self visitChildren: aNode
 ]
 
 { #category : 'visiting' }
