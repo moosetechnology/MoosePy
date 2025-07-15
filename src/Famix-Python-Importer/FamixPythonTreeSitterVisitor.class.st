@@ -425,7 +425,8 @@ FamixPythonTreeSitterVisitor >> setMetaclassOf: aClassDefinitionNode [
 									self
 										resolve: ((SRIdentifierWithNode identifier: aMetaclass _value sourceText)
 												 expectedKind: FamixPythonMetaclass;
-												 notFoundReplacementEntity: [ :unresolvedMetaclass :currentEntity | self ensureStubMetaclassNamed: unresolvedMetaclass identifier ];
+												 notFoundReplacementEntity: [ :unresolvedMetaclass :currentEntity | "We should never end up here but I'm still bulletproofing the parser in case we get code with errors"
+													 self ensureStubMetaclassNamed: unresolvedMetaclass identifier ];
 												 yourself)
 										foundAction: [ :entity :currentEntity | metaclassUsage metaclass: entity ] ]
 							ifFalse: [
@@ -436,14 +437,15 @@ FamixPythonTreeSitterVisitor >> setMetaclassOf: aClassDefinitionNode [
 											self
 												resolve: ((FamixPythonImportedEntityResolvable identifier: definition second import: import)
 														 expectedKind: FamixPythonMetaclass;
-														 notFoundReplacementEntity: [ :unresolved :currentEntity | 1 halt ];
+														 notFoundReplacementEntity: [ :unresolved :currentEntity | "We should never end up here because this means we have the sources of the imported entities but I'm still bulletproofing the parser in case we have some code that cannot run"
+															 self ensureStubMetaclassNamed: definition second ];
 														 yourself)
 												foundAction: [ :entity :currentEntity | metaclassUsage metaclass: entity ].
 											^ metaclassUsage ].
 									"If we did not find an import, we have a stub."
-									^ (self ensureStubMetaclassNamed: definition second)
-										  typeContainer: (self ensureStubPackagesFromPath: definition first);
-										  yourself ] ] ]
+									metaclassUsage metaclass: ((self ensureStubMetaclassNamed: definition second)
+											 typeContainer: (self ensureStubPackagesFromPath: definition first);
+											 yourself) ] ] ]
 ]
 
 { #category : 'private' }
@@ -691,7 +693,7 @@ FamixPythonTreeSitterVisitor >> visitGlobalStatement: aNode [
 FamixPythonTreeSitterVisitor >> visitIdentifier: anIdentifierNode [
 
 	self flag: #todo. "review some + clean method"
-	(#( aliased_import attribute call function_definition class_definition parameters keyword_argument lambda_parameters named_expression pattern_list ) includes:
+	(#( aliased_import attribute call function_definition class_definition parameters keyword_argument lambda_parameters named_expression pattern_list ERROR) includes:
 		 anIdentifierNode parent type) ifTrue: [ ^ anIdentifierNode sourceText ].
 	anIdentifierNode isLeftSideOfAssignation ifTrue: [ ^ anIdentifierNode sourceText ].
 	(#( argument_list return_statement lambda if_statement comparison_operator binary_operator assignment ) includes: anIdentifierNode parent type) ifTrue: [

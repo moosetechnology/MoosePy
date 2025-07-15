@@ -4987,6 +4987,26 @@ FamixPythonProject1Test >> testStubMetaclassUsage [
 	self assert: metaclass name equals: 'StubMetaclass'
 ]
 
+{ #category : 'tests - metaclasses' }
+FamixPythonProject1Test >> testStubMetaclassUsage2 [
+
+	| metaclass class metaclassUsage |
+	metaclass := self metaclassNamed: 'StubMetaclass2'.
+	class := self classNamed: 'ClassWithStubMetaclass2'.
+
+	metaclassUsage := class metaclassUsage.
+
+	self assert: metaclassUsage isNotNil.
+	self assert: metaclassUsage class equals: FamixPythonMetaclassUsage.
+	self assert: metaclassUsage source equals: class.
+	self assert: metaclassUsage user equals: class.
+	self assert: metaclassUsage target equals: metaclass.
+	self assert: metaclassUsage metaclass equals: metaclass.
+	self assert: (metaclass metaclassUsers anySatisfy: [ :aUsage | aUsage user = class ]).
+	self assert: metaclass isStub.
+	self assert: metaclass name equals: 'StubMetaclass2'
+]
+
 { #category : 'tests - packages' }
 FamixPythonProject1Test >> testSubPackage [
 
