@@ -326,6 +326,50 @@ FamixPythonTreeSitterVisitor >> isMetaclassDefinition: aClassDefinitionNode [
 		  ifNotNil: [ :argumentList | argumentList collectNamedChild anySatisfy: [ :node | node type = #identifier and: [ node sourceText = 'type' ] ] ]
 ]
 
+{ #category : 'visiting' }
+FamixPythonTreeSitterVisitor >> manageAssignationTo: aNode [
+
+	| variable |
+	aNode type = #attribute
+		ifTrue: [
+				| pair |
+				pair := self attributeAsAssociation: aNode.
+				self flag: #todo. "Might not be self..."
+				pair key = 'self'
+					ifTrue: [
+							| class |
+							class := self currentEntityOfType: FamixPythonClass.
+							variable := (class childOfType: FamixTAttribute named: pair value) ifNil: [
+									            variable := self model newAttribute
+										                        name: pair value;
+										                        parentType: class;
+										                        isClassSide: false;
+										                        yourself.
+
+									            "We select the lhs node because the source anchor should not be the full assignation."
+									            self setSourceAnchor: variable from: aNode.
+									            variable ] ]
+					ifFalse: [
+							self flag: #todo.
+							^ self ] ]
+		ifFalse: [
+				| name |
+				name := self visit: aNode.
+				"If we have a variable of this name already, we should not recreate it. Except if this variable got shadowed! In that case, we should recreate it."
+				(self currentEntity query descendants ofType: FamixTStructuralEntity)
+					detect: [ :child | child name = name and: [ child isShadowable not or: [ child isShadowed not ] ] ]
+					ifFound: [ :var | variable := var ]
+					ifNone: [
+							| shadowedEntity |
+							shadowedEntity := self findSadowedEntityNamed: name.
+							variable := self currentEntity createLocalVariable: name.
+							shadowedEntity ifNotNil: [ variable shadowedEntity: shadowedEntity ].
+							"We select the lhs node because the source anchor should not be the full assignation."
+							self setSourceAnchor: variable from: aNode ] ].
+	self createWriteAccessTo: variable from: aNode assignationNode.
+	^ variable
+]
+
 { #category : 'accessing' }
 FamixPythonTreeSitterVisitor >> methodNamed: aString inClassNamed: aClassName [
 
@@ -570,33 +614,13 @@ FamixPythonTreeSitterVisitor >> visitArgumentList: anArgumentListNode [
 { #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> visitAssignment: anAssignmentNode [
 
-	| names |
-	self flag: #todo. "Manage attributes"
-	anAssignmentNode _left type = #attribute ifTrue: [ ^ self ].
-	(anAssignmentNode _left collectNamedChild anySatisfy: [ :node | node type = #attribute ]) ifTrue: [ ^ self ].
 	anAssignmentNode _left type = #subscript ifTrue: [ ^ self ].
-	names := self visit: anAssignmentNode _left. "Could return a string or a collection of strings in case of multiple assignations. We need to manage this."
-	names isString ifTrue: [ names := { names } ].
 
-	names := names collect: [ :name |
-			         | variable |
-			         "If we have a variable of this name already, we should not recreate it. Except if this variable got shadowed! In that case, we should recreate it."
-			         (self currentEntity query descendants ofType: FamixTStructuralEntity)
-				         detect: [ :child | child name = name and: [ child isShadowable not or: [ child isShadowed not ] ] ]
-				         ifFound: [ :var | variable := var ]
-				         ifNone: [
-						         | shadowedEntity |
-						         shadowedEntity := self findSadowedEntityNamed:  name.
-						         variable := self currentEntity createLocalVariable: name.
-						         shadowedEntity ifNotNil: [ variable shadowedEntity: shadowedEntity ].
-						         "We select the lhs node because the source anchor should not be the full assignation."
-						         self setSourceAnchor: variable from: anAssignmentNode _left ].
-	
-			         self createWriteAccessTo: variable from: anAssignmentNode assignationNode.
-			         variable ].
+	anAssignmentNode _left type = #pattern_list
+		ifTrue: [ (self visit: anAssignmentNode _left) collect: [ :node | self manageAssignationTo: node ] ]
+		ifFalse: [ self manageAssignationTo: anAssignmentNode _left ].
 
-	super visitNode: anAssignmentNode.
-	^ names
+	super visitNode: anAssignmentNode
 ]
 
 { #category : 'visiting' }
@@ -733,7 +757,7 @@ FamixPythonTreeSitterVisitor >> visitGlobalStatement: aNode [
 FamixPythonTreeSitterVisitor >> visitIdentifier: anIdentifierNode [
 
 	self flag: #todo. "review some + clean method"
-	(#( aliased_import attribute call function_definition class_definition parameters keyword_argument lambda_parameters named_expression pattern_list ERROR) includes:
+	(#( aliased_import attribute call function_definition class_definition parameters keyword_argument lambda_parameters named_expression pattern_list list_comprehension ERROR) includes:
 		 anIdentifierNode parent type) ifTrue: [ ^ anIdentifierNode sourceText ].
 	anIdentifierNode isLeftSideOfAssignation ifTrue: [ ^ anIdentifierNode sourceText ].
 	(#( argument_list return_statement lambda if_statement comparison_operator binary_operator assignment ) includes: anIdentifierNode parent type) ifTrue: [
@@ -939,7 +963,7 @@ FamixPythonTreeSitterVisitor >> visitNotOperator: aNode [
 { #category : 'visiting' }
 FamixPythonTreeSitterVisitor >> visitPatternList: aPatternListNode [
 
-	^ self visit: aPatternListNode collectNamedChild
+	^ aPatternListNode collectNamedChild
 ]
 
 { #category : 'visiting' }
