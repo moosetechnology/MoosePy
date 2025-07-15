@@ -54,7 +54,6 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'visitor',
-		'errorReport',
 		'rootPackagePath',
 		'filesToIgnoreBlock'
 	],
