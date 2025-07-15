@@ -630,9 +630,9 @@ FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression
 	| source |
 	source := aFieldAccessExpression source.
 
-	aFieldAccessExpression isReceiverOfFunctionCall ifTrue: [ 
-		super visitFieldAccessExpression: aFieldAccessExpression.
-		^ source ].
+	aFieldAccessExpression isReceiverOfFunctionCall ifTrue: [
+			super visitFieldAccessExpression: aFieldAccessExpression.
+			^ source ].
 
 	"Symbol resolution of accesses and references to imported entities.
 	Example:
@@ -641,16 +641,23 @@ FamixPythonImporterVisitor >> visitFieldAccessExpression: aFieldAccessExpression
 	print(moduleAtRoot.moduleVariable)
 	"
 	self findImportMatchingSource: source ifFound: [ :import |
-		self
-			resolve: ((FamixPythonImportedAccessOrReferenceResolvable identifier: aFieldAccessExpression name import: import)
-					 notFoundReplacementEntity: [ :unresolved :currentEntity | "This unknown entity can be a variable or a class."
-						 self ensureStubUnknownEntityNamed: unresolved identifier ];
-					 yourself)
-			foundAction: [ :entity :currentEntity |
-				| association |
-				association := entity createAccessOrReferenceFrom: currentEntity node: aFieldAccessExpression.
-				self setSourceAnchor: association from: aFieldAccessExpression ].
-		^ source ].
+			self
+				resolve: ((FamixPythonImportedEntityResolvable identifier: aFieldAccessExpression name import: import)
+						 expectedKinds: {
+								 FamixPythonClass.
+								 FamixPythonFunction.
+								 FamixPythonLocalVariable.
+								 FamixPythonGlobalVariable.
+								 FamixPythonAttribute.
+								 FamixPythonParameter };
+						 notFoundReplacementEntity: [ :unresolved :currentEntity | "This unknown entity can be a variable or a class."
+							 self ensureStubUnknownEntityNamed: unresolved identifier ];
+						 yourself)
+				foundAction: [ :entity :currentEntity |
+						| association |
+						association := entity createAccessOrReferenceFrom: currentEntity node: aFieldAccessExpression.
+						self setSourceAnchor: association from: aFieldAccessExpression ].
+			^ source ].
 
 	aFieldAccessExpression source traceCr.
 
