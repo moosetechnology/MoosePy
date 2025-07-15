@@ -438,7 +438,9 @@ FamixPythonTreeSitterVisitor >> setMetaclassOf: aClassDefinitionNode [
 												resolve: ((FamixPythonImportedEntityResolvable identifier: definition second import: import)
 														 expectedKind: FamixPythonMetaclass;
 														 notFoundReplacementEntity: [ :unresolved :currentEntity | "We should never end up here because this means we have the sources of the imported entities but I'm still bulletproofing the parser in case we have some code that cannot run"
-															 self ensureStubMetaclassNamed: definition second ];
+																 (self ensureStubMetaclassNamed: unresolved identifier)
+																	 typeContainer: (self ensureStubPackagesFromPath: definition first);
+																	 yourself ];
 														 yourself)
 												foundAction: [ :entity :currentEntity | metaclassUsage metaclass: entity ].
 											^ metaclassUsage ].

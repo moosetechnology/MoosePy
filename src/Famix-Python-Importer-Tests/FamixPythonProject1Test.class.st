@@ -4984,7 +4984,8 @@ FamixPythonProject1Test >> testStubMetaclassUsage [
 	self assert: metaclassUsage metaclass equals: metaclass.
 	self assert: (metaclass metaclassUsers anySatisfy: [ :aUsage | aUsage user = class ]).
 	self assert: metaclass isStub.
-	self assert: metaclass name equals: 'StubMetaclass'
+	self assert: metaclass name equals: 'StubMetaclass'.
+	self assert: metaclass typeContainer name equals: 'subpackage'
 ]
 
 { #category : 'tests - metaclasses' }
