@@ -218,9 +218,20 @@ FamixPythonImporter >> importFileReference: aFileReference [
 { #category : 'api' }
 FamixPythonImporter >> importPythonFile: aFileReference [
 
+	| parser tree |
 	('Importing ' , aFileReference pathString) traceCr.
-	"(aFileReference basename = #'moduleAtRoot11.py') ifTrue: [ 1halt ]."
-	(PythonParser parseFileWithErrors: aFileReference) acceptVisitor: visitor
+
+	parser := TSParser new.
+	parser language: TSLanguage python.
+	visitor fileReference: aFileReference.
+	tree := parser parseString: visitor sourceText.
+
+	"(aFileReference basename = #'modulesReferencingThings.py') ifTrue: [ 1halt ]."
+
+	self flag: #todo. "A tool to list possible nodes, possible parents and possible children"
+	FamixTSRootNodeWrapper new
+		tsNode: tree rootNode;
+		accept: visitor
 ]
 
 { #category : 'initialization' }
@@ -252,5 +263,5 @@ FamixPythonImporter >> visitor [
 { #category : 'accessing' }
 FamixPythonImporter >> visitorClass [
 
-	^ FamixPythonImporterVisitor
+	^ FamixPythonVisitor
 ]

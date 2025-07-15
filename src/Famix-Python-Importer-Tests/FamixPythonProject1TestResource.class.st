@@ -19,7 +19,7 @@ FamixPythonProject1TestResource >> setUp [
 
 	super setUp.
 
-	model := FamixTreeSitterPythonImporter import: FamixPythonBridge parsingExamples / 'project1'
+	model := FamixPythonImporter import: FamixPythonBridge parsingExamples / 'project1'
 ]
 
 { #category : 'running' }

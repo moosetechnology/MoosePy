@@ -1,5 +1,5 @@
 Class {
-	#name : 'FamixPythonTreeSitterVisitor',
+	#name : 'FamixPythonVisitor',
 	#superclass : 'TSVisitor',
 	#traits : 'SRTSolverUserVisitor',
 	#classTraits : 'SRTSolverUserVisitor classTrait',
@@ -15,13 +15,13 @@ Class {
 }
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> attributeAsAssociation: anAttributeNode [
+FamixPythonVisitor >> attributeAsAssociation: anAttributeNode [
 
 	^ (anAttributeNode _object sourceText copyWithout: Character space) -> (self visit: anAttributeNode _attribute)
 ]
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> createAssociationsForFunctionCallNode: aCallNode forResult: result in: currentEntity [
+FamixPythonVisitor >> createAssociationsForFunctionCallNode: aCallNode forResult: result in: currentEntity [
 
 	^ (result isCollection not and: [ result isClass ])
 		  ifTrue: [
@@ -34,7 +34,7 @@ FamixPythonTreeSitterVisitor >> createAssociationsForFunctionCallNode: aCallNode
 ]
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> createFunction: aFunctionDefinition [
+FamixPythonVisitor >> createFunction: aFunctionDefinition [
 
 	| function name shadowedEntity signature |
 	name := self visit: aFunctionDefinition _name.
@@ -55,7 +55,7 @@ FamixPythonTreeSitterVisitor >> createFunction: aFunctionDefinition [
 ]
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> createImport: anImport ofName: aName from: fromName alias: alias [
+FamixPythonVisitor >> createImport: anImport ofName: aName from: fromName alias: alias [
 
 	| import |
 	import := model newImport
@@ -93,7 +93,7 @@ FamixPythonTreeSitterVisitor >> createImport: anImport ofName: aName from: fromN
 ]
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> createInvocationOf: target from: currentEntity node: aNode [
+FamixPythonVisitor >> createInvocationOf: target from: currentEntity node: aNode [
 
 	| invocation |
 	invocation := self model newInvocation
@@ -109,7 +109,7 @@ FamixPythonTreeSitterVisitor >> createInvocationOf: target from: currentEntity n
 ]
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> createMethod: aMethodNode [
+FamixPythonVisitor >> createMethod: aMethodNode [
 
 	| method name signature |
 	name := self visit: aMethodNode _name.
@@ -144,7 +144,7 @@ FamixPythonTreeSitterVisitor >> createMethod: aMethodNode [
 ]
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> createStubPackageNamed: aString [
+FamixPythonVisitor >> createStubPackageNamed: aString [
 
 	^ (model newPackageNamed: aString)
 		  isStub: true;
@@ -152,7 +152,7 @@ FamixPythonTreeSitterVisitor >> createStubPackageNamed: aString [
 ]
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> createWriteAccessTo: variable from: anAssignmentNode [
+FamixPythonVisitor >> createWriteAccessTo: variable from: anAssignmentNode [
 
 	| access |
 	access := model newAccess
@@ -164,13 +164,13 @@ FamixPythonTreeSitterVisitor >> createWriteAccessTo: variable from: anAssignment
 ]
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> ensureMethod: aMethodNode [
+FamixPythonVisitor >> ensureMethod: aMethodNode [
 
 	^ (self methodNamed: aMethodNode _name inClassNamed: self currentEntity name) ifNil: [ self createMethod: aMethodNode ]
 ]
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> ensureStubClassNamed: aName [
+FamixPythonVisitor >> ensureStubClassNamed: aName [
 
 	^ model allClasses
 		  detect: [ :class | class isStub and: [ class name = aName ] ]
@@ -181,7 +181,7 @@ FamixPythonTreeSitterVisitor >> ensureStubClassNamed: aName [
 ]
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> ensureStubMetaclassNamed: aName [
+FamixPythonVisitor >> ensureStubMetaclassNamed: aName [
 
 	^ (model allWithType: FamixPythonMetaclass)
 		  detect: [ :class | class isStub and: [ class name = aName ] ]
@@ -193,7 +193,7 @@ FamixPythonTreeSitterVisitor >> ensureStubMetaclassNamed: aName [
 ]
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> ensureStubMethodNamed: aName [
+FamixPythonVisitor >> ensureStubMethodNamed: aName [
 
 	^ model allMethods
 		  detect: [ :method | method isStub and: [ method name = aName ] ]
@@ -204,7 +204,7 @@ FamixPythonTreeSitterVisitor >> ensureStubMethodNamed: aName [
 ]
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> ensureStubPackageNamed: aString [
+FamixPythonVisitor >> ensureStubPackageNamed: aString [
 
 	^ model allPackages
 		  detect: [ :class | class isStub and: [ class name = aString ] ]
@@ -212,7 +212,7 @@ FamixPythonTreeSitterVisitor >> ensureStubPackageNamed: aString [
 ]
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> ensureStubPackagesFromPath: aPythonImportPath [
+FamixPythonVisitor >> ensureStubPackagesFromPath: aPythonImportPath [
 	"This method takes a python import path and should ensure we have a stub entity for each. It should return the stub package for the last element of the path too."
 
 	| splitted package |
@@ -236,7 +236,7 @@ FamixPythonTreeSitterVisitor >> ensureStubPackagesFromPath: aPythonImportPath [
 ]
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> ensureStubUnknownEntityNamed: aString [
+FamixPythonVisitor >> ensureStubUnknownEntityNamed: aString [
 
 	^ (self unknownEntityNamed: aString) ifNil: [
 			  model newUnknownEntity
@@ -245,17 +245,17 @@ FamixPythonTreeSitterVisitor >> ensureStubUnknownEntityNamed: aString [
 ]
 
 { #category : 'accessing' }
-FamixPythonTreeSitterVisitor >> fileReference [
+FamixPythonVisitor >> fileReference [
 	^ fileReference
 ]
 
 { #category : 'accessing' }
-FamixPythonTreeSitterVisitor >> fileReference: anObject [
+FamixPythonVisitor >> fileReference: anObject [
 	fileReference := anObject
 ]
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> findImportMatchingSource: aString ifFound: aBlock [
+FamixPythonVisitor >> findImportMatchingSource: aString ifFound: aBlock [
 	"If I get a string such as `matplotlib.pyglot.array()`, I'll check if we have an import that is not a from import matching `matplotlib.pyglot` and execute the block as parameter if this is the case.
 	
 	I also manages the case of aliases like this:
@@ -285,7 +285,7 @@ FamixPythonTreeSitterVisitor >> findImportMatchingSource: aString ifFound: aBloc
 ]
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> findSadowedEntityNamed: name [
+FamixPythonVisitor >> findSadowedEntityNamed: name [
 	"If the same element already has a shadowable entity of the same name, we select the last one defined. If there is none, we return nil"
 
 	self withCurrentEntityDo: [ :entity |
@@ -296,7 +296,7 @@ FamixPythonTreeSitterVisitor >> findSadowedEntityNamed: name [
 ]
 
 { #category : 'accessing' }
-FamixPythonTreeSitterVisitor >> getConstructorOf: aClass [
+FamixPythonVisitor >> getConstructorOf: aClass [
 
 	^ aClass methods
 		  detect: [ :method | method isConstructor ]
@@ -309,7 +309,7 @@ FamixPythonTreeSitterVisitor >> getConstructorOf: aClass [
 ]
 
 { #category : 'initialization' }
-FamixPythonTreeSitterVisitor >> initialize [
+FamixPythonVisitor >> initialize [
 
 	super initialize.
 	model := FamixPythonModel new name: 'default Python Model'.
@@ -319,7 +319,7 @@ FamixPythonTreeSitterVisitor >> initialize [
 ]
 
 { #category : 'testing' }
-FamixPythonTreeSitterVisitor >> isMetaclassDefinition: aClassDefinitionNode [
+FamixPythonVisitor >> isMetaclassDefinition: aClassDefinitionNode [
 
 	^ aClassDefinitionNode _superclasses
 		  ifNil: [ false ]
@@ -327,7 +327,7 @@ FamixPythonTreeSitterVisitor >> isMetaclassDefinition: aClassDefinitionNode [
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> manageAssignationTo: aNode [
+FamixPythonVisitor >> manageAssignationTo: aNode [
 
 	| variable |
 	aNode type = #attribute
@@ -371,7 +371,7 @@ FamixPythonTreeSitterVisitor >> manageAssignationTo: aNode [
 ]
 
 { #category : 'accessing' }
-FamixPythonTreeSitterVisitor >> methodNamed: aString inClassNamed: aClassName [
+FamixPythonVisitor >> methodNamed: aString inClassNamed: aClassName [
 
 	^ (self model allWithType: FamixPythonMethod)
 		  detect: [ :e | e name = aString and: [ e parentType name = aClassName ] ]
@@ -379,12 +379,12 @@ FamixPythonTreeSitterVisitor >> methodNamed: aString inClassNamed: aClassName [
 ]
 
 { #category : 'accessing' }
-FamixPythonTreeSitterVisitor >> model [
+FamixPythonVisitor >> model [
 	^ model
 ]
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> relativeFilePath [
+FamixPythonVisitor >> relativeFilePath [
 
 	self model rootFolder ifNil: [ ^ self fileReference fullName removePrefix: '/' ].
 
@@ -392,7 +392,7 @@ FamixPythonTreeSitterVisitor >> relativeFilePath [
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> resolveInvocationOrInstantiationFrom: aCallNode [
+FamixPythonVisitor >> resolveInvocationOrInstantiationFrom: aCallNode [
 	"When we end up here we might have multiple cases to manage:
 	- x() => This is either a function invocation or instantiation. There should be no stub. 
 	- package.module.x() => Function invocation or instantiation comming from one of the import. Stub is an unknown entity.
@@ -458,7 +458,7 @@ FamixPythonTreeSitterVisitor >> resolveInvocationOrInstantiationFrom: aCallNode 
 ]
 
 { #category : 'initialization' }
-FamixPythonTreeSitterVisitor >> setMetaclassOf: aClassDefinitionNode [
+FamixPythonVisitor >> setMetaclassOf: aClassDefinitionNode [
 
 	(self visit: aClassDefinitionNode _superclasses) ifNotNil: [ :nodes |
 			nodes
@@ -501,7 +501,7 @@ FamixPythonTreeSitterVisitor >> setMetaclassOf: aClassDefinitionNode [
 ]
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> setSourceAnchor: aFamixEntity from: aTSNode [
+FamixPythonVisitor >> setSourceAnchor: aFamixEntity from: aTSNode [
 
 	^ self
 		  setSourceAnchorTo: aFamixEntity
@@ -511,7 +511,7 @@ FamixPythonTreeSitterVisitor >> setSourceAnchor: aFamixEntity from: aTSNode [
 ]
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> setSourceAnchorTo: aFamixEntity fileName: aString start: aNumber end: anotherNumber [
+FamixPythonVisitor >> setSourceAnchorTo: aFamixEntity fileName: aString start: aNumber end: anotherNumber [
 
 	aFamixEntity sourceAnchor: (FamixPythonIndexedFileAnchor new
 			 fileName: aString;
@@ -526,7 +526,7 @@ FamixPythonTreeSitterVisitor >> setSourceAnchorTo: aFamixEntity fileName: aStrin
 ]
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> setSuperclassesOf: classDefinitionNode [
+FamixPythonVisitor >> setSuperclassesOf: classDefinitionNode [
 
 	self flag: #todo. "Add test of a class with a superclass and a metaclass"
 	self flag: #todo. "Add test on multiple inheritance"
@@ -573,14 +573,14 @@ FamixPythonTreeSitterVisitor >> setSuperclassesOf: classDefinitionNode [
 ]
 
 { #category : 'accessing' }
-FamixPythonTreeSitterVisitor >> sourceText [
+FamixPythonVisitor >> sourceText [
 
 	self flag: #todo. "Manage encorders."
 	^ self fileReference contents
 ]
 
 { #category : 'private' }
-FamixPythonTreeSitterVisitor >> unknownEntityNamed: aString [
+FamixPythonVisitor >> unknownEntityNamed: aString [
 
 	^ (self model allWithType: FamixPythonUnknownEntity)
 		  detect: [ :e | e name = aString ]
@@ -588,7 +588,7 @@ FamixPythonTreeSitterVisitor >> unknownEntityNamed: aString [
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visit: anObject [
+FamixPythonVisitor >> visit: anObject [
 
 	anObject isTSNode ifTrue: [ ^ self visitNode: anObject ].
 	anObject isCollection ifTrue: [ ^ self visitNodes: anObject ].
@@ -596,13 +596,13 @@ FamixPythonTreeSitterVisitor >> visit: anObject [
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitAliasedImport: anAliasImport [
+FamixPythonVisitor >> visitAliasedImport: anAliasImport [
 
 	^ (self visit: anAliasImport _name) -> (self visit: anAliasImport _alias)
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitArgumentList: anArgumentListNode [
+FamixPythonVisitor >> visitArgumentList: anArgumentListNode [
 	"An argument list can either be in a class definition to list superclasses and things like metaclass or in a call."
 
 	"In case of a class definition we let my caller handle the nodes"
@@ -612,7 +612,7 @@ FamixPythonTreeSitterVisitor >> visitArgumentList: anArgumentListNode [
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitAssignment: anAssignmentNode [
+FamixPythonVisitor >> visitAssignment: anAssignmentNode [
 
 	anAssignmentNode _left type = #subscript ifTrue: [ ^ self ].
 
@@ -624,7 +624,7 @@ FamixPythonTreeSitterVisitor >> visitAssignment: anAssignmentNode [
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitAttribute: anAttributeNode [
+FamixPythonVisitor >> visitAttribute: anAttributeNode [
 	"An attribute can signify two things:
 		- It's the receiver of a method or function call so we use it to produce an invocation or instantiation
 		- Else it is probably a reference or access to something imported with a simple import."
@@ -672,13 +672,13 @@ FamixPythonTreeSitterVisitor >> visitAttribute: anAttributeNode [
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitBlock: aNode [
+FamixPythonVisitor >> visitBlock: aNode [
 
 	^ super visitNode: aNode
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitCall: aCallNode [
+FamixPythonVisitor >> visitCall: aCallNode [
 
 	self resolveInvocationOrInstantiationFrom: aCallNode.
 
@@ -686,7 +686,7 @@ FamixPythonTreeSitterVisitor >> visitCall: aCallNode [
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitClassDefinition: aClassDefinitionNode [
+FamixPythonVisitor >> visitClassDefinition: aClassDefinitionNode [
 
 	| class shadowedEntity name |
 	name := self visit: aClassDefinitionNode _name.
@@ -711,32 +711,32 @@ FamixPythonTreeSitterVisitor >> visitClassDefinition: aClassDefinitionNode [
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitComment: aCommentNode [
+FamixPythonVisitor >> visitComment: aCommentNode [
 
 	commentsImporter addCommentNode: aCommentNode
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitDottedName: aDottedNameNode [
+FamixPythonVisitor >> visitDottedName: aDottedNameNode [
 
 	^ aDottedNameNode sourceText
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitExpressionStatement: aNode [
+FamixPythonVisitor >> visitExpressionStatement: aNode [
 
 	^ super visitNode: aNode
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitFalse: aNode [
+FamixPythonVisitor >> visitFalse: aNode [
 	"noop"
 
 	
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitFunctionDefinition: aFunctionDefinition [
+FamixPythonVisitor >> visitFunctionDefinition: aFunctionDefinition [
 	"the parser does not make a difference between function and method, but a method is defined in a class and its first parameter is self."
 
 	| entity |
@@ -748,13 +748,13 @@ FamixPythonTreeSitterVisitor >> visitFunctionDefinition: aFunctionDefinition [
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitGlobalStatement: aNode [
+FamixPythonVisitor >> visitGlobalStatement: aNode [
 
 	self flag: #todo
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitIdentifier: anIdentifierNode [
+FamixPythonVisitor >> visitIdentifier: anIdentifierNode [
 
 	self flag: #todo. "review some + clean method"
 	(#( aliased_import attribute call function_definition class_definition parameters keyword_argument lambda_parameters named_expression pattern_list list_comprehension ERROR) includes:
@@ -789,7 +789,7 @@ FamixPythonTreeSitterVisitor >> visitIdentifier: anIdentifierNode [
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitImportFromStatement: anImportFromStatement [
+FamixPythonVisitor >> visitImportFromStatement: anImportFromStatement [
 
 	| moduleName identifiers |
 	moduleName := anImportFromStatement _module_name accept: self.
@@ -815,7 +815,7 @@ FamixPythonTreeSitterVisitor >> visitImportFromStatement: anImportFromStatement 
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitImportStatement: anImportStatement [
+FamixPythonVisitor >> visitImportStatement: anImportStatement [
 
 	| identifiers |
 	identifiers := self visit: anImportStatement _name.
@@ -837,14 +837,14 @@ FamixPythonTreeSitterVisitor >> visitImportStatement: anImportStatement [
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitInteger: aNode [
+FamixPythonVisitor >> visitInteger: aNode [
 	"noop"
 
 	
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitLambda: aLambdaNode [
+FamixPythonVisitor >> visitLambda: aLambdaNode [
 
 	| lambda |
 	lambda := model newLambda.
@@ -858,25 +858,25 @@ FamixPythonTreeSitterVisitor >> visitLambda: aLambdaNode [
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitList: aNode [
+FamixPythonVisitor >> visitList: aNode [
 	"noop"
 
 	
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitListComprehension: aNode [
+FamixPythonVisitor >> visitListComprehension: aNode [
 	"noop"
 
 	
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitModule: aModuleNode [
+FamixPythonVisitor >> visitModule: aModuleNode [
 
 	| isPackageDeclaration entity |
 	"Reset the comment presenter for the current module."
-	commentsImporter := FamixPythonTSCommentsImporter visitor: self.
+	commentsImporter := FamixPythonCommentsImporter visitor: self.
 	
 	"If the file is name __init__.py this means that we have the declaration of a package. Else we have a module that can be in a package."
 	isPackageDeclaration := self fileReference basename = '__init__.py'.
@@ -905,7 +905,7 @@ FamixPythonTreeSitterVisitor >> visitModule: aModuleNode [
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitNamedExpression: aNamedExpressionNode [
+FamixPythonVisitor >> visitNamedExpression: aNamedExpressionNode [
 
 	| name variable |
 	name := self visit: aNamedExpressionNode _name.
@@ -931,7 +931,7 @@ FamixPythonTreeSitterVisitor >> visitNamedExpression: aNamedExpressionNode [
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitNode: aTSNode [
+FamixPythonVisitor >> visitNode: aTSNode [
 
 	^ self errorReport catch: Exception during: [
 			  | visitMethod |
@@ -948,38 +948,38 @@ FamixPythonTreeSitterVisitor >> visitNode: aTSNode [
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitNodes: aCollection [
+FamixPythonVisitor >> visitNodes: aCollection [
 
 	^ aCollection collect: [ :node | self visit: node ]
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitNotOperator: aNode [
+FamixPythonVisitor >> visitNotOperator: aNode [
 	"noop"
 
 	
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitPatternList: aPatternListNode [
+FamixPythonVisitor >> visitPatternList: aPatternListNode [
 
 	^ aPatternListNode collectNamedChild
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitRelativeImport: aRelativeImportNode [
+FamixPythonVisitor >> visitRelativeImport: aRelativeImportNode [
 
 	^ aRelativeImportNode sourceText
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitReturnStatement: aNode [
+FamixPythonVisitor >> visitReturnStatement: aNode [
 
 	^ super visitNode: aNode
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitString: aStringNode [
+FamixPythonVisitor >> visitString: aStringNode [
 
 	aStringNode parent type = #expression_statement ifTrue: [ commentsImporter addStringNode: aStringNode ].
 
@@ -988,14 +988,14 @@ FamixPythonTreeSitterVisitor >> visitString: aStringNode [
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitTrue: aNode [
+FamixPythonVisitor >> visitTrue: aNode [
 	"noop"
 
 	
 ]
 
 { #category : 'visiting' }
-FamixPythonTreeSitterVisitor >> visitWildcardImport: aWildcarImportNode [
+FamixPythonVisitor >> visitWildcardImport: aWildcarImportNode [
 
 	^ #( #* )
 ]

@@ -14,8 +14,8 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'visitor',
-		'fileNode',
-		'topEntity',
+		'commentIntervals',
+		'stringCommentIntervals',
 		'entitiesInFile'
 	],
 	#category : 'Famix-Python-Importer-Importer',
@@ -24,12 +24,23 @@ Class {
 }
 
 { #category : 'instance creation' }
-FamixPythonCommentsImporter class >> importCommentsOf: aFileNode visitor: aPythonImporterVisitor [
+FamixPythonCommentsImporter class >> visitor: aPythonImporterVisitor [
 
 	^ self new
 		  visitor: aPythonImporterVisitor;
-		  fileNode: aFileNode;
-		  import
+		  yourself
+]
+
+{ #category : 'accessing' }
+FamixPythonCommentsImporter >> addCommentNode: aNode [
+
+	commentIntervals add: (self intervalOf: aNode)
+]
+
+{ #category : 'accessing' }
+FamixPythonCommentsImporter >> addStringNode: aNode [
+
+	stringCommentIntervals add: (self intervalOf: aNode)
 ]
 
 { #category : 'actions' }
@@ -40,14 +51,14 @@ FamixPythonCommentsImporter >> createCommentFor: anEntity from: start to: stop [
 	comment commentedEntity: anEntity.
 	visitor
 		setSourceAnchorTo: comment
-		fileName: (visitor relativeFilePath: fileNode)
+		fileName: visitor relativeFilePath
 		start: start
 		end: stop.
 	^ comment
 ]
 
 { #category : 'actions' }
-FamixPythonCommentsImporter >> createMultilineCommentFromInterval: commentInterval [
+FamixPythonCommentsImporter >> createMultilineCommentFromInterval: commentInterval [ 
 
 	"Before checking if the comment is inside an entity, we check that it is not right before the declaration of an entity."
 	(self entityFollowingComment: commentInterval) ifNotNil: [ :entity | ^ self createCommentFor: entity from: commentInterval first to: commentInterval second ].
@@ -92,7 +103,7 @@ FamixPythonCommentsImporter >> entityFollowingComment: commentInterval [
 	"
 	"Take the entity right after the comment"
 	((self entitiesInFile select: [ :entity | entity sourceAnchor startPos > commentInterval second ]) detectMin: [ :entity | entity sourceAnchor startPos ])
-		ifNotNil: [ :entity | (fileNode hasOnlySpacesAndTabsBetween: commentInterval second + 1 and: entity sourceAnchor startPos - 1) ifTrue: [ ^ entity ] ].
+		ifNotNil: [ :entity | (self source hasOnlySpacesAndTabsBetween: commentInterval second + 1 and: entity sourceAnchor startPos - 1) ifTrue: [ ^ entity ] ].
 	^ nil
 ]
 
@@ -102,27 +113,14 @@ FamixPythonCommentsImporter >> entityOnLineOfComment: commentInterval [
 	
 	`var = 31 # Number of bytes`
 	"
-	
+
 	"Take the entity right before the comment"
-	((self entitiesInFile select: [ :entity | entity isStructuralEntity and: [ entity sourceAnchor endPos < commentInterval first ] ])
-		detectMax: [ :entity |
-			"We take the start because comments are not considered part of the entites so we might have multiple entities with the same end pos if they are imbricated."
-		 	entity sourceAnchor startPos ]) ifNotNil: [ :entity |
-		(fileNode hasNoLineReturnBetween: entity sourceAnchor endPos + 1 and: commentInterval first - 1) ifTrue: [ ^ entity ] ].
+
+	((self entitiesInFile select: [ :entity | entity isStructuralEntity and: [ entity sourceAnchor endPos < commentInterval first ] ]) detectMax: [ :entity | "We take the start because comments are not considered part of the entites so we might have multiple entities with the same end pos if they are imbricated."
+		 entity sourceAnchor startPos ]) ifNotNil: [ :entity |
+		(self source hasNoLineReturnBetween: entity sourceAnchor endPos + 1 and: commentInterval first - 1) ifTrue: [ ^ entity ] ].
 
 	^ nil
-]
-
-{ #category : 'accessing' }
-FamixPythonCommentsImporter >> fileNode [
-
-	^ fileNode
-]
-
-{ #category : 'accessing' }
-FamixPythonCommentsImporter >> fileNode: anObject [
-
-	fileNode := anObject
 ]
 
 { #category : 'actions' }
@@ -130,25 +128,46 @@ FamixPythonCommentsImporter >> import [
 	"Comments are not represented by nodes in SmaCC. A FileNode can return the intervals of the comments so we need to find to whose entity those comments are attached to.
 	I also save strings that are comments into the #multilineComments property."
 
-	fileNode comments ifNotEmpty: [ :commentIntervals |
-		| intervals |
-		"If we have two single line comments following each other, we can merge them."
-		intervals := OrderedCollection new.
-		commentIntervals do: [ :interval |
-			intervals ifEmpty: [ intervals add: interval ] ifNotEmpty: [ "We can merge if we have only spaces and tabs between the comments."
-				(fileNode hasOnlySpacesAndTabsBetween: intervals last second + 1 and: interval first - 1)
-					ifTrue: [ intervals last at: 2 put: interval second ]
-					ifFalse: [ intervals add: interval ] ] ].
+	commentIntervals ifNotEmpty: [
+			| intervals |
+			"If we have two single line comments following each other, we can merge them."
+			intervals := OrderedCollection new.
+			commentIntervals do: [ :interval |
+					intervals ifEmpty: [ intervals add: interval ] ifNotEmpty: [ "We can merge if we have only spaces and tabs between the comments."
+							(self source hasOnlySpacesAndTabsBetween: intervals last second + 1 and: interval first - 1)
+								ifTrue: [ intervals last at: 2 put: interval second ]
+								ifFalse: [ intervals add: interval ] ] ].
 
-		intervals do: [ :commentInterval | visitor errorReport catch: Exception during: [ self createSingleLineCommentFromInterval: commentInterval ] ] ].
+			intervals do: [ :commentInterval | visitor errorReport catch: Exception during: [ self createSingleLineCommentFromInterval: commentInterval ] ] ].
 
-	fileNode multilineComments do: [ :interval | visitor errorReport catch: Exception during: [ self createMultilineCommentFromInterval: interval ] ]
+	stringCommentIntervals do: [ :interval | visitor errorReport catch: Exception during: [ self createMultilineCommentFromInterval: interval ] ]
+]
+
+{ #category : 'initialization' }
+FamixPythonCommentsImporter >> initialize [
+
+	super initialize.
+	commentIntervals := OrderedCollection new.
+	stringCommentIntervals := OrderedCollection new
+]
+
+{ #category : 'accessing' }
+FamixPythonCommentsImporter >> intervalOf: aNode [
+
+	^ {
+		  aNode startPosition.
+		  (aNode rootNode endPosition min: aNode endPosition + 1) "Take the line return. This might not work on files from windows since it's CRLF also we can have spaces before the line return. We should maybe do something more robust. Also, do not take it of we are at the end of the file." }
 ]
 
 { #category : 'accessing' }
 FamixPythonCommentsImporter >> model [
 
 	^ self visitor model
+]
+
+{ #category : 'accessing' }
+FamixPythonCommentsImporter >> source [
+	^ visitor sourceText
 ]
 
 { #category : 'accessing' }
