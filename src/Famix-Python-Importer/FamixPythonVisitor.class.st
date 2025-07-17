@@ -549,7 +549,7 @@ FamixPythonVisitor >> visitArgumentList: anArgumentListNode [
 { #category : 'visiting' }
 FamixPythonVisitor >> visitAssignment: anAssignmentNode [
 
-	anAssignmentNode _left type = #subscript ifTrue: [ ^ self ].
+	anAssignmentNode _left type = #subscript ifTrue: [ ^ self visitChildren: anAssignmentNode ].
 
 	anAssignmentNode _left type = #pattern_list
 		ifTrue: [ (self visit: anAssignmentNode _left) collect: [ :node | self manageAssignationTo: node ] ]
