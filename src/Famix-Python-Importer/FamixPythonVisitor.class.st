@@ -607,9 +607,8 @@ FamixPythonVisitor >> visitAttribute: anAttributeNode [
 
 { #category : 'visiting' }
 FamixPythonVisitor >> visitAugmentedAssignment: aNode [
-	"We should manage it the same way as a normal assignment in Famix"
+	"We should manage it the same way as a normal assignment in Famix. The only change is that we will create a read access to the variable on the left side, but this will be dealt with in another place."
 
-	self flag: #todo. "Add tests on those"
 	^ self visitAssignment: aNode
 ]
 
