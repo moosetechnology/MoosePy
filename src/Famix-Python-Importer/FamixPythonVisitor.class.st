@@ -297,6 +297,7 @@ FamixPythonVisitor >> getConstructorOf: aClass [
 FamixPythonVisitor >> initialize [
 
 	super initialize.
+	self flag: #todo. "Add management and tests on parenthesized_expression kind of node"
 	importPaths := IdentityDictionary new
 ]
 
@@ -548,6 +549,7 @@ FamixPythonVisitor >> visitArgumentList: anArgumentListNode [
 
 { #category : 'visiting' }
 FamixPythonVisitor >> visitAssignment: anAssignmentNode [
+	"I represent an assignation expression that is different from an assignation statement we can find in lambdas"
 
 	anAssignmentNode _left type = #subscript ifTrue: [ ^ self visitChildren: anAssignmentNode ].
 
@@ -555,7 +557,8 @@ FamixPythonVisitor >> visitAssignment: anAssignmentNode [
 		ifTrue: [ (self visit: anAssignmentNode _left) collect: [ :node | self manageAssignationTo: node ] ]
 		ifFalse: [ self manageAssignationTo: anAssignmentNode _left ].
 
-	self visitChildren: anAssignmentNode
+	"We visitied the left side above, now we need to visit the right side."
+	self visit: anAssignmentNode _right
 ]
 
 { #category : 'visiting' }
@@ -614,7 +617,7 @@ FamixPythonVisitor >> visitAugmentedAssignment: aNode [
 	^ self visitAssignment: aNode
 ]
 
-{ #category : 'visiting' }
+{ #category : 'visiting - noop' }
 FamixPythonVisitor >> visitBlock: aNode [
 
 	^ self visitChildren: aNode
@@ -632,7 +635,9 @@ FamixPythonVisitor >> visitCall: aCallNode [
 FamixPythonVisitor >> visitClassDefinition: aClassDefinitionNode [
 
 	| class shadowedEntity name |
-	name := self visit: aClassDefinitionNode _name.
+	name := aClassDefinitionNode _name sourceText. "No need to visit. It will always be an identifier and this identifier do not need symbol resolution."
+	
+	self flag: #todo. "Generalize shadowing check?"
 	"If we are shadowing an entity, we need to mark is as shadowed."
 	shadowedEntity := self findSadowedEntityNamed: name.
 
@@ -650,7 +655,7 @@ FamixPythonVisitor >> visitClassDefinition: aClassDefinitionNode [
 	^ self useCurrentEntity: class during: [
 			  self setSuperclassesOf: aClassDefinitionNode.
 			  self setMetaclassOf: aClassDefinitionNode.
-			  self visitChildren: aClassDefinitionNode ]
+			  self visit: aClassDefinitionNode _body ]
 ]
 
 { #category : 'visiting' }
@@ -671,7 +676,7 @@ FamixPythonVisitor >> visitExpressionStatement: aNode [
 	^ self visitChildren: aNode
 ]
 
-{ #category : 'visiting' }
+{ #category : 'visiting - noop' }
 FamixPythonVisitor >> visitFalse: aNode [
 	"noop"
 
@@ -700,10 +705,11 @@ FamixPythonVisitor >> visitGlobalStatement: aNode [
 FamixPythonVisitor >> visitIdentifier: anIdentifierNode [
 
 	self flag: #todo. "review some + clean method"
-	(#( aliased_import attribute call function_definition class_definition parameters keyword_argument lambda_parameters named_expression pattern_list list_comprehension ERROR) includes:
+	self flag: #todo. "Manage the for_statement"
+	(#( aliased_import attribute call function_definition parameters keyword_argument lambda_parameters named_expression pattern_list list_comprehension parenthesized_expression for_statement subscript ERROR) includes:
 		 anIdentifierNode parent type) ifTrue: [ ^ anIdentifierNode sourceText ].
 	anIdentifierNode isLeftSideOfAssignation ifTrue: [ ^ anIdentifierNode sourceText ].
-	(#( argument_list return_statement lambda if_statement comparison_operator binary_operator assignment ) includes: anIdentifierNode parent type) ifTrue: [
+	(#( argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator) includes: anIdentifierNode parent type) ifTrue: [
 			^ self
 				  resolve: ((SRIdentifierWithNode identifier: anIdentifierNode sourceText)
 						   expectedKind: {
@@ -779,7 +785,7 @@ FamixPythonVisitor >> visitImportStatement: anImportStatement [
 				alias: alias ]
 ]
 
-{ #category : 'visiting' }
+{ #category : 'visiting - noop' }
 FamixPythonVisitor >> visitInteger: aNode [
 	"noop"
 
@@ -908,7 +914,7 @@ FamixPythonVisitor >> visitRelativeImport: aRelativeImportNode [
 	^ aRelativeImportNode sourceText
 ]
 
-{ #category : 'visiting' }
+{ #category : 'visiting - noop' }
 FamixPythonVisitor >> visitReturnStatement: aNode [
 
 	^ self visitChildren: aNode
@@ -923,7 +929,7 @@ FamixPythonVisitor >> visitString: aStringNode [
 	^ self
 ]
 
-{ #category : 'visiting' }
+{ #category : 'visiting - noop' }
 FamixPythonVisitor >> visitTrue: aNode [
 	"noop"
 
