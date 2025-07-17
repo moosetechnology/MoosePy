@@ -230,3 +230,8 @@ class ClassWihtComments():
 
 class ClassUsingImportedMetaclass(metaclass=moduleAtRoot8.CustomMetaclass2):
     pass
+
+not moduleAtRoot3.moduleAtRootVariable3
+
+augmentedAssignmentVar = 1
+augmentedAssignmentVar += 3
