@@ -108,6 +108,12 @@ FamixPythonImporter class >> importReader [
 	(self import: '/Users/cyril/testPython/reader' asFileReference) inspect
 ]
 
+{ #category : 'accessing' }
+FamixPythonImporter >> commentVisitorClass [
+
+	^ FamixPythonCommentVisitor
+]
+
 { #category : 'api' }
 FamixPythonImporter >> determineSourceRootFolderFrom: fileReference [
 	"We decided in the parser to define a folder as the root of the project to be used as the base of relative imports. This folder will be the first package of the project. 

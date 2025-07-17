@@ -640,10 +640,11 @@ FamixPythonVisitor >> visitClassDefinition: aClassDefinitionNode [
 			  self visit: aClassDefinitionNode _body ]
 ]
 
-{ #category : 'visiting' }
+{ #category : 'visiting - noop' }
 FamixPythonVisitor >> visitComment: aCommentNode [
+	"noop - Managed by the comment importer"
 
-	commentsImporter addCommentNode: aCommentNode
+	
 ]
 
 { #category : 'visiting' }
@@ -674,7 +675,9 @@ FamixPythonVisitor >> visitFunctionDefinition: aFunctionDefinition [
 		          ifTrue: [ self ensureMethod: aFunctionDefinition ]
 		          ifFalse: [ self createFunction: aFunctionDefinition ].
 
-	^ self useCurrentEntity: entity during: [ self visitChildren: aFunctionDefinition ]
+	^ self useCurrentEntity: entity during: [
+			  self visit: aFunctionDefinition _parameters.
+			  self visit: aFunctionDefinition _body ]
 ]
 
 { #category : 'visiting' }
@@ -810,9 +813,7 @@ FamixPythonVisitor >> visitListComprehension: aNode [
 FamixPythonVisitor >> visitModule: aModuleNode [
 
 	| isPackageDeclaration entity |
-	"Reset the comment presenter for the current module."
-	commentsImporter := FamixPythonCommentsImporter visitor: self.
-	
+
 	"If the file is name __init__.py this means that we have the declaration of a package. Else we have a module that can be in a package."
 	isPackageDeclaration := self fileReference basename = '__init__.py'.
 	entity := isPackageDeclaration
@@ -827,11 +828,12 @@ FamixPythonVisitor >> visitModule: aModuleNode [
 					entity parentPackage: self currentEntity ].
 
 			(self currentEntity: entity) isMainEntity: true ].
-
-	aModuleNode collectNamedChild do: [ :child | child accept: self ].
+	self visitChildren: aModuleNode.
 	
-	commentsImporter import.
-	"FamixPythonCommentsImporter importCommentsOf: aModuleNode visitor: self."
+	"Importing the comments of the file."
+	(FamixPythonCommentVisitor visitor: self)
+				visitNode: aModuleNode;
+				import.
 
 	"If we are in a package declaration we need to keep the package in the context for the modules in the package. The package will be pop later by the importer."
 	^ isPackageDeclaration
@@ -896,12 +898,10 @@ FamixPythonVisitor >> visitReturnStatement: aNode [
 	^ self visitChildren: aNode
 ]
 
-{ #category : 'visiting' }
+{ #category : 'visiting - noop' }
 FamixPythonVisitor >> visitString: aStringNode [
+	"noop - we don't need the children and comments are managed in a separated visitor."
 
-	aStringNode parent type = #expression_statement ifTrue: [ commentsImporter addStringNode: aStringNode ].
-
-	"No need to visit children, we do nothing with them currently."
 	^ self
 ]
 
