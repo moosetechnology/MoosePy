@@ -15,6 +15,20 @@ FamixPythonVisitor >> attributeAsAssociation: anAttributeNode [
 	^ (anAttributeNode _object sourceText copyWithout: Character space) -> (self visit: anAttributeNode _attribute)
 ]
 
+{ #category : 'visiting' }
+FamixPythonVisitor >> checkShadowingOfName: aString during: aBlock [
+	"If the same element already has a shadowable entity of the same name, we select the last one defined and mark it as shadowed by the new entity returned by the block."
+
+	| shadowedEntity newEntity |
+	self withCurrentEntityDo: [ :entity |
+			((entity query descendants ofType: FamixTShadowable) select: [ :child | child name = aString ]) ifNotEmpty: [ :entities |
+				shadowedEntity := entities detectMax: [ :anEntity | anEntity sourceAnchor startPos ] ] ].
+
+	newEntity := aBlock value.
+
+	shadowedEntity ifNotNil: [ newEntity shadowedEntity: shadowedEntity ]
+]
+
 { #category : 'private' }
 FamixPythonVisitor >> createAssociationsForFunctionCallNode: aCallNode forResult: result in: currentEntity [
 
@@ -28,20 +42,16 @@ FamixPythonVisitor >> createAssociationsForFunctionCallNode: aCallNode forResult
 { #category : 'private' }
 FamixPythonVisitor >> createFunction: aFunctionDefinition [
 
-	| function name shadowedEntity signature |
+	| function name signature |
 	name := self visit: aFunctionDefinition _name.
 	signature := aFunctionDefinition completeSource copyFrom: aFunctionDefinition _name startPosition to: aFunctionDefinition _parameters endPosition.
 
-	"If we are shadowing an entity, we need to mark is as shadowed."
-	shadowedEntity := self findSadowedEntityNamed: name.
-
-	function := model newFunction
-		            name: name;
-		            signature: signature;
-		            functionOwner: self currentEntity;
-		            yourself.
-
-	shadowedEntity ifNotNil: [ function shadowedEntity: shadowedEntity ].
+	self checkShadowingOfName: name during: [
+			function := model newFunction
+				            name: name;
+				            signature: signature;
+				            functionOwner: self currentEntity;
+				            yourself ].
 
 	^ self setSourceAnchor: function from: aFunctionDefinition
 ]
@@ -266,17 +276,6 @@ FamixPythonVisitor >> findImportMatchingSource: aString ifFound: aBlock [
 		  ifFound: aBlock
 ]
 
-{ #category : 'private' }
-FamixPythonVisitor >> findSadowedEntityNamed: name [
-	"If the same element already has a shadowable entity of the same name, we select the last one defined. If there is none, we return nil"
-
-	self withCurrentEntityDo: [ :entity |
-		((entity query descendants ofType: FamixTShadowable) select: [ :child | child name = name ]) ifNotEmpty: [ :entities |
-			^ entities detectMax: [ :anEntity | anEntity sourceAnchor startPos ] ] ].
-
-	^ nil
-]
-
 { #category : 'accessing' }
 FamixPythonVisitor >> getConstructorOf: aClass [
 
@@ -340,11 +339,7 @@ FamixPythonVisitor >> manageAssignationTo: aNode [
 					detect: [ :child | child name = name and: [ child isShadowable not or: [ child isShadowed not ] ] ]
 					ifFound: [ :var | variable := var ]
 					ifNone: [
-							| shadowedEntity |
-							shadowedEntity := self findSadowedEntityNamed: name.
-							variable := self currentEntity createLocalVariable: name.
-							shadowedEntity ifNotNil: [ variable shadowedEntity: shadowedEntity ].
-							"We select the lhs node because the source anchor should not be the full assignation."
+							self checkShadowingOfName: name during: [ variable := self currentEntity createLocalVariable: name ].
 							self setSourceAnchor: variable from: aNode ] ].
 	self createWriteAccessTo: variable from: aNode assignationNode.
 	"In the case of an augmented assignment, we produce a read access on top of the write access"
@@ -629,20 +624,14 @@ FamixPythonVisitor >> visitCall: aCallNode [
 { #category : 'visiting' }
 FamixPythonVisitor >> visitClassDefinition: aClassDefinitionNode [
 
-	| class shadowedEntity name |
+	| class name |
 	name := aClassDefinitionNode _name sourceText. "No need to visit. It will always be an identifier and this identifier do not need symbol resolution."
-	
-	self flag: #todo. "Generalize shadowing check?"
-	"If we are shadowing an entity, we need to mark is as shadowed."
-	shadowedEntity := self findSadowedEntityNamed: name.
 
-	class := (self isMetaclassDefinition: aClassDefinitionNode)
-		         ifTrue: [ model newMetaclass ]
-		         ifFalse: [ model newClass ].
+	self checkShadowingOfName: name during: [
+			class := (self isMetaclassDefinition: aClassDefinitionNode)
+				         ifTrue: [ model newMetaclassNamed: name ]
+				         ifFalse: [ model newClassNamed: name ] ].
 
-	class name: name.
-
-	shadowedEntity ifNotNil: [ class shadowedEntity: shadowedEntity ].
 	class typeContainer: self currentEntity.
 
 	self setSourceAnchor: class from: aClassDefinitionNode.
@@ -863,13 +852,10 @@ FamixPythonVisitor >> visitNamedExpression: aNamedExpressionNode [
 		detect: [ :child | child name = name and: [ child isShadowable not or: [ child isShadowed not ] ] ]
 		ifFound: [ :var | variable := var ]
 		ifNone: [
-				| shadowedEntity |
 				self flag: #todo. "Add test on shadowing at this level. This is not yet covered by test. If you comment the next line the parser is still passing all tests."
-				shadowedEntity := self findSadowedEntityNamed: name.
-				variable := self currentEntity createLocalVariable: name.
-				shadowedEntity ifNotNil: [ variable shadowedEntity: shadowedEntity ].
-				"We select the lhs node because the source anchor should not be the full assignation."
-				self setSourceAnchor: variable from: aNamedExpressionNode _name ].
+				self checkShadowingOfName: name during: [ variable := self currentEntity createLocalVariable: name ].
+				self setSourceAnchor: variable from: aNamedExpressionNode _name
+				"We select the lhs node because the source anchor should not be the full assignation." ].
 
 	self createWriteAccessTo: variable from: aNamedExpressionNode.
 
