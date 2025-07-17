@@ -10,6 +10,6 @@ FamixTSNodeWrapper >> assignationNode [
 { #category : '*Famix-Python-Importer' }
 FamixTSNodeWrapper >> isLeftSideOfAssignation [
 
-	self parentsDo: [ :node | node type = #assignment ifTrue: [ ^ node _left includesChild: self ] ].
+	self parentsDo: [ :node | (#( assignment augmented_assignment ) includes: node type) ifTrue: [ ^ node _left includesChild: self ] ].
 	^ false
 ]

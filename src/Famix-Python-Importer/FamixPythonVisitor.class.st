@@ -607,6 +607,14 @@ FamixPythonVisitor >> visitAttribute: anAttributeNode [
 ]
 
 { #category : 'visiting' }
+FamixPythonVisitor >> visitAugmentedAssignment: aNode [
+	"We should manage it the same way as a normal assignment in Famix"
+
+	self flag: #todo. "Add tests on those"
+	^ self visitAssignment: aNode
+]
+
+{ #category : 'visiting' }
 FamixPythonVisitor >> visitBlock: aNode [
 
 	^ self visitChildren: aNode
