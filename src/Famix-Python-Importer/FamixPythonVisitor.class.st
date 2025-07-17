@@ -20,10 +20,7 @@ FamixPythonVisitor >> createAssociationsForFunctionCallNode: aCallNode forResult
 
 	^ (result isCollection not and: [ result isClass ])
 		  ifTrue: [
-				  | reference |
-				  reference := result createAccessOrReferenceFrom: currentEntity node: aCallNode.
-				  self setSourceAnchor: reference from: aCallNode.
-
+				  result createAccessOrReferenceFrom: currentEntity node: aCallNode.
 				  self createInvocationOf: (self getConstructorOf: result) from: currentEntity node: aCallNode ]
 		  ifFalse: [ self createInvocationOf: result from: currentEntity node: aCallNode ]
 ]
@@ -350,8 +347,8 @@ FamixPythonVisitor >> manageAssignationTo: aNode [
 							"We select the lhs node because the source anchor should not be the full assignation."
 							self setSourceAnchor: variable from: aNode ] ].
 	self createWriteAccessTo: variable from: aNode assignationNode.
-	aNode assignationNode type = #augmented_assignment ifTrue: [
-		self setSourceAnchor: (variable createAccessOrReferenceFrom: self currentEntity node: aNode assignationNode) from: aNode assignationNode ].
+	"In the case of an augmented assignment, we produce a read access on top of the write access"
+	aNode assignationNode type = #augmented_assignment ifTrue: [ variable createAccessOrReferenceFrom: self currentEntity node: aNode assignationNode ].
 	^ variable
 ]
 
@@ -574,7 +571,7 @@ FamixPythonVisitor >> visitAttribute: anAttributeNode [
 	name := self visit: anAttributeNode _attribute.
 
 	"If the parent is a call , we return info to resolve the call"
-	( anAttributeNode parent type = #call) ifTrue: [
+	anAttributeNode parent type = #call ifTrue: [
 			^ {
 				  source.
 				  name } ].
@@ -600,10 +597,7 @@ FamixPythonVisitor >> visitAttribute: anAttributeNode [
 						 notFoundReplacementEntity: [ :unresolved :currentEntity | "This unknown entity can be a variable or a class."
 							 self ensureStubUnknownEntityNamed: unresolved identifier ];
 						 yourself)
-				foundAction: [ :entity :currentEntity |
-						| association |
-						association := entity createAccessOrReferenceFrom: currentEntity node: anAttributeNode.
-						self setSourceAnchor: association from: anAttributeNode ].
+				foundAction: [ :entity :currentEntity | entity createAccessOrReferenceFrom: currentEntity node: anAttributeNode ].
 			^ source ].
 
 	self flag: #todo. "We are missing instance variable accesses here"
@@ -708,31 +702,29 @@ FamixPythonVisitor >> visitIdentifier: anIdentifierNode [
 
 	self flag: #todo. "review some + clean method"
 	self flag: #todo. "Manage the for_statement"
-	(#( aliased_import attribute call function_definition parameters keyword_argument lambda_parameters named_expression pattern_list list_comprehension parenthesized_expression for_statement subscript ERROR) includes:
-		 anIdentifierNode parent type) ifTrue: [ ^ anIdentifierNode sourceText ].
+	(#( aliased_import attribute call function_definition parameters keyword_argument lambda_parameters named_expression pattern_list list_comprehension
+	    parenthesized_expression for_statement subscript ERROR ) includes: anIdentifierNode parent type) ifTrue: [ ^ anIdentifierNode sourceText ].
 	anIdentifierNode isLeftSideOfAssignation ifTrue: [ ^ anIdentifierNode sourceText ].
-	(#( argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator) includes: anIdentifierNode parent type) ifTrue: [
-			^ self
-				  resolve: ((SRIdentifierWithNode identifier: anIdentifierNode sourceText)
-						   expectedKind: {
-								   FamixPythonClass.
-								   FamixPythonFunction.
-								   FamixPythonLocalVariable.
-								   FamixPythonGlobalVariable.
-								   FamixPythonAttribute.
-								   FamixPythonParameter };
-						   notFoundReplacementEntity: [ :unresolved :currentEntity | "If we are the receiver of an invocation and we did not find the associated entity it's because it's an instance of a class or the namespace from the import. In that case we should create nothing so we give a null entity.""]"
-								   self flag: #todo.
-								   "aVariableExpression isInvocationOrInstantiationReceiver
+	(#( argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator ) includes: anIdentifierNode parent type)
+		ifTrue: [
+				^ self
+					  resolve: ((SRIdentifierWithNode identifier: anIdentifierNode sourceText)
+							   expectedKind: {
+									   FamixPythonClass.
+									   FamixPythonFunction.
+									   FamixPythonLocalVariable.
+									   FamixPythonGlobalVariable.
+									   FamixPythonAttribute.
+									   FamixPythonParameter };
+							   notFoundReplacementEntity: [ :unresolved :currentEntity | "If we are the receiver of an invocation and we did not find the associated entity it's because it's an instance of a class or the namespace from the import. In that case we should create nothing so we give a null entity.""]"
+									   self flag: #todo.
+									   "aVariableExpression isInvocationOrInstantiationReceiver
 						 ifTrue: [ FamixPythonNilEntity ]
 						 ifFalse: [" "This can be a structural entity or a class"
-								   self ensureStubUnknownEntityNamed: unresolved identifier ];
-						   yourself)
-				  foundAction: [ :entity :currentEntity | "See the comment in the notFoundReplacementEntity block to see why we do this."
-						  entity isMooseEntity ifTrue: [
-								  | association |
-								  association := entity createAccessOrReferenceFrom: currentEntity node: anIdentifierNode.
-								  self setSourceAnchor: association from: anIdentifierNode ] ] ].
+									   self ensureStubUnknownEntityNamed: unresolved identifier ];
+							   yourself)
+					  foundAction: [ :entity :currentEntity | "See the comment in the notFoundReplacementEntity block to see why we do this."
+						  entity isMooseEntity ifTrue: [ entity createAccessOrReferenceFrom: currentEntity node: anIdentifierNode ] ] ].
 
 
 

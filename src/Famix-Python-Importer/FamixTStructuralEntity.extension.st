@@ -7,5 +7,6 @@ FamixTStructuralEntity >> createAccessOrReferenceFrom: anEntity node: aNode [
 		  variable: self;
 		  accessor: anEntity;
 		  isWrite: aNode isLeftSideOfAssignation;
+		  in: [ :association | aNode visitor setSourceAnchor: association from: aNode ];
 		  yourself
 ]
