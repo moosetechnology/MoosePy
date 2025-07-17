@@ -350,6 +350,8 @@ FamixPythonVisitor >> manageAssignationTo: aNode [
 							"We select the lhs node because the source anchor should not be the full assignation."
 							self setSourceAnchor: variable from: aNode ] ].
 	self createWriteAccessTo: variable from: aNode assignationNode.
+	aNode assignationNode type = #augmented_assignment ifTrue: [
+		self setSourceAnchor: (variable createAccessOrReferenceFrom: self currentEntity node: aNode assignationNode) from: aNode assignationNode ].
 	^ variable
 ]
 

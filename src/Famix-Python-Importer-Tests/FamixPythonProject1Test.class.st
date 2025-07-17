@@ -48,6 +48,48 @@ FamixPythonProject1Test >> testAccessOrReferenceToStubEntitySourceAnchor [
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAccessesOfAugmentedAssignment [
+	"In the case of 
+	
+	augmentedAssignmentVar = 1
+	augmentedAssignmentVar += 3
+
+	We should have 2 write accesses and 1 read access
+"
+
+	| variable module accesses |
+	variable := self globalVariableNamed: 'augmentedAssignmentVar'.
+	module := self moduleNamed: 'moduleAtRoot2'.
+
+	accesses := variable incomingAccesses select: [ :anAccess | anAccess accessor = module ].
+
+	self assert: accesses size equals: 3.
+	self assert: (accesses select: #isRead) size equals: 1.
+	self assert: (accesses select: #isWrite) size equals: 2
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAccessesOfAugmentedAssignmentSourceAnchor [
+	"In the case of 
+	
+	augmentedAssignmentVar = 1
+	augmentedAssignmentVar += 3
+
+	We should have 2 write accesses and 1 read access
+"
+
+	| variable module accesses |
+	variable := self globalVariableNamed: 'augmentedAssignmentVar'.
+	module := self moduleNamed: 'moduleAtRoot2'.
+
+	accesses := variable incomingAccesses select: [ :anAccess | anAccess accessor = module ].
+
+	self assert: accesses first sourceText equals: 'augmentedAssignmentVar = 1'.
+	self assert: accesses second sourceText equals: 'augmentedAssignmentVar += 3'.
+	self assert: accesses third sourceText equals: 'augmentedAssignmentVar += 3'
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testAccessesOfrnstate [
 	"Regression test"
 

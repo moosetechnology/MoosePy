@@ -3,7 +3,7 @@ Extension { #name : 'FamixTSNodeWrapper' }
 { #category : '*Famix-Python-Importer' }
 FamixTSNodeWrapper >> assignationNode [
 
-	self type = #assignment ifTrue: [ ^ self ].
+	(#( assignment augmented_assignment ) includes: self type) ifTrue: [ ^ self ].
 	^ self parent ifNotNil: [ self parent assignationNode ]
 ]
 
