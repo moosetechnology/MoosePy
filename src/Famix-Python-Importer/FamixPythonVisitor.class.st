@@ -324,8 +324,6 @@ FamixPythonVisitor >> manageAssignationTo: aNode [
 										                        parentType: class;
 										                        isClassSide: false;
 										                        yourself.
-
-									            "We select the lhs node because the source anchor should not be the full assignation."
 									            self setSourceAnchor: variable from: aNode.
 									            variable ] ]
 					ifFalse: [
@@ -854,8 +852,7 @@ FamixPythonVisitor >> visitNamedExpression: aNamedExpressionNode [
 		ifNone: [
 				self flag: #todo. "Add test on shadowing at this level. This is not yet covered by test. If you comment the next line the parser is still passing all tests."
 				self checkShadowingOfName: name during: [ variable := self currentEntity createLocalVariable: name ].
-				self setSourceAnchor: variable from: aNamedExpressionNode _name
-				"We select the lhs node because the source anchor should not be the full assignation." ].
+				self setSourceAnchor: variable from: aNamedExpressionNode _name ].
 
 	self createWriteAccessTo: variable from: aNamedExpressionNode.
 
