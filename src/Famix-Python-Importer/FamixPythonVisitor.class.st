@@ -870,11 +870,11 @@ FamixPythonVisitor >> visitNamedExpression: aNamedExpressionNode [
 	^ variable
 ]
 
-{ #category : 'visiting' }
+{ #category : 'visiting - noop' }
 FamixPythonVisitor >> visitNotOperator: aNode [
 	"noop"
 
-	
+	^ self visitChildren: aNode
 ]
 
 { #category : 'visiting' }
