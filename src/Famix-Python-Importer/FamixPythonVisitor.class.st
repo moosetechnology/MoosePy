@@ -15,7 +15,7 @@ FamixPythonVisitor >> attributeAsAssociation: anAttributeNode [
 	^ (anAttributeNode _object sourceText copyWithout: Character space) -> (self visit: anAttributeNode _attribute)
 ]
 
-{ #category : 'visiting' }
+{ #category : 'private' }
 FamixPythonVisitor >> checkShadowingOfName: aString during: aBlock [
 	"If the same element already has a shadowable entity of the same name, we select the last one defined and mark it as shadowed by the new entity returned by the block."
 
@@ -525,8 +525,15 @@ FamixPythonVisitor >> unknownEntityNamed: aString [
 
 { #category : 'visiting' }
 FamixPythonVisitor >> visitAliasedImport: anAliasImport [
+	"
+	Children:
+		- name: a dotted_name
+		- alias: an identifier (we do not visit it because it does not need to be resolved.
+		
+	Parents:
+		- Visiting me: import_statement / import_from_statement"
 
-	^ (self visit: anAliasImport _name) -> (self visit: anAliasImport _alias)
+	^ (self visit: anAliasImport _name) -> anAliasImport _alias sourceText
 ]
 
 { #category : 'visiting' }
@@ -649,6 +656,16 @@ FamixPythonVisitor >> visitComment: aCommentNode [
 
 { #category : 'visiting' }
 FamixPythonVisitor >> visitDottedName: aDottedNameNode [
+	"
+	Children:
+		- unnamed: identifier
+		
+	Parents:
+		- Visiting me: aliased_import / import_from_statement / import_statement
+		- Skipping me: relative_import
+		- Non yet managed: future_import_statement
+		
+	We do not visit the children."
 
 	^ aDottedNameNode sourceText
 ]
@@ -691,7 +708,7 @@ FamixPythonVisitor >> visitIdentifier: anIdentifierNode [
 
 	self flag: #todo. "review some + clean method"
 	self flag: #todo. "Manage the for_statement"
-	(#( aliased_import attribute call function_definition parameters keyword_argument lambda_parameters named_expression pattern_list list_comprehension
+	(#( attribute call function_definition parameters keyword_argument lambda_parameters named_expression pattern_list list_comprehension
 	    parenthesized_expression for_statement subscript ERROR ) includes: anIdentifierNode parent type) ifTrue: [ ^ anIdentifierNode sourceText ].
 	anIdentifierNode isLeftSideOfAssignation ifTrue: [ ^ anIdentifierNode sourceText ].
 	(#( argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator ) includes: anIdentifierNode parent type)
@@ -744,6 +761,17 @@ FamixPythonVisitor >> visitImportFromStatement: anImportFromStatement [
 				ofName: identifier
 				from: moduleName
 				alias: alias ]
+]
+
+{ #category : 'visiting - noop' }
+FamixPythonVisitor >> visitImportPrefix: aNode [
+	"
+	Children: none
+	
+	Parents:
+		- Skipping me: relative_import"
+
+	self error: 'We should never end up here. I can only be in a relative import and its visit does not visit me.'
 ]
 
 { #category : 'visiting' }
@@ -813,7 +841,6 @@ FamixPythonVisitor >> visitListComprehension: aNode [
 FamixPythonVisitor >> visitModule: aModuleNode [
 
 	| isPackageDeclaration entity |
-
 	"If the file is name __init__.py this means that we have the declaration of a package. Else we have a module that can be in a package."
 	isPackageDeclaration := self fileReference basename = '__init__.py'.
 	entity := isPackageDeclaration
@@ -829,11 +856,9 @@ FamixPythonVisitor >> visitModule: aModuleNode [
 
 			(self currentEntity: entity) isMainEntity: true ].
 	self visitChildren: aModuleNode.
-	
+
 	"Importing the comments of the file."
-	(FamixPythonCommentVisitor visitor: self)
-				visitNode: aModuleNode;
-				import.
+	FamixPythonCommentVisitor visitor: self importCommentsOf: aModuleNode.
 
 	"If we are in a package declaration we need to keep the package in the context for the modules in the package. The package will be pop later by the importer."
 	^ isPackageDeclaration
@@ -888,6 +913,14 @@ FamixPythonVisitor >> visitPatternList: aPatternListNode [
 
 { #category : 'visiting' }
 FamixPythonVisitor >> visitRelativeImport: aRelativeImportNode [
+	"
+	Children: 
+		- unnamed : dotted_name / import_prefix
+		
+	Parents:
+		- Visiting me: import_from_statement
+	
+	I don't need to visit the children, I just need the path"
 
 	^ aRelativeImportNode sourceText
 ]
