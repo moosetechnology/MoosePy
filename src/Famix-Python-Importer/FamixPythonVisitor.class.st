@@ -24,8 +24,9 @@ Class {
 
 { #category : 'private' }
 FamixPythonVisitor >> attributeAsAssociation: anAttributeNode [
+	"The attribute can only be an identifier. We do not visit it because the association attached to it will be managed elsewhere."
 
-	^ (anAttributeNode _object sourceText copyWithout: Character space) -> (self visit: anAttributeNode _attribute)
+	^ (anAttributeNode _object sourceText copyWithout: Character space) -> anAttributeNode _attribute sourceText
 ]
 
 { #category : 'private' }
@@ -256,11 +257,44 @@ FamixPythonVisitor >> initialize [
 ]
 
 { #category : 'testing' }
+FamixPythonVisitor >> isAccessOrReferenceNode: anIdentifierNode [
+	"I should return true if an Identifier node represent an access or a reference."
+
+	^ #( elif_clause list argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator expression_statement
+	     augmented_assignment ) includes: anIdentifierNode parent type
+]
+
+{ #category : 'testing' }
 FamixPythonVisitor >> isMetaclassDefinition: aClassDefinitionNode [
 
 	^ aClassDefinitionNode _superclasses
 		  ifNil: [ false ]
 		  ifNotNil: [ :argumentList | argumentList collectNamedChild anySatisfy: [ :node | node type = #identifier and: [ node sourceText = 'type' ] ] ]
+]
+
+{ #category : 'private' }
+FamixPythonVisitor >> manageAccessOrReferencesFrom: anIdentifierNode [
+	"To know if the identifier can be an access or reference we need to check its parents."
+
+	(self isAccessOrReferenceNode: anIdentifierNode) ifTrue: [
+			self
+				resolve: ((SRIdentifierWithNode identifier: anIdentifierNode sourceText)
+						 expectedKind: {
+								 FamixPythonClass.
+								 FamixPythonFunction.
+								 FamixPythonLocalVariable.
+								 FamixPythonGlobalVariable.
+								 FamixPythonAttribute.
+								 FamixPythonParameter };
+						 notFoundReplacementEntity: [ :unresolved :currentEntity | "If we are the receiver of an invocation and we did not find the associated entity it's because it's an instance of a class or the namespace from the import. In that case we should create nothing so we give a null entity.""]"
+								 self flag: #todo.
+								 "aVariableExpression isInvocationOrInstantiationReceiver
+						 ifTrue: [ FamixPythonNilEntity ]
+						 ifFalse: [" "This can be a structural entity or a class"
+								 self ensureStubUnknownEntityNamed: unresolved identifier ];
+						 yourself)
+				foundAction: [ :entity :currentEntity | "See the comment in the notFoundReplacementEntity block to see why we do this."
+					entity isMooseEntity ifTrue: [ entity createAccessOrReferenceFrom: currentEntity node: anIdentifierNode ] ] ]
 ]
 
 { #category : 'private' }
@@ -287,7 +321,8 @@ FamixPythonVisitor >> manageAssignationTo: aNode [
 							^ self ] ]
 		ifFalse: [
 				| name |
-				name := self visit: aNode.
+				"If it is not an attribute, it can only be an identifier and since we already manage the dependency of this side, we skip the visit."
+				name := aNode sourceText.
 				"If we have a variable of this name already, we should not recreate it. Except if this variable got shadowed! In that case, we should recreate it."
 				(self currentEntity query descendants ofType: FamixTStructuralEntity)
 					detect: [ :child | child name = name and: [ child isShadowable not or: [ child isShadowed not ] ] ]
@@ -584,6 +619,7 @@ FamixPythonVisitor >> visitAssignment: anAssignmentNode [
 
 	anAssignmentNode _left type = #subscript ifTrue: [ ^ self visitChildren: anAssignmentNode ].
 
+	self flag: #todo. "Maybe we should not do this here but in the children nodes?"
 	anAssignmentNode _left type = #pattern_list
 		ifTrue: [ (self visit: anAssignmentNode _left) collect: [ :node | self manageAssignationTo: node ] ]
 		ifFalse: [ self manageAssignationTo: anAssignmentNode _left ].
@@ -853,38 +889,18 @@ FamixPythonVisitor >> visitGlobalStatement: aNode [
 
 { #category : 'visiting' }
 FamixPythonVisitor >> visitIdentifier: anIdentifierNode [
-
+	"An identifier is widly used in the python tree. 
+	Some are just names and some can represent an access or a reference."
+	
+	"In a class definition signature, this represent the declaration of a superclass."
 	anIdentifierNode parent parent type = #class_definition ifTrue: [ ^ self manageInheritanceDeclaredBy: anIdentifierNode ].
 
-	self flag: #todo. "review some + clean method"
-	self flag: #todo. "Manage the for_statement"
-	(#( attribute call function_definition parameters keyword_argument lambda_parameters named_expression pattern_list list_comprehension parenthesized_expression 
-	    for_statement subscript ERROR ) includes: anIdentifierNode parent type) ifTrue: [ ^ anIdentifierNode sourceText ].
+	"Accesses to the left side of an assignation is managed directly in the assignation visit."
 	anIdentifierNode isLeftSideOfAssignation ifTrue: [ ^ anIdentifierNode sourceText ].
-	(#( elif_clause list argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator expression_statement augmented_assignment) includes:
-		 anIdentifierNode parent type) ifTrue: [
-			^ self
-				  resolve: ((SRIdentifierWithNode identifier: anIdentifierNode sourceText)
-						   expectedKind: {
-								   FamixPythonClass.
-								   FamixPythonFunction.
-								   FamixPythonLocalVariable.
-								   FamixPythonGlobalVariable.
-								   FamixPythonAttribute.
-								   FamixPythonParameter };
-						   notFoundReplacementEntity: [ :unresolved :currentEntity | "If we are the receiver of an invocation and we did not find the associated entity it's because it's an instance of a class or the namespace from the import. In that case we should create nothing so we give a null entity.""]"
-								   self flag: #todo.
-								   "aVariableExpression isInvocationOrInstantiationReceiver
-						 ifTrue: [ FamixPythonNilEntity ]
-						 ifFalse: [" "This can be a structural entity or a class"
-								   self ensureStubUnknownEntityNamed: unresolved identifier ];
-						   yourself)
-				  foundAction: [ :entity :currentEntity | "See the comment in the notFoundReplacementEntity block to see why we do this."
-					  entity isMooseEntity ifTrue: [ entity createAccessOrReferenceFrom: currentEntity node: anIdentifierNode ] ] ].
 
+	self manageAccessOrReferencesFrom: anIdentifierNode.
 
-
-	1 halt
+	^ anIdentifierNode sourceText
 ]
 
 { #category : 'visiting - noop' }
