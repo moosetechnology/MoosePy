@@ -2245,8 +2245,8 @@ FamixPythonProject1Test >> testImportFutureWithAlias [
 	self assert: import importedEntity equals: entity.
 	self assert: import isFromImport.
 	self assert: import isFutureImport.
-	self assert: import alias equals: 'annots'.
-	self assert: import sourceText equals: 'from __future__ import annotations as annots'
+	self assert: import alias equals: 'annot'.
+	self assert: import sourceText equals: 'from __future__ import annotations as annot'
 ]
 
 { #category : 'tests - imports' }
