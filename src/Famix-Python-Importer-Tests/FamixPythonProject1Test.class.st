@@ -5098,9 +5098,9 @@ FamixPythonProject1Test >> testStubFunctionInvocationFromFromImportedModuleHasPa
 	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
 
 	self assert: function isStub.
-	self assert: function parentPackage equals: (self unknownEntityNamed: 'subpackage').
+	self assert: function parentPackage equals: (self unknownEntityNamed: 'module').
 	self assert: function parentPackage isStub.
-	self assert: function parentPackage parentPackage equals: (self packageNamed: 'package').
+	self assert: function parentPackage parentPackage equals: (self packageNamed: 'otherPackage').
 	self assert: function parentPackage parentPackage isStub
 ]
 

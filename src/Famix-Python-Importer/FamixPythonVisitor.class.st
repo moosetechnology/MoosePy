@@ -1,3 +1,16 @@
+"
+Lets define some rules.
+
+They are not respected yet but it will come.
+
+- Creating a new entity should be done in a method starting by ""create"" and in ""entity creation"". 
+- Creating a new association should be done in a method starting by ""create"" and in ""association creation"".
+- Creating a new entity if one does not exist yet should go in ""ensure entity"" protocol.
+- No other method should begins by ""create"".
+- Creating an entity if it does not exist yet should start by ""ensure""
+- Visit method cutting all visit or visiting all children should go in the protocol ""visitin - noop""
+- Other visit methods should be in ""visiting""
+"
 Class {
 	#name : 'FamixPythonVisitor',
 	#superclass : 'FamixTSAbstractVisitor',
@@ -29,6 +42,16 @@ FamixPythonVisitor >> checkShadowingOfName: aString during: aBlock [
 	shadowedEntity ifNotNil: [ newEntity shadowedEntity: shadowedEntity ]
 ]
 
+{ #category : 'association creation' }
+FamixPythonVisitor >> createAccessTo: variable isWrite: aBoolean from: anAssignmentNode [
+
+	^ model newAccess
+		  variable: variable;
+		  isWrite: aBoolean;
+		  in: [ :access | self setSourceAnchor: access from: anAssignmentNode ];
+		  yourself
+]
+
 { #category : 'private' }
 FamixPythonVisitor >> createAssociationsForFunctionCallNode: aCallNode forResult: result in: currentEntity [
 
@@ -39,101 +62,31 @@ FamixPythonVisitor >> createAssociationsForFunctionCallNode: aCallNode forResult
 		  ifFalse: [ self createInvocationOf: result from: currentEntity node: aCallNode ]
 ]
 
-{ #category : 'private' }
-FamixPythonVisitor >> createFunction: aFunctionDefinition [
+{ #category : 'entity creation' }
+FamixPythonVisitor >> createClassNamed: aString [
 
-	| function name signature |
-	name := self visit: aFunctionDefinition _name.
-	signature := aFunctionDefinition completeSource copyFrom: aFunctionDefinition _name startPosition to: aFunctionDefinition _parameters endPosition.
-
-	self checkShadowingOfName: name during: [
-			function := model newFunction
-				            name: name;
-				            signature: signature;
-				            functionOwner: self currentEntity;
-				            yourself ].
-
-	^ self setSourceAnchor: function from: aFunctionDefinition
+	^ (model newClassNamed: aString)
+		  isStub: true; "We set this to true because setting a source anchor will set it to false automatically later in case it is not a stub."
+		  yourself
 ]
 
-{ #category : 'private' }
-FamixPythonVisitor >> createImport: anImport ofName: aName from: fromName alias: alias [
+{ #category : 'association creation' }
+FamixPythonVisitor >> createInheritance [
 
-	| import |
-	import := model newImport
-		          alias: alias;
-		          isFromImport: fromName isNotNil;
-		          yourself.
-
-	self setSourceAnchor: import from: anImport.
-
-	self currentEntity addImport: import.
-
-	importPaths at: import put: ((fromName
-			  ifNil: [ aName ]
-			  ifNotNil: [ fromName ]) copyWithout: Character space).
-
-	self solver
-		resolve: (fromName
-				 ifNil: [
-						 (FamixPythonImportResolvable path: aName)
-							 notFoundReplacementEntity: [ :unresolvedImport :currentEntity | self ensureStubPackagesFromPath: unresolvedImport path ];
-							 yourself ]
-				 ifNotNil: [
-						 (FamixPythonFromImportResolvable path: fromName entityName: aName)
-							 notFoundReplacementEntity: [ :unresolvedImport :currentEntity |
-									 | package |
-									 package := self ensureStubPackagesFromPath: unresolvedImport path.
-
-									 (self ensureStubUnknownEntityNamed: unresolvedImport entityName)
-										 parentPackage: package;
-										 "This entity can be a package on a module."yourself ];
-							 yourself ])
-		foundAction: [ :entity :currentEntity | entity addIncomingImport: import ].
-
-	^ import
+	^ model newInheritance
+		  subclass: self currentEntity;
+		  yourself
 ]
 
-{ #category : 'private' }
-FamixPythonVisitor >> createImportedInheritanceFrom: anAttributeNode [
-
-	| inheritance definition |
-	"We should never end up here because this means we have the sources of the imported entities but I'm still bulletproofing the parser in case we have some code that cannot run""If we did not find an import, we have a stub."
-	inheritance := self ensureInheritance: anAttributeNode.
-	definition := self attributeAsAssociation: anAttributeNode.
-
-	self findImportMatchingSource: definition key ifFound: [ :import |
-			self
-				resolve: ((FamixPythonImportedEntityResolvable identifier: definition value import: import)
-						 expectedKind: FamixPythonClass;
-						 notFoundReplacementEntity: [ :unresolved :currentEntity |
-								 (self ensureStubClassNamed: unresolved identifier)
-									 typeContainer: (self ensureStubPackagesFromPath: definition key);
-									 yourself ];
-						 yourself)
-				foundAction: [ :entity :currentEntity | inheritance superclass: entity ].
-			^ inheritance ].
-
-	inheritance superclass: ((self ensureStubClassNamed: definition value)
-			 typeContainer: (self ensureStubPackagesFromPath: definition key);
-			 yourself)
+{ #category : 'association creation' }
+FamixPythonVisitor >> createInheritance: anAttributeNode [
+	self flag: #todo. "Should have a #From: in the name but currently clashing with another method"
+	^ self createInheritance
+		  in: [ :inheritance | self setSourceAnchor: inheritance from: anAttributeNode ];
+		  yourself
 ]
 
-{ #category : 'private' }
-FamixPythonVisitor >> createInheritanceFrom: superclassNode [
-
-	| inheritance |
-	inheritance := self ensureInheritance: superclassNode.
-
-	self
-		resolve: ((SRIdentifierWithNode identifier: superclassNode sourceText)
-				 expectedKind: FamixPythonClass;
-				 notFoundReplacementEntity: [ :unresolvedSuperclass :currentEntity | self ensureStubClassNamed: unresolvedSuperclass identifier ];
-				 yourself)
-		foundAction: [ :entity :currentEntity | inheritance superclass: entity ]
-]
-
-{ #category : 'private' }
+{ #category : 'association creation' }
 FamixPythonVisitor >> createInvocationOf: target from: currentEntity node: aNode [
 
 	| invocation |
@@ -149,42 +102,23 @@ FamixPythonVisitor >> createInvocationOf: target from: currentEntity node: aNode
 	^ invocation
 ]
 
-{ #category : 'private' }
-FamixPythonVisitor >> createMethod: aMethodNode [
+{ #category : 'entity creation' }
+FamixPythonVisitor >> createMetaclassNamed: aString [
 
-	| method name signature |
-	name := self visit: aMethodNode _name.
-	signature := aMethodNode completeSource copyFrom: aMethodNode _name startPosition to: aMethodNode _parameters endPosition.
-	method := model newMethod
-		          name: name;
-		          isStub: true;
-		          signature: signature;
-		          yourself.
-
-	method parentType: self currentEntity.
-
-	name = '__init__' ifTrue: [ method isConstructor: true ].
-
-	(name beginsWith: 'get_') ifTrue: [
-			self
-				resolve: ((SRIdentifierWithNode identifier: (name withoutPrefix: 'get_'))
-						 expectedKind: FamixPythonAttribute;
-						 yourself)
-				foundAction: [ :entity :currentEntity | method beGetter ]
-				ifNone: [ "We do nothing" ] ].
-
-	(name beginsWith: 'set_') ifTrue: [
-			self
-				resolve: ((SRIdentifierWithNode identifier: (name withoutPrefix: 'set_'))
-						 expectedKind: FamixPythonAttribute;
-						 yourself)
-				foundAction: [ :entity :currentEntity | method beSetter ]
-				ifNone: [ "We do nothing" ] ].
-
-	^ self setSourceAnchor: method from: aMethodNode
+	^ (model newMetaclassNamed: aString)
+		  isStub: true; "We set this to true because setting a source anchor will set it to false automatically later in case it is not a stub."
+		  yourself
 ]
 
-{ #category : 'private' }
+{ #category : 'entity creation' }
+FamixPythonVisitor >> createMethodNamed: aString [
+
+	^ (model newMethodNamed: aString)
+		  isStub: true; "We set this to true because setting a source anchor will set it to false automatically later in case it is not a stub."
+		  yourself
+]
+
+{ #category : 'entity creation' }
 FamixPythonVisitor >> createStubPackageNamed: aString [
 
 	^ (model newPackageNamed: aString)
@@ -192,68 +126,40 @@ FamixPythonVisitor >> createStubPackageNamed: aString [
 		  yourself
 ]
 
-{ #category : 'private' }
-FamixPythonVisitor >> createWriteAccessTo: variable from: anAssignmentNode [
-
-	| access |
-	access := model newAccess
-		          variable: variable;
-		          accessor: self currentEntity;
-		          isWrite: true;
-		          yourself.
-	self setSourceAnchor: access from: anAssignmentNode
-]
-
-{ #category : 'private' }
-FamixPythonVisitor >> ensureInheritance: anAttributeNode [
-
-	^ model newInheritance
-		  subclass: self currentEntity;
-		  in: [ :inheritance | self setSourceAnchor: inheritance from: anAttributeNode ];
-		  yourself
-]
-
-{ #category : 'private' }
+{ #category : 'ensure entity' }
 FamixPythonVisitor >> ensureMethod: aMethodNode [
 
-	^ (self methodNamed: aMethodNode _name inClassNamed: self currentEntity name) ifNil: [ self createMethod: aMethodNode ]
+	^ (self methodNamed: aMethodNode _name inClassNamed: self currentEntity name)
+		  ifNotNil: [ "I think that this should never happen. Let's keep and halt for a while and see if we ever end up here. If it's the case, I need to add a test to reproduce this!"
+			  1 halt ]
+		  ifNil: [ self manageMethodDeclarationFrom: aMethodNode ]
 ]
 
-{ #category : 'private' }
+{ #category : 'ensure entity' }
 FamixPythonVisitor >> ensureStubClassNamed: aName [
 
 	^ model allClasses
 		  detect: [ :class | class isStub and: [ class name = aName ] ]
-		  ifNone: [
-				  (model newClassNamed: aName)
-					  isStub: true;
-					  yourself ]
+		  ifNone: [ self createClassNamed: aName ]
 ]
 
-{ #category : 'private' }
+{ #category : 'ensure entity' }
 FamixPythonVisitor >> ensureStubMetaclassNamed: aName [
 
 	^ (model allWithType: FamixPythonMetaclass)
 		  detect: [ :class | class isStub and: [ class name = aName ] ]
-		  ifNone: [
-				  model newMetaclass
-					  name: aName;
-					  isStub: true;
-					  yourself ]
+		  ifNone: [ self createMetaclassNamed: aName ]
 ]
 
-{ #category : 'private' }
+{ #category : 'ensure entity' }
 FamixPythonVisitor >> ensureStubMethodNamed: aName [
 
 	^ model allMethods
 		  detect: [ :method | method isStub and: [ method name = aName ] ]
-		  ifNone: [
-				  (model newMethodNamed: aName)
-					  isStub: true;
-					  yourself ]
+		  ifNone: [ self createMethodNamed: aName ]
 ]
 
-{ #category : 'private' }
+{ #category : 'ensure entity' }
 FamixPythonVisitor >> ensureStubPackageNamed: aString [
 
 	^ model allPackages
@@ -261,7 +167,7 @@ FamixPythonVisitor >> ensureStubPackageNamed: aString [
 		  ifNone: [ self createStubPackageNamed: aString ]
 ]
 
-{ #category : 'private' }
+{ #category : 'ensure entity' }
 FamixPythonVisitor >> ensureStubPackagesFromPath: aPythonImportPath [
 	"This method takes a python import path and should ensure we have a stub entity for each. It should return the stub package for the last element of the path too."
 
@@ -285,23 +191,17 @@ FamixPythonVisitor >> ensureStubPackagesFromPath: aPythonImportPath [
 	^ package
 ]
 
-{ #category : 'private' }
+{ #category : 'ensure entity' }
 FamixPythonVisitor >> ensureStubUnknownEntityNamed: aString [
 
-	^ (self unknownEntityNamed: aString) ifNil: [
-			  model newUnknownEntity
-				  name: aString;
-				  yourself ]
+	^ (self unknownEntityNamed: aString) ifNil: [ model newUnknownEntityNamed: aString ]
 ]
 
-{ #category : 'private' }
+{ #category : 'ensure entity' }
 FamixPythonVisitor >> ensureSuperclassFor: aClassDefinitionNode [
 	"Visiting the children of the superclasses should create the superclass of the class definition. But, if there are none, this means we should inherit from object."
 
-	self currentEntity superInheritances ifEmpty: [
-			model newInheritance
-				superclass: (self ensureStubClassNamed: 'object');
-				subclass: self currentEntity ]
+	self currentEntity superInheritances ifEmpty: [ self createInheritance superclass: (self ensureStubClassNamed: 'object') ]
 ]
 
 { #category : 'private' }
@@ -336,12 +236,12 @@ FamixPythonVisitor >> findImportMatchingSource: aString ifFound: aBlock [
 
 { #category : 'accessing' }
 FamixPythonVisitor >> getConstructorOf: aClass [
+	"If we instantiate a class, we need to invoke the constructor. If it was not overrident by the developer, we create a stub"
 
 	^ aClass methods
 		  detect: [ :method | method isConstructor ]
 		  ifNone: [
-				  (model newMethodNamed: '__init__')
-					  isStub: true;
+				  (self createMethodNamed: '__init__')
 					  isConstructor: true;
 					  parentType: aClass;
 					  yourself ]
@@ -377,9 +277,7 @@ FamixPythonVisitor >> manageAssignationTo: aNode [
 							| class |
 							class := self currentEntityOfType: FamixPythonClass.
 							variable := (class childOfType: FamixTAttribute named: pair value) ifNil: [
-									            variable := self model newAttribute
-										                        name: pair value;
-										                        parentType: class;
+									            variable := (class createLocalVariable: pair value)
 										                        isClassSide: false;
 										                        yourself.
 									            self setSourceAnchor: variable from: aNode.
@@ -397,14 +295,107 @@ FamixPythonVisitor >> manageAssignationTo: aNode [
 					ifNone: [
 							self checkShadowingOfName: name during: [ variable := self currentEntity createLocalVariable: name ].
 							self setSourceAnchor: variable from: aNode ] ].
-	self createWriteAccessTo: variable from: aNode assignationNode.
+	(self createAccessTo: variable isWrite: true from: aNode assignationNode) accessor: self currentEntity.
 	"In the case of an augmented assignment, we produce a read access on top of the write access"
 	aNode assignationNode type = #augmented_assignment ifTrue: [ variable createAccessOrReferenceFrom: self currentEntity node: aNode assignationNode ].
 	^ variable
 ]
 
 { #category : 'private' }
-FamixPythonVisitor >> manageMetaclassUsageFrom: aKeywordArgumentNode [
+FamixPythonVisitor >> manageFunctionDeclarationFrom: aFunctionDefinition [
+
+	| function name signature |
+	name := self visit: aFunctionDefinition _name.
+	signature := aFunctionDefinition completeSource copyFrom: aFunctionDefinition _name startPosition to: aFunctionDefinition _parameters endPosition.
+
+	self checkShadowingOfName: name during: [
+			function := (model newFunctionNamed: name)
+				            signature: signature;
+				            functionOwner: self currentEntity;
+				            yourself ].
+
+	^ self setSourceAnchor: function from: aFunctionDefinition
+]
+
+{ #category : 'private' }
+FamixPythonVisitor >> manageImport: anImport ofName: aName from: fromName alias: alias [
+
+	| import |
+	import := model newImport
+		          alias: alias;
+		          isFromImport: fromName isNotNil;
+		          importingEntity: self currentEntity;
+		          yourself.
+
+	self setSourceAnchor: import from: anImport.
+
+
+	importPaths at: import put: ((fromName
+			  ifNil: [ aName ]
+			  ifNotNil: [ fromName ]) copyWithout: Character space).
+
+	self solver
+		resolve: (fromName
+				 ifNil: [
+						 (FamixPythonImportResolvable path: aName)
+							 notFoundReplacementEntity: [ :unresolvedImport :currentEntity | self ensureStubPackagesFromPath: unresolvedImport path ];
+							 yourself ]
+				 ifNotNil: [
+						 (FamixPythonFromImportResolvable path: fromName entityName: aName)
+							 notFoundReplacementEntity: [ :unresolvedImport :currentEntity |
+									 | package |
+									 package := self ensureStubPackagesFromPath: unresolvedImport path.
+
+									 (self ensureStubUnknownEntityNamed: unresolvedImport entityName)
+										 parentPackage: package;
+										 "This entity can be a package on a module."yourself ];
+							 yourself ])
+		foundAction: [ :entity :currentEntity | entity addIncomingImport: import ].
+
+	^ import
+]
+
+{ #category : 'private' }
+FamixPythonVisitor >> manageImportedInheritanceDeclaredBy: anAttributeNode [
+
+	| inheritance definition |
+	"We should never end up here because this means we have the sources of the imported entities but I'm still bulletproofing the parser in case we have some code that cannot run""If we did not find an import, we have a stub."
+	inheritance := self createInheritance: anAttributeNode.
+	definition := self attributeAsAssociation: anAttributeNode.
+
+	self findImportMatchingSource: definition key ifFound: [ :import |
+			self
+				resolve: ((FamixPythonImportedEntityResolvable identifier: definition value import: import)
+						 expectedKind: FamixPythonClass;
+						 notFoundReplacementEntity: [ :unresolved :currentEntity |
+								 (self ensureStubClassNamed: unresolved identifier)
+									 typeContainer: (self ensureStubPackagesFromPath: definition key);
+									 yourself ];
+						 yourself)
+				foundAction: [ :entity :currentEntity | inheritance superclass: entity ].
+			^ inheritance ].
+
+	inheritance superclass: ((self ensureStubClassNamed: definition value)
+			 typeContainer: (self ensureStubPackagesFromPath: definition key);
+			 yourself)
+]
+
+{ #category : 'private' }
+FamixPythonVisitor >> manageInheritanceDeclaredBy: superclassNode [
+
+	| inheritance |
+	inheritance := self createInheritance: superclassNode.
+
+	self
+		resolve: ((SRIdentifierWithNode identifier: superclassNode sourceText)
+				 expectedKind: FamixPythonClass;
+				 notFoundReplacementEntity: [ :unresolvedSuperclass :currentEntity | self ensureStubClassNamed: unresolvedSuperclass identifier ];
+				 yourself)
+		foundAction: [ :entity :currentEntity | inheritance superclass: entity ]
+]
+
+{ #category : 'private' }
+FamixPythonVisitor >> manageMetaclassUsageDeclaredBy: aKeywordArgumentNode [
 
 	| metaclassUsage |
 	metaclassUsage := model newMetaclassUsage.
@@ -438,11 +429,45 @@ FamixPythonVisitor >> manageMetaclassUsageFrom: aKeywordArgumentNode [
 						   yourself) ]
 ]
 
+{ #category : 'private' }
+FamixPythonVisitor >> manageMethodDeclarationFrom: aMethodNode [
+
+	| method name signature |
+	name := self visit: aMethodNode _name.
+	signature := aMethodNode completeSource copyFrom: aMethodNode _name startPosition to: aMethodNode _parameters endPosition.
+	method := (self createMethodNamed: name)
+		          signature: signature;
+		          yourself.
+
+	method parentType: self currentEntity.
+
+	name = '__init__' ifTrue: [ method isConstructor: true ].
+
+	(name beginsWith: 'get_') ifTrue: [
+			self
+				resolve: ((SRIdentifierWithNode identifier: (name withoutPrefix: 'get_'))
+						 expectedKind: FamixPythonAttribute;
+						 yourself)
+				foundAction: [ :entity :currentEntity | method beGetter ]
+				ifNone: [ "We do nothing" ] ].
+
+	(name beginsWith: 'set_') ifTrue: [
+			self
+				resolve: ((SRIdentifierWithNode identifier: (name withoutPrefix: 'set_'))
+						 expectedKind: FamixPythonAttribute;
+						 yourself)
+				foundAction: [ :entity :currentEntity | method beSetter ]
+				ifNone: [ "We do nothing" ] ].
+
+	^ self setSourceAnchor: method from: aMethodNode
+]
+
 { #category : 'accessing' }
 FamixPythonVisitor >> methodNamed: aString inClassNamed: aClassName [
 
-	^ (self model allWithType: FamixPythonMethod)
-		  detect: [ :e | e name = aString and: [ e parentType name = aClassName ] ]
+	self flag: #todo. "Check if we get here? If it's the case, we should probably create a new methods shadowing the previous one."
+	^ self model allModelMethods
+		  detect: [ :method | method name = aString and: [ method parentType name = aClassName ] ]
 		  ifNone: [ nil ]
 ]
 
@@ -518,7 +543,7 @@ FamixPythonVisitor >> resolveInvocationOrInstantiationFrom: aCallNode [
 		  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aCallNode forResult: result in: currentEntity ]
 ]
 
-{ #category : 'private' }
+{ #category : 'accessing' }
 FamixPythonVisitor >> unknownEntityNamed: aString [
 
 	^ (self model allWithType: FamixPythonUnknownEntity)
@@ -575,7 +600,7 @@ FamixPythonVisitor >> visitAttribute: anAttributeNode [
 
 	| source name |
 	
-	anAttributeNode parent parent type = #class_definition ifTrue: [ ^ self createImportedInheritanceFrom: anAttributeNode ].
+	anAttributeNode parent parent type = #class_definition ifTrue: [ ^ self manageImportedInheritanceDeclaredBy: anAttributeNode ].
 	
 	source := anAttributeNode _object sourceText copyWithout: Character space.
 	name := self visit: anAttributeNode _attribute.
@@ -673,8 +698,8 @@ FamixPythonVisitor >> visitClassDefinition: aClassDefinitionNode [
 
 	self checkShadowingOfName: name during: [
 			class := (self isMetaclassDefinition: aClassDefinitionNode)
-				         ifTrue: [ model newMetaclassNamed: name ]
-				         ifFalse: [ model newClassNamed: name ] ].
+				         ifTrue: [ self createMetaclassNamed: name ]
+				         ifFalse: [ self createClassNamed: name ] ].
 
 	class typeContainer: self currentEntity.
 
@@ -760,7 +785,7 @@ FamixPythonVisitor >> visitFunctionDefinition: aFunctionDefinition [
 	| entity |
 	entity := self currentEntity isClass
 		          ifTrue: [ self ensureMethod: aFunctionDefinition ]
-		          ifFalse: [ self createFunction: aFunctionDefinition ].
+		          ifFalse: [ self manageFunctionDeclarationFrom: aFunctionDefinition ].
 
 	^ self useCurrentEntity: entity during: [
 			  self visit: aFunctionDefinition _parameters.
@@ -776,7 +801,7 @@ FamixPythonVisitor >> visitGlobalStatement: aNode [
 { #category : 'visiting' }
 FamixPythonVisitor >> visitIdentifier: anIdentifierNode [
 
-	anIdentifierNode parent parent type = #class_definition ifTrue: [ ^ self createInheritanceFrom: anIdentifierNode ].
+	anIdentifierNode parent parent type = #class_definition ifTrue: [ ^ self manageInheritanceDeclaredBy: anIdentifierNode ].
 
 	self flag: #todo. "review some + clean method"
 	self flag: #todo. "Manage the for_statement"
@@ -829,7 +854,7 @@ FamixPythonVisitor >> visitImportFromStatement: anImportFromStatement [
 
 	identifiers keysAndValuesDo: [ :identifier :alias |
 			self
-				createImport: anImportFromStatement
+				manageImport: anImportFromStatement
 				ofName: identifier
 				from: moduleName
 				alias: alias ]
@@ -862,7 +887,7 @@ FamixPythonVisitor >> visitImportStatement: anImportStatement [
 
 	identifiers keysAndValuesDo: [ :identifier :alias |
 			self
-				createImport: anImportStatement
+				manageImport: anImportStatement
 				ofName: identifier
 				from: nil
 				alias: alias ]
@@ -875,12 +900,12 @@ FamixPythonVisitor >> visitInteger: aNode [
 	
 ]
 
-{ #category : 'private' }
+{ #category : 'visiting' }
 FamixPythonVisitor >> visitKeywordArgument: aKeywordArgumentNode [
 
 	"In the class definition, if we have a #metaclass argument, then it's a metaclass usage"
 	(aKeywordArgumentNode _name sourceText = #metaclass and: [ aKeywordArgumentNode parent parent type = #class_definition ]) ifTrue: [
-		self manageMetaclassUsageFrom: aKeywordArgumentNode ].
+		self manageMetaclassUsageDeclaredBy: aKeywordArgumentNode ].
 
 	^ self visit: aKeywordArgumentNode _value
 ]
@@ -938,7 +963,7 @@ FamixPythonVisitor >> visitModule: aModuleNode [
 
 			self currentEntity: entity ].
 	
-	"(fileReference basename = #'moduleAtRoot5.py') ifTrue: [ 1halt ]."
+	(fileReference basename = #'moduleAtRoot100.py') ifTrue: [ 1halt ].
 	
 	self visitChildren: aModuleNode.
 
@@ -966,7 +991,7 @@ FamixPythonVisitor >> visitNamedExpression: aNamedExpressionNode [
 				self checkShadowingOfName: name during: [ variable := self currentEntity createLocalVariable: name ].
 				self setSourceAnchor: variable from: aNamedExpressionNode _name ].
 
-	self createWriteAccessTo: variable from: aNamedExpressionNode.
+	(self createAccessTo: variable isWrite: true from: aNamedExpressionNode) accessor: self currentEntity.
 
 	self visitChildren: aNamedExpressionNode.
 	^ variable
