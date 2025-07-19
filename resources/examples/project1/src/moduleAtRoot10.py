@@ -1,7 +1,8 @@
 import subpackage
 from package import StubMetaclass2
+from otherPackage import module
 
-subpackage.function([1, 2, 3, 4])
+module.function([1, 2, 3, 4])
 
 
 def function_to_try_keywords_parameters(param1, param2):
