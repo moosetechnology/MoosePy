@@ -204,7 +204,7 @@ FamixPythonVisitor >> createWriteAccessTo: variable from: anAssignmentNode [
 	self setSourceAnchor: access from: anAssignmentNode
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'private' }
 FamixPythonVisitor >> ensureInheritance: anAttributeNode [
 
 	^ model newInheritance
@@ -624,8 +624,37 @@ FamixPythonVisitor >> visitAugmentedAssignment: aNode [
 
 { #category : 'visiting - noop' }
 FamixPythonVisitor >> visitBlock: aNode [
+	"
+	Children:
+		- unnamed: continue_statement / for_statement / global_statement / with_statement / comment / delete_statement / nonlocal_statement / break_statement / import_from_statement / expression_statement / type_alias_statement / pass_statement / try_statement / decorated_definition / assert_statement / raise_statement / class_definition / import_statement / while_statement / return_statement / function_definition / if_statement
+		
+	Parents:
+		- Visiting me: function_definition / class_definition
+		- Skipping me: none
+		- Non yet managed: except_clause / with_statement / elif_clause / finaly_clause / if_statement / while_statement / for_statement / try_statement / esle_clause
+	"
 
 	^ self visitChildren: aNode
+]
+
+{ #category : 'visiting - noop' }
+FamixPythonVisitor >> visitBreakStatement: aNode [
+	"
+	Children: none
+	
+	Parents:
+		- Visiting me: block
+	
+	example:
+	
+		for i in range(5):
+		    if i == 3:
+ 		       break
+  		  print(i)
+		
+	noop, nothing to do at Famix level."
+
+	
 ]
 
 { #category : 'visiting' }
@@ -684,7 +713,7 @@ FamixPythonVisitor >> visitDottedName: aDottedNameNode [
 	^ aDottedNameNode sourceText
 ]
 
-{ #category : 'visiting' }
+{ #category : 'visiting - noop' }
 FamixPythonVisitor >> visitExpressionStatement: aNode [
 
 	^ self visitChildren: aNode
