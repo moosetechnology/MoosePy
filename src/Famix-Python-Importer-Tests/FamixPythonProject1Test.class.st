@@ -316,7 +316,61 @@ FamixPythonProject1Test >> testClassReferenceFromAList [
 
 	| class module reference |
 	class := self classNamed: 'ClassToReferenceInList'.
-	module := self moduleNamed: 'moduleAtRoot2'.
+	module := self moduleNamed: 'moduleAtRoot12'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testClassReferenceFromAReturn [
+	"I am a regression test
+	
+	I did the mistake to skip visit of list children why prevent to find all references :("
+
+	| class function reference |
+	class := self classNamed: 'ClassToReferenceInReturn'.
+	function := self functionNamed: 'function_with_return'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = function ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: function.
+	self assert: reference referencer equals: function.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (function outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testClassReferenceFromAWhileBody [
+
+	| class module reference |
+	class := self classNamed: 'ClassToReferenceInWhileBody'.
+	module := self moduleNamed: 'moduleAtRoot12'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testClassReferenceFromAWhileElseClause [
+
+	| class module reference |
+	class := self classNamed: 'ClassToReferenceInWhileElseClause'.
+	module := self moduleNamed: 'moduleAtRoot12'.
 
 	reference := (class incomingReferences select: [ :aReference | aReference referencer = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
 
