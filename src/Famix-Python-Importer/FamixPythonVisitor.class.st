@@ -95,6 +95,45 @@ FamixPythonVisitor >> createImport: anImport ofName: aName from: fromName alias:
 ]
 
 { #category : 'private' }
+FamixPythonVisitor >> createImportedInheritanceFrom: anAttributeNode [
+
+	| inheritance definition |
+	"We should never end up here because this means we have the sources of the imported entities but I'm still bulletproofing the parser in case we have some code that cannot run""If we did not find an import, we have a stub."
+	inheritance := self ensureInheritance: anAttributeNode.
+	definition := self attributeAsAssociation: anAttributeNode.
+
+	self findImportMatchingSource: definition key ifFound: [ :import |
+			self
+				resolve: ((FamixPythonImportedEntityResolvable identifier: definition value import: import)
+						 expectedKind: FamixPythonClass;
+						 notFoundReplacementEntity: [ :unresolved :currentEntity |
+								 (self ensureStubClassNamed: unresolved identifier)
+									 typeContainer: (self ensureStubPackagesFromPath: definition key);
+									 yourself ];
+						 yourself)
+				foundAction: [ :entity :currentEntity | inheritance superclass: entity ].
+			^ inheritance ].
+
+	inheritance superclass: ((self ensureStubClassNamed: definition value)
+			 typeContainer: (self ensureStubPackagesFromPath: definition key);
+			 yourself)
+]
+
+{ #category : 'private' }
+FamixPythonVisitor >> createInheritanceFrom: superclassNode [
+
+	| inheritance |
+	inheritance := self ensureInheritance: superclassNode.
+
+	self
+		resolve: ((SRIdentifierWithNode identifier: superclassNode sourceText)
+				 expectedKind: FamixPythonClass;
+				 notFoundReplacementEntity: [ :unresolvedSuperclass :currentEntity | self ensureStubClassNamed: unresolvedSuperclass identifier ];
+				 yourself)
+		foundAction: [ :entity :currentEntity | inheritance superclass: entity ]
+]
+
+{ #category : 'private' }
 FamixPythonVisitor >> createInvocationOf: target from: currentEntity node: aNode [
 
 	| invocation |
@@ -163,6 +202,15 @@ FamixPythonVisitor >> createWriteAccessTo: variable from: anAssignmentNode [
 		          isWrite: true;
 		          yourself.
 	self setSourceAnchor: access from: anAssignmentNode
+]
+
+{ #category : 'as yet unclassified' }
+FamixPythonVisitor >> ensureInheritance: anAttributeNode [
+
+	^ model newInheritance
+		  subclass: self currentEntity;
+		  in: [ :inheritance | self setSourceAnchor: inheritance from: anAttributeNode ];
+		  yourself
 ]
 
 { #category : 'private' }
@@ -244,6 +292,16 @@ FamixPythonVisitor >> ensureStubUnknownEntityNamed: aString [
 			  model newUnknownEntity
 				  name: aString;
 				  yourself ]
+]
+
+{ #category : 'private' }
+FamixPythonVisitor >> ensureSuperclassFor: aClassDefinitionNode [
+	"Visiting the children of the superclasses should create the superclass of the class definition. But, if there are none, this means we should inherit from object."
+
+	self currentEntity superInheritances ifEmpty: [
+			model newInheritance
+				superclass: (self ensureStubClassNamed: 'object');
+				subclass: self currentEntity ]
 ]
 
 { #category : 'private' }
@@ -345,6 +403,41 @@ FamixPythonVisitor >> manageAssignationTo: aNode [
 	^ variable
 ]
 
+{ #category : 'private' }
+FamixPythonVisitor >> manageMetaclassUsageFrom: aKeywordArgumentNode [
+
+	| metaclassUsage |
+	metaclassUsage := model newMetaclassUsage.
+	metaclassUsage user: self currentEntity.
+	self setSourceAnchor: metaclassUsage from: aKeywordArgumentNode. "If it's not an identifier then it means it's an imported metaclass."
+	^ aKeywordArgumentNode _value type = #identifier
+		  ifTrue: [
+				  self
+					  resolve: ((SRIdentifierWithNode identifier: aKeywordArgumentNode _value sourceText)
+							   expectedKind: FamixPythonMetaclass;
+							   notFoundReplacementEntity: [ :unresolvedMetaclass :currentEntity | "We should never end up here but I'm still bulletproofing the parser in case we get code with errors"
+								   self ensureStubMetaclassNamed: unresolvedMetaclass identifier ];
+							   yourself)
+					  foundAction: [ :entity :currentEntity | metaclassUsage metaclass: entity ] ]
+		  ifFalse: [
+				  | definition |
+				  definition := self attributeAsAssociation: aKeywordArgumentNode _value.
+				  self findImportMatchingSource: definition key ifFound: [ :import |
+						  self
+							  resolve: ((FamixPythonImportedEntityResolvable identifier: definition value import: import)
+									   expectedKind: FamixPythonMetaclass;
+									   notFoundReplacementEntity: [ :unresolved :currentEntity | "We should never end up here because this means we have the sources of the imported entities but I'm still bulletproofing the parser in case we have some code that cannot run"
+											   (self ensureStubMetaclassNamed: unresolved identifier)
+												   typeContainer: (self ensureStubPackagesFromPath: definition key);
+												   yourself ];
+									   yourself)
+							  foundAction: [ :entity :currentEntity | metaclassUsage metaclass: entity ].
+						  ^ metaclassUsage ]. "If we did not find an import, we have a stub."
+				  metaclassUsage metaclass: ((self ensureStubMetaclassNamed: definition value)
+						   typeContainer: (self ensureStubPackagesFromPath: definition key);
+						   yourself) ]
+]
+
 { #category : 'accessing' }
 FamixPythonVisitor >> methodNamed: aString inClassNamed: aClassName [
 
@@ -426,96 +519,6 @@ FamixPythonVisitor >> resolveInvocationOrInstantiationFrom: aCallNode [
 ]
 
 { #category : 'private' }
-FamixPythonVisitor >> setMetaclassOf: aClassDefinitionNode [
-
-	(self visit: aClassDefinitionNode _superclasses) ifNotNil: [ :nodes |
-			nodes
-				detect: [ :node | node type = #keyword_argument and: [ node _name sourceText = #metaclass ] ]
-				ifFound: [ :aMetaclass |
-						| metaclassUsage |
-						metaclassUsage := model newMetaclassUsage.
-						metaclassUsage user: self currentEntity.
-						self setSourceAnchor: metaclassUsage from: aMetaclass.
-
-						"If it's not an identifier then it means it's an imported metaclass."
-						aMetaclass _value type = #identifier
-							ifTrue: [
-									self
-										resolve: ((SRIdentifierWithNode identifier: aMetaclass _value sourceText)
-												 expectedKind: FamixPythonMetaclass;
-												 notFoundReplacementEntity: [ :unresolvedMetaclass :currentEntity | "We should never end up here but I'm still bulletproofing the parser in case we get code with errors"
-													 self ensureStubMetaclassNamed: unresolvedMetaclass identifier ];
-												 yourself)
-										foundAction: [ :entity :currentEntity | metaclassUsage metaclass: entity ] ]
-							ifFalse: [
-									| definition |
-									definition := self attributeAsAssociation: aMetaclass _value.
-
-									self findImportMatchingSource: definition key ifFound: [ :import |
-											self
-												resolve: ((FamixPythonImportedEntityResolvable identifier: definition value import: import)
-														 expectedKind: FamixPythonMetaclass;
-														 notFoundReplacementEntity: [ :unresolved :currentEntity | "We should never end up here because this means we have the sources of the imported entities but I'm still bulletproofing the parser in case we have some code that cannot run"
-																 (self ensureStubMetaclassNamed: unresolved identifier)
-																	 typeContainer: (self ensureStubPackagesFromPath: definition key);
-																	 yourself ];
-														 yourself)
-												foundAction: [ :entity :currentEntity | metaclassUsage metaclass: entity ].
-											^ metaclassUsage ].
-									"If we did not find an import, we have a stub."
-									metaclassUsage metaclass: ((self ensureStubMetaclassNamed: definition value)
-											 typeContainer: (self ensureStubPackagesFromPath: definition key);
-											 yourself) ] ] ]
-]
-
-{ #category : 'private' }
-FamixPythonVisitor >> setSuperclassesOf: classDefinitionNode [
-
-	self flag: #todo. "Add test of a class with a superclass and a metaclass"
-	self flag: #todo. "Add test on multiple inheritance"
-	self flag: #todo. "The code can be cleaned... Maybe we don't need the visit here but inline the condition added in #argument_list?"
-	"If we have keyword arguments it's not superclass definition so we reject them. For now, we decided to not import them except the one to define a metaclass."
-	^ (((self visit: classDefinitionNode _superclasses) ifNil: [ #(  ) ]) reject: [ :each | each type = #keyword_argument ])
-		  ifEmpty: [
-				  model newInheritance
-					  superclass: (self ensureStubClassNamed: 'object');
-					  subclass: self currentEntity ]
-		  ifNotEmpty: [ :superclasses |
-				  superclasses do: [ :superclass |
-						  | inheritance |
-						  inheritance := model newInheritance.
-						  inheritance subclass: self currentEntity.
-						  self setSourceAnchor: inheritance from: superclass.
-						  superclass type = #identifier
-							  ifTrue: [
-									  self
-										  resolve: ((SRIdentifierWithNode identifier: superclass sourceText)
-												   expectedKind: FamixPythonClass;
-												   notFoundReplacementEntity: [ :unresolvedSuperclass :currentEntity | self ensureStubClassNamed: unresolvedSuperclass identifier ];
-												   yourself)
-										  foundAction: [ :entity :currentEntity | inheritance superclass: entity ] ]
-							  ifFalse: [
-									  | definition |
-									  definition := self attributeAsAssociation: superclass.
-
-									  self findImportMatchingSource: definition key ifFound: [ :import |
-											  self
-												  resolve: ((FamixPythonImportedEntityResolvable identifier: definition value import: import)
-														   expectedKind: FamixPythonClass;
-														   notFoundReplacementEntity: [ :unresolved :currentEntity | "We should never end up here because this means we have the sources of the imported entities but I'm still bulletproofing the parser in case we have some code that cannot run"
-																   (self ensureStubClassNamed: unresolved identifier)
-																	   typeContainer: (self ensureStubPackagesFromPath: definition key);
-																	   yourself ];
-														   yourself)
-												  foundAction: [ :entity :currentEntity | inheritance superclass: entity ].
-											  ^ inheritance ].
-									  "If we did not find an import, we have a stub."
-									  inheritance superclass: ((self ensureStubClassNamed: definition value)
-											   typeContainer: (self ensureStubPackagesFromPath: definition key);
-											   yourself) ] ] ]
-]
-
-{ #category : 'private' }
 FamixPythonVisitor >> unknownEntityNamed: aString [
 
 	^ (self model allWithType: FamixPythonUnknownEntity)
@@ -547,13 +550,7 @@ FamixPythonVisitor >> visitArgumentList: anArgumentListNode [
 	
 	An argument list can either be in a class definition to list superclasses and things like metaclass or in a call."
 
-	"In case of a class definition we let my caller handle the nodes"
-	anArgumentListNode parent type = #class_definition ifTrue: [ ^ anArgumentListNode collectNamedChild ].
-
-	"For a call, we visit the children"
-	anArgumentListNode parent type = #call ifTrue: [ ^ self visitChildren: anArgumentListNode ].
-	
-	self error: 'We should not have a parent that is neither a class_definition or a call. If you get here, please open an issue with the type of my parent and the piece of code that produced it.'
+	^ self visitChildren: anArgumentListNode
 ]
 
 { #category : 'visiting' }
@@ -577,6 +574,9 @@ FamixPythonVisitor >> visitAttribute: anAttributeNode [
 		- Else it is probably a reference or access to something imported with a simple import."
 
 	| source name |
+	
+	anAttributeNode parent parent type = #class_definition ifTrue: [ ^ self createImportedInheritanceFrom: anAttributeNode ].
+	
 	source := anAttributeNode _object sourceText copyWithout: Character space.
 	name := self visit: anAttributeNode _attribute.
 
@@ -652,9 +652,12 @@ FamixPythonVisitor >> visitClassDefinition: aClassDefinitionNode [
 	self setSourceAnchor: class from: aClassDefinitionNode.
 
 	^ self useCurrentEntity: class during: [
-			  self setSuperclassesOf: aClassDefinitionNode.
-			self flag: #todo. "Setting the metaclass should be done while visiting keywork parameters I think. Not here"
-			  self setMetaclassOf: aClassDefinitionNode.
+			  self flag: #todo. "Add test of a class with a superclass and a metaclass"
+			  self flag: #todo. "Add test on multiple inheritance"
+			  self visit: aClassDefinitionNode _superclasses.
+			  self ensureSuperclassFor: aClassDefinitionNode.
+			  self flag: #todo. "Setting the metaclass should be done while visiting keywork parameters I think. Not here"
+			  "  self setMetaclassOf: aClassDefinitionNode."
 			  self visit: aClassDefinitionNode _body ]
 ]
 
@@ -724,31 +727,33 @@ FamixPythonVisitor >> visitGlobalStatement: aNode [
 { #category : 'visiting' }
 FamixPythonVisitor >> visitIdentifier: anIdentifierNode [
 
+	anIdentifierNode parent parent type = #class_definition ifTrue: [ ^ self createInheritanceFrom: anIdentifierNode ].
+
 	self flag: #todo. "review some + clean method"
 	self flag: #todo. "Manage the for_statement"
-	(#( attribute call function_definition parameters keyword_argument lambda_parameters named_expression pattern_list list_comprehension
-	    parenthesized_expression for_statement subscript ERROR ) includes: anIdentifierNode parent type) ifTrue: [ ^ anIdentifierNode sourceText ].
+	(#( attribute call function_definition parameters keyword_argument lambda_parameters named_expression pattern_list list_comprehension parenthesized_expression
+	    for_statement subscript ERROR ) includes: anIdentifierNode parent type) ifTrue: [ ^ anIdentifierNode sourceText ].
 	anIdentifierNode isLeftSideOfAssignation ifTrue: [ ^ anIdentifierNode sourceText ].
-	(#( list argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator ) includes: anIdentifierNode parent type)
-		ifTrue: [
-				^ self
-					  resolve: ((SRIdentifierWithNode identifier: anIdentifierNode sourceText)
-							   expectedKind: {
-									   FamixPythonClass.
-									   FamixPythonFunction.
-									   FamixPythonLocalVariable.
-									   FamixPythonGlobalVariable.
-									   FamixPythonAttribute.
-									   FamixPythonParameter };
-							   notFoundReplacementEntity: [ :unresolved :currentEntity | "If we are the receiver of an invocation and we did not find the associated entity it's because it's an instance of a class or the namespace from the import. In that case we should create nothing so we give a null entity.""]"
-									   self flag: #todo.
-									   "aVariableExpression isInvocationOrInstantiationReceiver
+	(#( list argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator ) includes:
+		 anIdentifierNode parent type) ifTrue: [
+			^ self
+				  resolve: ((SRIdentifierWithNode identifier: anIdentifierNode sourceText)
+						   expectedKind: {
+								   FamixPythonClass.
+								   FamixPythonFunction.
+								   FamixPythonLocalVariable.
+								   FamixPythonGlobalVariable.
+								   FamixPythonAttribute.
+								   FamixPythonParameter };
+						   notFoundReplacementEntity: [ :unresolved :currentEntity | "If we are the receiver of an invocation and we did not find the associated entity it's because it's an instance of a class or the namespace from the import. In that case we should create nothing so we give a null entity.""]"
+								   self flag: #todo.
+								   "aVariableExpression isInvocationOrInstantiationReceiver
 						 ifTrue: [ FamixPythonNilEntity ]
 						 ifFalse: [" "This can be a structural entity or a class"
-									   self ensureStubUnknownEntityNamed: unresolved identifier ];
-							   yourself)
-					  foundAction: [ :entity :currentEntity | "See the comment in the notFoundReplacementEntity block to see why we do this."
-						  entity isMooseEntity ifTrue: [ entity createAccessOrReferenceFrom: currentEntity node: anIdentifierNode ] ] ].
+								   self ensureStubUnknownEntityNamed: unresolved identifier ];
+						   yourself)
+				  foundAction: [ :entity :currentEntity | "See the comment in the notFoundReplacementEntity block to see why we do this."
+					  entity isMooseEntity ifTrue: [ entity createAccessOrReferenceFrom: currentEntity node: anIdentifierNode ] ] ].
 
 
 
@@ -819,6 +824,16 @@ FamixPythonVisitor >> visitInteger: aNode [
 	"noop"
 
 	
+]
+
+{ #category : 'private' }
+FamixPythonVisitor >> visitKeywordArgument: aKeywordArgumentNode [
+
+	"In the class definition, if we have a #metaclass argument, then it's a metaclass usage"
+	(aKeywordArgumentNode _name sourceText = #metaclass and: [ aKeywordArgumentNode parent parent type = #class_definition ]) ifTrue: [
+		self manageMetaclassUsageFrom: aKeywordArgumentNode ].
+
+	^ self visit: aKeywordArgumentNode _value
 ]
 
 { #category : 'visiting' }
