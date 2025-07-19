@@ -236,10 +236,3 @@ not moduleAtRoot3.moduleAtRootVariable3
 
 augmentedAssignmentVar = 1
 augmentedAssignmentVar += 3
-
-
-class ClassToReferenceInList:
-    pass
-
-
-listWithReference = [ClassToReferenceInList]
