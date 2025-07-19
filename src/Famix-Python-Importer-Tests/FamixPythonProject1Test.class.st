@@ -309,6 +309,91 @@ FamixPythonProject1Test >> testClassInPackage [
 ]
 
 { #category : 'tests - references' }
+FamixPythonProject1Test >> testClassReferenceFromAIfBlock [
+
+	| class module reference |
+	class := self classNamed: 'ClassToReferenceInIfBlock'.
+	module := self moduleNamed: 'moduleAtRoot12'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testClassReferenceFromAIfCondition [
+
+	| class module reference |
+	class := self classNamed: 'ClassToReferenceInIfCondition'.
+	module := self moduleNamed: 'moduleAtRoot12'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testClassReferenceFromAIfElifClause [
+
+	| class module reference |
+	class := self classNamed: 'ClassToReferenceInIfElifClause'.
+	module := self moduleNamed: 'moduleAtRoot12'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testClassReferenceFromAIfElifCondition [
+
+	| class module reference |
+	class := self classNamed: 'ClassToReferenceInIfElifCondition'.
+	module := self moduleNamed: 'moduleAtRoot12'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testClassReferenceFromAIfElseClause [
+
+	| class module reference |
+	class := self classNamed: 'ClassToReferenceInIfElseClause'.
+	module := self moduleNamed: 'moduleAtRoot12'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
+]
+
+{ #category : 'tests - references' }
 FamixPythonProject1Test >> testClassReferenceFromAList [
 	"I am a regression test
 	

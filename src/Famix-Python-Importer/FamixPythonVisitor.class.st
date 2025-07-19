@@ -654,9 +654,9 @@ FamixPythonVisitor >> visitBlock: aNode [
 		- unnamed: continue_statement / for_statement / global_statement / with_statement / comment / delete_statement / nonlocal_statement / break_statement / import_from_statement / expression_statement / type_alias_statement / pass_statement / try_statement / decorated_definition / assert_statement / raise_statement / class_definition / import_statement / while_statement / return_statement / function_definition / if_statement
 		
 	Parents:
-		- Visiting me: function_definition / class_definition / while_statement
+		- Visiting me: function_definition / class_definition / while_statement / elif_clause / if_statement / esle_clause
 		- Skipping me: none
-		- Non yet managed: except_clause / with_statement / elif_clause / finaly_clause / if_statement / for_statement / try_statement / esle_clause
+		- Non yet managed: except_clause / with_statement / finaly_clause / for_statement / try_statement
 	"
 
 	^ self visitChildren: aNode
@@ -759,6 +759,21 @@ FamixPythonVisitor >> visitDottedName: aDottedNameNode [
 ]
 
 { #category : 'visiting - noop' }
+FamixPythonVisitor >> visitElifClause: aNode [
+	"
+	Children:
+		- condition: not_operator / subscript / boolean_operator / call / comparison_operator / attribute / parenthesized_expression / identifier / binary_operator
+		- consequence: block
+		- unnamed: comment
+		
+	Parents:
+		- Visiting me: if_statement
+	"
+
+	^ self visitChildren: aNode
+]
+
+{ #category : 'visiting - noop' }
 FamixPythonVisitor >> visitElseClause: aNode [
 	"
 	Children:
@@ -766,8 +781,8 @@ FamixPythonVisitor >> visitElseClause: aNode [
 		- unnamed: comment
 		
 	Parents:
-		- Visiting me: while_statement
-		- Not yet managed: if_statement / try_statement / for_statement
+		- Visiting me: while_statement / if_statement
+		- Not yet managed: try_statement / for_statement
 	"
 
 	^ self visitChildren: aNode
@@ -823,7 +838,7 @@ FamixPythonVisitor >> visitIdentifier: anIdentifierNode [
 	(#( attribute call function_definition parameters keyword_argument lambda_parameters named_expression pattern_list list_comprehension parenthesized_expression 
 	    for_statement subscript ERROR ) includes: anIdentifierNode parent type) ifTrue: [ ^ anIdentifierNode sourceText ].
 	anIdentifierNode isLeftSideOfAssignation ifTrue: [ ^ anIdentifierNode sourceText ].
-	(#( list argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator expression_statement augmented_assignment) includes:
+	(#( elif_clause list argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator expression_statement augmented_assignment) includes:
 		 anIdentifierNode parent type) ifTrue: [
 			^ self
 				  resolve: ((SRIdentifierWithNode identifier: anIdentifierNode sourceText)
@@ -847,6 +862,22 @@ FamixPythonVisitor >> visitIdentifier: anIdentifierNode [
 
 
 	1 halt
+]
+
+{ #category : 'visiting - noop' }
+FamixPythonVisitor >> visitIfStatement: aNode [
+	"
+	Children:
+		- condition: call / subscript / conditional_expression / attribute / binary_operator / parenthesized_expression / identifier / list_comprehension / true / boolean_operator / named_expression / comparison_operator / integer / not_operator
+		- consequence: block
+		- alternative: elif_clause / else_clause
+		- unnamed: comment
+		
+	Parents:
+		- Visiting me: module / block
+	"
+
+	^ self visitChildren: aNode
 ]
 
 { #category : 'visiting' }
