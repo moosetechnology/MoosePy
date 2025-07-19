@@ -255,6 +255,7 @@ FamixPythonProject1Test >> testClassInClass [
 
 	self assert: class class equals: FamixPythonClass.
 	self assert: class name equals: 'ClassInClass'.
+	self deny: class isStub.
 	self assert: class typeContainer equals: (self classNamed: 'ClassWithClasses')
 ]
 
@@ -266,6 +267,7 @@ FamixPythonProject1Test >> testClassInFunction [
 
 	self assert: class class equals: FamixPythonClass.
 	self assert: class name equals: 'ClassInFunction'.
+	self deny: class isStub.
 	self assert: class typeContainer equals: (self functionNamed: 'function_with_class_inside')
 ]
 
@@ -277,6 +279,7 @@ FamixPythonProject1Test >> testClassInMethod [
 
 	self assert: class class equals: FamixPythonClass.
 	self assert: class name equals: 'ClassInMethod'.
+	self deny: class isStub.
 	self assert: class typeContainer equals: ((self classNamed: 'ClassWithClasses') methods detect: #isConstructor) 
 ]
 
@@ -288,6 +291,7 @@ FamixPythonProject1Test >> testClassInModule [
 
 	self assert: class class equals: FamixPythonClass.
 	self assert: class name equals: 'ClassWithClasses'.
+	self deny: class isStub.
 	self assert: class typeContainer equals: (self moduleNamed: 'moduleWithClasses')
 ]
 
@@ -300,6 +304,7 @@ FamixPythonProject1Test >> testClassInPackage [
 
 	self assert: class class equals: FamixPythonClass.
 	self assert: class name equals: 'ClassInSubpackage'.
+	self deny: class isStub.
 	self assert: class typeContainer equals: (self packageNamed: 'subpackage1')
 ]
 
@@ -1124,6 +1129,7 @@ FamixPythonProject1Test >> testFunctionInAFunction [
 	self assert: function class equals: FamixPythonFunction.
 	self assert: function name equals: 'inner_function'.
 	self assert: function signature equals: 'inner_function(finput)'.
+	self deny: function isStub.
 	self assert: function functionOwner equals: (self functionNamed: 'function_with_inner_function')
 ]
 
@@ -1138,6 +1144,7 @@ FamixPythonProject1Test >> testFunctionInAModule [
 	self assert: function class equals: FamixPythonFunction.
 	self assert: function name equals: 'functionWithImport'.
 	self assert: function signature equals: 'functionWithImport()'.
+	self deny: function isStub.
 	self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot')
 ]
 
@@ -1152,6 +1159,7 @@ FamixPythonProject1Test >> testFunctionInAPackage [
 	self assert: function class equals: FamixPythonFunction.
 	self assert: function name equals: 'return2'.
 	self assert: function signature equals: 'return2()'.
+	self deny: function isStub.
 	self assert: function functionOwner equals: (self packageNamed: 'subsubpackage1')
 ]
 
@@ -1479,6 +1487,8 @@ FamixPythonProject1Test >> testFunctionParameters [
 			param2 }.
 	self assert: param1 name equals: 'list1'.
 	self assert: param2 name equals: 'list2'.
+	self deny: param1 isStub.
+	self deny: param2 isStub.
 	self assert: param1 class equals: FamixPythonParameter.
 	self assert: param2 class equals: FamixPythonParameter.
 	self assert: param1 parentBehaviouralEntity equals: function.
@@ -1898,6 +1908,7 @@ FamixPythonProject1Test >> testGlobalVariableInModule [
 	self assert: global class equals: FamixPythonGlobalVariable.
 	self assert: global name equals: 'moduleAtRootVariable'.
 	self assert: global parentScope equals: (self moduleNamed: 'moduleAtRoot').
+	self deny: global isStub.
 	
 	self assert: global sourceAnchor isNotNil.
 	self assert: global sourceText equals: 'moduleAtRootVariable'
@@ -1914,6 +1925,7 @@ FamixPythonProject1Test >> testGlobalVariableInPackage [
 	self assert: global class equals: FamixPythonGlobalVariable.
 	self assert: global name equals: 'rootPackageVariable'.
 	self assert: global parentScope equals: (self packageNamed: 'root').
+	self deny: global isStub.
 
 	self assert: global sourceAnchor isNotNil.
 	self assert: global sourceText equals: 'rootPackageVariable'
@@ -1942,18 +1954,21 @@ FamixPythonProject1Test >> testGlobalVariablesAssignedWithATuple [
 	self assert: global class equals: FamixPythonGlobalVariable.
 	self assert: global name equals: 'globalWithTuple1'.
 	self assert: global parentScope equals: (self moduleNamed: 'moduleAtRoot').
+	self deny: global isStub.
 
 	global := self globalVariableNamed: 'globalWithTuple2'.
 
 	self assert: global class equals: FamixPythonGlobalVariable.
 	self assert: global name equals: 'globalWithTuple2'.
 	self assert: global parentScope equals: (self moduleNamed: 'moduleAtRoot').
+	self deny: global isStub.
 
 	global := self globalVariableNamed: 'globalWithTuple3'.
 
 	self assert: global class equals: FamixPythonGlobalVariable.
 	self assert: global name equals: 'globalWithTuple3'.
-	self assert: global parentScope equals: (self moduleNamed: 'moduleAtRoot')
+	self assert: global parentScope equals: (self moduleNamed: 'moduleAtRoot').
+	self deny: global isStub.
 ]
 
 { #category : 'tests - global variables' }
@@ -2602,7 +2617,8 @@ FamixPythonProject1Test >> testLambdaInAClass [
 
 	self assert: lambda class equals: FamixPythonLambda.
 	self assert: lambda signature equals: 'toto'.
-	self assert: lambda lambdaContainer equals: container
+	self assert: lambda lambdaContainer equals: container.
+	self deny: lambda isStub.
 ]
 
 { #category : 'tests - lambdas' }
@@ -2618,7 +2634,8 @@ FamixPythonProject1Test >> testLambdaInAFunction [
 
 	self assert: lambda class equals: FamixPythonLambda.
 	self assert: lambda signature equals: 'a'.
-	self assert: lambda lambdaContainer equals: container
+	self assert: lambda lambdaContainer equals: container.
+	self deny: lambda isStub
 ]
 
 { #category : 'tests - lambdas' }
@@ -2639,7 +2656,8 @@ FamixPythonProject1Test >> testLambdaInALambda [
 
 	self assert: lambda class equals: FamixPythonLambda.
 	self assert: lambda signature equals: 'y'.
-	self assert: lambda lambdaContainer equals: container
+	self assert: lambda lambdaContainer equals: container.
+	self deny: lambda isStub
 ]
 
 { #category : 'tests - lambdas' }
@@ -2655,7 +2673,8 @@ FamixPythonProject1Test >> testLambdaInAMethod [
 
 	self assert: lambda class equals: FamixPythonLambda.
 	self assert: lambda signature equals: 'tata'.
-	self assert: lambda lambdaContainer equals: container
+	self assert: lambda lambdaContainer equals: container.
+	self deny: lambda isStub
 ]
 
 { #category : 'tests - lambdas' }
@@ -2671,7 +2690,8 @@ FamixPythonProject1Test >> testLambdaInAModule [
 
 	self assert: lambda class equals: FamixPythonLambda.
 	self assert: lambda signature equals: 'a, b'.
-	self assert: lambda lambdaContainer equals: container
+	self assert: lambda lambdaContainer equals: container.
+	self deny: lambda isStub
 ]
 
 { #category : 'tests - lambdas' }
@@ -2679,19 +2699,16 @@ FamixPythonProject1Test >> testLambdaInAPackage [
 
 	| lambda container |
 	container := self packageNamed: 'packageWithLambdas'.
-	
+
 	self assert: container class equals: FamixPythonPackage.
 	self assert: container lambdas size equals: 1.
-	
+
 	lambda := container lambdas anyOne.
-	
+
 	self assert: lambda class equals: FamixPythonLambda.
 	self assert: lambda signature equals: 'a'.
-	self assert: lambda lambdaContainer equals: container
-	
-	
-	
-	
+	self assert: lambda lambdaContainer equals: container.
+	self deny: lambda isStub
 ]
 
 { #category : 'tests - parameters' }
@@ -2708,6 +2725,8 @@ FamixPythonProject1Test >> testLambdaParameters [
 			param2 }.
 	self assert: param1 name equals: 'a'.
 	self assert: param2 name equals: 'b'.
+	self deny: param1 isStub.
+	self deny: param2 isStub.
 	self assert: param1 class equals: FamixPythonParameter.
 	self assert: param2 class equals: FamixPythonParameter.
 	self assert: param1 parentBehaviouralEntity equals: lambda.
@@ -2747,7 +2766,8 @@ FamixPythonProject1Test >> testLambdaWithoutParameters [
 
 	self assert: lambda class equals: FamixPythonLambda.
 	self assert: lambda signature equals: ''.
-	self assert: lambda lambdaContainer equals: container
+	self assert: lambda lambdaContainer equals: container.
+	self deny: lambda isStub
 ]
 
 { #category : 'tests - invocations' }
@@ -2886,7 +2906,8 @@ FamixPythonProject1Test >> testMetaclass [
 
 	self assert: metaclass class equals: FamixPythonMetaclass.
 	self assert: metaclass name equals: 'CustomMetaclass'.
-	self assert: metaclass typeContainer equals: (self moduleNamed: 'moduleAtRoot8')
+	self assert: metaclass typeContainer equals: (self moduleNamed: 'moduleAtRoot8').
+	self deny: metaclass isStub
 ]
 
 { #category : 'tests - metaclasses' }
@@ -3144,6 +3165,8 @@ FamixPythonProject1Test >> testMethodParameters [
 	self assert: param2 name equals: 'tuple_attr'.
 	self assert: param1 isSelf.
 	self deny: param2 isSelf.
+	self deny: param1 isStub.
+	self deny: param2 isStub.
 	self assert: param1 class equals: FamixPythonParameter.
 	self assert: param2 class equals: FamixPythonParameter.
 	self assert: param1 parentBehaviouralEntity equals: method.
@@ -3516,7 +3539,8 @@ FamixPythonProject1Test >> testModuleInRootPackage [
 	self assert: module class equals: FamixPythonModule.
 	self assert: module name equals: 'moduleInRootPackage'.
 	self deny: module isRoot.
-	self assert: module parentPackage equals: (self packageNamed: 'root')
+	self assert: module parentPackage equals: (self packageNamed: 'root').
+	self deny: module isStub
 ]
 
 { #category : 'tests - modules' }
@@ -3530,7 +3554,8 @@ FamixPythonProject1Test >> testModuleInSubPackage [
 	self assert: module class equals: FamixPythonModule.
 	self assert: module name equals: 'moduleInSubPackage1'.
 	self deny: module isRoot.
-	self assert: module parentPackage equals: (self packageNamed: 'subpackage1')
+	self assert: module parentPackage equals: (self packageNamed: 'subpackage1').
+	self deny: module isStub
 ]
 
 { #category : 'tests - from-import relative' }
@@ -4835,7 +4860,8 @@ FamixPythonProject1Test >> testRootPackage [
 	
 	self assert: rootPackage class equals: FamixPythonPackage.
 	self assert: rootPackage name equals: 'src'.
-	self assert: rootPackage isRoot
+	self assert: rootPackage isRoot.
+	self deny: rootPackage isStub
 ]
 
 { #category : 'tests - shadowing' }
@@ -4894,6 +4920,7 @@ FamixPythonProject1Test >> testSimpleClass [
 
 	self assert: class class equals: FamixPythonClass.
 	self assert: class name equals: 'Person'.
+	self deny: class isStub.
 	self assert: class typeContainer equals: (self moduleNamed: 'moduleAtRoot2')
 ]
 
@@ -4922,6 +4949,7 @@ FamixPythonProject1Test >> testSimpleFunction [
 	self assert: function class equals: FamixPythonFunction.
 	self assert: function name equals: 'sort_list'.
 	self assert: function signature equals: 'sort_list(list1, list2)'.
+	self deny: function isStub.
 	self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot')
 ]
 
@@ -4994,7 +5022,8 @@ FamixPythonProject1Test >> testSimpleLocalVariableInFunction [
 
 	self assert: variable class equals: FamixPythonLocalVariable.
 	self assert: variable name equals: 'local_in_function2'.
-	self assert: variable parentBehaviouralEntity equals: (self functionNamed: 'function_with_local_variables')
+	self assert: variable parentBehaviouralEntity equals: (self functionNamed: 'function_with_local_variables').
+	self deny: variable isStub
 ]
 
 { #category : 'tests - local variables' }
@@ -5005,7 +5034,8 @@ FamixPythonProject1Test >> testSimpleLocalVariableInLambda [
 
 	self assert: variable class equals: FamixPythonLocalVariable.
 	self assert: variable name equals: 'temporary_in_lambda'.
-	self assert: variable parentBehaviouralEntity equals: (self functionNamed: 'function_with_lambda_with_temporary') lambdas anyOne
+	self assert: variable parentBehaviouralEntity equals: (self functionNamed: 'function_with_lambda_with_temporary') lambdas anyOne.
+	self deny: variable isStub
 ]
 
 { #category : 'tests - local variables' }
@@ -5016,7 +5046,8 @@ FamixPythonProject1Test >> testSimpleLocalVariableInMethod [
 
 	self assert: variable class equals: FamixPythonLocalVariable.
 	self assert: variable name equals: 'local_in_method2'.
-	self assert: variable parentBehaviouralEntity equals: (self methodNamed: 'method_with_local_variables')
+	self assert: variable parentBehaviouralEntity equals: (self methodNamed: 'method_with_local_variables').
+	self deny: variable isStub
 ]
 
 { #category : 'tests - methods' }
@@ -5030,7 +5061,8 @@ FamixPythonProject1Test >> testSimpleMethod [
 	self assert: method class equals: FamixPythonMethod.
 	self assert: method name equals: 'printInfos'.
 	self assert: method signature equals: 'printInfos(self)'.
-	self assert: method parentType equals: (self classNamed: 'Person')
+	self assert: method parentType equals: (self classNamed: 'Person').
+	self deny: method isStub
 ]
 
 { #category : 'tests - modules' }
