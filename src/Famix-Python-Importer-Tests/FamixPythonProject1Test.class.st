@@ -304,6 +304,26 @@ FamixPythonProject1Test >> testClassInPackage [
 ]
 
 { #category : 'tests - references' }
+FamixPythonProject1Test >> testClassReferenceFromAList [
+	"I am a regression test
+	
+	I did the mistake to skip visit of list children why prevent to find all references :("
+
+	| class module reference |
+	class := self classNamed: 'ClassToReferenceInList'.
+	module := self moduleNamed: 'moduleAtRoot2'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
+]
+
+{ #category : 'tests - references' }
 FamixPythonProject1Test >> testClassReferenceFromClass [
 
 	| class class2 reference |

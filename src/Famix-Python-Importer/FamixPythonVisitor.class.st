@@ -538,12 +538,22 @@ FamixPythonVisitor >> visitAliasedImport: anAliasImport [
 
 { #category : 'visiting' }
 FamixPythonVisitor >> visitArgumentList: anArgumentListNode [
-	"An argument list can either be in a class definition to list superclasses and things like metaclass or in a call."
+	"
+	Children:
+		- unnamed: identifier / set_comprehension / binary_operator / concatenated_string / unary_operator / comment / dictionary / named_expression / call / list / dictionary_splat / boolean_operator / not_operator / float / none / dictionary_comprehension / set / false / conditional_expression / generator_expression / ellipsis / string / keyword_argument / true / attribute / list_splat / parenthesized_expression / integer / lambda / comparison_operator / tuple / list_comprehension / subscript
+		
+	Parents:
+		- Visiting me: call / class_definition
+	
+	An argument list can either be in a class definition to list superclasses and things like metaclass or in a call."
 
 	"In case of a class definition we let my caller handle the nodes"
 	anArgumentListNode parent type = #class_definition ifTrue: [ ^ anArgumentListNode collectNamedChild ].
 
-	^ self visitChildren: anArgumentListNode
+	"For a call, we visit the children"
+	anArgumentListNode parent type = #call ifTrue: [ ^ self visitChildren: anArgumentListNode ].
+	
+	self error: 'We should not have a parent that is neither a class_definition or a call. If you get here, please open an issue with the type of my parent and the piece of code that produced it.'
 ]
 
 { #category : 'visiting' }
@@ -643,6 +653,7 @@ FamixPythonVisitor >> visitClassDefinition: aClassDefinitionNode [
 
 	^ self useCurrentEntity: class during: [
 			  self setSuperclassesOf: aClassDefinitionNode.
+			self flag: #todo. "Setting the metaclass should be done while visiting keywork parameters I think. Not here"
 			  self setMetaclassOf: aClassDefinitionNode.
 			  self visit: aClassDefinitionNode _body ]
 ]
@@ -711,7 +722,7 @@ FamixPythonVisitor >> visitIdentifier: anIdentifierNode [
 	(#( attribute call function_definition parameters keyword_argument lambda_parameters named_expression pattern_list list_comprehension
 	    parenthesized_expression for_statement subscript ERROR ) includes: anIdentifierNode parent type) ifTrue: [ ^ anIdentifierNode sourceText ].
 	anIdentifierNode isLeftSideOfAssignation ifTrue: [ ^ anIdentifierNode sourceText ].
-	(#( argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator ) includes: anIdentifierNode parent type)
+	(#( list argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator ) includes: anIdentifierNode parent type)
 		ifTrue: [
 				^ self
 					  resolve: ((SRIdentifierWithNode identifier: anIdentifierNode sourceText)
@@ -827,7 +838,7 @@ FamixPythonVisitor >> visitLambdaParameters: aParameterNode [
 FamixPythonVisitor >> visitList: aNode [
 	"noop"
 
-	
+	^ self visitChildren: aNode
 ]
 
 { #category : 'visiting' }
@@ -854,7 +865,10 @@ FamixPythonVisitor >> visitModule: aModuleNode [
 					self assert: self currentEntity isPackage.
 					entity parentPackage: self currentEntity ].
 
-			(self currentEntity: entity) isMainEntity: true ].
+			self currentEntity: entity ].
+	
+	"(fileReference basename = #'moduleAtRoot5.py') ifTrue: [ 1halt ]."
+	
 	self visitChildren: aModuleNode.
 
 	"Importing the comments of the file."
