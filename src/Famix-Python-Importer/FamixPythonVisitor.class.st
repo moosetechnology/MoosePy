@@ -694,6 +694,13 @@ FamixPythonVisitor >> visitFalse: aNode [
 	
 ]
 
+{ #category : 'visiting - noop' }
+FamixPythonVisitor >> visitFloat: aNode [
+	"noop"
+
+	
+]
+
 { #category : 'visiting' }
 FamixPythonVisitor >> visitFunctionDefinition: aFunctionDefinition [
 	"the parser does not make a difference between function and method, but a method is defined in a class and its first parameter is self."
@@ -899,6 +906,13 @@ FamixPythonVisitor >> visitNamedExpression: aNamedExpressionNode [
 
 	self visitChildren: aNamedExpressionNode.
 	^ variable
+]
+
+{ #category : 'visiting - noop' }
+FamixPythonVisitor >> visitNone: aNode [
+	"noop"
+
+	
 ]
 
 { #category : 'visiting - noop' }
