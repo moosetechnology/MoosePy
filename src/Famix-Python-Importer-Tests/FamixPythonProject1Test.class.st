@@ -214,6 +214,7 @@ FamixPythonProject1Test >> testClassImportsModule [
 	self assert: import importingEntity equals: class.
 	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot3').
 	self deny: import isFromImport.
+	self deny: import isFutureImport.
 	self assert: import sourceText equals: 'import moduleAtRoot3'
 ]
 
@@ -244,6 +245,7 @@ FamixPythonProject1Test >> testClassImportsPackageFrom [
 	self assert: import importingEntity equals: class.
 	self assert: import importedEntity equals: package.
 	self assert: import isFromImport.
+	self deny: import isFutureImport.
 	self assert: import sourceText equals: 'from root2 import subpackageInRoot2'
 ]
 
@@ -2213,6 +2215,38 @@ FamixPythonProject1Test >> testImportAnEntityThatIsShadowed [
 	self assert: import importedEntity class equals: FamixPythonFunction.
 	self assert: import isFromImport.
 	self assert: import sourceText equals: 'from root2.moduleWithShadowing import shadowedName'
+]
+
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testImportFuture [
+
+	| entity module import |
+
+	entity := self unknownEntityNamed: 'generator_stop'.
+	module := self moduleNamed: 'moduleAtRoot9'.
+	import := module imports detect: [ :pimport | pimport target name = 'generator_stop' ].
+
+	self assert: import importingEntity equals: module.
+	self assert: import importedEntity equals: entity.
+	self assert: import isFromImport.
+	self assert: import isFutureImport.
+	self assert: import sourceText equals: 'from __future__ import generator_stop'
+]
+
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testImportFutureWithAlias [
+
+	| entity module import |
+	entity := self unknownEntityNamed: 'annotations'.
+	module := self moduleNamed: 'moduleAtRoot9'.
+	import := module imports detect: [ :pimport | pimport target name = 'annotations' ].
+
+	self assert: import importingEntity equals: module.
+	self assert: import importedEntity equals: entity.
+	self assert: import isFromImport.
+	self assert: import isFutureImport.
+	self assert: import alias equals: 'annots'.
+	self assert: import sourceText equals: 'from __future__ import annotations as annots'
 ]
 
 { #category : 'tests - imports' }

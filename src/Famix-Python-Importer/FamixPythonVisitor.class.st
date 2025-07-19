@@ -559,7 +559,7 @@ FamixPythonVisitor >> visitAliasedImport: anAliasImport [
 		- alias: an identifier (we do not visit it because it does not need to be resolved.
 		
 	Parents:
-		- Visiting me: import_statement / import_from_statement"
+		- Visiting me: import_statement / import_from_statement / future_import_statement"
 
 	^ (self visit: anAliasImport _name) -> anAliasImport _alias sourceText
 ]
@@ -820,6 +820,29 @@ FamixPythonVisitor >> visitFunctionDefinition: aFunctionDefinition [
 	^ self useCurrentEntity: entity during: [
 			  self visit: aFunctionDefinition _parameters.
 			  self visit: aFunctionDefinition _body ]
+]
+
+{ #category : 'visiting' }
+FamixPythonVisitor >> visitFutureImportStatement: aNode [
+	"
+	Children:
+		- name: dotted_name / aliased_import
+		
+	Parents:
+		- Visiting me: module
+	"
+
+	| name |
+	name := self visit: aNode _name.
+	^ self
+		  manageImport: aNode
+		  ofName: (name isString
+				   ifTrue: [ name ]
+				   ifFalse: [ name key ])
+		  from: '__future__'
+		  alias: (name isString
+				   ifTrue: [ nil ]
+				   ifFalse: [ name value ])
 ]
 
 { #category : 'visiting' }

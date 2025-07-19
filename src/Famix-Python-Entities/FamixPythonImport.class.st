@@ -100,3 +100,11 @@ FamixPythonImport >> isFromImport: anObject [
 	<generated>
 	isFromImport := anObject
 ]
+
+{ #category : 'testing' }
+FamixPythonImport >> isFutureImport [
+	"In python it is possible to import future features. This is called a future import.
+	https://docs.python.org/3/library/__future__.html"
+
+	^ self importedEntity belongsTo name = '__future__'
+]
