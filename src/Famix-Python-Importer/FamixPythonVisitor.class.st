@@ -697,6 +697,26 @@ FamixPythonVisitor >> visitComment: aCommentNode [
 	
 ]
 
+{ #category : 'visiting - noop' }
+FamixPythonVisitor >> visitContinueStatement: aNode [
+	"
+	Children: none
+	
+	Parents:
+		- Visiting me: block
+	
+	example:
+	
+		for i in range(5):
+		    if i == 3:
+ 		       continue
+  		  print(i)
+		
+	noop, nothing to do at Famix level."
+
+	
+]
+
 { #category : 'visiting' }
 FamixPythonVisitor >> visitDottedName: aDottedNameNode [
 	"
@@ -975,6 +995,24 @@ FamixPythonVisitor >> visitParameters: aParameterNode [
 			  (model newParameterNamed: (self visit: parameter))
 				  parentBehaviouralEntity: self currentEntity;
 				  in: [ :param | self setSourceAnchor: param from: parameter ] ]
+]
+
+{ #category : 'visiting - noop' }
+FamixPythonVisitor >> visitPassStatement: aNode [
+	"
+	Children: none
+	
+	Parents:
+		- Visiting me: block
+	
+	example:
+	
+		class AClassDefinition:
+    			pass
+		
+	noop, nothing to do at Famix level."
+
+	
 ]
 
 { #category : 'visiting' }
