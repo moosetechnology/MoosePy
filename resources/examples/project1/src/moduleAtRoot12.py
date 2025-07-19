@@ -34,3 +34,31 @@ while num <= 5:
 else:
     ClassToReferenceInWhileElseClause
     print("Loop completed. Sum =", sum_result)
+
+
+class ClassToReferenceInIfCondition:
+    pass
+
+
+class ClassToReferenceInIfBlock:
+    pass
+
+
+class ClassToReferenceInIfElseClause:
+    pass
+
+
+class ClassToReferenceInIfElifClause:
+    pass
+
+
+class ClassToReferenceInIfElifCondition:
+    pass
+
+
+if ClassToReferenceInIfCondition == 1:
+    ClassToReferenceInIfBlock
+elif ClassToReferenceInIfElifCondition:
+    ClassToReferenceInIfElifClause
+else:
+    ClassToReferenceInIfElseClause
