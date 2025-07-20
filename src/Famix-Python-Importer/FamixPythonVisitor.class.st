@@ -8,7 +8,8 @@ They are not respected yet but it will come.
 - Creating a new entity if one does not exist yet should go in ""ensure entity"" protocol.
 - No other method should begins by ""create"".
 - Creating an entity if it does not exist yet should start by ""ensure""
-- Visit method cutting all visit or visiting all children should go in the protocol ""visitin - noop""
+- Visit method cutting all visit should go in the protocol ""visitin - noop""
+- Visit method visiting all children  should go in the protocol ""visitin - visitChildren""
 - Other visit methods should be in ""visiting""
 "
 Class {
@@ -624,10 +625,18 @@ FamixPythonVisitor >> visitArgumentList: anArgumentListNode [
 	^ self visitChildren: anArgumentListNode
 ]
 
-{ #category : 'visiting' }
+{ #category : 'visiting - visitChildren' }
 FamixPythonVisitor >> visitAssignment: anAssignmentNode [
-
-	self flag: #todo. "Comment"
+	"
+	Children:
+		- left: subscript / tuple_pattern / attribute / list_pattern / identifier / pattern_list
+		- right: identifier / set_comprehension / binary_operator / concatenated_string / unary_operator / await / dictionary / call / list / not_operator / boolean_operator / expression_list / float / none / set / dictionary_comprehension / false / generator_expression / conditional_expression / ellipsis / string / true / attribute / yield / parenthesized_expression / integer / comparison_operator / lambda / tuple / list_comprehension / assignment / subscript
+		- type: type
+		- unnamed: line_continuation
+	
+	Parents:
+		- Visiting me: assignment / expression_statement"
+	
 	^ self visitChildren: anAssignmentNode
 ]
 
@@ -688,7 +697,7 @@ FamixPythonVisitor >> visitAugmentedAssignment: aNode [
 	^ self visitAssignment: aNode
 ]
 
-{ #category : 'visiting - noop' }
+{ #category : 'visiting - visitChildren' }
 FamixPythonVisitor >> visitBlock: aNode [
 	"
 	Children:
@@ -799,7 +808,7 @@ FamixPythonVisitor >> visitDottedName: aDottedNameNode [
 	^ aDottedNameNode sourceText
 ]
 
-{ #category : 'visiting - noop' }
+{ #category : 'visiting - visitChildren' }
 FamixPythonVisitor >> visitElifClause: aNode [
 	"
 	Children:
@@ -814,7 +823,7 @@ FamixPythonVisitor >> visitElifClause: aNode [
 	^ self visitChildren: aNode
 ]
 
-{ #category : 'visiting - noop' }
+{ #category : 'visiting - visitChildren' }
 FamixPythonVisitor >> visitElseClause: aNode [
 	"
 	Children:
@@ -829,7 +838,7 @@ FamixPythonVisitor >> visitElseClause: aNode [
 	^ self visitChildren: aNode
 ]
 
-{ #category : 'visiting - noop' }
+{ #category : 'visiting - visitChildren' }
 FamixPythonVisitor >> visitExpressionStatement: aNode [
 
 	^ self visitChildren: aNode
@@ -908,7 +917,7 @@ FamixPythonVisitor >> visitIdentifier: anIdentifierNode [
 	^ anIdentifierNode sourceText
 ]
 
-{ #category : 'visiting - noop' }
+{ #category : 'visiting - visitChildren' }
 FamixPythonVisitor >> visitIfStatement: aNode [
 	"
 	Children:
@@ -1034,7 +1043,7 @@ FamixPythonVisitor >> visitListComprehension: aNode [
 	
 ]
 
-{ #category : 'visiting - noop' }
+{ #category : 'visiting - visitChildren' }
 FamixPythonVisitor >> visitListPattern: aNode [
 	"
 	TODO: Comment
@@ -1103,7 +1112,7 @@ FamixPythonVisitor >> visitNone: aNode [
 	
 ]
 
-{ #category : 'visiting - noop' }
+{ #category : 'visiting - visitChildren' }
 FamixPythonVisitor >> visitNotOperator: aNode [
 	"noop"
 
@@ -1139,7 +1148,7 @@ FamixPythonVisitor >> visitPassStatement: aNode [
 	
 ]
 
-{ #category : 'visiting - noop' }
+{ #category : 'visiting - visitChildren' }
 FamixPythonVisitor >> visitPatternList: aNode [
 	"
 	TODO: Comment
@@ -1162,7 +1171,7 @@ FamixPythonVisitor >> visitRelativeImport: aRelativeImportNode [
 	^ aRelativeImportNode sourceText
 ]
 
-{ #category : 'visiting - noop' }
+{ #category : 'visiting - visitChildren' }
 FamixPythonVisitor >> visitReturnStatement: aNode [
 
 	^ self visitChildren: aNode
@@ -1171,8 +1180,6 @@ FamixPythonVisitor >> visitReturnStatement: aNode [
 { #category : 'visiting - noop' }
 FamixPythonVisitor >> visitString: aStringNode [
 	"noop - we don't need the children and comments are managed in a separated visitor."
-
-	^ self
 ]
 
 { #category : 'visiting' }
@@ -1192,7 +1199,7 @@ FamixPythonVisitor >> visitTrue: aNode [
 	
 ]
 
-{ #category : 'visiting - noop' }
+{ #category : 'visiting - visitChildren' }
 FamixPythonVisitor >> visitTuplePattern: aNode [
 	"
 	TODO: Comment
@@ -1201,7 +1208,7 @@ FamixPythonVisitor >> visitTuplePattern: aNode [
 	^ self visitChildren: aNode
 ]
 
-{ #category : 'visiting - noop' }
+{ #category : 'visiting - visitChildren' }
 FamixPythonVisitor >> visitWhileStatement: aNode [
 	"
 	Children:
