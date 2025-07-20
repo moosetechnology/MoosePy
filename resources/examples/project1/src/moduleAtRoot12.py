@@ -62,3 +62,12 @@ elif ClassToReferenceInIfElifCondition:
     ClassToReferenceInIfElifClause
 else:
     ClassToReferenceInIfElseClause
+
+
+class ClassToReferenceInClassDeclarationBody:
+    pass
+
+
+class ClassWithReferenceInBody:
+    ClassToReferenceInClassDeclarationBody
+    pass
