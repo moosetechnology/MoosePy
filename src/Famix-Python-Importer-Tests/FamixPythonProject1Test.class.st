@@ -152,7 +152,7 @@ FamixPythonProject1Test >> testAssignationWithVariableListPatternOnLeftSide [
 	global := self globalVariableNamed: 'variableListPattern1'.
 	module := self moduleNamed: 'moduleAtRoot13'.
 
-	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
 
 	self assert: access class equals: FamixPythonAccess.
 	self assert: access source equals: module.
@@ -171,7 +171,7 @@ FamixPythonProject1Test >> testAssignationWithVariablePatternListIdentifierOnLef
 	global := self globalVariableNamed: 'variablePatternListIdentifier1'.
 	module := self moduleNamed: 'moduleAtRoot13'.
 
-	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
 
 	self assert: access class equals: FamixPythonAccess.
 	self assert: access source equals: module.
@@ -190,6 +190,7 @@ FamixPythonProject1Test >> testAssignationWithVariableSubscriptOnLeftSide [
 	global := self globalVariableNamed: 'variableSubscript'.
 	module := self moduleNamed: 'moduleAtRoot13'.
 
+	self assert: (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) size equals: 2.
 	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
 
 	self assert: access class equals: FamixPythonAccess.
@@ -225,6 +226,48 @@ FamixPythonProject1Test >> testAssignationWithVariableTuplePatternOnLeftSide [
 FamixPythonProject1Test >> testAssociationsSourcesAreNeverStub [
 
 	(self model allUsing: FamixTAssociation) do: [ :association | self deny: association source isStub ]
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAugmentedAssignationWithAttributeOnLeftSide [
+
+	| variable class accesses |
+	variable := self attributeNamed: 'variableAugmentedAssignmentAttribute'.
+	class := self classNamed: 'ClassWithAugmentedAssignment'.
+
+	accesses := variable incomingAccesses select: [ :anAccess | anAccess accessor = class ].
+
+	self assert: accesses size equals: 3.
+	self assert: (accesses select: #isRead) size equals: 1.
+	self assert: (accesses select: #isWrite) size equals: 2
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAugmentedAssignationWithIdentifierOnLeftSide [
+
+	| variable module accesses |
+	variable := self globalVariableNamed: 'variableAugmentedAssignmentIdentifier'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	accesses := variable incomingAccesses select: [ :anAccess | anAccess accessor = module ].
+
+	self assert: accesses size equals: 3.
+	self assert: (accesses select: #isRead) size equals: 1.
+	self assert: (accesses select: #isWrite) size equals: 2
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAugmentedAssignationWithSubscriptOnLeftSide [
+
+	| variable module accesses |
+	variable := self globalVariableNamed: 'variableAugmentedAssignmentSubscript'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	accesses := variable incomingAccesses select: [ :anAccess | anAccess accessor = module ].
+
+	self assert: accesses size equals: 3.
+	self assert: (accesses select: #isRead) size equals: 1.
+	self assert: (accesses select: #isWrite) size equals: 2
 ]
 
 { #category : 'tests - from-import' }

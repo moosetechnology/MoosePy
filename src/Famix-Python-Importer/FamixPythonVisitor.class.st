@@ -690,11 +690,18 @@ FamixPythonVisitor >> visitAttribute: anAttributeNode [
 	^ source
 ]
 
-{ #category : 'visiting' }
+{ #category : 'visiting - visitChildren' }
 FamixPythonVisitor >> visitAugmentedAssignment: aNode [
-	"We should manage it the same way as a normal assignment in Famix. The only change is that we will create a read access to the variable on the left side, but this will be dealt with in another place."
+	"
+	Children: 
+		- left: attribute / identifier / subscript
+		- right: identifier / set_comprehension / binary_operator / concatenated_string / unary_operator / call / list / boolean_operator / expression_list / float / set / conditional_expression / string / attribute / parenthesized_expression / integer / comparison_operator / tuple / list_comprehension / subscript
+		
+	Parents:
+		- Visiting me: expression_statement
+	"
 
-	^ self visitAssignment: aNode
+	^ self visitChildren: aNode
 ]
 
 { #category : 'visiting - visitChildren' }
