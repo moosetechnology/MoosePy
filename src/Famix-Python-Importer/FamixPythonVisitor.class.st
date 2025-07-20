@@ -46,11 +46,17 @@ FamixPythonVisitor >> checkShadowingOfName: aString during: aBlock [
 { #category : 'association creation' }
 FamixPythonVisitor >> createAccessTo: variable isWrite: aBoolean from: anAssignmentNode [
 
-	^ model newAccess
-		  variable: variable;
-		  isWrite: aBoolean;
-		  in: [ :access | self setSourceAnchor: access from: anAssignmentNode ];
-		  yourself
+	| access |
+	access := model newAccess
+		          variable: variable;
+		          isWrite: aBoolean;
+		          yourself.
+
+	self setSourceAnchor: access from: anAssignmentNode.
+	"In the case of an augmented assignment, we produce a read access on top of the write access"
+	(aBoolean and: [ anAssignmentNode type = #augmented_assignment ]) ifTrue: [ variable createAccessOrReferenceFrom: self currentEntity node: anAssignmentNode ].
+
+	^ access
 ]
 
 { #category : 'private' }
@@ -298,41 +304,26 @@ FamixPythonVisitor >> manageAccessOrReferencesFrom: anIdentifierNode [
 ]
 
 { #category : 'private' }
-FamixPythonVisitor >> manageAssignationTo: aNode [
+FamixPythonVisitor >> manageAttributeWriteAccessTo: aNode [
 
-	| variable |
-	aNode type = #attribute
+	| variable pair |
+	pair := self attributeAsAssociation: aNode.
+	self flag: #todo. "Might not be self..."
+	pair key = 'self'
 		ifTrue: [
-				| pair |
-				pair := self attributeAsAssociation: aNode.
-				self flag: #todo. "Might not be self..."
-				pair key = 'self'
-					ifTrue: [
-							| class |
-							class := self currentEntityOfType: FamixPythonClass.
-							variable := (class childOfType: FamixTAttribute named: pair value) ifNil: [
-									            variable := (class createLocalVariable: pair value)
-										                        isClassSide: false;
-										                        yourself.
-									            self setSourceAnchor: variable from: aNode.
-									            variable ] ]
-					ifFalse: [
-							self flag: #todo.
-							^ self ] ]
+				| class |
+				class := self currentEntityOfType: FamixPythonClass.
+				variable := (class childOfType: FamixTAttribute named: pair value) ifNil: [
+						            variable := (class createLocalVariable: pair value)
+							                        isClassSide: false;
+							                        yourself.
+						            self setSourceAnchor: variable from: aNode.
+						            variable ] ]
 		ifFalse: [
-				| name |
-				"If it is not an attribute, it can only be an identifier and since we already manage the dependency of this side, we skip the visit."
-				name := aNode sourceText.
-				"If we have a variable of this name already, we should not recreate it. Except if this variable got shadowed! In that case, we should recreate it."
-				(self currentEntity query descendants ofType: FamixTStructuralEntity)
-					detect: [ :child | child name = name and: [ child isShadowable not or: [ child isShadowed not ] ] ]
-					ifFound: [ :var | variable := var ]
-					ifNone: [
-							self checkShadowingOfName: name during: [ variable := self currentEntity createLocalVariable: name ].
-							self setSourceAnchor: variable from: aNode ] ].
+				self flag: #todo.
+				^ self ].
 	(self createAccessTo: variable isWrite: true from: aNode assignationNode) accessor: self currentEntity.
-	"In the case of an augmented assignment, we produce a read access on top of the write access"
-	aNode assignationNode type = #augmented_assignment ifTrue: [ variable createAccessOrReferenceFrom: self currentEntity node: aNode assignationNode ].
+	
 	^ variable
 ]
 
@@ -497,6 +488,26 @@ FamixPythonVisitor >> manageMethodDeclarationFrom: aMethodNode [
 	^ self setSourceAnchor: method from: aMethodNode
 ]
 
+{ #category : 'private' }
+FamixPythonVisitor >> manageWriteAccessTo: aNode [
+	"I'm managing the write access to an identifier. I have an alternative for access to an attibute such as `instance.var = 3`. See #manageAttributeWriteAccessTo: for this."
+
+	| variable name |
+	name := aNode sourceText.
+
+	"If we have a variable of this name already, we should not recreate it. Except if this variable got shadowed! In that case, we should recreate it."
+	(self currentEntity query descendants ofType: FamixTStructuralEntity)
+		detect: [ :child | child name = name and: [ child isShadowable not or: [ child isShadowed not ] ] ]
+		ifFound: [ :var | variable := var ]
+		ifNone: [
+				self checkShadowingOfName: name during: [ variable := self currentEntity createLocalVariable: name ].
+				self setSourceAnchor: variable from: aNode ].
+
+	(self createAccessTo: variable isWrite: true from: aNode assignationNode) accessor: self currentEntity.
+
+	^ variable
+]
+
 { #category : 'accessing' }
 FamixPythonVisitor >> methodNamed: aString inClassNamed: aClassName [
 
@@ -615,17 +626,9 @@ FamixPythonVisitor >> visitArgumentList: anArgumentListNode [
 
 { #category : 'visiting' }
 FamixPythonVisitor >> visitAssignment: anAssignmentNode [
-	"I represent an assignation expression that is different from an assignation statement we can find in lambdas"
 
-	anAssignmentNode _left type = #subscript ifTrue: [ ^ self visitChildren: anAssignmentNode ].
-
-	self flag: #todo. "Maybe we should not do this here but in the children nodes?"
-	anAssignmentNode _left type = #pattern_list
-		ifTrue: [ (self visit: anAssignmentNode _left) collect: [ :node | self manageAssignationTo: node ] ]
-		ifFalse: [ self manageAssignationTo: anAssignmentNode _left ].
-
-	"We visitied the left side above, now we need to visit the right side."
-	self visit: anAssignmentNode _right
+	self flag: #todo. "Comment"
+	^ self visitChildren: anAssignmentNode
 ]
 
 { #category : 'visiting' }
@@ -637,6 +640,8 @@ FamixPythonVisitor >> visitAttribute: anAttributeNode [
 	| source name |
 	
 	anAttributeNode parent parent type = #class_definition ifTrue: [ ^ self manageImportedInheritanceDeclaredBy: anAttributeNode ].
+	
+	anAttributeNode isLeftSideOfAssignation ifTrue: [ ^ self manageAttributeWriteAccessTo: anAttributeNode ].
 	
 	source := anAttributeNode _object sourceText copyWithout: Character space.
 	name := self visit: anAttributeNode _attribute.
@@ -895,8 +900,8 @@ FamixPythonVisitor >> visitIdentifier: anIdentifierNode [
 	"In a class definition signature, this represent the declaration of a superclass."
 	anIdentifierNode parent parent type = #class_definition ifTrue: [ ^ self manageInheritanceDeclaredBy: anIdentifierNode ].
 
-	"Accesses to the left side of an assignation is managed directly in the assignation visit."
-	anIdentifierNode isLeftSideOfAssignation ifTrue: [ ^ anIdentifierNode sourceText ].
+	"Manages write access separated to read access"
+	anIdentifierNode isLeftSideOfAssignation ifTrue: [ ^ self manageWriteAccessTo: anIdentifierNode ].
 
 	self manageAccessOrReferencesFrom: anIdentifierNode.
 
@@ -1029,6 +1034,15 @@ FamixPythonVisitor >> visitListComprehension: aNode [
 	
 ]
 
+{ #category : 'visiting - noop' }
+FamixPythonVisitor >> visitListPattern: aNode [
+	"
+	TODO: Comment
+	"
+	self flag: #todo. "Comment"
+	^ self visitChildren: aNode
+]
+
 { #category : 'visiting' }
 FamixPythonVisitor >> visitModule: aModuleNode [
 
@@ -1125,10 +1139,13 @@ FamixPythonVisitor >> visitPassStatement: aNode [
 	
 ]
 
-{ #category : 'visiting' }
-FamixPythonVisitor >> visitPatternList: aPatternListNode [
-
-	^ aPatternListNode collectNamedChild
+{ #category : 'visiting - noop' }
+FamixPythonVisitor >> visitPatternList: aNode [
+	"
+	TODO: Comment
+	"
+	self flag: #todo. "Comment"
+	^ self visitChildren: aNode
 ]
 
 { #category : 'visiting' }
@@ -1158,11 +1175,30 @@ FamixPythonVisitor >> visitString: aStringNode [
 	^ self
 ]
 
+{ #category : 'visiting' }
+FamixPythonVisitor >> visitSubscript: aNode [
+
+	self flag: #todo. "comment"
+
+	aNode isLeftSideOfAssignation ifTrue: [ self flag: #todo ].
+
+	^ self visitChildren: aNode
+]
+
 { #category : 'visiting - noop' }
 FamixPythonVisitor >> visitTrue: aNode [
 	"noop"
 
 	
+]
+
+{ #category : 'visiting - noop' }
+FamixPythonVisitor >> visitTuplePattern: aNode [
+	"
+	TODO: Comment
+	"
+	self flag: #todo. "Comment"
+	^ self visitChildren: aNode
 ]
 
 { #category : 'visiting - noop' }

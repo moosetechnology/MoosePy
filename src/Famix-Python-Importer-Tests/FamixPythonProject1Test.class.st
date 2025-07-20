@@ -107,6 +107,120 @@ FamixPythonProject1Test >> testAccessesOfrnstate [
 	self assert: global incomingAccesses third sourceText equals: 'rnstate'
 ]
 
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAssignationWithIdentifierOnLeftSide [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableIdentifier'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAssignationWithVariableAttributeOnLeftSide [
+
+	| attribute class access |
+	attribute := self attributeNamed: 'variableAttribute'.
+	class := self classNamed: 'ClassWithVariableAttribute'.
+
+	access := attribute incomingAccesses detect: [ :anAccess | anAccess accessor = class ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: class.
+	self assert: access accessor equals: class.
+	self assert: access target equals: attribute.
+	self assert: access variable equals: attribute.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (class accesses anySatisfy: [ :anAccess | anAccess variable = attribute ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAssignationWithVariableListPatternOnLeftSide [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableListPattern1'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAssignationWithVariablePatternListIdentifierOnLeftSide [
+
+	| global module access |
+	global := self globalVariableNamed: 'variablePatternListIdentifier1'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAssignationWithVariableSubscriptOnLeftSide [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableSubscript'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAssignationWithVariableTuplePatternOnLeftSide [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableTuplePattern1'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
 { #category : 'tests' }
 FamixPythonProject1Test >> testAssociationsSourcesAreNeverStub [
 
@@ -308,6 +422,23 @@ FamixPythonProject1Test >> testClassInPackage [
 	self assert: class name equals: 'ClassInSubpackage'.
 	self deny: class isStub.
 	self assert: class typeContainer equals: (self packageNamed: 'subpackage1')
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testClassReferenceFromAClassDefinitionBody [
+
+	| class class2 reference |
+	class := self classNamed: 'ClassToReferenceInClassDeclarationBody'.
+	class2 := self classNamed: 'ClassWithReferenceInBody'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = class2 ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: class2.
+	self assert: reference referencer equals: class2.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (class2 outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
 ]
 
 { #category : 'tests - references' }
