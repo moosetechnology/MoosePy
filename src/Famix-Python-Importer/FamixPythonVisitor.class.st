@@ -1091,25 +1091,19 @@ FamixPythonVisitor >> visitModule: aModuleNode [
 		  ifFalse: [ self popScope ]
 ]
 
-{ #category : 'visiting' }
+{ #category : 'visiting - visitChildren' }
 FamixPythonVisitor >> visitNamedExpression: aNamedExpressionNode [
+	"Children: 
+		- name: identifier
+		- value: string / call / binary_operator / identifier / subscript
+		
+	Parents: 
+		- Visiting me: while_statement / if_statement / interpolation / argument_list
+		- Todo: parenthesized_expression / tuple
+		
+	The write accesses will be managed in my children"
 
-	| name variable |
-	name := self visit: aNamedExpressionNode _name.
-
-	"If we have a variable of this name already, we should not recreate it. Except if this variable got shadowed! In that case, we should recreate it."
-	(self currentEntity query descendants ofType: FamixPythonLocalVariable)
-		detect: [ :child | child name = name and: [ child isShadowable not or: [ child isShadowed not ] ] ]
-		ifFound: [ :var | variable := var ]
-		ifNone: [
-				self flag: #todo. "Add test on shadowing at this level. This is not yet covered by test. If you comment the next line the parser is still passing all tests."
-				self checkShadowingOfName: name during: [ variable := self currentEntity createLocalVariable: name ].
-				self setSourceAnchor: variable from: aNamedExpressionNode _name ].
-
-	(self createAccessTo: variable isWrite: true from: aNamedExpressionNode) accessor: self currentEntity.
-
-	self visitChildren: aNamedExpressionNode.
-	^ variable
+	^ self visitChildren: aNamedExpressionNode
 ]
 
 { #category : 'visiting - noop' }
@@ -1184,9 +1178,54 @@ FamixPythonVisitor >> visitReturnStatement: aNode [
 	^ self visitChildren: aNode
 ]
 
-{ #category : 'visiting - noop' }
+{ #category : 'visiting - visitChildren' }
 FamixPythonVisitor >> visitString: aStringNode [
-	"noop - we don't need the children and comments are managed in a separated visitor."
+	"
+	Children:
+		- unnamed: string_end / string_content / string_start / interpolation
+		
+	Parents:
+		- Visiting me: for_statement / named_expression / argument_list / augmented_assignment / expression_statement / assignment / subscript
+		- Not yet managed: pair / set_comprehension / binary_operator / concatenated_string / for_in_clause / type / list / typed_default_parameter / slice / boolean_operator / expression_list / set / generator_expression / conditional_expression / keyword_argument / attribute / assert_statement / yield / default_parameter / parenthesized_expression / interpolation / comparison_operator / lambda / tuple / return_statement / list_comprehension"
+
+	^ self visitChildren: aStringNode
+]
+
+{ #category : 'visiting - visitChildren' }
+FamixPythonVisitor >> visitStringContent: aNode [
+	" noop
+	
+	Children:
+		- <unnamedChild>: escape_interpolation / escape_sequence
+	
+	Parents:
+		- Visiting me: string"
+
+	^ self visitChildren: aNode
+]
+
+{ #category : 'visiting - noop' }
+FamixPythonVisitor >> visitStringEnd: aNode [
+	" noop
+	
+	Children: none
+	
+	Parents:
+		- Visiting me: string"
+
+	
+]
+
+{ #category : 'visiting - noop' }
+FamixPythonVisitor >> visitStringStart: aNode [
+	" noop
+	
+	Children: none
+	
+	Parents:
+		- Visiting me: string"
+
+	
 ]
 
 { #category : 'visiting' }

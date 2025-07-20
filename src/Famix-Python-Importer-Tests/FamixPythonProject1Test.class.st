@@ -4243,6 +4243,120 @@ In package
 	self assert: comment commentedEntity equals: (self packageNamed: 'NameOfSubpackageOrClass')
 ]
 
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testNamedExpressionInArgumentList [
+
+	| global module access |
+	global := self globalVariableNamed: 'namedExpressionVariableInArgumentList'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testNamedExpressionInIfCondition [
+
+	| global module access |
+	global := self globalVariableNamed: 'namedExpressionVariableInIfCondition'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testNamedExpressionInInterpolation [
+
+	| global module access |
+	global := self globalVariableNamed: 'namedExpressionVariableInInterpolation'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testNamedExpressionInParenthsizedExpression [
+
+	| global module access |
+	global := self globalVariableNamed: 'namedExpressionVariableInParenthesizedExpression'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testNamedExpressionInTuple [
+
+	| global module access |
+	global := self globalVariableNamed: 'namedExpressionVariableInTuple'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testNamedExpressionInWhileCondition [
+
+	| global module access |
+	global := self globalVariableNamed: 'namedExpressionVariableInWhileCondition'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
 { #category : 'tests' }
 FamixPythonProject1Test >> testNoNilSourceOrTargetForAssociations [
 
