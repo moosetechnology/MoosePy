@@ -47,4 +47,4 @@ def function_to_be_called_with_named_expression(length):
 function_to_be_called_with_named_expression((namedExpressionVariableInArgumentList := len("hello")))
 
 # Named expression inside a tuple
-tupleWithNamedExpression = ((namedExpressionVariableInTuple := 1), (y := 2), namedExpressionVariableInTuple + y)
+tupleWithNamedExpression = (namedExpressionVariableInTuple := 1, y := 2)
