@@ -642,11 +642,20 @@ FamixPythonVisitor >> visitAssignment: anAssignmentNode [
 
 { #category : 'visiting' }
 FamixPythonVisitor >> visitAttribute: anAttributeNode [
-	"An attribute can signify two things:
-		- It's the receiver of a method or function call so we use it to produce an invocation or instantiation
-		- Else it is probably a reference or access to something imported with a simple import."
+	"
+	Children:
+		- object: list / subscript / list_splat / string / tuple / attribute / parenthesized_expression / identifier / concatenated_string / list_comprehension / set / dictionary_comprehension / set_comprehension / dictionary / call
+		- attribute: identifier
+		- <unnamedChild>: comment / line_continuation
+	
+	Parents:
+		Not yet managed:  while_statement / list / set / assert_statement / list_comprehension / list_pattern / yield / raise_statement / tuple / call / list_splat / type / boolean_operator / conditional_expression / as_pattern / binary_operator / assignment / for_statement / expression_list / typed_default_parameter / not_operator / delete_statement / for_in_clause / pattern_list / argument_list / expression_statement / elif_clause / interpolation / default_parameter / comparison_operator / return_statement / pair / if_statement / except_clause / set_comprehension / if_clause / slice / as_pattern_target / keyword_argument / parenthesized_expression / with_item / generator_expression / subscript / augmented_assignment / unary_operator / decorator / dictionary_splat / lambda / tuple_pattern / attribute
+	"
 
 	| source fullReceiver name variable |
+	
+	self flag: #todo. "This method is really ugly and full of holes..."
+	
 	anAttributeNode parent parent type = #class_definition ifTrue: [ ^ self manageImportedInheritanceDeclaredBy: anAttributeNode ].
 
 	anAttributeNode isLeftSideOfAssignation ifTrue: [ ^ self manageAttributeWriteAccessTo: anAttributeNode ].
@@ -1065,6 +1074,21 @@ FamixPythonVisitor >> visitInteger: aNode [
 	"noop"
 
 	
+]
+
+{ #category : 'visiting - visitChildren' }
+FamixPythonVisitor >> visitInterpolation: aNode [
+	"
+	Children:
+		- expression: list / subscript / none / conditional_expression / string / attribute / binary_operator / unary_operator / parenthesized_expression / identifier / tuple / list_comprehension / false / boolean_operator / named_expression / integer / float / call
+		- type_conversion: type_conversion
+		- format_specifier: format_specifier
+		
+	Parents:
+		- Visiting me: string
+	"
+
+	^ self visitChildren: aNode
 ]
 
 { #category : 'visiting' }

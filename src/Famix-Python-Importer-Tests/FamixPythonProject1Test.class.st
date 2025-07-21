@@ -1627,6 +1627,23 @@ FamixPythonProject1Test >> testFunctionInvocationHasSignature [
 ]
 
 { #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationInStringInterpolation [
+
+	| module function invocation |
+	function := self functionNamed: 'function_to_invoke_in_interpolation'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation invokedEntity equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
+]
+
+{ #category : 'tests - invocations' }
 FamixPythonProject1Test >> testFunctionInvocationOfImportedEntity [
 
 	| class function invocation |
