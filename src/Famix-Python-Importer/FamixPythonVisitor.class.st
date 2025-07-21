@@ -268,7 +268,7 @@ FamixPythonVisitor >> isAccessOrReferenceNode: anIdentifierNode [
 	"I should return true if an Identifier node represent an access or a reference."
 
 	^ #( elif_clause list argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator expression_statement
-	     augmented_assignment ) includes: anIdentifierNode parent type
+	     augmented_assignment unary_operator boolean_operator) includes: anIdentifierNode parent type
 ]
 
 { #category : 'testing' }
@@ -705,6 +705,22 @@ FamixPythonVisitor >> visitAugmentedAssignment: aNode [
 ]
 
 { #category : 'visiting - visitChildren' }
+FamixPythonVisitor >> visitBinaryOperator: aNode [
+	"
+	Children:
+		- left: identifier / set_comprehension / binary_operator / concatenated_string / unary_operator / call / list / float / none / set / dictionary_comprehension / false / string / true / attribute / parenthesized_expression / integer / tuple / list_comprehension / subscript
+		- right: identifier / set_comprehension / binary_operator / concatenated_string / unary_operator / dictionary / call / list / float / none / set / false / string / true / attribute / parenthesized_expression / integer / tuple / list_comprehension / subscript
+		- <unnamedChild>: comment / line_continuation
+		
+	Parents:
+		- Visiting me: assignment / binary_operator / if_statement / argument_list / expression_statement / elif_clause / comparison_operator / return_statement / if_clause / augmented_assignment / named_expression / unary_operator / boolean_operator
+		- Not yet managed: list / set / assert_statement / list_comprehension / type / yield / raise_statement / tuple / list_splat / conditional_expression / for_statement / expression_list / for_in_clause / typed_default_parameter / not_operator / interpolation / pair / default_parameter / set_comprehension / slice / keyword_argument / parenthesized_expression / generator_expression / subscript / lambda
+	"
+
+	^ self visitChildren: aNode
+]
+
+{ #category : 'visiting - visitChildren' }
 FamixPythonVisitor >> visitBlock: aNode [
 	"
 	Children:
@@ -714,6 +730,22 @@ FamixPythonVisitor >> visitBlock: aNode [
 		- Visiting me: function_definition / class_definition / while_statement / elif_clause / if_statement / esle_clause
 		- Skipping me: none
 		- Non yet managed: except_clause / with_statement / finaly_clause / for_statement / try_statement
+	"
+
+	^ self visitChildren: aNode
+]
+
+{ #category : 'visiting - visitChildren' }
+FamixPythonVisitor >> visitBooleanOperator: aNode [
+	"
+	Children:
+		- left: identifier / set_comprehension / binary_operator / concatenated_string / unary_operator / call / list / float / none / set / dictionary_comprehension / false / string / true / attribute / parenthesized_expression / integer / tuple / list_comprehension / subscript
+		- right: identifier / set_comprehension / binary_operator / concatenated_string / unary_operator / dictionary / call / list / float / none / set / false / string / true / attribute / parenthesized_expression / integer / tuple / list_comprehension / subscript
+		- <unnamedChild>: comment / line_continuation
+		
+	Parents:
+		- Visiting me: boolean_operator / assignment / binary_operator / if_statement / not_operator / argument_list / expression_statement / elif_clause / comparison_operator / return_statement / if_clause / augmented_assignment / named_expression / unary_operator
+		- Not yet managed: list / set / assert_statement / list_comprehension / type / yield / raise_statement / tuple / list_splat / conditional_expression / for_statement / expression_list / for_in_clause / typed_default_parameter / interpolation / pair / default_parameter / set_comprehension / slice / keyword_argument / parenthesized_expression / generator_expression / subscript / lambda
 	"
 
 	^ self visitChildren: aNode
@@ -777,6 +809,20 @@ FamixPythonVisitor >> visitComment: aCommentNode [
 	"noop - Managed by the comment importer"
 
 	
+]
+
+{ #category : 'visiting - visitChildren' }
+FamixPythonVisitor >> visitComparisonOperator: aNode [
+	"
+	Children:
+		- <unnamedChild>: identifier / set_comprehension / binary_operator / comment / unary_operator / concatenated_string / dictionary / call / list / float / none / set / false / generator_expression / ellipsis / string / true / attribute / parenthesized_expression / integer / tuple / line_continuation / list_comprehension / subscript
+		
+	Parents:
+		- Visiting me: if_statement / elif_clause / if_clause / augmented_assignment / argument_list / not_operator / expression_statement / while_statement / return_statement / assignment / boolean_operator
+		- Not yet managed: pair / list / expression_list / generator_expression / conditional_expression / keyword_argument / assert_statement / parenthesized_expression / lambda / tuple / list_comprehension / subscript
+	"
+
+	^ self visitChildren: aNode
 ]
 
 { #category : 'visiting - noop' }
@@ -1174,6 +1220,13 @@ FamixPythonVisitor >> visitRelativeImport: aRelativeImportNode [
 
 { #category : 'visiting - visitChildren' }
 FamixPythonVisitor >> visitReturnStatement: aNode [
+	"
+	Children:
+		- <unnamedChild>: identifier / set_comprehension / binary_operator / unary_operator / await / dictionary / call / list / not_operator / boolean_operator / expression_list / float / none / dictionary_comprehension / set / false / conditional_expression / generator_expression / string / true / attribute / parenthesized_expression / integer / comparison_operator / lambda / tuple / list_comprehension / subscript
+		
+	Parents:
+		- Visiting me: block
+		"
 
 	^ self visitChildren: aNode
 ]
@@ -1185,8 +1238,8 @@ FamixPythonVisitor >> visitString: aStringNode [
 		- unnamed: string_end / string_content / string_start / interpolation
 		
 	Parents:
-		- Visiting me: for_statement / named_expression / argument_list / augmented_assignment / expression_statement / assignment / subscript
-		- Not yet managed: pair / set_comprehension / binary_operator / concatenated_string / for_in_clause / type / list / typed_default_parameter / slice / boolean_operator / expression_list / set / generator_expression / conditional_expression / keyword_argument / attribute / assert_statement / yield / default_parameter / parenthesized_expression / interpolation / comparison_operator / lambda / tuple / return_statement / list_comprehension"
+		- Visiting me: for_statement / named_expression / argument_list / augmented_assignment / expression_statement / assignment / subscript / return_statement / binary_operator / boolean_operator
+		- Not yet managed: pair / set_comprehension / concatenated_string / for_in_clause / type / list / typed_default_parameter / slice / expression_list / set / generator_expression / conditional_expression / keyword_argument / attribute / assert_statement / yield / default_parameter / parenthesized_expression / interpolation / comparison_operator / lambda / tuple / list_comprehension"
 
 	^ self visitChildren: aStringNode
 ]
@@ -1251,6 +1304,20 @@ FamixPythonVisitor >> visitTuplePattern: aNode [
 	TODO: Comment
 	"
 	self flag: #todo. "Comment"
+	^ self visitChildren: aNode
+]
+
+{ #category : 'visiting - visitChildren' }
+FamixPythonVisitor >> visitUnaryOperator: aNode [
+	"
+	Children:
+		- argument: subscript / attribute / binary_operator / parenthesized_expression / identifier / false / true / float / integer / call
+		
+	Parents:
+		- Visiting me: binary_operator / argument_list / augmented_assignment / expression_statement / comparison_operator / return_statement / assignment / boolean_operator
+		- Not yet managed: pair / type / list / typed_default_parameter / slice / expression_list / set / conditional_expression / keyword_argument / list_splat / default_parameter / parenthesized_expression / interpolation / lambda / tuple / list_comprehension / subscript
+	"
+
 	^ self visitChildren: aNode
 ]
 

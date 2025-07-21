@@ -5055,6 +5055,82 @@ FamixPythonProject1Test >> testReadAccessInANot [
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInBinaryOperator [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableToAccessInBinaryOperator'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInBooleanOperator [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableInBooleanOperator'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInComparisonOperator [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableToAccessInComparisonOperator'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInUnaryOperator [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableInUnaryOperator'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testReadAccessSourceAnchor [
 
 	| global module access |
