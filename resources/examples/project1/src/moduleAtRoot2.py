@@ -90,14 +90,14 @@ class Person:
         if not moduleAtRoot3.moduleAtRootVariable3:
             print(self.get_name() + moduleAtRoot4.moduleAtRootSpaceString + str(self.age))
 
-    def get_name(self):
-        # Comment in method
-        return self.name
-
     # Comment before method
     def set_name(self, name):
         # Comment before ivar
         self.name = name
+
+    def get_name(self):
+        # Comment in method
+        return self.name
 
 
 p1 = Person("John", 36)
