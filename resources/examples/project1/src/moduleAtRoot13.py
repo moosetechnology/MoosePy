@@ -54,3 +54,10 @@ var = variableToAccessInBinaryOperator + 3
 
 variableToAccessInComparisonOperator = 4
 print(variableToAccessInComparisonOperator == 5)
+
+variableInUnaryOperator = 5
+var = ~variableInUnaryOperator
+
+variableInBooleanOperator = True
+var = variableInBooleanOperator and False
+
