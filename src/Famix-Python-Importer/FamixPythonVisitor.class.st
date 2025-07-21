@@ -646,12 +646,11 @@ FamixPythonVisitor >> visitAttribute: anAttributeNode [
 		- It's the receiver of a method or function call so we use it to produce an invocation or instantiation
 		- Else it is probably a reference or access to something imported with a simple import."
 
-	| source name |
-	
+	| source fullReceiver name variable |
 	anAttributeNode parent parent type = #class_definition ifTrue: [ ^ self manageImportedInheritanceDeclaredBy: anAttributeNode ].
-	
+
 	anAttributeNode isLeftSideOfAssignation ifTrue: [ ^ self manageAttributeWriteAccessTo: anAttributeNode ].
-	
+
 	source := anAttributeNode _object sourceText copyWithout: Character space.
 	name := self visit: anAttributeNode _attribute.
 
@@ -668,25 +667,41 @@ FamixPythonVisitor >> visitAttribute: anAttributeNode [
 	print(moduleAtRoot.moduleVariable)
 	"
 	self flag: #todo. "Add test with reference and spaces in the namespace."
-	source := anAttributeNode sourceText.
-	self findImportMatchingSource: source ifFound: [ :import |
-			self
-				resolve: ((FamixPythonImportedEntityResolvable identifier: name import: import)
-						 expectedKinds: {
-								 FamixPythonClass.
-								 FamixPythonFunction.
-								 FamixPythonLocalVariable.
-								 FamixPythonGlobalVariable.
-								 FamixPythonAttribute.
-								 FamixPythonParameter };
-						 notFoundReplacementEntity: [ :unresolved :currentEntity | "This unknown entity can be a variable or a class."
-							 self ensureStubUnknownEntityNamed: unresolved identifier ];
-						 yourself)
-				foundAction: [ :entity :currentEntity | entity createAccessOrReferenceFrom: currentEntity node: anAttributeNode ].
-			^ source ].
+	fullReceiver := anAttributeNode sourceText.
+	self findImportMatchingSource: fullReceiver ifFound: [ :import |
+			^ self
+				  resolve: ((FamixPythonImportedEntityResolvable identifier: name import: import)
+						   expectedKinds: {
+								   FamixPythonClass.
+								   FamixPythonFunction.
+								   FamixPythonLocalVariable.
+								   FamixPythonGlobalVariable.
+								   FamixPythonAttribute.
+								   FamixPythonParameter };
+						   notFoundReplacementEntity: [ :unresolved :currentEntity | "This unknown entity can be a variable or a class."
+							   self ensureStubUnknownEntityNamed: unresolved identifier ];
+						   yourself)
+				  foundAction: [ :entity :currentEntity | entity createAccessOrReferenceFrom: currentEntity node: anAttributeNode ] ].
 
-	self flag: #todo. "We are missing instance variable accesses here"
-	"1halt"
+	self flag: #todo. "Can be something else than self."
+	"This means with have an internal access to an ivar."
+	source = 'self'
+		ifTrue: [
+				| class |
+				class := self currentEntityOfType: FamixPythonClass.
+				variable := (class childOfType: FamixTAttribute named: name) ifNil: [
+						            variable := (class createLocalVariable: name)
+							                        isClassSide: false;
+							                        yourself.
+						            self setSourceAnchor: variable from: anAttributeNode.
+						            variable ] ]
+		ifFalse: [
+				self flag: #todo "We are missing instance variable accesses here"
+				"1halt" ].
+	self flag: #todo. "remove guard once the previous if will be finished."
+	variable ifNotNil: [ (self createAccessTo: variable isWrite: false from: anAttributeNode) accessor: self currentEntity ].
+
+
 	^ source
 ]
 
