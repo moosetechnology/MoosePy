@@ -61,3 +61,9 @@ var = ~variableInUnaryOperator
 variableInBooleanOperator = True
 var = variableInBooleanOperator and False
 
+
+def function_to_invoke_in_interpolation():
+    return "Cyril"
+
+
+print(f"Hello ({function_to_invoke_in_interpolation()})")
