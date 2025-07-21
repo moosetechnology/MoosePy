@@ -48,3 +48,9 @@ function_to_be_called_with_named_expression((namedExpressionVariableInArgumentLi
 
 # Named expression inside a tuple
 tupleWithNamedExpression = (namedExpressionVariableInTuple := 1, y := 2)
+
+variableToAccessInBinaryOperator = 2
+var = variableToAccessInBinaryOperator + 3
+
+variableToAccessInComparisonOperator = 4
+print(variableToAccessInComparisonOperator == 5)
