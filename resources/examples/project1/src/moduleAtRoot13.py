@@ -78,3 +78,25 @@ variableToAccessInLisSplat = [1, 2, 3]
 
 print(*variableToAccessInLisSplat)
 
+
+def sum3(a, b):
+    return a + b
+
+
+variableToAccessInDictionarySplat = {'a': 1, 'b': 2}
+sum3(**variableToAccessInDictionarySplat)  # = sum3(a=1, b=2) = 3, as c is using the default value (0)
+
+variableToAccessInDefaultParameter = 4
+
+
+def function_with_variable_accessed_in_default_parameter(
+        argument_with_default_access=variableToAccessInDefaultParameter):
+    return argument_with_default_access + 4
+
+
+variableToAccessInTypedDefaultParameter = 1
+
+
+def function_with_variable_accessed_in_typed_default_parameter(
+        arg: int = variableToAccessInTypedDefaultParameter) -> int:
+    return arg
