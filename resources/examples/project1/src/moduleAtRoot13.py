@@ -100,3 +100,8 @@ variableToAccessInTypedDefaultParameter = 1
 def function_with_variable_accessed_in_typed_default_parameter(
         arg: int = variableToAccessInTypedDefaultParameter) -> int:
     return arg
+
+
+variableToAccessInLambdaDefaultParameter = 2
+
+lambda lambda_access_parameter=variableToAccessInLambdaDefaultParameter: lambda_access_parameter

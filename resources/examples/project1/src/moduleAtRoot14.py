@@ -60,3 +60,16 @@ function_with_typed_default_parameter()
 
 def function_with_combo_parameters(a, b, /, c, *, d, **kwargs):
     return a, b, c, d, kwargs
+
+
+lambda lambda_parameter_identifier: lambda_parameter_identifier
+
+lambda lambda_default_parameter=1: lambda_default_parameter
+
+lambda *lambda_parameter_list_splat: lambda_parameter_list_splat[1]
+
+lambda **lambda_parameter_dictionary_splat: lambda_parameter_dictionary_splat["name"]
+
+lambda arg1, *, arg2: arg1 + arg2
+
+lambda arg1, /, arg2: arg1 + arg2
