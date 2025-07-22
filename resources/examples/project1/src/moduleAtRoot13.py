@@ -67,3 +67,14 @@ def function_to_invoke_in_interpolation():
 
 
 print(f"Hello ({function_to_invoke_in_interpolation()})")
+
+variableToAccessInPair = 3
+
+{
+    'Paire': variableToAccessInPair
+}
+
+variableToAccessInLisSplat = [1, 2, 3]
+
+print(*variableToAccessInLisSplat)
+
