@@ -15,3 +15,9 @@ FamixTSNodeWrapper >> isLeftSideOfAssignation [
 		node type = #named_expression ifTrue: [ ^ node _name = self ] ].
 ^ false
 ]
+
+{ #category : '*Famix-Python-Importer' }
+FamixTSNodeWrapper >> isParameterDeclaration [
+
+	^ self parent isNotNil and: [ self parent type = #parameters ]
+]

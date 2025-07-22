@@ -1299,6 +1299,66 @@ FamixPythonProject1Test >> testFromImportWithStubPackagesOfTheSameName [
 	self assert: import sourceText equals: 'from scipy.stats.stats import pearsonr'
 ]
 
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testFunctionDefaultParameter [
+
+	| function parameter |
+	function := self functionNamed: 'function_with_default_parameter'.
+	parameter := self parameterNamed: 'default_parameter'.
+
+	self assert: function parameters size equals: 1.
+	self assert: function keywordSeparatorPosition equals: nil.
+	self assert: function positionalSeparatorPosition equals: nil.
+	self assertCollection: function parameters hasSameElements: { parameter }.
+	self assert: parameter name equals: 'default_parameter'.
+	self deny: parameter isStub.
+	self assert: parameter class equals: FamixPythonParameter.
+	self assert: parameter parentBehaviouralEntity equals: function.
+	self assert: parameter hasDefaultValue.
+	self deny: parameter isListSplat.
+	self assert: parameter isDictionarySplatPattern
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testFunctionDictionarySplatParameter [
+
+	| function parameter |
+	function := self functionNamed: 'function_with_dictionary_splat'.
+	parameter := self parameterNamed: 'dictionary_splat_pattern_parameter'.
+
+	self assert: function parameters size equals: 1.
+	self assert: function keywordSeparatorPosition equals: nil.
+	self assert: function positionalSeparatorPosition equals: nil.
+	self assertCollection: function parameters hasSameElements: { parameter }.
+	self assert: parameter name equals: 'dictionary_splat_pattern_parameter'.
+	self deny: parameter isStub.
+	self assert: parameter class equals: FamixPythonParameter.
+	self assert: parameter parentBehaviouralEntity equals: function.
+	self deny: parameter hasDefaultValue.
+	self deny: parameter isListSplat.
+	self assert: parameter isDictionarySplatPattern
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testFunctionIdentifierParameter [
+
+	| function parameter |
+	function := self functionNamed: 'function_with_identifier_parameters'.
+	parameter := self parameterNamed: 'identifier_parameter1'.
+
+	self assert: function parameters size equals: 2.
+	self assert: function keywordSeparatorPosition equals: nil.
+	self assert: function positionalSeparatorPosition equals: nil.
+	self assertCollection: function parameters hasSameElements: { parameter }.
+	self assert: parameter name equals: 'identifier_parameter1'.
+	self deny: parameter isStub.
+	self assert: parameter class equals: FamixPythonParameter.
+	self assert: parameter parentBehaviouralEntity equals: function.
+	self deny: parameter hasDefaultValue.
+	self deny: parameter isListSplat.
+	self assert: parameter isDictionarySplatPattern
+]
+
 { #category : 'tests - from-import' }
 FamixPythonProject1Test >> testFunctionImportsClassFromAModule [
 
@@ -1806,6 +1866,36 @@ FamixPythonProject1Test >> testFunctionInvocationWithNamespaceOfMultipleLevelSou
 ]
 
 { #category : 'tests - parameters' }
+FamixPythonProject1Test >> testFunctionKeywordSeparatorParameter [
+
+	| function |
+	function := self functionNamed: 'function_with_keyword_separator'.
+
+	self assert: function keywordSeparatorPosition equals: 2.
+	self assert: function positionalSeparatorPosition equals: nil
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testFunctionListSplatParameter [
+
+	| function parameter |
+	function := self functionNamed: 'function_with_list_splat'.
+	parameter := self parameterNamed: 'list_splat_parameter'.
+
+	self assert: function parameters size equals: 1.
+	self assert: function keywordSeparatorPosition equals: nil.
+	self assert: function positionalSeparatorPosition equals: nil.
+	self assertCollection: function parameters hasSameElements: { parameter }.
+	self assert: parameter name equals: 'list_splat_parameter'.
+	self deny: parameter isStub.
+	self assert: parameter class equals: FamixPythonParameter.
+	self assert: parameter parentBehaviouralEntity equals: function.
+	self deny: parameter hasDefaultValue.
+	self assert: parameter isListSplat.
+	self assert: parameter isDictionarySplatPattern
+]
+
+{ #category : 'tests - parameters' }
 FamixPythonProject1Test >> testFunctionParameters [
 
 	| function param1 param2 |
@@ -1835,6 +1925,16 @@ FamixPythonProject1Test >> testFunctionParametersSourceAnchor [
 
 	self assert: param sourceAnchor isNotNil.
 	self assert: param sourceText equals: 'list1'
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testFunctionPositionalSeparatorParameter [
+
+	| function |
+	function := self functionNamed: 'function_with_positional_separator'.
+
+	self assert: function keywordSeparatorPosition equals: nil.
+	self assert: function positionalSeparatorPosition equals: 2
 ]
 
 { #category : 'tests - references' }
@@ -2142,6 +2242,33 @@ FamixPythonProject1Test >> testFunctionSourceAnchor [
     zipped_pairs = zip(list2, list1)
     z = [x for _, x in sorted(zipped_pairs)]
     return z' withPlatformLineEndings
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testFunctionTypedDefaultParameter [
+
+	| function parameter |
+	function := self functionNamed: 'function_with_typed_default_parameter'.
+	parameter := self parameterNamed: 'default_typed_parameter'.
+
+	self assert: function parameters size equals: 1.
+	self assertCollection: function parameters hasSameElements: { parameter }.
+	self assert: parameter name equals: 'default_typed_parameter'.
+	self deny: parameter isStub.
+	self assert: parameter class equals: FamixPythonParameter.
+	self assert: parameter parentBehaviouralEntity equals: function.
+	self assert: parameter hasDefaultValue.
+	self deny: parameter isListSplat.
+	self assert: parameter isDictionarySplatPattern.
+	self skip.
+	self flag: #todo "Manage assertions on types."
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testFunctionTypedParameter [
+
+	self flag: #todo.
+	self skip
 ]
 
 { #category : 'tests - functions' }
@@ -3094,7 +3221,9 @@ FamixPythonProject1Test >> testLambdaParameters [
 	self assert: param1 class equals: FamixPythonParameter.
 	self assert: param2 class equals: FamixPythonParameter.
 	self assert: param1 parentBehaviouralEntity equals: lambda.
-	self assert: param2 parentBehaviouralEntity equals: lambda
+	self assert: param2 parentBehaviouralEntity equals: lambda.
+	self deny: param1 hasDefaultValue.
+	self deny: param2 hasDefaultValue
 ]
 
 { #category : 'tests - parameters' }
@@ -5129,6 +5258,25 @@ FamixPythonProject1Test >> testReadAccessInComparisonOperator [
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInDefaultParameter [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableToAccessInDefaultParameter'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testReadAccessInListSplat [
 
 	| global module access |
@@ -5152,6 +5300,25 @@ FamixPythonProject1Test >> testReadAccessInPair [
 
 	| global module access |
 	global := self globalVariableNamed: 'variableToAccessInPair'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInTypedDefaultParameter [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableToAccessInTypedDefaultParameter'.
 	module := self moduleNamed: 'moduleAtRoot13'.
 
 	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].

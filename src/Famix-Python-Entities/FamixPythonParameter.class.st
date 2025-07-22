@@ -33,6 +33,7 @@
 
 | Name | Type | Default value | Comment |
 |---|
+| `hasDefaultValue` | `Boolean` | false | Return true if there is a default value to the parameter|
 | `isStub` | `Boolean` | false | Flag true if the entity attributes are incomplete, either because the entity is missing or not imported.|
 | `name` | `String` | nil | Basic name of the entity, not full reference.|
 
@@ -54,6 +55,15 @@ FamixPythonParameter class >> annotation [
 	<package: #'Famix-Python-Entities'>
 	<generated>
 	^ self
+]
+
+{ #category : 'accessing' }
+FamixPythonParameter >> hasDefaultValue [
+
+	<FMProperty: #hasDefaultValue type: #Boolean defaultValue: false>
+	<derived>
+	<FMComment: 'Return true if there is a default value to the parameter'>
+	^ self attributeAt: #hasDefaultValue ifAbsent: [ false ]
 ]
 
 { #category : 'testing' }
