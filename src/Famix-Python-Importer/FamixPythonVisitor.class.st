@@ -886,8 +886,7 @@ FamixPythonVisitor >> visitDefaultParameter: aNode [
 		- value: list / lambda / none / string / tuple / attribute / binary_operator / unary_operator / identifier / false / true / ellipsis / dictionary / float / integer / call
 		
 	Parents:
-		- Parents visiting me: parameters
-		- Not yet managed: lambda_parameters
+		- Parents visiting me: parameters / lambda_parameters
 	"
 
 	(self visit: aNode _name) attributeAt: #hasDefaultValue put: true.
@@ -901,8 +900,8 @@ FamixPythonVisitor >> visitDictionarySplatPattern: aNode [
 		- <unnamedChild>: identifier
 		
 	Parents:
-		- Parents visiting me: parameters
-		- Not yet managed: lambda_parameters / typed_parameter
+		- Parents visiting me: lambda_parameters / parameters
+		- Not yet managed: typed_parameter
 	"
 
 	"There can be only one child"
@@ -1151,8 +1150,7 @@ FamixPythonVisitor >> visitKeywordSeparator: aNode [
 	Children: none
 		
 	Parents:
-		- Parents visiting me: parameters
-		- Not yet managed: lambda_parameters
+		- Parents visiting me: lambda_parameters / parameters
 	"
 
 	self currentEntity attributeAt: #keywordSeparatorPosition put: self currentEntity parameters size + 1
@@ -1174,8 +1172,14 @@ FamixPythonVisitor >> visitLambda: aLambdaNode [
 
 { #category : 'visiting' }
 FamixPythonVisitor >> visitLambdaParameters: aParameterNode [
+	"
+	Children: 
+		- <unnamedChild>: dictionary_splat_pattern / default_parameter / list_splat_pattern / keyword_separator / identifier
+		
+	Parents:
+		- Not yet managed: lambda"
 
-	^ self visitParameters: aParameterNode
+	^ self visitChildren: aParameterNode
 ]
 
 { #category : 'visiting' }
@@ -1222,8 +1226,8 @@ FamixPythonVisitor >> visitListSplatPattern: aNode [
 		- <unnamedChild>: identifier
 		
 	Parents:
-		- Parents visiting me: parameters
-		- Not yet managed: lambda_parameters / pattern_list / tuple_pattern / typed_parameter
+		- Parents visiting me: lambda_parameters / parameters
+		- Not yet managed: pattern_list / tuple_pattern / typed_parameter
 	"
 
 	| result |
@@ -1357,8 +1361,7 @@ FamixPythonVisitor >> visitPositionalSeparator: aNode [
 	Children: none
 		
 	Parents:
-		- Parents visiting me: parameters
-		- Not yet managed:  lambda_parameters
+		- Parents visiting me: lambda_parameters / parameters
 	"
 
 	self currentEntity attributeAt: #positionalSeparatorPosition put: self currentEntity parameters size + 1

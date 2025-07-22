@@ -3097,6 +3097,66 @@ FamixPythonProject1Test >> testKeywordsParametersShouldNotCreateAccessOrReferenc
 	self deny: ((self model allWithType: FamixPythonUnknownEntity) anySatisfy: [ :entity | entity name = 'param2' ])
 ]
 
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testLambdaDefaultParameter [
+
+	| lambda parameter |
+	lambda := (self moduleNamed: 'moduleAtRoot14') lambdas at: 2.
+	parameter := self parameterNamed: 'lambda_default_parameter'.
+
+	self assert: lambda parameters size equals: 1.
+	self assert: lambda keywordSeparatorPosition equals: nil.
+	self assert: lambda positionalSeparatorPosition equals: nil.
+	self assertCollection: lambda parameters hasSameElements: { parameter }.
+	self assert: parameter name equals: 'lambda_default_parameter'.
+	self deny: parameter isStub.
+	self assert: parameter class equals: FamixPythonParameter.
+	self assert: parameter parentBehaviouralEntity equals: lambda.
+	self assert: parameter hasDefaultValue.
+	self deny: parameter isListSplat.
+	self deny: parameter isDictionarySplat
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testLambdaDictionarySplatParameter [
+
+	| lambda parameter |
+	lambda := (self moduleNamed: 'moduleAtRoot14') lambdas at: 4.
+	parameter := self parameterNamed: 'lambda_parameter_dictionary_splat'.
+
+	self assert: lambda parameters size equals: 1.
+	self assert: lambda keywordSeparatorPosition equals: nil.
+	self assert: lambda positionalSeparatorPosition equals: nil.
+	self assertCollection: lambda parameters hasSameElements: { parameter }.
+	self assert: parameter name equals: 'lambda_parameter_dictionary_splat'.
+	self deny: parameter isStub.
+	self assert: parameter class equals: FamixPythonParameter.
+	self assert: parameter parentBehaviouralEntity equals: lambda.
+	self deny: parameter hasDefaultValue.
+	self deny: parameter isListSplat.
+	self assert: parameter isDictionarySplat
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testLambdaIdentifierParameter [
+
+	| lambda parameter |
+	lambda := (self moduleNamed: 'moduleAtRoot14') lambdas at: 1.
+	parameter := self parameterNamed: 'lambda_parameter_identifier'.
+
+	self assert: lambda parameters size equals: 1.
+	self assert: lambda keywordSeparatorPosition equals: nil.
+	self assert: lambda positionalSeparatorPosition equals: nil.
+	self assertCollection: lambda parameters hasSameElements: { parameter }.
+	self assert: parameter name equals: 'lambda_parameter_identifier'.
+	self deny: parameter isStub.
+	self assert: parameter class equals: FamixPythonParameter.
+	self assert: parameter parentBehaviouralEntity equals: lambda.
+	self deny: parameter hasDefaultValue.
+	self deny: parameter isListSplat.
+	self deny: parameter isDictionarySplat
+]
+
 { #category : 'tests - lambdas' }
 FamixPythonProject1Test >> testLambdaInAClass [
 
@@ -3205,6 +3265,36 @@ FamixPythonProject1Test >> testLambdaInAPackage [
 ]
 
 { #category : 'tests - parameters' }
+FamixPythonProject1Test >> testLambdaKeywordSeparatorParameter [
+
+	| lambda |
+	lambda := (self moduleNamed: 'moduleAtRoot14') lambdas at: 5.
+
+	self assert: lambda keywordSeparatorPosition equals: 2.
+	self assert: lambda positionalSeparatorPosition equals: nil
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testLambdaListSplatParameter [
+
+	| lambda parameter |
+	lambda := (self moduleNamed: 'moduleAtRoot14') lambdas at: 3.
+	parameter := self parameterNamed: 'lambda_parameter_list_splat'.
+
+	self assert: lambda parameters size equals: 1.
+	self assert: lambda keywordSeparatorPosition equals: nil.
+	self assert: lambda positionalSeparatorPosition equals: nil.
+	self assertCollection: lambda parameters hasSameElements: { parameter }.
+	self assert: parameter name equals: 'lambda_parameter_list_splat'.
+	self deny: parameter isStub.
+	self assert: parameter class equals: FamixPythonParameter.
+	self assert: parameter parentBehaviouralEntity equals: lambda.
+	self deny: parameter hasDefaultValue.
+	self assert: parameter isListSplat.
+	self deny: parameter isDictionarySplat
+]
+
+{ #category : 'tests - parameters' }
 FamixPythonProject1Test >> testLambdaParameters [
 
 	| lambda param1 param2 |
@@ -3236,6 +3326,16 @@ FamixPythonProject1Test >> testLambdaParametersSourceAnchor [
 
 	self assert: param sourceAnchor isNotNil.
 	self assert: param sourceText equals: 'b'
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testLambdaPositionalSeparatorParameter [
+
+	| lambda |
+	lambda := (self moduleNamed: 'moduleAtRoot14') lambdas at: 6.
+
+	self assert: lambda keywordSeparatorPosition equals: nil.
+	self assert: lambda positionalSeparatorPosition equals: 2
 ]
 
 { #category : 'tests - lambdas' }
@@ -5276,6 +5376,25 @@ FamixPythonProject1Test >> testReadAccessInDefaultParameter [
 	self deny: access isWrite.
 	self assert: access isRead.
 	self assert: (function accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInLambdaDefaultParameter [
+
+	| global lambda access |
+	global := self globalVariableNamed: 'variableToAccessInLambdaDefaultParameter'.
+	lambda := (self moduleNamed: 'moduleAtRoot13') lambdas anyOne.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = lambda ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: lambda.
+	self assert: access accessor equals: lambda.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (lambda accesses anySatisfy: [ :anAccess | anAccess variable = global ])
 ]
 
 { #category : 'tests - accesses' }
