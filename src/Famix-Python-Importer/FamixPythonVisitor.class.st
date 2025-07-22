@@ -886,10 +886,29 @@ FamixPythonVisitor >> visitDefaultParameter: aNode [
 		- value: list / lambda / none / string / tuple / attribute / binary_operator / unary_operator / identifier / false / true / ellipsis / dictionary / float / integer / call
 		
 	Parents:
-		- Not yet managed: lambda_parameters / parameters
+		- Parents visiting me: parameters
+		- Not yet managed: lambda_parameters
 	"
 
-	^ self visitChildren: aNode
+	(self visit: aNode _name) attributeAt: #hasDefaultValue put: true.
+	self visit: aNode _value
+]
+
+{ #category : 'visiting' }
+FamixPythonVisitor >> visitDictionarySplatPattern: aNode [
+	"
+	Children:
+		- <unnamedChild>: identifier
+		
+	Parents:
+		- Parents visiting me: parameters
+		- Not yet managed: lambda_parameters / typed_parameter
+	"
+
+	"There can be only one child"
+	^ (self visitChildren: aNode) anyOne
+		  attributeAt: #isDictionarySplat put: true;
+		  yourself
 ]
 
 { #category : 'visiting' }
@@ -1127,6 +1146,19 @@ FamixPythonVisitor >> visitKeywordArgument: aKeywordArgumentNode [
 ]
 
 { #category : 'visiting' }
+FamixPythonVisitor >> visitKeywordSeparator: aNode [
+	"
+	Children: none
+		
+	Parents:
+		- Parents visiting me: parameters
+		- Not yet managed: lambda_parameters
+	"
+
+	self currentEntity attributeAt: #keywordSeparatorPosition put: self currentEntity parameters size + 1
+]
+
+{ #category : 'visiting' }
 FamixPythonVisitor >> visitLambda: aLambdaNode [
 
 	| lambda |
@@ -1181,6 +1213,26 @@ FamixPythonVisitor >> visitListSplat: aNode [
 	"
 
 	^ self visitChildren: aNode
+]
+
+{ #category : 'visiting' }
+FamixPythonVisitor >> visitListSplatPattern: aNode [
+	"
+	Children:
+		- <unnamedChild>: identifier
+		
+	Parents:
+		- Parents visiting me: parameters
+		- Not yet managed: lambda_parameters / pattern_list / tuple_pattern / typed_parameter
+	"
+
+	| result |
+	result := self visitChildren: aNode.
+
+	self flag: #todo. "When managing type check for a list splat in a typed parameter"
+	result first class = FamixPythonParameter ifTrue: [ result first attributeAt: #isListSplat put: true ].
+
+	^ result
 ]
 
 { #category : 'visiting' }
@@ -1258,8 +1310,14 @@ FamixPythonVisitor >> visitPair: aNode [
 	^ self visitChildren: aNode
 ]
 
-{ #category : 'visiting' }
+{ #category : 'visiting - visitChildren' }
 FamixPythonVisitor >> visitParameters: aParameterNode [
+	"
+	Children:
+		- <unnamedChild>: positional_separator / dictionary_splat_pattern / comment / list_splat_pattern / default_parameter / keyword_separator / typed_default_parameter / identifier / typed_parameter
+		
+	Parents:
+		- Visiting me: function_definition"
 
 	self flag: #todo. "Manage typed parameters"
 	self flag: #todo. "Add test that first param not called self is still self"
@@ -1291,6 +1349,19 @@ FamixPythonVisitor >> visitPatternList: aNode [
 	"
 	self flag: #todo. "Comment"
 	^ self visitChildren: aNode
+]
+
+{ #category : 'visiting' }
+FamixPythonVisitor >> visitPositionalSeparator: aNode [
+	"
+	Children: none
+		
+	Parents:
+		- Parents visiting me: parameters
+		- Not yet managed:  lambda_parameters
+	"
+
+	self currentEntity attributeAt: #positionalSeparatorPosition put: self currentEntity parameters size + 1
 ]
 
 { #category : 'visiting' }

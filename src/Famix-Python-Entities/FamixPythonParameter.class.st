@@ -57,13 +57,31 @@ FamixPythonParameter class >> annotation [
 	^ self
 ]
 
-{ #category : 'accessing' }
+{ #category : 'testing' }
 FamixPythonParameter >> hasDefaultValue [
 
 	<FMProperty: #hasDefaultValue type: #Boolean defaultValue: false>
 	<derived>
 	<FMComment: 'Return true if there is a default value to the parameter'>
 	^ self attributeAt: #hasDefaultValue ifAbsent: [ false ]
+]
+
+{ #category : 'testing' }
+FamixPythonParameter >> isDictionarySplat [
+
+	<FMProperty: #isDictionarySplat type: #Boolean defaultValue: false>
+	<derived>
+	<FMComment: 'Return true if there is the parameter is a dictionary splat(example: `def f(**kwargs):`)'>
+	^ self attributeAt: #isDictionarySplat ifAbsent: [ false ]
+]
+
+{ #category : 'testing' }
+FamixPythonParameter >> isListSplat [
+
+	<FMProperty: #isListSplat type: #Boolean defaultValue: false>
+	<derived>
+	<FMComment: 'Return true if there is the parameter is a list splat (example: `def f(*args):`)'>
+	^ self attributeAt: #isListSplat ifAbsent: [ false ]
 ]
 
 { #category : 'testing' }

@@ -19,5 +19,24 @@ FamixTSNodeWrapper >> isLeftSideOfAssignation [
 { #category : '*Famix-Python-Importer' }
 FamixTSNodeWrapper >> isParameterDeclaration [
 
-	^ self parent isNotNil and: [ self parent type = #parameters ]
+	"def f(arg):"
+	self parent isParameterList ifTrue: [ ^ true ].
+	
+	"def f(*args):"
+	(self parent type = #list_splat_pattern and: [ self parent parent isParameterList ]) ifTrue: [ ^ true ].
+	
+	"def f(**kwarg):"
+	self parent type = #dictionary_splat_pattern ifTrue: [ ^ true ].
+
+	"In a default parameter, it represent the parameter if it's in the name field."
+	"def f(arg=3):"
+	(self parent type = #default_parameter and: [ self parent _name = self ]) ifTrue: [ ^ true ].
+
+	^ false
+]
+
+{ #category : '*Famix-Python-Importer' }
+FamixTSNodeWrapper >> isParameterList [
+
+	^ #( lambda_parameters parameters ) includes: self type
 ]

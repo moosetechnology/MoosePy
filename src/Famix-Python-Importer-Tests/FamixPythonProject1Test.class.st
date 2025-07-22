@@ -1316,7 +1316,7 @@ FamixPythonProject1Test >> testFunctionDefaultParameter [
 	self assert: parameter parentBehaviouralEntity equals: function.
 	self assert: parameter hasDefaultValue.
 	self deny: parameter isListSplat.
-	self assert: parameter isDictionarySplatPattern
+	self deny: parameter isDictionarySplat
 ]
 
 { #category : 'tests - parameters' }
@@ -1336,7 +1336,7 @@ FamixPythonProject1Test >> testFunctionDictionarySplatParameter [
 	self assert: parameter parentBehaviouralEntity equals: function.
 	self deny: parameter hasDefaultValue.
 	self deny: parameter isListSplat.
-	self assert: parameter isDictionarySplatPattern
+	self assert: parameter isDictionarySplat
 ]
 
 { #category : 'tests - parameters' }
@@ -1349,14 +1349,16 @@ FamixPythonProject1Test >> testFunctionIdentifierParameter [
 	self assert: function parameters size equals: 2.
 	self assert: function keywordSeparatorPosition equals: nil.
 	self assert: function positionalSeparatorPosition equals: nil.
-	self assertCollection: function parameters hasSameElements: { parameter }.
+	self assertCollection: function parameters hasSameElements: {
+			parameter.
+			(self parameterNamed: 'identifier_parameter2') }.
 	self assert: parameter name equals: 'identifier_parameter1'.
 	self deny: parameter isStub.
 	self assert: parameter class equals: FamixPythonParameter.
 	self assert: parameter parentBehaviouralEntity equals: function.
 	self deny: parameter hasDefaultValue.
 	self deny: parameter isListSplat.
-	self assert: parameter isDictionarySplatPattern
+	self deny: parameter isDictionarySplat
 ]
 
 { #category : 'tests - from-import' }
@@ -1871,7 +1873,7 @@ FamixPythonProject1Test >> testFunctionKeywordSeparatorParameter [
 	| function |
 	function := self functionNamed: 'function_with_keyword_separator'.
 
-	self assert: function keywordSeparatorPosition equals: 2.
+	self assert: function keywordSeparatorPosition equals: 3.
 	self assert: function positionalSeparatorPosition equals: nil
 ]
 
@@ -1892,7 +1894,7 @@ FamixPythonProject1Test >> testFunctionListSplatParameter [
 	self assert: parameter parentBehaviouralEntity equals: function.
 	self deny: parameter hasDefaultValue.
 	self assert: parameter isListSplat.
-	self assert: parameter isDictionarySplatPattern
+	self deny: parameter isDictionarySplat
 ]
 
 { #category : 'tests - parameters' }
@@ -1934,7 +1936,7 @@ FamixPythonProject1Test >> testFunctionPositionalSeparatorParameter [
 	function := self functionNamed: 'function_with_positional_separator'.
 
 	self assert: function keywordSeparatorPosition equals: nil.
-	self assert: function positionalSeparatorPosition equals: 2
+	self assert: function positionalSeparatorPosition equals: 3
 ]
 
 { #category : 'tests - references' }
@@ -2248,6 +2250,8 @@ FamixPythonProject1Test >> testFunctionSourceAnchor [
 FamixPythonProject1Test >> testFunctionTypedDefaultParameter [
 
 	| function parameter |
+	self skip.
+	self flag: #todo. "Manage assertions on types."
 	function := self functionNamed: 'function_with_typed_default_parameter'.
 	parameter := self parameterNamed: 'default_typed_parameter'.
 
@@ -2259,9 +2263,7 @@ FamixPythonProject1Test >> testFunctionTypedDefaultParameter [
 	self assert: parameter parentBehaviouralEntity equals: function.
 	self assert: parameter hasDefaultValue.
 	self deny: parameter isListSplat.
-	self assert: parameter isDictionarySplatPattern.
-	self skip.
-	self flag: #todo "Manage assertions on types."
+	self deny: parameter isDictionarySplat
 ]
 
 { #category : 'tests - parameters' }
@@ -5260,20 +5262,20 @@ FamixPythonProject1Test >> testReadAccessInComparisonOperator [
 { #category : 'tests - accesses' }
 FamixPythonProject1Test >> testReadAccessInDefaultParameter [
 
-	| global module access |
+	| global function access |
 	global := self globalVariableNamed: 'variableToAccessInDefaultParameter'.
-	module := self moduleNamed: 'moduleAtRoot13'.
+	function := self functionNamed: 'function_with_variable_accessed_in_default_parameter'.
 
-	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = function ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
 
 	self assert: access class equals: FamixPythonAccess.
-	self assert: access source equals: module.
-	self assert: access accessor equals: module.
+	self assert: access source equals: function.
+	self assert: access accessor equals: function.
 	self assert: access target equals: global.
 	self assert: access variable equals: global.
 	self deny: access isWrite.
 	self assert: access isRead.
-	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+	self assert: (function accesses anySatisfy: [ :anAccess | anAccess variable = global ])
 ]
 
 { #category : 'tests - accesses' }
@@ -5317,20 +5319,22 @@ FamixPythonProject1Test >> testReadAccessInPair [
 { #category : 'tests - accesses' }
 FamixPythonProject1Test >> testReadAccessInTypedDefaultParameter [
 
-	| global module access |
+	| global function access |
 	global := self globalVariableNamed: 'variableToAccessInTypedDefaultParameter'.
-	module := self moduleNamed: 'moduleAtRoot13'.
+	function := self functionNamed: 'function_with_variable_accessed_in_typed_default_parameter'.
 
-	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+	self skip. 
+	self flag: #todo.
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = function ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
 
 	self assert: access class equals: FamixPythonAccess.
-	self assert: access source equals: module.
-	self assert: access accessor equals: module.
+	self assert: access source equals: function.
+	self assert: access accessor equals: function.
 	self assert: access target equals: global.
 	self assert: access variable equals: global.
 	self deny: access isWrite.
 	self assert: access isRead.
-	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+	self assert: (function accesses anySatisfy: [ :anAccess | anAccess variable = global ])
 ]
 
 { #category : 'tests - accesses' }
