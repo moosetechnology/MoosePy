@@ -105,3 +105,13 @@ def function_with_variable_accessed_in_typed_default_parameter(
 variableToAccessInLambdaDefaultParameter = 2
 
 lambda lambda_access_parameter=variableToAccessInLambdaDefaultParameter: lambda_access_parameter
+
+variableToAccessInAssertStatement = 3
+
+assert variableToAccessInAssertStatement < 4
+
+variableToAccessInLambdaBody = 3
+
+lambda: variableToAccessInLambdaBody + 5
+
+
