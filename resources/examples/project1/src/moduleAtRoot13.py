@@ -126,10 +126,15 @@ variableToAccessInDictionaryComprehensionIfClause = [4, 8, 15, 16, 23, 42]
 # Use 'multiplier' before the 'for', and 'threshold' after it
 result = {v * variableToAccessInDictionaryComprehension: v for v in variableToAccessInDictionaryComprehensionForInClause if v > variableToAccessInDictionaryComprehensionIfClause}
 
-print(result)
 
+variableToAccessInListComprehensionIfClause = 10
+variableToAccessInListComprehensionForInClause = [4, 7, 11, 15, 3]
 
+# List comprehension accessing the global variable 'limit'
+large_numbers = [n for n in variableToAccessInListComprehensionForInClause if n > variableToAccessInListComprehensionIfClause]
 
+variableToAccessInList = 5
+my_list = [1, 2, variableToAccessInList, 4]
 
-
-
+variableToAccessInListSplat = [3, 4, 5]
+my_list2 = [1, 2, *variableToAccessInListSplat, 6]
