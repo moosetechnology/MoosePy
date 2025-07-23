@@ -115,3 +115,11 @@ variableToAccessInLambdaBody = 3
 lambda: variableToAccessInLambdaBody + 5
 
 
+variableWithDictionaryToAccessInDictionarySplat = {"name": "Alice", "age": 30}
+extended = {**variableWithDictionaryToAccessInDictionarySplat, "location": "Paris"}
+
+
+
+
+
+
