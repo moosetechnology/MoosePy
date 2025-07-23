@@ -277,7 +277,7 @@ FamixPythonVisitor >> isAccessOrReferenceNode: anIdentifierNode [
 	"I should return true if an Identifier node represent an access or a reference."
 
 	^ #( elif_clause list argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator expression_statement
-	     augmented_assignment unary_operator boolean_operator pair list_splat default_parameter) includes: anIdentifierNode parent type
+	     augmented_assignment unary_operator boolean_operator pair list_splat default_parameter dictionary_splat ) includes: anIdentifierNode parent type
 ]
 
 { #category : 'testing' }
@@ -903,6 +903,20 @@ FamixPythonVisitor >> visitDefaultParameter: aNode [
 
 	(self visit: aNode _name) attributeAt: #hasDefaultValue put: true.
 	self visit: aNode _value
+]
+
+{ #category : 'visiting - visitChildren' }
+FamixPythonVisitor >> visitDictionarySplat: aParameterNode [
+	"
+	Children:
+		- <unnamedChild>: subscript / call / dictionary / attribute / parenthesized_expression / identifier / dictionary_comprehension
+		
+	Parents:
+		- Visiting me: argument_list
+		- Not yet managed: dictionary
+		"
+
+	^ self visitChildren: aParameterNode
 ]
 
 { #category : 'visiting' }
