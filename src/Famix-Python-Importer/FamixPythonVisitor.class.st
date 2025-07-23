@@ -87,8 +87,8 @@ FamixPythonVisitor >> createInheritance [
 ]
 
 { #category : 'association creation' }
-FamixPythonVisitor >> createInheritance: anAttributeNode [
-	self flag: #todo. "Should have a #From: in the name but currently clashing with another method"
+FamixPythonVisitor >> createInheritanceFrom: anAttributeNode [
+
 	^ self createInheritance
 		  in: [ :inheritance | self setSourceAnchor: inheritance from: anAttributeNode ];
 		  yourself
@@ -141,15 +141,6 @@ FamixPythonVisitor >> createStubPackageNamed: aString [
 	^ (model newPackageNamed: aString)
 		  isStub: true;
 		  yourself
-]
-
-{ #category : 'ensure entity' }
-FamixPythonVisitor >> ensureMethod: aMethodNode [
-
-	^ (self methodNamed: aMethodNode _name inClassNamed: self currentEntity name)
-		  ifNotNil: [ "I think that this should never happen. Let's keep and halt for a while and see if we ever end up here. If it's the case, I need to add a test to reproduce this!"
-			  1 halt ]
-		  ifNil: [ self manageMethodDeclarationFrom: aMethodNode ]
 ]
 
 { #category : 'ensure entity' }
@@ -397,7 +388,7 @@ FamixPythonVisitor >> manageImportedInheritanceDeclaredBy: anAttributeNode [
 
 	| inheritance definition |
 	"We should never end up here because this means we have the sources of the imported entities but I'm still bulletproofing the parser in case we have some code that cannot run""If we did not find an import, we have a stub."
-	inheritance := self createInheritance: anAttributeNode.
+	inheritance := self createInheritanceFrom: anAttributeNode.
 	definition := self attributeAsAssociation: anAttributeNode.
 
 	self findImportMatchingSource: definition key ifFound: [ :import |
@@ -421,7 +412,7 @@ FamixPythonVisitor >> manageImportedInheritanceDeclaredBy: anAttributeNode [
 FamixPythonVisitor >> manageInheritanceDeclaredBy: superclassNode [
 
 	| inheritance |
-	inheritance := self createInheritance: superclassNode.
+	inheritance := self createInheritanceFrom: superclassNode.
 
 	self
 		resolve: ((SRIdentifierWithNode identifier: superclassNode sourceText)
@@ -469,14 +460,11 @@ FamixPythonVisitor >> manageMetaclassUsageDeclaredBy: aKeywordArgumentNode [
 { #category : 'private' }
 FamixPythonVisitor >> manageMethodDeclarationFrom: aMethodNode [
 
-	| method name signature |
-	name := self visit: aMethodNode _name.
-	signature := aMethodNode completeSource copyFrom: aMethodNode _name startPosition to: aMethodNode _parameters endPosition.
-	method := (self createMethodNamed: name)
-		          signature: signature;
+	| method name |
+	method := (self createMethodNamed: (name := self visit: aMethodNode _name))
+		          signature: (aMethodNode completeSource copyFrom: aMethodNode _name startPosition to: aMethodNode _parameters endPosition);
+		          parentType: self currentEntity;
 		          yourself.
-
-	method parentType: self currentEntity.
 
 	name = '__init__' ifTrue: [ method isConstructor: true ].
 
@@ -517,15 +505,6 @@ FamixPythonVisitor >> manageWriteAccessTo: aNode [
 	(self createAccessTo: variable isWrite: true from: aNode assignationNode) accessor: self currentEntity.
 
 	^ variable
-]
-
-{ #category : 'accessing' }
-FamixPythonVisitor >> methodNamed: aString inClassNamed: aClassName [
-
-	self flag: #todo. "Check if we get here? If it's the case, we should probably create a new methods shadowing the previous one."
-	^ self model allModelMethods
-		  detect: [ :method | method name = aString and: [ method parentType name = aClassName ] ]
-		  ifNone: [ nil ]
 ]
 
 { #category : 'accessing' }
@@ -1053,7 +1032,7 @@ FamixPythonVisitor >> visitFunctionDefinition: aFunctionDefinition [
 
 	| entity |
 	entity := self currentEntity isClass
-		          ifTrue: [ self ensureMethod: aFunctionDefinition ]
+		          ifTrue: [ self manageMethodDeclarationFrom: aFunctionDefinition ]
 		          ifFalse: [ self manageFunctionDeclarationFrom: aFunctionDefinition ].
 
 	^ self useCurrentEntity: entity during: [
