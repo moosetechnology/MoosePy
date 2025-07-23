@@ -5303,6 +5303,25 @@ FamixPythonProject1Test >> testReadAccessInANot [
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInAssertStatement [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableToAccessInAssertStatement'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testReadAccessInBinaryOperator [
 
 	| global module access |
@@ -5379,6 +5398,25 @@ FamixPythonProject1Test >> testReadAccessInDefaultParameter [
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInLambdaBody [
+
+	| global lambda access |
+	global := self globalVariableNamed: 'variableToAccessInLambdaBody'.
+	lambda := (self moduleNamed: 'moduleAtRoot13') lambdas at: 2.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = lambda ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: lambda.
+	self assert: access accessor equals: lambda.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (lambda accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testReadAccessInLambdaDefaultParameter [
 
 	| global lambda access |
@@ -5439,11 +5477,11 @@ FamixPythonProject1Test >> testReadAccessInPair [
 FamixPythonProject1Test >> testReadAccessInTypedDefaultParameter [
 
 	| global function access |
+	self skip. 
+	self flag: #todo.
 	global := self globalVariableNamed: 'variableToAccessInTypedDefaultParameter'.
 	function := self functionNamed: 'function_with_variable_accessed_in_typed_default_parameter'.
 
-	self skip. 
-	self flag: #todo.
 	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = function ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
 
 	self assert: access class equals: FamixPythonAccess.
