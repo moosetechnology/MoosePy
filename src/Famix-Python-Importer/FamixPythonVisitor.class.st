@@ -286,7 +286,7 @@ FamixPythonVisitor >> manageAccessOrReferencesFrom: anIdentifierNode [
 
 	(self isAccessOrReferenceNode: anIdentifierNode) ifTrue: [
 			self
-				resolve: ((SRIdentifierWithNode identifier: anIdentifierNode sourceText)
+				resolve: ((SRIdentifierResolvable identifier: anIdentifierNode sourceText)
 						 expectedKind: {
 								 FamixPythonClass.
 								 FamixPythonFunction.
@@ -415,7 +415,7 @@ FamixPythonVisitor >> manageInheritanceDeclaredBy: superclassNode [
 	inheritance := self createInheritanceFrom: superclassNode.
 
 	self
-		resolve: ((SRIdentifierWithNode identifier: superclassNode sourceText)
+		resolve: ((SRIdentifierResolvable identifier: superclassNode sourceText)
 				 expectedKind: FamixPythonClass;
 				 notFoundReplacementEntity: [ :unresolvedSuperclass :currentEntity | self ensureStubClassNamed: unresolvedSuperclass identifier ];
 				 yourself)
@@ -432,7 +432,7 @@ FamixPythonVisitor >> manageMetaclassUsageDeclaredBy: aKeywordArgumentNode [
 	^ aKeywordArgumentNode _value type = #identifier
 		  ifTrue: [
 				  self
-					  resolve: ((SRIdentifierWithNode identifier: aKeywordArgumentNode _value sourceText)
+					  resolve: ((SRIdentifierResolvable identifier: aKeywordArgumentNode _value sourceText)
 							   expectedKind: FamixPythonMetaclass;
 							   notFoundReplacementEntity: [ :unresolvedMetaclass :currentEntity | "We should never end up here but I'm still bulletproofing the parser in case we get code with errors"
 								   self ensureStubMetaclassNamed: unresolvedMetaclass identifier ];
@@ -470,7 +470,7 @@ FamixPythonVisitor >> manageMethodDeclarationFrom: aMethodNode [
 
 	(name beginsWith: 'get_') ifTrue: [
 			self
-				resolve: ((SRIdentifierWithNode identifier: (name withoutPrefix: 'get_'))
+				resolve: ((SRIdentifierResolvable identifier: (name withoutPrefix: 'get_'))
 						 expectedKind: FamixPythonAttribute;
 						 yourself)
 				foundAction: [ :entity :currentEntity | method beGetter ]
@@ -478,7 +478,7 @@ FamixPythonVisitor >> manageMethodDeclarationFrom: aMethodNode [
 
 	(name beginsWith: 'set_') ifTrue: [
 			self
-				resolve: ((SRIdentifierWithNode identifier: (name withoutPrefix: 'set_'))
+				resolve: ((SRIdentifierResolvable identifier: (name withoutPrefix: 'set_'))
 						 expectedKind: FamixPythonAttribute;
 						 yourself)
 				foundAction: [ :entity :currentEntity | method beSetter ]

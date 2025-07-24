@@ -15,17 +15,6 @@ FamixPythonImportResolvable class >> path: aStringPath [
 ]
 
 { #category : 'accessing' }
-FamixPythonImportResolvable >> entity [
-	^ entity
-]
-
-{ #category : 'accessing' }
-FamixPythonImportResolvable >> entity: anObject [
-
-	entity := anObject
-]
-
-{ #category : 'accessing' }
 FamixPythonImportResolvable >> path [
 	^ path
 ]
@@ -38,5 +27,5 @@ FamixPythonImportResolvable >> path: anObject [
 { #category : 'resolution' }
 FamixPythonImportResolvable >> resolveInScope: aScope currentEntity: currentEntity [
 
-	entity := self findTargetEntityFor: path from: currentEntity mooseModel
+	self result: (self findTargetEntityFor: path from: currentEntity mooseModel)
 ]

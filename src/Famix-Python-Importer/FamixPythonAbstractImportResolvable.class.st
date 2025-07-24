@@ -2,8 +2,7 @@ Class {
 	#name : 'FamixPythonAbstractImportResolvable',
 	#superclass : 'SRResolvable',
 	#instVars : [
-		'path',
-		'entity'
+		'path'
 	],
 	#category : 'Famix-Python-Importer-SymbolResolution',
 	#package : 'Famix-Python-Importer',
@@ -14,23 +13,6 @@ Class {
 FamixPythonAbstractImportResolvable class >> isAbstract [
 
 	^ self = FamixPythonAbstractImportResolvable
-]
-
-{ #category : 'hooks' }
-FamixPythonAbstractImportResolvable >> applyReplacementStrategyWithCurrentEntity: aCurrentEntity [
-
-	self entity: (self notFoundReplacementEntity cull: self cull: aCurrentEntity)
-]
-
-{ #category : 'accessing' }
-FamixPythonAbstractImportResolvable >> entity [
-	^ entity
-]
-
-{ #category : 'accessing' }
-FamixPythonAbstractImportResolvable >> entity: anObject [
-
-	entity := anObject
 ]
 
 { #category : 'resolution' }

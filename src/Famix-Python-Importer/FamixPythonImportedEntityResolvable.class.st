@@ -12,8 +12,7 @@ Class {
 	#superclass : 'SRResolvable',
 	#instVars : [
 		'import',
-		'identifier',
-		'entity'
+		'identifier'
 	],
 	#category : 'Famix-Python-Importer-SymbolResolution',
 	#package : 'Famix-Python-Importer',
@@ -27,24 +26,6 @@ FamixPythonImportedEntityResolvable class >> identifier: aString import: anImpor
 		  identifier: aString;
 		  import: anImport;
 		  yourself
-]
-
-{ #category : 'hooks' }
-FamixPythonImportedEntityResolvable >> applyReplacementStrategyWithCurrentEntity: aCurrentEntity [
-
-	self entity: (self notFoundReplacementEntity cull: self cull: aCurrentEntity)
-]
-
-{ #category : 'accessing' }
-FamixPythonImportedEntityResolvable >> entity [
-
-	^ entity
-]
-
-{ #category : 'accessing' }
-FamixPythonImportedEntityResolvable >> entity: anObject [
-
-	entity := anObject
 ]
 
 { #category : 'accessing' }
@@ -74,9 +55,9 @@ FamixPythonImportedEntityResolvable >> import: anObject [
 { #category : 'resolution' }
 FamixPythonImportedEntityResolvable >> resolveInScope: aScope currentEntity: currentEntity [
 
-	import importedEntity name = identifier ifTrue: [ ^ self entity: import importedEntity ].
+	import importedEntity name = identifier ifTrue: [ ^ self result: import importedEntity ].
 
 	^ (import importedEntity definedEntitiesNamed: identifier ofKinds: self expectedKinds)
 		  ifEmpty: [ SRNoResolutionPossible signal ]
-		  ifNotEmpty: [ :entities | self entity: entities anyOne ]
+		  ifNotEmpty: [ :entities | self result: entities anyOne ]
 ]
