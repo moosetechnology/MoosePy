@@ -261,6 +261,8 @@ FamixPythonVisitor >> initialize [
 	super initialize.
 	self flag: #todo. "Add management and tests on parenthesized_expression kind of node"
 	self flag: #todo. "Manage local variables in dictionary comprehension, forIn...."
+	self flag: #todo. "Manage classes in classes. Especially for example the symbol resolution of local methods.".
+	self flag: #todo. "Add a test of a local method invocation, but the method comes from a stub superclass (I know I did not managed the stubs. It should fail first"
 	importPaths := IdentityDictionary new
 ]
 
@@ -546,7 +548,7 @@ FamixPythonVisitor >> resolveInvocationOrInstantiationFrom: aCallNode [
 	self flag: #todo. "Can be something different than self..."
 	receiver first = 'self' ifTrue: [
 			^ self
-				  resolve: (FamixPythonLocalMethodInvocationResolvable identifier: receiver second)
+				  resolve: (SRLocalClassEntityResolvable identifier: receiver second expectedKind: FamixTMethod)
 				  foundAction: [ :method :currentEntity | self createInvocationOf: method from: currentEntity node: aCallNode ] ].
 
 	"=> package.module.x()"
