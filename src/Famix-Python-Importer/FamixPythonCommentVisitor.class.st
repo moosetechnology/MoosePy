@@ -1,9 +1,14 @@
+"
+Check my super class comment for more info.
+
+I consider that single line comments are node of type comment and the multiline comments are the string nodes that are in expression statements (so not in assignations or argument list, etc)
+"
 Class {
 	#name : 'FamixPythonCommentVisitor',
 	#superclass : 'FamixTSAbstractCommentsVisitor',
-	#category : 'Famix-Python-Importer-Importer',
+	#category : 'Famix-Python-Importer-Core',
 	#package : 'Famix-Python-Importer',
-	#tag : 'Importer'
+	#tag : 'Core'
 }
 
 { #category : 'visiting' }

@@ -18,9 +18,9 @@ Class {
 	#instVars : [
 		'importPaths'
 	],
-	#category : 'Famix-Python-Importer-Visitors',
+	#category : 'Famix-Python-Importer-Core',
 	#package : 'Famix-Python-Importer',
-	#tag : 'Visitors'
+	#tag : 'Core'
 }
 
 { #category : 'private' }
@@ -261,8 +261,9 @@ FamixPythonVisitor >> initialize [
 	super initialize.
 	self flag: #todo. "Add management and tests on parenthesized_expression kind of node"
 	self flag: #todo. "Manage local variables in dictionary comprehension, forIn...."
-	self flag: #todo. "Manage classes in classes. Especially for example the symbol resolution of local methods.".
+	self flag: #todo. "Manage classes in classes. Especially for example the symbol resolution of local methods."
 	self flag: #todo. "Add a test of a local method invocation, but the method comes from a stub superclass (I know I did not managed the stubs. It should fail first"
+	self flag: #todo. "Create local var in loops or conditions"
 	importPaths := IdentityDictionary new
 ]
 
@@ -389,7 +390,6 @@ FamixPythonVisitor >> manageImport: anImport ofName: aName from: fromName alias:
 FamixPythonVisitor >> manageImportedInheritanceDeclaredBy: anAttributeNode [
 
 	| inheritance definition |
-	"We should never end up here because this means we have the sources of the imported entities but I'm still bulletproofing the parser in case we have some code that cannot run""If we did not find an import, we have a stub."
 	inheritance := self createInheritanceFrom: anAttributeNode.
 	definition := self attributeAsAssociation: anAttributeNode.
 
@@ -405,6 +405,7 @@ FamixPythonVisitor >> manageImportedInheritanceDeclaredBy: anAttributeNode [
 				foundAction: [ :entity :currentEntity | inheritance superclass: entity ].
 			^ inheritance ].
 
+	"If we did not find an import, we have a stub."
 	inheritance superclass: ((self ensureStubClassNamed: definition value)
 			 typeContainer: (self ensureStubPackagesFromPath: definition key);
 			 yourself)
@@ -1121,11 +1122,11 @@ FamixPythonVisitor >> visitIfStatement: aNode [
 FamixPythonVisitor >> visitImportFromStatement: anImportFromStatement [
 
 	| moduleName identifiers |
-	moduleName := anImportFromStatement _module_name accept: self.
+	moduleName := self visit: anImportFromStatement _module_name.
 
-	identifiers := self visit: (anImportFromStatement
-			                nodeChildByFieldName: 'name'
-			                ifAbsent: [ anImportFromStatement detectNamedChild: 'wildcard_import' ifNone: [ self error: 'We should have at least one of them.' ] ]).
+	identifiers := self visit:
+		               (anImportFromStatement _name ifNil: [
+			                anImportFromStatement detectNamedChild: 'wildcard_import' ifNone: [ self error: 'We should have at least one of them.' ] ]).
 	identifiers isAssociation ifTrue: [ identifiers := { identifiers } asDictionary ].
 	identifiers isString ifTrue: [ identifiers := { identifiers } ].
 	identifiers isDictionary ifFalse: [
@@ -1590,6 +1591,11 @@ FamixPythonVisitor >> visitWhileStatement: aNode [
 
 { #category : 'visiting' }
 FamixPythonVisitor >> visitWildcardImport: aWildcarImportNode [
+	"
+	Children: none
+	
+	Parents:
+		- Visiting me: import_from_statement"
 
 	^ #( #* )
 ]

@@ -56,9 +56,9 @@ Class {
 		'rootPackagePath',
 		'filesToIgnoreBlock'
 	],
-	#category : 'Famix-Python-Importer-Importer',
+	#category : 'Famix-Python-Importer-Core',
 	#package : 'Famix-Python-Importer',
-	#tag : 'Importer'
+	#tag : 'Core'
 }
 
 { #category : 'api' }
