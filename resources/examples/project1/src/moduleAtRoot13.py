@@ -131,10 +131,12 @@ variableToAccessInListComprehensionIfClause = 10
 variableToAccessInListComprehensionForInClause = [4, 7, 11, 15, 3]
 
 # List comprehension accessing the global variable 'limit'
-large_numbers = [n for n in variableToAccessInListComprehensionForInClause if n > variableToAccessInListComprehensionIfClause]
+large_numbers = [localVarToAccessInListComprehension for localVarToAccessInListComprehension in variableToAccessInListComprehensionForInClause if localVarToAccessInListComprehension > variableToAccessInListComprehensionIfClause]
 
 variableToAccessInList = 5
 my_list = [1, 2, variableToAccessInList, 4]
 
 variableToAccessInListSplat = [3, 4, 5]
 my_list2 = [1, 2, *variableToAccessInListSplat, 6]
+
+print(localVarToAccessInGeneratorExpression for localVarToAccessInGeneratorExpression in range(5))
