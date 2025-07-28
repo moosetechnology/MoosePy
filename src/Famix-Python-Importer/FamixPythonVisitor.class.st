@@ -268,14 +268,6 @@ FamixPythonVisitor >> initialize [
 ]
 
 { #category : 'testing' }
-FamixPythonVisitor >> isAccessOrReferenceNode: anIdentifierNode [
-	"I should return true if an Identifier node represent an access or a reference."
-
-	^ #( elif_clause list argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator expression_statement
-	     augmented_assignment unary_operator boolean_operator pair list_splat default_parameter dictionary_splat #if_clause #for_in_clause generator_expression list_comprehension) includes: anIdentifierNode parent type
-]
-
-{ #category : 'testing' }
 FamixPythonVisitor >> isMetaclassDefinition: aClassDefinitionNode [
 
 	^ aClassDefinitionNode _superclasses
@@ -287,7 +279,7 @@ FamixPythonVisitor >> isMetaclassDefinition: aClassDefinitionNode [
 FamixPythonVisitor >> manageAccessOrReferencesFrom: anIdentifierNode [
 	"To know if the identifier can be an access or reference we need to check its parents."
 
-	(self isAccessOrReferenceNode: anIdentifierNode) ifTrue: [
+	anIdentifierNode isAccessOrReferenceNode ifTrue: [
 			self
 				resolve: ((SRIdentifierResolvable identifier: anIdentifierNode sourceText)
 						 expectedKind: {

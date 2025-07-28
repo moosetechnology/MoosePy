@@ -8,6 +8,15 @@ FamixTSNodeWrapper >> assignationNode [
 ]
 
 { #category : '*Famix-Python-Importer' }
+FamixTSNodeWrapper >> isAccessOrReferenceNode [
+	"I should return true if an Identifier node represent an access or a reference."
+
+	^ #( elif_clause list argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator expression_statement
+	     augmented_assignment unary_operator boolean_operator pair list_splat default_parameter dictionary_splat #if_clause #for_in_clause generator_expression
+	     list_comprehension dictionary_comprehension ) includes: self parent type
+]
+
+{ #category : '*Famix-Python-Importer' }
 FamixTSNodeWrapper >> isInField: aName ofParentOfType: aType [
 
 	self parentsDo: [ :node |
@@ -32,6 +41,9 @@ FamixTSNodeWrapper >> isLocalVariableDeclaration [
 	
 	"[localVarInListComprehension for localVarInListComprehension in [4, 5] if localVarInListComprehension > 2]"
 	(self isInField: #body ofParentOfType: #list_comprehension) ifTrue: [ ^ true ].
+	
+	"{localVariableInDictionaryComprehension * localVariableInDictionaryComprehension: localVariableInDictionaryComprehension for localVariableInDictionaryComprehension in [4, 5] if localVariableInDictionaryComprehension > 10}"
+	(self isInField: #body ofParentOfType: #dictionary_comprehension) ifTrue: [ ^ true ].
 	
 	^ false
 ]
