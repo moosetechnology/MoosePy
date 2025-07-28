@@ -272,7 +272,7 @@ FamixPythonVisitor >> isAccessOrReferenceNode: anIdentifierNode [
 	"I should return true if an Identifier node represent an access or a reference."
 
 	^ #( elif_clause list argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator expression_statement
-	     augmented_assignment unary_operator boolean_operator pair list_splat default_parameter dictionary_splat #if_clause #for_in_clause) includes: anIdentifierNode parent type
+	     augmented_assignment unary_operator boolean_operator pair list_splat default_parameter dictionary_splat #if_clause #for_in_clause generator_expression list_comprehension) includes: anIdentifierNode parent type
 ]
 
 { #category : 'testing' }
@@ -297,12 +297,19 @@ FamixPythonVisitor >> manageAccessOrReferencesFrom: anIdentifierNode [
 								 FamixPythonGlobalVariable.
 								 FamixPythonAttribute.
 								 FamixPythonParameter };
-						 notFoundReplacementEntity: [ :unresolved :currentEntity | "If we are the receiver of an invocation and we did not find the associated entity it's because it's an instance of a class or the namespace from the import. In that case we should create nothing so we give a null entity.""]"
-								 self flag: #todo.
-								 "aVariableExpression isInvocationOrInstantiationReceiver
+						 notFoundReplacementEntity: [ :unresolved :currentEntity | "In some cases, the identifier is the declaration of a local variable. It depends on the structure."
+								 anIdentifierNode isLocalVariableDeclaration
+									 ifTrue: [
+											 (self model newLocalVariableNamed: unresolved identifier)
+												 parentBehaviouralEntity: currentEntity;
+												 in: [ :var | self setSourceAnchor: var from: anIdentifierNode ];
+												 yourself ]
+									 ifFalse: [ "If we are the receiver of an invocation and we did not find the associated entity it's because it's an instance of a class or the namespace from the import. In that case we should create nothing so we give a null entity.""]"
+											 self flag: #todo.
+											 "aVariableExpression isInvocationOrInstantiationReceiver
 						 ifTrue: [ FamixPythonNilEntity ]
 						 ifFalse: [" "This can be a structural entity or a class"
-								 self ensureStubUnknownEntityNamed: unresolved identifier ];
+											 self ensureStubUnknownEntityNamed: unresolved identifier ] ];
 						 yourself)
 				foundAction: [ :entity :currentEntity | "See the comment in the notFoundReplacementEntity block to see why we do this."
 					entity isMooseEntity ifTrue: [ entity createAccessOrReferenceFrom: currentEntity node: anIdentifierNode ] ] ]
@@ -319,7 +326,7 @@ FamixPythonVisitor >> manageAttributeWriteAccessTo: aNode [
 				| class |
 				class := self currentEntityOfType: FamixPythonClass.
 				variable := (class childOfType: FamixTAttribute named: pair value) ifNil: [
-						            variable := (class createLocalVariable: pair value)
+						            variable := (class createVariable: pair value)
 							                        isClassSide: false;
 							                        yourself.
 						            self setSourceAnchor: variable from: aNode.
@@ -502,7 +509,7 @@ FamixPythonVisitor >> manageWriteAccessTo: aNode [
 		detect: [ :child | child name = name and: [ child isShadowable not or: [ child isShadowed not ] ] ]
 		ifFound: [ :var | variable := var ]
 		ifNone: [
-				self checkShadowingOfName: name during: [ variable := self currentEntity createLocalVariable: name ].
+				self checkShadowingOfName: name during: [ variable := self currentEntity createVariable: name ].
 				self setSourceAnchor: variable from: aNode ].
 
 	(self createAccessTo: variable isWrite: true from: aNode assignationNode) accessor: self currentEntity.
@@ -704,7 +711,7 @@ FamixPythonVisitor >> visitAttribute: anAttributeNode [
 				| class |
 				class := self currentEntityOfType: FamixPythonClass.
 				variable := (class childOfType: FamixTAttribute named: name) ifNil: [
-						            variable := (class createLocalVariable: name)
+						            variable := (class createVariable: name)
 							                        isClassSide: false;
 							                        yourself.
 						            self setSourceAnchor: variable from: anAttributeNode.
@@ -1062,6 +1069,21 @@ FamixPythonVisitor >> visitFutureImportStatement: aNode [
 		  alias: (name isString
 				   ifTrue: [ nil ]
 				   ifFalse: [ name value ])
+]
+
+{ #category : 'visiting' }
+FamixPythonVisitor >> visitGeneratorExpression: aNode [
+	"
+	Children:
+		
+		
+	Parents:
+		- Parents visiting me:
+		- Not yet managed:
+	"
+
+	self flag: #todo. "Comment"
+	^ self visitChildren: aNode
 ]
 
 { #category : 'visiting' }

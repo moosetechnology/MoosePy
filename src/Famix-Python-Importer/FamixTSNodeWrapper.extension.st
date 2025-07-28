@@ -8,12 +8,32 @@ FamixTSNodeWrapper >> assignationNode [
 ]
 
 { #category : '*Famix-Python-Importer' }
+FamixTSNodeWrapper >> isInField: aName ofParentOfType: aType [
+
+	self parentsDo: [ :node |
+		node type = aType ifTrue: [ ^ node nodeChildByFieldName: aName ifPresent: [ :field | field includesChild: self ] ifAbsent: [ false ] ] ].
+	^ false
+]
+
+{ #category : '*Famix-Python-Importer' }
 FamixTSNodeWrapper >> isLeftSideOfAssignation [
 
 	self parentsDo: [ :node |
 		(#( assignment augmented_assignment ) includes: node type) ifTrue: [ ^ node _left includesChild: self ].
 		node type = #named_expression ifTrue: [ ^ node _name = self ] ].
 ^ false
+]
+
+{ #category : '*Famix-Python-Importer' }
+FamixTSNodeWrapper >> isLocalVariableDeclaration [
+
+	"print(localVarInGeneratorExpression2 * localVarInGeneratorExpression2 for localVarInGeneratorExpression2 in range(5)) ==> When it's in the body, it can be a local variable declaration. But not in the other children."
+	(self isInField: #body ofParentOfType: #generator_expression) ifTrue: [ ^ true ].
+	
+	"[localVarInListComprehension for localVarInListComprehension in [4, 5] if localVarInListComprehension > 2]"
+	(self isInField: #body ofParentOfType: #list_comprehension) ifTrue: [ ^ true ].
+	
+	^ false
 ]
 
 { #category : '*Famix-Python-Importer' }

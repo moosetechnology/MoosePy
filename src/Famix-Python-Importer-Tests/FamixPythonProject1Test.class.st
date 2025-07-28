@@ -3406,6 +3406,62 @@ FamixPythonProject1Test >> testLocalVariableInFunctionSourceAnchor [
 ]
 
 { #category : 'tests - local variables' }
+FamixPythonProject1Test >> testLocalVariableInGeneratorExpression [
+
+	| variable |
+	variable := self localVariableNamed: 'localVarInGeneratorExpression'.
+
+	self assert: variable class equals: FamixPythonLocalVariable.
+	self assert: variable name equals: 'localVarInGeneratorExpression'.
+	self assert: variable parentBehaviouralEntity equals: (self moduleNamed: 'moduleAtRoot15').
+	self deny: variable isStub
+]
+
+{ #category : 'tests - local variables' }
+FamixPythonProject1Test >> testLocalVariableInGeneratorExpression2 [
+
+	| variable |
+	variable := self localVariableNamed: 'localVarInGeneratorExpression2'.
+
+	self assert: variable class equals: FamixPythonLocalVariable.
+	self assert: variable name equals: 'localVarInGeneratorExpression2'.
+	self assert: variable parentBehaviouralEntity equals: (self moduleNamed: 'moduleAtRoot15').
+	self deny: variable isStub
+]
+
+{ #category : 'tests - local variables' }
+FamixPythonProject1Test >> testLocalVariableInGeneratorExpressionSourceAnchor [
+
+	| variable |
+	variable := self localVariableNamed: 'localVarInGeneratorExpression'.
+
+	self assert: variable sourceAnchor isNotNil.
+	self assert: variable sourceText equals: 'localVarInGeneratorExpression'
+]
+
+{ #category : 'tests - local variables' }
+FamixPythonProject1Test >> testLocalVariableInListComprehension [
+
+	| variable |
+	variable := self localVariableNamed: 'localVarInListComprehension'.
+
+	self assert: variable class equals: FamixPythonLocalVariable.
+	self assert: variable name equals: 'localVarInListComprehension'.
+	self assert: variable parentBehaviouralEntity equals: (self moduleNamed: 'moduleAtRoot15').
+	self deny: variable isStub
+]
+
+{ #category : 'tests - local variables' }
+FamixPythonProject1Test >> testLocalVariableInListComprehensionSourceAnchor [
+
+	| variable |
+	variable := self localVariableNamed: 'localVarInListComprehension'.
+
+	self assert: variable sourceAnchor isNotNil.
+	self assert: variable sourceText equals: 'localVarInListComprehension'
+]
+
+{ #category : 'tests - local variables' }
 FamixPythonProject1Test >> testLocalVariableInMethodSourceAnchor [
 
 	| variable |
@@ -5474,6 +5530,18 @@ FamixPythonProject1Test >> testReadAccessInDictionarySplat [
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInGeneratorExpression [
+
+	| global module accesses |
+	global := self localVariableNamed: 'localVarToAccessInGeneratorExpression'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	accesses := global incomingAccesses select: [ :anAccess | anAccess accessor = module ].
+
+	self assert: accesses size equals: 2
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testReadAccessInLambdaBody [
 
 	| global lambda access |
@@ -5535,6 +5603,25 @@ FamixPythonProject1Test >> testReadAccessInList [
 
 	| global module access |
 	global := self globalVariableNamed: 'variableToAccessInList'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInListComprehension [
+
+	| global module access |
+	global := self localVariableNamed: 'localVarToAccessInListComprehension'.
 	module := self moduleNamed: 'moduleAtRoot13'.
 
 	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].

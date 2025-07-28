@@ -179,6 +179,7 @@ FamixPythonGenerator >> defineHierarchy [
 	module --|> #TWithAccesses. 
 	module --|> #TWithReferences.
 	module --|> #TReferenceable. 
+	module --|> #TWithLocalVariables.
 
 	namedEntity --|> sourcedEntity.
 	namedEntity --|> #TInvocationsReceiver.

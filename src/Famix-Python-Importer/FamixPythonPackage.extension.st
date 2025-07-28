@@ -1,7 +1,7 @@
 Extension { #name : 'FamixPythonPackage' }
 
 { #category : '*Famix-Python-Importer' }
-FamixPythonPackage >> createLocalVariable: aString [
+FamixPythonPackage >> createVariable: aString [
 
 	^ mooseModel newGlobalVariable
 		  name: aString;
