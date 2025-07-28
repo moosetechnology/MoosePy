@@ -5,3 +5,5 @@ print(localVarInGeneratorExpression for localVarInGeneratorExpression in range(5
 print(localVarInGeneratorExpression2 * localVarInGeneratorExpression2 for localVarInGeneratorExpression2 in range(5))
 
 [localVarInListComprehension for localVarInListComprehension in [4, 5] if localVarInListComprehension > 2]
+
+{localVariableInDictionaryComprehension * localVariableInDictionaryComprehension: localVariableInDictionaryComprehension for localVariableInDictionaryComprehension in [4, 5] if localVariableInDictionaryComprehension > 10}

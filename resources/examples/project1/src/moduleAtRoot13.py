@@ -124,7 +124,7 @@ variableToAccessInDictionaryComprehensionForInClause = 10
 variableToAccessInDictionaryComprehensionIfClause = [4, 8, 15, 16, 23, 42]
 
 # Use 'multiplier' before the 'for', and 'threshold' after it
-result = {v * variableToAccessInDictionaryComprehension: v for v in variableToAccessInDictionaryComprehensionForInClause if v > variableToAccessInDictionaryComprehensionIfClause}
+result = {localVarToAccessInDictionaryComprehension * variableToAccessInDictionaryComprehension: localVarToAccessInDictionaryComprehension for localVarToAccessInDictionaryComprehension in variableToAccessInDictionaryComprehensionForInClause if localVarToAccessInDictionaryComprehension > variableToAccessInDictionaryComprehensionIfClause}
 
 
 variableToAccessInListComprehensionIfClause = 10
