@@ -140,3 +140,10 @@ variableToAccessInListSplat = [3, 4, 5]
 my_list2 = [1, 2, *variableToAccessInListSplat, 6]
 
 print(localVarToAccessInGeneratorExpression for localVarToAccessInGeneratorExpression in range(5))
+
+variableToAccessInConcatenatedString = "Hello"
+
+var = "To say:\n"\
+        f" ({variableToAccessInConcatenatedString})"
+
+"String with escaped interpolation {{notAVariable}}"
