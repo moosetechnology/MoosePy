@@ -850,6 +850,20 @@ FamixPythonVisitor >> visitComparisonOperator: aNode [
 	^ self visitChildren: aNode
 ]
 
+{ #category : 'visiting - visitChildren' }
+FamixPythonVisitor >> visitConcatenatedString: aNode [
+	"
+	Children:
+		- <unnamedChild>: string / comment
+
+	Parents:
+		- Visiting me: argument_list / assignment / augmented_assignment / binary_operator / comparison_operator / conditional_expression / lambda / list / pair
+		- Not yet managed: attribute / keyword_argument / parenthesized_expression / tuple
+	"
+
+	^ self visitChildren: aNode
+]
+
 { #category : 'visiting - noop' }
 FamixPythonVisitor >> visitContinueStatement: aNode [
 	"
@@ -985,6 +999,18 @@ FamixPythonVisitor >> visitElseClause: aNode [
 	Parents:
 		- Visiting me: while_statement / if_statement
 		- Not yet managed: try_statement / for_statement
+	"
+
+	^ self visitChildren: aNode
+]
+
+{ #category : 'visiting - visitChildren' }
+FamixPythonVisitor >> visitEscapeSequence: aNode [
+	"
+	Children: none
+
+	Parents:
+		- Visiting me: string_content
 	"
 
 	^ self visitChildren: aNode
@@ -1505,8 +1531,8 @@ FamixPythonVisitor >> visitString: aStringNode [
 		- unnamed: string_end / string_content / string_start / interpolation
 		
 	Parents:
-		- Visiting me: for_statement / named_expression / argument_list / augmented_assignment / expression_statement / assignment / subscript / return_statement / binary_operator / boolean_operator / pair / interpolation / default_parameter  / assert_statement / lambda / for_in_clause / list / list_comprehension
-		- Not yet managed:  set_comprehension / concatenated_string / type / typed_default_parameter / slice / expression_list / set / generator_expression / conditional_expression / keyword_argument / attribute / yield / parenthesized_expression / comparison_operator / tuple"
+		- Visiting me: for_statement / named_expression / argument_list / augmented_assignment / expression_statement / assignment / subscript / return_statement / binary_operator / boolean_operator / pair / interpolation / default_parameter  / assert_statement / lambda / for_in_clause / list / list_comprehension / concatenated_string
+		- Not yet managed:  set_comprehension / type / typed_default_parameter / slice / expression_list / set / generator_expression / conditional_expression / keyword_argument / attribute / yield / parenthesized_expression / comparison_operator / tuple"
 
 	^ self visitChildren: aStringNode
 ]

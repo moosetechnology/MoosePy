@@ -4683,6 +4683,12 @@ FamixPythonProject1Test >> testNamedExpressionInWhileCondition [
 	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
 ]
 
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testNoAccessInInterpolationEscape [
+
+	self assert: (self model allGlobalVariables noneSatisfy: [ :variable | variable name = 'notAVariable' ])
+]
+
 { #category : 'tests' }
 FamixPythonProject1Test >> testNoNilSourceOrTargetForAssociations [
 
@@ -5442,6 +5448,25 @@ FamixPythonProject1Test >> testReadAccessInComparisonOperator [
 
 	| global module access |
 	global := self globalVariableNamed: 'variableToAccessInComparisonOperator'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInConcatenatedString [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableToAccessInConcatenatedString'.
 	module := self moduleNamed: 'moduleAtRoot13'.
 
 	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
