@@ -17,14 +17,6 @@ FamixTSNodeWrapper >> isAccessOrReferenceNode [
 ]
 
 { #category : '*Famix-Python-Importer' }
-FamixTSNodeWrapper >> isInField: aName ofParentOfType: aType [
-
-	self parentsDo: [ :node |
-		node type = aType ifTrue: [ ^ node nodeChildByFieldName: aName ifPresent: [ :field | field includesChild: self ] ifAbsent: [ false ] ] ].
-	^ false
-]
-
-{ #category : '*Famix-Python-Importer' }
 FamixTSNodeWrapper >> isLeftSideOfAssignation [
 
 	self parentsDo: [ :node |
