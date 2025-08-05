@@ -7,6 +7,24 @@ FamixPythonEntity >> canHaveImports [
 ]
 
 { #category : '*Famix-Python-Importer' }
+FamixPythonEntity >> reachableEntities [
+
+	| entities |
+	entities := Set new.
+
+	self canHaveImports ifTrue: [
+			self imports do: [ :import | "It is possible for the imported entity to be nil in case it was not yet resolved.
+		Imagine you reference something and later in the file there is an import. We resolve things in the order they appear, so the import might not yet be resolved. But in that case we can just ignore it."
+					import importedEntity ifNotNil: [ :entity |
+							entities add: import importedEntity.
+							entities addAll: entity definedEntities ] ] ].
+
+	entities addAll: super definedEntities.
+
+	^ entities
+]
+
+{ #category : '*Famix-Python-Importer' }
 FamixPythonEntity >> reachableEntitiesNamed: aString ofKinds: aCollection [
 
 	| entities |

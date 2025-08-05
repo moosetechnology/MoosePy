@@ -169,8 +169,11 @@ FamixPythonImporter >> import: aFileReference [
 
 	self flag: #todo. "We should probably handle it another way in production."
 	self errorReport ifNotEmpty: [ self errorReport inspect ].
+	
+	"I'm adding some properties to help with the import. Cleaning up afterward."
+	self model entities do: #flush.
 
-	^ visitor model
+	^ self model
 ]
 
 { #category : 'api' }

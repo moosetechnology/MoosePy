@@ -359,6 +359,8 @@ FamixPythonVisitor >> manageImport: anImport ofName: aName from: fromName alias:
 
 	self setSourceAnchor: import from: anImport.
 
+	"This will be used for the access, invocation and instantiation resolutions."
+	import cacheAt: #importedEntityName put: aName.
 
 	importPaths at: import put: ((fromName
 			  ifNil: [ aName ]
@@ -565,20 +567,25 @@ FamixPythonVisitor >> resolveInvocationOrInstantiationFrom: aCallNode [
 						   yourself)
 				  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aCallNode forResult: result in: currentEntity ] ].
 
-	"=> c.x() or module.x() with `from package import module`"
-	^ self
-		  resolve: ((FamixPythonInvocationOrInstantiationWithUnknownReceiverResolvable identifier: receiver second receiver: receiver first)
-				   notFoundReplacementEntity: [ :unresolved :currentEntity | "Two case possible:
-						- The receiver is an import of a stub module or package and we should create an unknown entity that can be a function or a class invoked
-						- The receiver is not an imported module or package but an instance of a class and the entity is a stub method"
-						   unresolved hasCorrespondingImport
-							   ifTrue: [
+	"=> module.x() when module is an imported entity"
+	self currentEntity allEffectiveImports
+		detect: [ :import | (import propertyNamed: #importedEntityName) = receiver first or: [ import alias = receiver first ] ]
+		ifFound: [ :import |
+				^ self
+					  resolve: ((FamixPythonDependencyFromImportedEntityResolvable identifier: receiver second import: import)
+							   notFoundReplacementEntity: [ :unresolved :currentEntity |
 									   (self ensureStubUnknownEntityNamed: unresolved identifier)
-										   parentPackage: unresolved correspondingImport importedEntity;
-										   yourself ]
-							   ifFalse: [ { (self ensureStubMethodNamed: unresolved identifier) } ] ];
+										   parentPackage: unresolved import importedEntity;
+										   yourself ];
+							   yourself)
+					  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aCallNode forResult: result in: currentEntity ] ].
+
+	"=> c.x()"
+	^ self
+		  resolve: ((FamixPythonMethodInvocationResolvable identifier: receiver second receiver: receiver first)
+				   notFoundReplacementEntity: [ :unresolved :currentEntity | self ensureStubMethodNamed: unresolved identifier ];
 				   yourself)
-		  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aCallNode forResult: result in: currentEntity ]
+		  foundAction: [ :result :currentEntity | self createInvocationOf: result from: currentEntity node: aCallNode ]
 ]
 
 { #category : 'accessing' }
