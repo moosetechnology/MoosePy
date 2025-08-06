@@ -1119,6 +1119,16 @@ FamixPythonProject1Test >> testCommentInPackage [
 	self assert: comment commentedEntity equals: (self packageNamed: 'NameOfSubpackageOrClass')
 ]
 
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testCommentWithWideString [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment | aComment sourceText beginsWith: '# Comment with wide string ぁ' ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self moduleNamed: 'moduleAtRoot2')
+]
+
 { #category : 'tests - methods' }
 FamixPythonProject1Test >> testConstructor [
 
