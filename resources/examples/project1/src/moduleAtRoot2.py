@@ -1,6 +1,7 @@
 import moduleAtRoot
 import moduleAtRoot
 import moduleAtRoot3
+import moduleAtRoot8
 
 # Comment in module at root 2
 
@@ -91,14 +92,14 @@ class Person:
         if not moduleAtRoot3.moduleAtRootVariable3:
             print(self.get_name() + moduleAtRoot4.moduleAtRootSpaceString + str(self.age))
 
-    def get_name(self):
-        # Comment in method
-        return self.name
-
     # Comment before method
     def set_name(self, name):
         # Comment before ivar
         self.name = name
+
+    def get_name(self):
+        # Comment in method
+        return self.name
 
 
 p1 = Person("John", 36)
@@ -227,3 +228,13 @@ class ClassWihtComments():
         In method
         """
         return self.ivar_commented
+
+
+class ClassUsingImportedMetaclass(metaclass=moduleAtRoot8.CustomMetaclass2):
+    pass
+
+
+not moduleAtRoot3.moduleAtRootVariable3
+
+augmentedAssignmentVar = 1
+augmentedAssignmentVar += 3
