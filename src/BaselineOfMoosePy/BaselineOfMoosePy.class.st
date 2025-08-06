@@ -19,7 +19,8 @@ BaselineOfMoosePy >> baseline: spec [
 				package: 'Famix-Python-Generator';
 				package: 'Famix-Python-Tests' with: [ spec requires: #( 'Famix-Python-Entities' 'Famix-Python-Generator' ) ];
 				package: 'Famix-Python-Importer' with: [ spec requires: #( 'Famix-Python-Entities' 'TreeSitterFamixIntegration' ) ];
-				package: 'Famix-Python-Importer-Tests' with: [ spec requires: #( 'Famix-Python-Importer' 'GitBridge' ) ].
+				package: 'Famix-Python-Importer-Tests' with: [ spec requires: #( 'Famix-Python-Importer' 'GitBridge' ) ];
+				package: 'Famix-Python-IDE' with: [ spec requires: #( 'Famix-Python-Importer' ) ].
 
 			spec
 				group: 'Core' with: #( 'Famix-Python-Entities' 'Famix-Python-Importer' 'Famix-Python-Importer-Tests' 'Famix-Python-Tests' );
