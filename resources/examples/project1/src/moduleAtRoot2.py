@@ -1,7 +1,6 @@
 import moduleAtRoot
 import moduleAtRoot
 import moduleAtRoot3
-import moduleAtRoot8
 
 # Comment in module at root 2
 
@@ -9,6 +8,8 @@ moduleAtRoot2Variable = 42  # Comment after global
 globalVariableWithCommonName = False
 
 moduleAtRoot.sort_list(["a", "b", "c", "d", "e", "f", "g", "h", "i"], [0, 1, 1, 0, 1, 2, 2, 0, 1])
+
+# Comment with wide string ぁ
 
 print(moduleAtRoot.moduleAtRootVariable)
 
@@ -90,14 +91,14 @@ class Person:
         if not moduleAtRoot3.moduleAtRootVariable3:
             print(self.get_name() + moduleAtRoot4.moduleAtRootSpaceString + str(self.age))
 
+    def get_name(self):
+        # Comment in method
+        return self.name
+
     # Comment before method
     def set_name(self, name):
         # Comment before ivar
         self.name = name
-
-    def get_name(self):
-        # Comment in method
-        return self.name
 
 
 p1 = Person("John", 36)
@@ -226,13 +227,3 @@ class ClassWihtComments():
         In method
         """
         return self.ivar_commented
-
-
-class ClassUsingImportedMetaclass(metaclass=moduleAtRoot8.CustomMetaclass2):
-    pass
-
-
-not moduleAtRoot3.moduleAtRootVariable3
-
-augmentedAssignmentVar = 1
-augmentedAssignmentVar += 3
