@@ -51,39 +51,39 @@ FamixPythonInvocationOrInstantiationWithUnknownReceiverResolvable >> resolveInSc
 	"First we check if the receiver is an imported module or package. If it is not, we have a method invocation that we are treating later."
 
 	node receiver receiver isVariableExpression ifTrue: [
-		| receiverName |
-		receiverName := node receiver receiver name.
-		((currentEntity withAllParents flatCollect: [ :anEntity | anEntity query outgoing local dependenciesOfType: FamixPythonImport ]) select: [ :import |
-			 import importedEntity isNotNil "It's nil if we did not resolve it yet but that means the import is not relevent here." ])
-			detect: [ :import |
-				({
-					 FamixPythonModule.
-					 FamixPythonPackage.
-					 FamixPythonUnknownEntity } anySatisfy: [ :class | import importedEntity isOfType: class ]) and: [
-					import hasAlias
-						ifTrue: [ import alias = receiverName ]
-						ifFalse: [ import importedEntity name = receiverName ] ] ]
-			ifFound: [ :import |
-				correspondingImport := import.
-				^ (import importedEntity definedEntitiesNamed: identifier ofKinds: {
-						   FamixPythonFunction.
-						   FamixPythonClass }) ifEmpty: [ SRNoResolutionPossible signal ] ifNotEmpty: [ :entities |
-					  | matchingEntities |
-					  self flag: #todo. "This could probably be simplified? Or at least remove duplication with sibling classes.."
-					  self flag: #todo. "Do we need the sorting? If no update also the other resolvable with this code."
-					  matchingEntities := entities sorted: [ :anEntity | anEntity sourceAnchor startPos ] ascending.
-					  (matchingEntities collectAsSet: #class) size = 1
-						  ifTrue: [ "This is an instantiation"
-							  matchingEntities last isClass ifTrue: [ ^ self entity: matchingEntities last ].
+			| receiverName |
+			receiverName := node receiver receiver name.
+			((currentEntity withAllParents flatCollect: [ :anEntity | anEntity query outgoing local dependenciesOfType: FamixPythonImport ]) select: [ :import |
+				 import importedEntity isNotNil "It's nil if we did not resolve it yet but that means the import is not relevent here." ])
+				detect: [ :import |
+						({
+							 FamixPythonModule.
+							 FamixPythonPackage.
+							 FamixPythonUnknownEntity } anySatisfy: [ :class | import importedEntity isOfType: class ]) and: [
+								import hasAlias
+									ifTrue: [ import alias = receiverName ]
+									ifFalse: [ import importedEntity name = receiverName ] ] ]
+				ifFound: [ :import |
+						correspondingImport := import.
+						^ (import importedEntity definedEntitiesNamed: identifier ofKinds: {
+								   FamixPythonFunction.
+								   FamixPythonClass }) ifEmpty: [ SRNoResolutionPossible signal ] ifNotEmpty: [ :entities |
+								  | matchingEntities |
+								  self flag: #todo. "This could probably be simplified? Or at least remove duplication with sibling classes.."
+								  self flag: #todo. "Do we need the sorting? If no update also the other resolvable with this code."
+								  matchingEntities := entities sorted: [ :anEntity | anEntity sourceAnchor startPos ] ascending.
+								  (matchingEntities collectAsSet: #class) size = 1
+									  ifTrue: [ "This is an instantiation"
+											  matchingEntities last isClass ifTrue: [ ^ self result: matchingEntities last ].
 
-							  self entity: matchingEntities ]
-						  ifFalse: [
-							  self entity: (matchingEntities last isClass
-									   ifTrue: [ matchingEntities last ]
-									   ifFalse: [ { matchingEntities last } ]) ] ] ] ].
+											  self result: matchingEntities ]
+									  ifFalse: [
+											  self result: (matchingEntities last isClass
+													   ifTrue: [ matchingEntities last ]
+													   ifFalse: [ { matchingEntities last } ]) ] ] ] ].
 
 	^ (aScope entity withAllParents flatCollectAsSet: [ :anEntity | anEntity reachableEntitiesNamed: identifier ofKinds: { FamixPythonMethod } ])
-		  ifNotEmpty: [ :methods | entity := methods ]
+		  ifNotEmpty: [ :methods | self result: methods ]
 		  ifEmpty: [ SRNoResolutionPossible signal ]
 ]
 

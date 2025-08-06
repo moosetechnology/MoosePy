@@ -33,11 +33,11 @@ FamixPythonInvocationOrInstantiationWithNamespaceResolvable >> resolveInScope: a
 		  matchingEntities := entities sorted: [ :anEntity | anEntity sourceAnchor startPos ] ascending.
 		  (matchingEntities collectAsSet: #class) size = 1
 			  ifTrue: [ "This is an instantiation"
-				  matchingEntities last isClass ifTrue: [ ^ self entity: matchingEntities last ].
+				  matchingEntities last isClass ifTrue: [ ^ self result: matchingEntities last ].
 
-				  self entity: matchingEntities ]
+				  self result: matchingEntities ]
 			  ifFalse: [
-				  self entity: (matchingEntities last isClass
+				  self result: (matchingEntities last isClass
 						   ifTrue: [ matchingEntities last ]
 						   ifFalse: [ { matchingEntities last } ]) ] ]
 ]

@@ -13,8 +13,8 @@ FamixPythonLocalMethodInvocationResolvable >> resolveInScope: aScope currentEnti
 	aScope entity isClass ifFalse: [ NotFound signal ].
 
 	(aScope reachableEntitiesNamed: identifier ofKinds: { FamixPythonMethod }) ifNotEmpty: [ :entities | "I don't think we can have multiple results here."
-		self assert: entities size = 1.
-		^ entity := entities anyOne ].
+			self assert: entities size = 1.
+			^ self result: entities anyOne ].
 
 	SRNoResolutionPossible signal
 ]

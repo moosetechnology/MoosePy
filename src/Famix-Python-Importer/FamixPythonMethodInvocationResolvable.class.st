@@ -10,6 +10,6 @@ Class {
 FamixPythonMethodInvocationResolvable >> resolveInScope: aScope currentEntity: currentEntity [
 
 	^ (aScope entity withAllParents flatCollectAsSet: [ :anEntity | anEntity reachableEntitiesNamed: identifier ofKinds: { FamixPythonMethod } ])
-		  ifNotEmpty: [ :methods | entity := methods ]
+		  ifNotEmpty: [ :methods | self result: methods ]
 		  ifEmpty: [ SRNoResolutionPossible signal ]
 ]

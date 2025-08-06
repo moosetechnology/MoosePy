@@ -12,8 +12,7 @@ Class {
 	#superclass : 'SRResolvable',
 	#instVars : [
 		'import',
-		'identifier',
-		'entity'
+		'identifier'
 	],
 	#category : 'Famix-Python-Importer-SymbolResolution',
 	#package : 'Famix-Python-Importer',
@@ -27,24 +26,6 @@ FamixPythonImportedAccessOrReferenceResolvable class >> identifier: aString impo
 		  identifier: aString;
 		  import: anImport;
 		  yourself
-]
-
-{ #category : 'hooks' }
-FamixPythonImportedAccessOrReferenceResolvable >> applyReplacementStrategyWithCurrentEntity: aCurrentEntity [
-
-	self entity: (self notFoundReplacementEntity cull: self cull: aCurrentEntity)
-]
-
-{ #category : 'accessing' }
-FamixPythonImportedAccessOrReferenceResolvable >> entity [
-
-	^ entity
-]
-
-{ #category : 'accessing' }
-FamixPythonImportedAccessOrReferenceResolvable >> entity: anObject [
-
-	entity := anObject
 ]
 
 { #category : 'accessing' }
@@ -74,7 +55,7 @@ FamixPythonImportedAccessOrReferenceResolvable >> import: anObject [
 { #category : 'resolution' }
 FamixPythonImportedAccessOrReferenceResolvable >> resolveInScope: aScope currentEntity: currentEntity [
 
-	import importedEntity name = identifier ifTrue: [ ^ self entity: import importedEntity ].
+	import importedEntity name = identifier ifTrue: [ ^ self result: import importedEntity ].
 
 	^ (import importedEntity definedEntitiesNamed: identifier ofKinds: {
 			   FamixPythonClass.
@@ -82,5 +63,5 @@ FamixPythonImportedAccessOrReferenceResolvable >> resolveInScope: aScope current
 			   FamixPythonLocalVariable.
 			   FamixPythonGlobalVariable.
 			   FamixPythonAttribute.
-			   FamixPythonParameter }) ifEmpty: [ SRNoResolutionPossible signal ] ifNotEmpty: [ :entities | self entity: entities anyOne ]
+			   FamixPythonParameter }) ifEmpty: [ SRNoResolutionPossible signal ] ifNotEmpty: [ :entities | self result: entities anyOne ]
 ]

@@ -44,23 +44,23 @@ FamixPythonFromImportResolvable >> resolveInScope: aScope currentEntity: current
 	targetModule := path = '.'
 		                ifTrue: [ (currentEntity query ancestors ofType: FamixTPackage) anyOne ]
 		                ifFalse: [
-			                | remainingPath |
-			                (path beginsWith: '.')
-				                ifTrue: [
-					                | currentPackage |
-					                "In case of a relative path we need to find the origin package for the resolution"
-					                remainingPath := path allButFirst.
-					                currentPackage := (currentEntity query ancestors ofType: FamixTPackage) anyOne. "If we have a module, we need to start with its parent package. If we have a package, it starts in itself."
-					                [ remainingPath beginsWith: '.' ] whileTrue: [
-						                currentPackage := currentPackage parentPackage.
-						                remainingPath := remainingPath allButFirst ].
-					                possibleEntities := currentPackage children ]
-				                ifFalse: [ "If we have an absolute path we just start at the root."
-					                remainingPath := path.
-					                possibleEntities := currentEntity rootParents flatCollect: #children ].
+				                | remainingPath |
+				                (path beginsWith: '.')
+					                ifTrue: [
+							                | currentPackage |
+							                "In case of a relative path we need to find the origin package for the resolution"
+							                remainingPath := path allButFirst.
+							                currentPackage := (currentEntity query ancestors ofType: FamixTPackage) anyOne. "If we have a module, we need to start with its parent package. If we have a package, it starts in itself."
+							                [ remainingPath beginsWith: '.' ] whileTrue: [
+									                currentPackage := currentPackage parentPackage.
+									                remainingPath := remainingPath allButFirst ].
+							                possibleEntities := currentPackage children ]
+					                ifFalse: [ "If we have an absolute path we just start at the root."
+							                remainingPath := path.
+							                possibleEntities := currentEntity rootParents flatCollect: #children ].
 
-			                "We trim the path because we can have spaces after the dots in relativ paths."
-			                self findTargetEntityFor: remainingPath trim from: possibleEntities ].
+				                "We trim the path because we can have spaces after the dots in relativ paths."
+				                self findTargetEntityFor: remainingPath trim from: possibleEntities ].
 
 
 	"If we have an import all then we import the targeted module directly."
@@ -69,8 +69,8 @@ FamixPythonFromImportResolvable >> resolveInScope: aScope currentEntity: current
 		                    ifFalse: [ targetModule allChildren select: [ :child | child isNamedEntity and: [ child name = entityName ] ] ].
 
 	"It is possible that we have multiple entities with the same name and in that case, python select the last one declared. So we sort by source anchor position to find this one."
-	entity := possibleEntities detectMax: [ :possibleEntity |
-		          possibleEntity sourceAnchor
-			          ifNil: [ 1 "Packages might not have sources." ]
-			          ifNotNil: #startPos ]
+	self result: (possibleEntities detectMax: [ :possibleEntity |
+				 possibleEntity sourceAnchor
+					 ifNil: [ 1 "Packages might not have sources." ]
+					 ifNotNil: #startPos ])
 ]
