@@ -25,7 +25,7 @@ FamixPythonInvocationOrInstantiationWithNamespaceResolvable >> import: anObject 
 { #category : 'resolution' }
 FamixPythonInvocationOrInstantiationWithNamespaceResolvable >> resolveInScope: aScope currentEntity: currentEntity [
 
-	import importedEntity name = identifier ifTrue: [ ^ self entity: import importedEntity ].
+	import importedEntity name = identifier ifTrue: [ ^ self result: import importedEntity ].
 
 	^ (import importedEntity definedEntitiesNamed: identifier ofKinds: self expectedKinds) ifEmpty: [ SRNoResolutionPossible signal ] ifNotEmpty: [ :entities |
 			  | matchingEntities |
@@ -33,11 +33,11 @@ FamixPythonInvocationOrInstantiationWithNamespaceResolvable >> resolveInScope: a
 			  matchingEntities := entities sorted: [ :anEntity | anEntity sourceAnchor startPos ] ascending.
 			  (matchingEntities collectAsSet: #class) size = 1
 				  ifTrue: [ "This is an instantiation"
-						  matchingEntities last isClass ifTrue: [ ^ self entity: matchingEntities last ].
+						  matchingEntities last isClass ifTrue: [ ^ self result: matchingEntities last ].
 
 						  self result: matchingEntities ]
 				  ifFalse: [
-						  self entity: (matchingEntities last isClass
+						  self result: (matchingEntities last isClass
 								   ifTrue: [ matchingEntities last ]
 								   ifFalse: [ { matchingEntities last } ]) ] ]
 ]
