@@ -550,7 +550,10 @@ FamixPythonVisitor >> resolveInvocationOrInstantiationFrom: aCallNode [
 	self flag: #todo. "Can be something different than self..."
 	receiver first = 'self' ifTrue: [
 			^ self
-				  resolve: (SRLocalClassEntityResolvable identifier: receiver second expectedKind: FamixTMethod)
+				  resolve: ((SRLocalClassEntityResolvable identifier: receiver second expectedKind: FamixTMethod)
+						   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one is a method from a missing superclass"
+							   self ensureStubMethodNamed: unresolved identifier ];
+						   yourself)
 				  foundAction: [ :method :currentEntity | self createInvocationOf: method from: currentEntity node: aCallNode ] ].
 
 	"=> package.module.x()"

@@ -3393,6 +3393,24 @@ FamixPythonProject1Test >> testLocalMethodInvocationFromMethod [
 ]
 
 { #category : 'tests - invocations' }
+FamixPythonProject1Test >> testLocalMethodInvocationOfStubMethodFromSuperclass [
+
+	| method method2 invocation |
+	method2 := self methodNamed: 'missing_super_method'.
+	method := self methodNamed: 'method_calling_missing_super'.
+
+	invocation := method2 incomingInvocations detect: [ :aReference | aReference sender = method ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: method.
+	self assert: invocation sender equals: method.
+	self assertCollection: invocation target hasSameElements: { method2 }.
+	self assert: invocation invokedEntity equals: method2.
+	self assert: (method outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = method2 ]).
+	self assert: method2 isStub
+]
+
+{ #category : 'tests - invocations' }
 FamixPythonProject1Test >> testLocalMethodInvocationSourceAnchor [
 
 	| method method2 invocation |
