@@ -219,7 +219,7 @@ FamixPythonImporter >> importFileReference: aFileReference [
 FamixPythonImporter >> importPythonFile: aFileReference [
 
 	('Importing ' , aFileReference pathString) traceCr.
-	"(aFileReference basename = #'moduleAtRoot11.py') ifTrue: [ 1halt ]."
+	(aFileReference basename = #'moduleWithImportsAndAliases.py') ifTrue: [ 1halt ].
 	(PythonParser parseFileWithErrors: aFileReference) acceptVisitor: visitor
 ]
 

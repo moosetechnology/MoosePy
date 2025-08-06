@@ -171,7 +171,7 @@ FamixPythonImporterVisitor >> createMethod: aMethodNode [
 
 	(aMethodNode name beginsWith: 'get_') ifTrue: [
 		self
-			resolve: ((SRIdentifierWithNode identifier: (aMethodNode name withoutPrefix: 'get_'))
+			resolve: ((SRIdentifierResolvable identifier: (aMethodNode name withoutPrefix: 'get_'))
 					 expectedKind: FamixPythonAttribute;
 					 yourself)
 			foundAction: [ :entity :currentEntity | method beGetter ]
@@ -179,7 +179,7 @@ FamixPythonImporterVisitor >> createMethod: aMethodNode [
 
 	(aMethodNode name beginsWith: 'set_') ifTrue: [
 		self
-			resolve: ((SRIdentifierWithNode identifier: (aMethodNode name withoutPrefix: 'set_'))
+			resolve: ((SRIdentifierResolvable identifier: (aMethodNode name withoutPrefix: 'set_'))
 					 expectedKind: FamixPythonAttribute;
 					 yourself)
 			foundAction: [ :entity :currentEntity | method beSetter ]
@@ -461,35 +461,35 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 
 	"=> x()"
 	aFunctionCallExpression hasReceiver ifFalse: [
-		^ self
-			  resolve: ((FamixPythonInvocationOrInstantiationResolvable identifier: aFunctionCallExpression receiver name)
-					   expectedKind: {
-							   FamixPythonFunction.
-							   FamixPythonClass };
-					   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one can be a function or a class"
-						   { (self ensureStubUnknownEntityNamed: unresolved identifier) } ];
-					   yourself)
-			  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aFunctionCallExpression forResult: result in: currentEntity ] ].
+			^ self
+				  resolve: ((FamixPythonInvocationOrInstantiationResolvable identifier: aFunctionCallExpression receiver name)
+						   expectedKind: {
+								   FamixPythonFunction.
+								   FamixPythonClass };
+						   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one can be a function or a class"
+							   { (self ensureStubUnknownEntityNamed: unresolved identifier) } ];
+						   yourself)
+				  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aFunctionCallExpression forResult: result in: currentEntity ] ].
 
 	"=> self.x()"
 	aFunctionCallExpression isLocalMethodInvocation ifTrue: [
-		^ self
-			  resolve: (FamixPythonLocalMethodInvocationResolvable identifier: aFunctionCallExpression receiver name)
-			  foundAction: [ :method :currentEntity | self createInvocationOf: method from: currentEntity node: aFunctionCallExpression ] ].
+			^ self
+				  resolve: (SRLocalClassEntityResolvable identifier: aFunctionCallExpression receiver name expectedKind: FamixPythonMethod)
+				  foundAction: [ :method :currentEntity | self createInvocationOf: method from: currentEntity node: aFunctionCallExpression ] ].
 
 	"=> package.module.x()"
 	self findImportMatchingSource: aFunctionCallExpression receiver source ifFound: [ :import |
-		^ self
-			  resolve: ((FamixPythonInvocationOrInstantiationWithNamespaceResolvable identifier: aFunctionCallExpression receiver name import: import)
-					   expectedKind: {
-							   FamixPythonFunction.
-							   FamixPythonClass };
-					   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one can be a function or a class"
-						   (self ensureStubUnknownEntityNamed: unresolved identifier)
-							   parentPackage: import importedEntity;
-							   yourself ];
-					   yourself)
-			  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aFunctionCallExpression forResult: result in: currentEntity ] ].
+			^ self
+				  resolve: ((FamixPythonInvocationOrInstantiationWithNamespaceResolvable identifier: aFunctionCallExpression receiver name import: import)
+						   expectedKind: {
+								   FamixPythonFunction.
+								   FamixPythonClass };
+						   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one can be a function or a class"
+								   (self ensureStubUnknownEntityNamed: unresolved identifier)
+									   parentPackage: import importedEntity;
+									   yourself ];
+						   yourself)
+				  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aFunctionCallExpression forResult: result in: currentEntity ] ].
 
 	"=> c.x() or module.x() with `from package import module`"
 	^ self
@@ -500,12 +500,12 @@ FamixPythonImporterVisitor >> resolveInvocationOrInstantiationFrom: aFunctionCal
 				   notFoundReplacementEntity: [ :unresolved :currentEntity | "Two case possible:
 						- The receiver is an import of a stub module or package and we should create an unknown entity that can be a function or a class invoked
 						- The receiver is not an imported module or package but an instance of a class and the entity is a stub method"
-					   unresolved hasCorrespondingImport
-						   ifTrue: [
-							   (self ensureStubUnknownEntityNamed: unresolved identifier)
-								   parentPackage: unresolved correspondingImport importedEntity;
-								   yourself ]
-						   ifFalse: [ { (self ensureStubMethodNamed: unresolved identifier) } ] ];
+						   unresolved hasCorrespondingImport
+							   ifTrue: [
+									   (self ensureStubUnknownEntityNamed: unresolved identifier)
+										   parentPackage: unresolved correspondingImport importedEntity;
+										   yourself ]
+							   ifFalse: [ { (self ensureStubMethodNamed: unresolved identifier) } ] ];
 				   yourself)
 		  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aFunctionCallExpression forResult: result in: currentEntity ]
 ]
@@ -550,7 +550,7 @@ FamixPythonImporterVisitor >> setSuperclassesOf: classDefinitionNode from: class
 				  inheritance subclass: class.
 				  self setSourceAnchor: inheritance from: superclass.
 				  self
-					  resolve: ((SRIdentifierWithNode identifier: superclass name)
+					  resolve: ((SRIdentifierResolvable identifier: superclass name)
 							   expectedKind: FamixPythonClass;
 							   notFoundReplacementEntity: [ :unresolvedSuperclass :currentEntity | self ensureStubClassNamed: unresolvedSuperclass identifier ];
 							   yourself)
@@ -750,7 +750,7 @@ FamixPythonImporterVisitor >> visitInstantiationOrInvocationIdentifier: aFunctio
 FamixPythonImporterVisitor >> visitInternalInstanceVariableAccess: anInternalInstanceVariableAccess [
 
 	self
-		resolve: ((SRIdentifierWithNode identifier: anInternalInstanceVariableAccess name)
+		resolve: ((SRIdentifierResolvable identifier: anInternalInstanceVariableAccess name)
 				 expectedKind: { FamixPythonAttribute };
 				 yourself)
 		foundAction: [ :entity :currentEntity |
@@ -782,7 +782,7 @@ FamixPythonImporterVisitor >> visitMetaclass: aMetaclass [
 	metaclassUsage user: self currentEntity.
 	self setSourceAnchor: metaclassUsage from: aMetaclass.
 	self
-		resolve: ((SRIdentifierWithNode identifier: aMetaclass name)
+		resolve: ((SRIdentifierResolvable identifier: aMetaclass name)
 				 expectedKind: FamixPythonMetaclass;
 				 notFoundReplacementEntity: [ :unresolvedMetaclass :currentEntity | self ensureStubMetaclassNamed: unresolvedMetaclass identifier ];
 				 yourself)
@@ -864,7 +864,7 @@ FamixPythonImporterVisitor >> visitSuperclass: aSuperclass [
 FamixPythonImporterVisitor >> visitVariableExpression: aVariableExpression [
 
 	self
-		resolve: ((SRIdentifierWithNode identifier: aVariableExpression name)
+		resolve: ((SRIdentifierResolvable identifier: aVariableExpression name)
 				 expectedKind: {
 						 FamixPythonClass.
 						 FamixPythonFunction.
