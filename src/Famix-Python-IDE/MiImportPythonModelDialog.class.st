@@ -30,7 +30,7 @@ MiImportPythonModelDialog class >> title [
 { #category : 'accessing' }
 MiImportPythonModelDialog class >> windowExtent [
 
-	^ 500 @ 400
+	^ 700 @ 400
 ]
 
 { #category : 'layout' }
