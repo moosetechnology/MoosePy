@@ -18,11 +18,18 @@ FamixTSNodeWrapper >> isAccessOrReferenceNode [
 
 { #category : '*Famix-Python-Importer' }
 FamixTSNodeWrapper >> isIsDirectFunctionInvocationOrInstanciation [
+	"If it's not in a function of a call we cannot match."
+
+	(self isInField: #function ofParentOfType: #call) ifFalse: [ ^ false ].
 
 	(self parent type = #call and: [ self parent _function = self ]) ifTrue: [ ^ true ].
 
 	self flag: #todo. "Manage other find of parenthesized_expressions that have more than just one identifier."
 	(self parent type = #parenthesized_expression and: [ self parent collectNamedChild = { self } ]) ifTrue: [ ^ true ].
+
+	"Manage [*function_to_invoke_in_list_splat(slice, indices[:-1], indices[1:])]"
+	self flag: #todo. "Maybe we have other cases of list splat in a function call"
+	(self parent type = #list_splat and: [ self parent collectNamedChild = { self } ]) ifTrue: [ ^ true ].
 
 	^ false
 ]

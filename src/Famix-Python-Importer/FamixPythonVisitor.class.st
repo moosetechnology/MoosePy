@@ -545,7 +545,7 @@ FamixPythonVisitor >> resolveInvocationOrInstantiationFrom: aCallNode [
 	| receiver |
 	" => x()()/table[x]()
 	This is happening when we invoke the result of an invocation. The parser cannot know what is invoked. I'm ignoring it"
-	(#( subscript call identifier parenthesized_expression) includes: aCallNode _function type) ifTrue: [ ^ self ].
+	(#( subscript call identifier parenthesized_expression list_splat) includes: aCallNode _function type) ifTrue: [ ^ self ].
 
 	receiver := self visit: aCallNode _function.
 
@@ -1404,7 +1404,7 @@ FamixPythonVisitor >> visitModule: aModuleNode [
 
 			self currentEntity: entity ].
 	
-	(fileReference basename = #'moduleWithStubkosdwkds.py') ifTrue: [ 1halt ].
+	(fileReference basename = #'moduleAtRoot130.py') ifTrue: [ 1halt ].
 	
 	self visitChildren: aModuleNode.
 

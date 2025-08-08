@@ -1822,6 +1822,23 @@ FamixPythonProject1Test >> testFunctionInvocationSourceAnchor [
 ]
 
 { #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationWithListSplat [
+
+	| module function invocation |
+	function := self functionNamed: 'function_to_invoke_in_list_splat'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation invokedEntity equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
+]
+
+{ #category : 'tests - invocations' }
 FamixPythonProject1Test >> testFunctionInvocationWithNamespaceAndAlias [
 
 	| module function invocation |
@@ -3156,6 +3173,19 @@ FamixPythonProject1Test >> testInvocationOfStubFunctionWithNamespace [
 	self assertCollection: invocation target hasSameElements: { function }.
 	self assert: invocation invokedEntity equals: function.
 	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testInvocationsThatCannotBeResolved [
+	"I created a file with a lot of invocations that cannot be resolved and we will ensure we do not create any invocation for them."
+
+	| module invocations |
+	module := self moduleNamed: 'moduleAtRoot16'.
+	invocations := module outgoingInvocations.
+
+	"We have one because it's the invocation of the result of an invocation."
+	self assert: invocations size equals: 1.
+	self assertCollection: (invocations collect: [ :invocation | invocation invokedEntity name ]) hasSameElements: { #function_returning_function }
 ]
 
 { #category : 'tests - unknown access or reference' }
