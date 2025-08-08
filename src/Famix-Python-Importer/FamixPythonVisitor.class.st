@@ -308,6 +308,65 @@ FamixPythonVisitor >> manageAccessOrReferencesFrom: anIdentifierNode [
 ]
 
 { #category : 'private' }
+FamixPythonVisitor >> manageAttributeAsCallReceiver: aNode [
+	"When we end up here we might have multiple cases to manage:
+	- package.module.x() => Function invocation or instantiation comming from one of the import. Stub is an unknown entity.
+	- module.x() with `from package import module` => Function invecation or instantiation from an imported module. Stub is an unknown entity.
+	- self.x() => Method invocation. There should be no stub.
+	- c.x() => Method invocation. Can be a stub method"
+
+	| identifier receiverSource |
+	"We do not visit the attribute to simplify things."
+	identifier := aNode _attribute sourceText.
+	receiverSource := aNode _object sourceText.
+
+	"=> self.x()"
+	self flag: #todo. "Can be something different than self..."
+	receiverSource = 'self' ifTrue: [
+			^ self
+				  resolve: ((SRLocalClassEntityResolvable identifier: identifier expectedKind: FamixTMethod)
+						   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one is a method from a missing superclass"
+							   self ensureStubMethodNamed: unresolved identifier ];
+						   yourself)
+				  foundAction: [ :method :currentEntity | self createInvocationOf: method from: currentEntity node: (aNode parentOfType: #call) ] ].
+
+	"=> package.module.x()"
+	self findImportMatchingSource: aNode sourceText ifFound: [ :import |
+			^ self
+				  resolve: ((FamixPythonInvocationOrInstantiationWithNamespaceResolvable identifier: identifier import: import)
+						   expectedKind: {
+								   FamixPythonFunction.
+								   FamixPythonClass };
+						   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one can be a function or a class"
+								   (self ensureStubUnknownEntityNamed: unresolved identifier)
+									   parentPackage: import importedEntity;
+									   yourself ];
+						   yourself)
+				  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: (aNode parentOfType: #call) forResult: result in: currentEntity ] ].
+
+	"=> module.x() when module is an imported entity"
+	self currentEntity allEffectiveImports
+		detect: [ :import | (import propertyNamed: #importedEntityName) = receiverSource or: [ import alias = receiverSource ] ]
+		ifFound: [ :import |
+				^ self
+					  resolve: ((FamixPythonDependencyFromImportedEntityResolvable identifier: identifier import: import)
+							   notFoundReplacementEntity: [ :unresolved :currentEntity |
+									   (self ensureStubUnknownEntityNamed: unresolved identifier)
+										   parentPackage: unresolved import importedEntity;
+										   yourself ];
+							   yourself)
+					  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: (aNode parentOfType: #call) forResult: result in: currentEntity ] ].
+
+	"=> c.x()"
+	self visit: aNode _object.
+	^ self
+		  resolve: ((FamixPythonMethodInvocationResolvable identifier: identifier receiver: receiverSource)
+				   notFoundReplacementEntity: [ :unresolved :currentEntity | self ensureStubMethodNamed: unresolved identifier ];
+				   yourself)
+		  foundAction: [ :result :currentEntity | self createInvocationOf: result from: currentEntity node: (aNode parentOfType: #call) ]
+]
+
+{ #category : 'private' }
 FamixPythonVisitor >> manageAttributeWriteAccessTo: aNode [
 
 	| variable pair |
@@ -532,68 +591,6 @@ FamixPythonVisitor >> modelClass [
 	^ FamixPythonModel
 ]
 
-{ #category : 'private' }
-FamixPythonVisitor >> resolveInvocationOrInstantiationFrom: aCallNode [
-	"When we end up here we might have multiple cases to manage:
-	- package.module.x() => Function invocation or instantiation comming from one of the import. Stub is an unknown entity.
-	- module.x() with `from package import module` => Function invecation or instantiation from an imported module. Stub is an unknown entity.
-	- self.x() => Method invocation. There should be no stub.
-	- c.x() => Method invocation. Can be a stub method
-	- x()() => Invocation or Instantiation of the result of another invocation. This we cannot really treat it here so for now I'll just ignore this case.
-	- table[x]() => Same as above but with the content of a table"
-
-	| receiver |
-	" => x()()/table[x]()
-	This is happening when we invoke the result of an invocation. The parser cannot know what is invoked. I'm ignoring it"
-	(#( subscript call identifier parenthesized_expression list_splat) includes: aCallNode _function type) ifTrue: [ ^ self ].
-
-	receiver := self visit: aCallNode _function.
-
-	"=> self.x()"
-	self flag: #todo. "Can be something different than self..."
-	receiver first = 'self' ifTrue: [
-			^ self
-				  resolve: ((SRLocalClassEntityResolvable identifier: receiver second expectedKind: FamixTMethod)
-						   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one is a method from a missing superclass"
-							   self ensureStubMethodNamed: unresolved identifier ];
-						   yourself)
-				  foundAction: [ :method :currentEntity | self createInvocationOf: method from: currentEntity node: aCallNode ] ].
-
-	"=> package.module.x()"
-	self findImportMatchingSource: receiver first ifFound: [ :import |
-			^ self
-				  resolve: ((FamixPythonInvocationOrInstantiationWithNamespaceResolvable identifier: receiver second import: import)
-						   expectedKind: {
-								   FamixPythonFunction.
-								   FamixPythonClass };
-						   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one can be a function or a class"
-								   (self ensureStubUnknownEntityNamed: unresolved identifier)
-									   parentPackage: import importedEntity;
-									   yourself ];
-						   yourself)
-				  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aCallNode forResult: result in: currentEntity ] ].
-
-	"=> module.x() when module is an imported entity"
-	self currentEntity allEffectiveImports
-		detect: [ :import | (import propertyNamed: #importedEntityName) = receiver first or: [ import alias = receiver first ] ]
-		ifFound: [ :import |
-				^ self
-					  resolve: ((FamixPythonDependencyFromImportedEntityResolvable identifier: receiver second import: import)
-							   notFoundReplacementEntity: [ :unresolved :currentEntity |
-									   (self ensureStubUnknownEntityNamed: unresolved identifier)
-										   parentPackage: unresolved import importedEntity;
-										   yourself ];
-							   yourself)
-					  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aCallNode forResult: result in: currentEntity ] ].
-
-	"=> c.x()"
-	^ self
-		  resolve: ((FamixPythonMethodInvocationResolvable identifier: receiver second receiver: receiver first)
-				   notFoundReplacementEntity: [ :unresolved :currentEntity | self ensureStubMethodNamed: unresolved identifier ];
-				   yourself)
-		  foundAction: [ :result :currentEntity | self createInvocationOf: result from: currentEntity node: aCallNode ]
-]
-
 { #category : 'accessing' }
 FamixPythonVisitor >> unknownEntityNamed: aString [
 
@@ -670,21 +667,17 @@ FamixPythonVisitor >> visitAttribute: anAttributeNode [
 	"
 
 	| source fullReceiver name variable |
-	
 	self flag: #todo. "This method is really ugly and full of holes..."
-	
+
 	anAttributeNode parent parent type = #class_definition ifTrue: [ ^ self manageImportedInheritanceDeclaredBy: anAttributeNode ].
 
 	anAttributeNode isLeftSideOfAssignation ifTrue: [ ^ self manageAttributeWriteAccessTo: anAttributeNode ].
 
+	"If the parent is a call , we manage it."
+	anAttributeNode isInCall ifTrue: [ ^ self manageAttributeAsCallReceiver: anAttributeNode ].
+
 	source := anAttributeNode _object sourceText copyWithout: Character space.
 	name := self visit: anAttributeNode _attribute.
-
-	"If the parent is a call , we return info to resolve the call"
-	anAttributeNode parent type = #call ifTrue: [
-			^ {
-				  source.
-				  name } ].
 
 	"Symbol resolution of accesses and references to imported entities.
 	Example:
@@ -813,8 +806,6 @@ FamixPythonVisitor >> visitBreakStatement: aNode [
 
 { #category : 'visiting' }
 FamixPythonVisitor >> visitCall: aCallNode [
-
-	self resolveInvocationOrInstantiationFrom: aCallNode.
 
 	^ self visitChildren: aCallNode
 ]
@@ -1404,7 +1395,7 @@ FamixPythonVisitor >> visitModule: aModuleNode [
 
 			self currentEntity: entity ].
 	
-	(fileReference basename = #'moduleAtRoot130.py') ifTrue: [ 1halt ].
+	(fileReference basename = #'moduleAtRoot80.py') ifTrue: [ 1halt ].
 	
 	self visitChildren: aModuleNode.
 
