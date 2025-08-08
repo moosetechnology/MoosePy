@@ -147,3 +147,13 @@ var = "To say:\n"\
         f" ({variableToAccessInConcatenatedString})"
 
 "String with escaped interpolation {{notAVariable}}"
+
+
+my_list = [1, 2, 3, 4, 5]
+
+
+def function_to_invoke_in_subscript_in_assignment():
+    return 2
+
+
+my_list[function_to_invoke_in_subscript_in_assignment()] = 10
