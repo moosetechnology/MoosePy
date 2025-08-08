@@ -17,6 +17,17 @@ FamixTSNodeWrapper >> isAccessOrReferenceNode [
 ]
 
 { #category : '*Famix-Python-Importer' }
+FamixTSNodeWrapper >> isIsDirectFunctionInvocationOrInstanciation [
+
+	(self parent type = #call and: [ self parent _function = self ]) ifTrue: [ ^ true ].
+
+	self flag: #todo. "Manage other find of parenthesized_expressions that have more than just one identifier."
+	(self parent type = #parenthesized_expression and: [ self parent collectNamedChild = { self } ]) ifTrue: [ ^ true ].
+
+	^ false
+]
+
+{ #category : '*Famix-Python-Importer' }
 FamixTSNodeWrapper >> isLeftSideOfAssignation [
 
 	self parentsDo: [ :node |

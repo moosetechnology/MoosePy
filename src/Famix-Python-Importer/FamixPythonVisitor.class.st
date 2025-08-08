@@ -332,6 +332,21 @@ FamixPythonVisitor >> manageAttributeWriteAccessTo: aNode [
 ]
 
 { #category : 'private' }
+FamixPythonVisitor >> manageDirectFunctionInvocationOnInstanciation: aNode [
+	"I should find a function invocation or an instanciation without ano receiver. For example function(1) or print(name) or (function)(1)"
+
+	self
+		resolve: ((FamixPythonInvocationOrInstantiationResolvable identifier: aNode sourceText)
+				 expectedKind: {
+						 FamixPythonFunction.
+						 FamixPythonClass };
+				 notFoundReplacementEntity: [ :unresolved :currentEntity | "This one can be a function or a class"
+					 { (self ensureStubUnknownEntityNamed: unresolved identifier) } ];
+				 yourself)
+		foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: (aNode parentOfType: #call) forResult: result in: currentEntity ]
+]
+
+{ #category : 'private' }
 FamixPythonVisitor >> manageFunctionDeclarationFrom: aFunctionDefinition [
 
 	| function name signature |
@@ -520,7 +535,6 @@ FamixPythonVisitor >> modelClass [
 { #category : 'private' }
 FamixPythonVisitor >> resolveInvocationOrInstantiationFrom: aCallNode [
 	"When we end up here we might have multiple cases to manage:
-	- x() => This is either a function invocation or instantiation. There should be no stub. 
 	- package.module.x() => Function invocation or instantiation comming from one of the import. Stub is an unknown entity.
 	- module.x() with `from package import module` => Function invecation or instantiation from an imported module. Stub is an unknown entity.
 	- self.x() => Method invocation. There should be no stub.
@@ -531,21 +545,10 @@ FamixPythonVisitor >> resolveInvocationOrInstantiationFrom: aCallNode [
 	| receiver |
 	" => x()()/table[x]()
 	This is happening when we invoke the result of an invocation. The parser cannot know what is invoked. I'm ignoring it"
-	(#( subscript call ) includes: aCallNode _function type) ifTrue: [ ^ self ].
+	(#( subscript call identifier parenthesized_expression) includes: aCallNode _function type) ifTrue: [ ^ self ].
 
 	receiver := self visit: aCallNode _function.
 
-	"=> x()"
-	receiver isString ifTrue: [
-			^ self
-				  resolve: ((FamixPythonInvocationOrInstantiationResolvable identifier: receiver)
-						   expectedKind: {
-								   FamixPythonFunction.
-								   FamixPythonClass };
-						   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one can be a function or a class"
-							   { (self ensureStubUnknownEntityNamed: unresolved identifier) } ];
-						   yourself)
-				  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: aCallNode forResult: result in: currentEntity ] ].
 	"=> self.x()"
 	self flag: #todo. "Can be something different than self..."
 	receiver first = 'self' ifTrue: [
@@ -1124,11 +1127,14 @@ FamixPythonVisitor >> visitGlobalStatement: aNode [
 FamixPythonVisitor >> visitIdentifier: anIdentifierNode [
 	"An identifier is widly used in the python tree. 
 	Some are just names and some can represent an access or a reference."
-	
+
 	anIdentifierNode isParameterDeclaration ifTrue: [ ^ self createParameterFrom: anIdentifierNode ].
-	
+
 	"In a class definition signature, this represent the declaration of a superclass."
 	anIdentifierNode parent parent type = #class_definition ifTrue: [ ^ self manageInheritanceDeclaredBy: anIdentifierNode ].
+
+	"For example function(1) or print(name) or (function)(1)"
+	anIdentifierNode isIsDirectFunctionInvocationOrInstanciation ifTrue: [ ^ self manageDirectFunctionInvocationOnInstanciation: anIdentifierNode ].
 
 	"Manages write access separated to read access"
 	anIdentifierNode isLeftSideOfAssignation ifTrue: [ ^ self manageWriteAccessTo: anIdentifierNode ].

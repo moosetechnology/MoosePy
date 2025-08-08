@@ -1687,6 +1687,23 @@ FamixPythonProject1Test >> testFunctionInvocationFromPackage [
 ]
 
 { #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationFromParenthesizedExpressionContainingOnlyAnIdentifierAsFunction [
+
+	| module function invocation |
+	function := self functionNamed: 'function_to_invoke_in_parenthesized_expression'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation invokedEntity equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
+]
+
+{ #category : 'tests - invocations' }
 FamixPythonProject1Test >> testFunctionInvocationFromSubscriptOnLeftSideOfAssignment [
 
 	| module function invocation |
