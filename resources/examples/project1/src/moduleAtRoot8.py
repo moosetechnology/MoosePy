@@ -34,3 +34,19 @@ print(x.base)
 rnstate = np.random.RandomState(1)
 X = 10 * rnstate.rand(50)
 y = 2 * X - 5 + rnstate.randn(50)
+
+class CustomMetaclass2(type):
+
+    def __init__(cls, name, bases, dct):
+        cls.base = 200
+
+
+for i in range(5):
+    if i == 3:
+        break
+    print(i)
+
+for i in range(5):
+    if i == 3:
+        continue
+    print(i)

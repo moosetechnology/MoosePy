@@ -2,6 +2,12 @@ import root2.NameOfSubpackageOrClass
 
 print(root2.NameOfSubpackageOrClass)
 
+import root
+
+
+class Cat(root.Animal):
+    pass
+
 
 def function_with_multiple_assignations():
     local_multiple1 = local_multiple2 = local_multiple3 = 2
@@ -61,4 +67,3 @@ def function_with_local_variables2():
 def function_with_local_variables_and_tuples():
     local_in_function_with_tuple1, local_in_function_with_tuple2 = (1, 2)
     return local_in_function_with_tuple1 + local_in_function_with_tuple2
-

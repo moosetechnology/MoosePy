@@ -48,6 +48,48 @@ FamixPythonProject1Test >> testAccessOrReferenceToStubEntitySourceAnchor [
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAccessesOfAugmentedAssignment [
+	"In the case of 
+	
+	augmentedAssignmentVar = 1
+	augmentedAssignmentVar += 3
+
+	We should have 2 write accesses and 1 read access
+"
+
+	| variable module accesses |
+	variable := self globalVariableNamed: 'augmentedAssignmentVar'.
+	module := self moduleNamed: 'moduleAtRoot2'.
+
+	accesses := variable incomingAccesses select: [ :anAccess | anAccess accessor = module ].
+
+	self assert: accesses size equals: 3.
+	self assert: (accesses select: #isRead) size equals: 1.
+	self assert: (accesses select: #isWrite) size equals: 2
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAccessesOfAugmentedAssignmentSourceAnchor [
+	"In the case of 
+	
+	augmentedAssignmentVar = 1
+	augmentedAssignmentVar += 3
+
+	We should have 2 write accesses and 1 read access
+"
+
+	| variable module accesses |
+	variable := self globalVariableNamed: 'augmentedAssignmentVar'.
+	module := self moduleNamed: 'moduleAtRoot2'.
+
+	accesses := variable incomingAccesses select: [ :anAccess | anAccess accessor = module ].
+
+	self assert: accesses first sourceText equals: 'augmentedAssignmentVar = 1'.
+	self assert: accesses second sourceText equals: 'augmentedAssignmentVar += 3'.
+	self assert: accesses third sourceText equals: 'augmentedAssignmentVar += 3'
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testAccessesOfrnstate [
 	"Regression test"
 
@@ -65,10 +107,167 @@ FamixPythonProject1Test >> testAccessesOfrnstate [
 	self assert: global incomingAccesses third sourceText equals: 'rnstate'
 ]
 
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAssignationWithIdentifierOnLeftSide [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableIdentifier'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAssignationWithVariableAttributeOnLeftSide [
+
+	| attribute class access |
+	attribute := self attributeNamed: 'variableAttribute'.
+	class := self classNamed: 'ClassWithVariableAttribute'.
+
+	access := attribute incomingAccesses detect: [ :anAccess | anAccess accessor = class ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: class.
+	self assert: access accessor equals: class.
+	self assert: access target equals: attribute.
+	self assert: access variable equals: attribute.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (class accesses anySatisfy: [ :anAccess | anAccess variable = attribute ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAssignationWithVariableListPatternOnLeftSide [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableListPattern1'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAssignationWithVariablePatternListIdentifierOnLeftSide [
+
+	| global module access |
+	global := self globalVariableNamed: 'variablePatternListIdentifier1'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAssignationWithVariableSubscriptOnLeftSide [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableSubscript'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	self assert: (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) size equals: 2.
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAssignationWithVariableTuplePatternOnLeftSide [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableTuplePattern1'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
 { #category : 'tests' }
 FamixPythonProject1Test >> testAssociationsSourcesAreNeverStub [
 
 	(self model allUsing: FamixTAssociation) do: [ :association | self deny: association source isStub ]
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAugmentedAssignationWithAttributeOnLeftSide [
+
+	| variable class accesses |
+	variable := self attributeNamed: 'variableAugmentedAssignmentAttribute'.
+	class := self classNamed: 'ClassWithAugmentedAssignment'.
+
+	accesses := variable incomingAccesses select: [ :anAccess | anAccess accessor = class ].
+
+	self assert: accesses size equals: 3.
+	self assert: (accesses select: #isRead) size equals: 1.
+	self assert: (accesses select: #isWrite) size equals: 2
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAugmentedAssignationWithIdentifierOnLeftSide [
+
+	| variable module accesses |
+	variable := self globalVariableNamed: 'variableAugmentedAssignmentIdentifier'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	accesses := variable incomingAccesses select: [ :anAccess | anAccess accessor = module ].
+
+	self assert: accesses size equals: 3.
+	self assert: (accesses select: #isRead) size equals: 1.
+	self assert: (accesses select: #isWrite) size equals: 2
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testAugmentedAssignationWithSubscriptOnLeftSide [
+
+	| variable module accesses |
+	variable := self globalVariableNamed: 'variableAugmentedAssignmentSubscript'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	accesses := variable incomingAccesses select: [ :anAccess | anAccess accessor = module ].
+
+	self assert: accesses size equals: 3.
+	self assert: (accesses select: #isRead) size equals: 1.
+	self assert: (accesses select: #isWrite) size equals: 2
 ]
 
 { #category : 'tests - from-import' }
@@ -172,6 +371,7 @@ FamixPythonProject1Test >> testClassImportsModule [
 	self assert: import importingEntity equals: class.
 	self assert: import importedEntity equals: (self moduleNamed: 'moduleAtRoot3').
 	self deny: import isFromImport.
+	self deny: import isFutureImport.
 	self assert: import sourceText equals: 'import moduleAtRoot3'
 ]
 
@@ -202,6 +402,7 @@ FamixPythonProject1Test >> testClassImportsPackageFrom [
 	self assert: import importingEntity equals: class.
 	self assert: import importedEntity equals: package.
 	self assert: import isFromImport.
+	self deny: import isFutureImport.
 	self assert: import sourceText equals: 'from root2 import subpackageInRoot2'
 ]
 
@@ -213,6 +414,7 @@ FamixPythonProject1Test >> testClassInClass [
 
 	self assert: class class equals: FamixPythonClass.
 	self assert: class name equals: 'ClassInClass'.
+	self deny: class isStub.
 	self assert: class typeContainer equals: (self classNamed: 'ClassWithClasses')
 ]
 
@@ -224,6 +426,7 @@ FamixPythonProject1Test >> testClassInFunction [
 
 	self assert: class class equals: FamixPythonClass.
 	self assert: class name equals: 'ClassInFunction'.
+	self deny: class isStub.
 	self assert: class typeContainer equals: (self functionNamed: 'function_with_class_inside')
 ]
 
@@ -235,6 +438,7 @@ FamixPythonProject1Test >> testClassInMethod [
 
 	self assert: class class equals: FamixPythonClass.
 	self assert: class name equals: 'ClassInMethod'.
+	self deny: class isStub.
 	self assert: class typeContainer equals: ((self classNamed: 'ClassWithClasses') methods detect: #isConstructor) 
 ]
 
@@ -246,6 +450,7 @@ FamixPythonProject1Test >> testClassInModule [
 
 	self assert: class class equals: FamixPythonClass.
 	self assert: class name equals: 'ClassWithClasses'.
+	self deny: class isStub.
 	self assert: class typeContainer equals: (self moduleNamed: 'moduleWithClasses')
 ]
 
@@ -258,7 +463,184 @@ FamixPythonProject1Test >> testClassInPackage [
 
 	self assert: class class equals: FamixPythonClass.
 	self assert: class name equals: 'ClassInSubpackage'.
+	self deny: class isStub.
 	self assert: class typeContainer equals: (self packageNamed: 'subpackage1')
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testClassReferenceFromAClassDefinitionBody [
+
+	| class class2 reference |
+	class := self classNamed: 'ClassToReferenceInClassDeclarationBody'.
+	class2 := self classNamed: 'ClassWithReferenceInBody'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = class2 ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: class2.
+	self assert: reference referencer equals: class2.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (class2 outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testClassReferenceFromAIfBlock [
+
+	| class module reference |
+	class := self classNamed: 'ClassToReferenceInIfBlock'.
+	module := self moduleNamed: 'moduleAtRoot12'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testClassReferenceFromAIfCondition [
+
+	| class module reference |
+	class := self classNamed: 'ClassToReferenceInIfCondition'.
+	module := self moduleNamed: 'moduleAtRoot12'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testClassReferenceFromAIfElifClause [
+
+	| class module reference |
+	class := self classNamed: 'ClassToReferenceInIfElifClause'.
+	module := self moduleNamed: 'moduleAtRoot12'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testClassReferenceFromAIfElifCondition [
+
+	| class module reference |
+	class := self classNamed: 'ClassToReferenceInIfElifCondition'.
+	module := self moduleNamed: 'moduleAtRoot12'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testClassReferenceFromAIfElseClause [
+
+	| class module reference |
+	class := self classNamed: 'ClassToReferenceInIfElseClause'.
+	module := self moduleNamed: 'moduleAtRoot12'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testClassReferenceFromAList [
+	"I am a regression test
+	
+	I did the mistake to skip visit of list children why prevent to find all references :("
+
+	| class module reference |
+	class := self classNamed: 'ClassToReferenceInList'.
+	module := self moduleNamed: 'moduleAtRoot12'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testClassReferenceFromAReturn [
+	"I am a regression test
+	
+	I did the mistake to skip visit of list children why prevent to find all references :("
+
+	| class function reference |
+	class := self classNamed: 'ClassToReferenceInReturn'.
+	function := self functionNamed: 'function_with_return'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = function ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: function.
+	self assert: reference referencer equals: function.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (function outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testClassReferenceFromAWhileBody [
+
+	| class module reference |
+	class := self classNamed: 'ClassToReferenceInWhileBody'.
+	module := self moduleNamed: 'moduleAtRoot12'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
+]
+
+{ #category : 'tests - references' }
+FamixPythonProject1Test >> testClassReferenceFromAWhileElseClause [
+
+	| class module reference |
+	class := self classNamed: 'ClassToReferenceInWhileElseClause'.
+	module := self moduleNamed: 'moduleAtRoot12'.
+
+	reference := (class incomingReferences select: [ :aReference | aReference referencer = module ]) detectMax: [ :aReference | aReference sourceAnchor startPos ].
+
+	self assert: reference class equals: FamixPythonReference.
+	self assert: reference source equals: module.
+	self assert: reference referencer equals: module.
+	self assert: reference target equals: class.
+	self assert: reference referredEntity equals: class.
+	self assert: (module outgoingReferences anySatisfy: [ :aReference | aReference referredEntity = class ])
 ]
 
 { #category : 'tests - references' }
@@ -737,6 +1119,16 @@ FamixPythonProject1Test >> testCommentInPackage [
 	self assert: comment commentedEntity equals: (self packageNamed: 'NameOfSubpackageOrClass')
 ]
 
+{ #category : 'tests - comments' }
+FamixPythonProject1Test >> testCommentWithWideString [
+
+	| comment |
+	comment := self model allComments detect: [ :aComment | aComment sourceText beginsWith: '# Comment with wide string ぁ' ].
+
+	self assert: comment class equals: FamixPythonComment.
+	self assert: comment commentedEntity equals: (self moduleNamed: 'moduleAtRoot2')
+]
+
 { #category : 'tests - methods' }
 FamixPythonProject1Test >> testConstructor [
 
@@ -917,6 +1309,68 @@ FamixPythonProject1Test >> testFromImportWithStubPackagesOfTheSameName [
 	self assert: import sourceText equals: 'from scipy.stats.stats import pearsonr'
 ]
 
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testFunctionDefaultParameter [
+
+	| function parameter |
+	function := self functionNamed: 'function_with_default_parameter'.
+	parameter := self parameterNamed: 'default_parameter'.
+
+	self assert: function parameters size equals: 1.
+	self assert: function keywordSeparatorPosition equals: nil.
+	self assert: function positionalSeparatorPosition equals: nil.
+	self assertCollection: function parameters hasSameElements: { parameter }.
+	self assert: parameter name equals: 'default_parameter'.
+	self deny: parameter isStub.
+	self assert: parameter class equals: FamixPythonParameter.
+	self assert: parameter parentBehaviouralEntity equals: function.
+	self assert: parameter hasDefaultValue.
+	self deny: parameter isListSplat.
+	self deny: parameter isDictionarySplat
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testFunctionDictionarySplatParameter [
+
+	| function parameter |
+	function := self functionNamed: 'function_with_dictionary_splat'.
+	parameter := self parameterNamed: 'dictionary_splat_pattern_parameter'.
+
+	self assert: function parameters size equals: 1.
+	self assert: function keywordSeparatorPosition equals: nil.
+	self assert: function positionalSeparatorPosition equals: nil.
+	self assertCollection: function parameters hasSameElements: { parameter }.
+	self assert: parameter name equals: 'dictionary_splat_pattern_parameter'.
+	self deny: parameter isStub.
+	self assert: parameter class equals: FamixPythonParameter.
+	self assert: parameter parentBehaviouralEntity equals: function.
+	self deny: parameter hasDefaultValue.
+	self deny: parameter isListSplat.
+	self assert: parameter isDictionarySplat
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testFunctionIdentifierParameter [
+
+	| function parameter |
+	function := self functionNamed: 'function_with_identifier_parameters'.
+	parameter := self parameterNamed: 'identifier_parameter1'.
+
+	self assert: function parameters size equals: 2.
+	self assert: function keywordSeparatorPosition equals: nil.
+	self assert: function positionalSeparatorPosition equals: nil.
+	self assertCollection: function parameters hasSameElements: {
+			parameter.
+			(self parameterNamed: 'identifier_parameter2') }.
+	self assert: parameter name equals: 'identifier_parameter1'.
+	self deny: parameter isStub.
+	self assert: parameter class equals: FamixPythonParameter.
+	self assert: parameter parentBehaviouralEntity equals: function.
+	self deny: parameter hasDefaultValue.
+	self deny: parameter isListSplat.
+	self deny: parameter isDictionarySplat
+]
+
 { #category : 'tests - from-import' }
 FamixPythonProject1Test >> testFunctionImportsClassFromAModule [
 
@@ -1062,6 +1516,7 @@ FamixPythonProject1Test >> testFunctionInAFunction [
 	self assert: function class equals: FamixPythonFunction.
 	self assert: function name equals: 'inner_function'.
 	self assert: function signature equals: 'inner_function(finput)'.
+	self deny: function isStub.
 	self assert: function functionOwner equals: (self functionNamed: 'function_with_inner_function')
 ]
 
@@ -1076,6 +1531,7 @@ FamixPythonProject1Test >> testFunctionInAModule [
 	self assert: function class equals: FamixPythonFunction.
 	self assert: function name equals: 'functionWithImport'.
 	self assert: function signature equals: 'functionWithImport()'.
+	self deny: function isStub.
 	self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot')
 ]
 
@@ -1090,6 +1546,7 @@ FamixPythonProject1Test >> testFunctionInAPackage [
 	self assert: function class equals: FamixPythonFunction.
 	self assert: function name equals: 'return2'.
 	self assert: function signature equals: 'return2()'.
+	self deny: function isStub.
 	self assert: function functionOwner equals: (self packageNamed: 'subsubpackage1')
 ]
 
@@ -1230,6 +1687,40 @@ FamixPythonProject1Test >> testFunctionInvocationFromPackage [
 ]
 
 { #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationFromParenthesizedExpressionContainingOnlyAnIdentifierAsFunction [
+
+	| module function invocation |
+	function := self functionNamed: 'function_to_invoke_in_parenthesized_expression'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation invokedEntity equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationFromSubscriptOnLeftSideOfAssignment [
+
+	| module function invocation |
+	function := self functionNamed: 'function_to_invoke_in_subscript_in_assignment'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation invokedEntity equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
+]
+
+{ #category : 'tests - invocations' }
 FamixPythonProject1Test >> testFunctionInvocationHasSignature [
 
 	| module function invocation |
@@ -1239,6 +1730,23 @@ FamixPythonProject1Test >> testFunctionInvocationHasSignature [
 	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
 
 	self assert: invocation signature equals: 'function_printing_arg("Cyril")'
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationInStringInterpolation [
+
+	| module function invocation |
+	function := self functionNamed: 'function_to_invoke_in_interpolation'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation invokedEntity equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
 ]
 
 { #category : 'tests - invocations' }
@@ -1311,6 +1819,23 @@ FamixPythonProject1Test >> testFunctionInvocationSourceAnchor [
 
 	self assert: invocation sourceAnchor isNotNil.
 	self assert: invocation sourceText equals: 'sort_list(x, y)'
+]
+
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testFunctionInvocationWithListSplat [
+
+	| module function invocation |
+	function := self functionNamed: 'function_to_invoke_in_list_splat'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation invokedEntity equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
 ]
 
 { #category : 'tests - invocations' }
@@ -1401,6 +1926,78 @@ FamixPythonProject1Test >> testFunctionInvocationWithNamespaceOfMultipleLevelSou
 
 	self assert: invocation sourceAnchor isNotNil.
 	self assert: invocation sourceText equals: 'root.subpackage1.subsubpackage1.function_with_function_ref()'
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testFunctionKeywordSeparatorParameter [
+
+	| function |
+	function := self functionNamed: 'function_with_keyword_separator'.
+
+	self assert: function keywordSeparatorPosition equals: 3.
+	self assert: function positionalSeparatorPosition equals: nil
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testFunctionListSplatParameter [
+
+	| function parameter |
+	function := self functionNamed: 'function_with_list_splat'.
+	parameter := self parameterNamed: 'list_splat_parameter'.
+
+	self assert: function parameters size equals: 1.
+	self assert: function keywordSeparatorPosition equals: nil.
+	self assert: function positionalSeparatorPosition equals: nil.
+	self assertCollection: function parameters hasSameElements: { parameter }.
+	self assert: parameter name equals: 'list_splat_parameter'.
+	self deny: parameter isStub.
+	self assert: parameter class equals: FamixPythonParameter.
+	self assert: parameter parentBehaviouralEntity equals: function.
+	self deny: parameter hasDefaultValue.
+	self assert: parameter isListSplat.
+	self deny: parameter isDictionarySplat
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testFunctionParameters [
+
+	| function param1 param2 |
+	function := self functionNamed: 'sort_list'.
+	param1 := self parameterNamed: 'list1'.
+	param2 := self parameterNamed: 'list2'.
+
+	self assert: function parameters size equals: 2.
+	self assertCollection: function parameters hasSameElements: {
+			param1.
+			param2 }.
+	self assert: param1 name equals: 'list1'.
+	self assert: param2 name equals: 'list2'.
+	self deny: param1 isStub.
+	self deny: param2 isStub.
+	self assert: param1 class equals: FamixPythonParameter.
+	self assert: param2 class equals: FamixPythonParameter.
+	self assert: param1 parentBehaviouralEntity equals: function.
+	self assert: param2 parentBehaviouralEntity equals: function
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testFunctionParametersSourceAnchor [
+
+	| param |
+	param := self parameterNamed: 'list1'.
+
+	self assert: param sourceAnchor isNotNil.
+	self assert: param sourceText equals: 'list1'
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testFunctionPositionalSeparatorParameter [
+
+	| function |
+	function := self functionNamed: 'function_with_positional_separator'.
+
+	self assert: function keywordSeparatorPosition equals: nil.
+	self assert: function positionalSeparatorPosition equals: 3
 ]
 
 { #category : 'tests - references' }
@@ -1710,6 +2307,33 @@ FamixPythonProject1Test >> testFunctionSourceAnchor [
     return z' withPlatformLineEndings
 ]
 
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testFunctionTypedDefaultParameter [
+
+	| function parameter |
+	self skip.
+	self flag: #todo. "Manage assertions on types."
+	function := self functionNamed: 'function_with_typed_default_parameter'.
+	parameter := self parameterNamed: 'default_typed_parameter'.
+
+	self assert: function parameters size equals: 1.
+	self assertCollection: function parameters hasSameElements: { parameter }.
+	self assert: parameter name equals: 'default_typed_parameter'.
+	self deny: parameter isStub.
+	self assert: parameter class equals: FamixPythonParameter.
+	self assert: parameter parentBehaviouralEntity equals: function.
+	self assert: parameter hasDefaultValue.
+	self deny: parameter isListSplat.
+	self deny: parameter isDictionarySplat
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testFunctionTypedParameter [
+
+	self flag: #todo.
+	self skip
+]
+
 { #category : 'tests - functions' }
 FamixPythonProject1Test >> testFunctionsWithSameNameButDifferentParents [
 
@@ -1806,6 +2430,7 @@ FamixPythonProject1Test >> testGlobalVariableInModule [
 	self assert: global class equals: FamixPythonGlobalVariable.
 	self assert: global name equals: 'moduleAtRootVariable'.
 	self assert: global parentScope equals: (self moduleNamed: 'moduleAtRoot').
+	self deny: global isStub.
 	
 	self assert: global sourceAnchor isNotNil.
 	self assert: global sourceText equals: 'moduleAtRootVariable'
@@ -1822,6 +2447,7 @@ FamixPythonProject1Test >> testGlobalVariableInPackage [
 	self assert: global class equals: FamixPythonGlobalVariable.
 	self assert: global name equals: 'rootPackageVariable'.
 	self assert: global parentScope equals: (self packageNamed: 'root').
+	self deny: global isStub.
 
 	self assert: global sourceAnchor isNotNil.
 	self assert: global sourceText equals: 'rootPackageVariable'
@@ -1850,18 +2476,21 @@ FamixPythonProject1Test >> testGlobalVariablesAssignedWithATuple [
 	self assert: global class equals: FamixPythonGlobalVariable.
 	self assert: global name equals: 'globalWithTuple1'.
 	self assert: global parentScope equals: (self moduleNamed: 'moduleAtRoot').
+	self deny: global isStub.
 
 	global := self globalVariableNamed: 'globalWithTuple2'.
 
 	self assert: global class equals: FamixPythonGlobalVariable.
 	self assert: global name equals: 'globalWithTuple2'.
 	self assert: global parentScope equals: (self moduleNamed: 'moduleAtRoot').
+	self deny: global isStub.
 
 	global := self globalVariableNamed: 'globalWithTuple3'.
 
 	self assert: global class equals: FamixPythonGlobalVariable.
 	self assert: global name equals: 'globalWithTuple3'.
-	self assert: global parentScope equals: (self moduleNamed: 'moduleAtRoot')
+	self assert: global parentScope equals: (self moduleNamed: 'moduleAtRoot').
+	self deny: global isStub.
 ]
 
 { #category : 'tests - global variables' }
@@ -1969,6 +2598,38 @@ FamixPythonProject1Test >> testImportAnEntityThatIsShadowed [
 	self assert: import sourceText equals: 'from root2.moduleWithShadowing import shadowedName'
 ]
 
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testImportFuture [
+
+	| entity module import |
+
+	entity := self unknownEntityNamed: 'generator_stop'.
+	module := self moduleNamed: 'moduleAtRoot9'.
+	import := module imports detect: [ :pimport | pimport target name = 'generator_stop' ].
+
+	self assert: import importingEntity equals: module.
+	self assert: import importedEntity equals: entity.
+	self assert: import isFromImport.
+	self assert: import isFutureImport.
+	self assert: import sourceText equals: 'from __future__ import generator_stop'
+]
+
+{ #category : 'tests - from-import' }
+FamixPythonProject1Test >> testImportFutureWithAlias [
+
+	| entity module import |
+	entity := self unknownEntityNamed: 'annotations'.
+	module := self moduleNamed: 'moduleAtRoot9'.
+	import := module imports detect: [ :pimport | pimport target name = 'annotations' ].
+
+	self assert: import importingEntity equals: module.
+	self assert: import importedEntity equals: entity.
+	self assert: import isFromImport.
+	self assert: import isFutureImport.
+	self assert: import alias equals: 'annot'.
+	self assert: import sourceText equals: 'from __future__ import annotations as annot'
+]
+
 { #category : 'tests - imports' }
 FamixPythonProject1Test >> testImportSourceAnchor [
 
@@ -2053,6 +2714,31 @@ FamixPythonProject1Test >> testImportWithTheNameOfAStubClass [
 	module := self moduleNamed: 'moduleWithStubImport'.
 
 	module imports do: [ :import | self deny: (import importedEntity isKindOf: FamixPythonClass) ]
+]
+
+{ #category : 'tests - inheritances' }
+FamixPythonProject1Test >> testImportedSuperclass [
+
+	| class |
+	class := self classNamed: 'Cat'.
+
+	self assert: class class equals: FamixPythonClass.
+	self assert: class name equals: 'Cat'.
+	self assert: class typeContainer equals: (self moduleNamed: 'moduleAtRoot6').
+	self assert: class superclass equals: (self classNamed: 'Animal').
+	self deny: class isStub.
+	self deny: class superclass isStub
+]
+
+{ #category : 'tests - inheritances' }
+FamixPythonProject1Test >> testImportedSuperclassShouldNotCreateReference [
+	"Animal is used in moduleAtRoot6 for an inheritance and we should not have a reference."
+
+	| class module |
+	class := self classNamed: 'Cat'.
+	module := self moduleNamed: 'moduleAtRoot6'.
+
+	self assertEmpty: (class incomingReferences select: [ :aReference | aReference referencer = module ])
 ]
 
 { #category : 'tests - inheritances' }
@@ -2413,6 +3099,31 @@ FamixPythonProject1Test >> testInvocationOfMultipleStubFunctionsOfTheSameName [
 ]
 
 { #category : 'tests - invocations' }
+FamixPythonProject1Test >> testInvocationOfSameNameAsStubPackage [
+	"regression test
+	
+	```python
+	import time
+	regression_variable = time.time()
+	```
+	
+	In that case we resolvec `time()` as the Package time which is wrong"
+
+	| module function invocation |
+	function := self unknownEntityNamed: 'time'.
+	module := self moduleNamed: 'moduleWithStubs'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation invokedEntity equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
+]
+
+{ #category : 'tests - invocations' }
 FamixPythonProject1Test >> testInvocationOfStubFunction [
 
 	| module function invocation |
@@ -2464,12 +3175,85 @@ FamixPythonProject1Test >> testInvocationOfStubFunctionWithNamespace [
 	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
 ]
 
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testInvocationsThatCannotBeResolved [
+	"I created a file with a lot of invocations that cannot be resolved and we will ensure we do not create any invocation for them."
+
+	| module invocations |
+	module := self moduleNamed: 'moduleAtRoot16'.
+	invocations := module outgoingInvocations.
+
+	"We have one because it's the invocation of the result of an invocation."
+	self assert: invocations size equals: 1.
+	self assertCollection: (invocations collect: [ :invocation | invocation invokedEntity name ]) hasSameElements: { #function_returning_function }
+]
+
 { #category : 'tests - unknown access or reference' }
 FamixPythonProject1Test >> testKeywordsParametersShouldNotCreateAccessOrReference [
 	"Regression test"
 
 	self deny: ((self model allWithType: FamixPythonUnknownEntity) anySatisfy: [ :entity | entity name = 'param1' ]).
 	self deny: ((self model allWithType: FamixPythonUnknownEntity) anySatisfy: [ :entity | entity name = 'param2' ])
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testLambdaDefaultParameter [
+
+	| lambda parameter |
+	lambda := (self moduleNamed: 'moduleAtRoot14') lambdas at: 2.
+	parameter := self parameterNamed: 'lambda_default_parameter'.
+
+	self assert: lambda parameters size equals: 1.
+	self assert: lambda keywordSeparatorPosition equals: nil.
+	self assert: lambda positionalSeparatorPosition equals: nil.
+	self assertCollection: lambda parameters hasSameElements: { parameter }.
+	self assert: parameter name equals: 'lambda_default_parameter'.
+	self deny: parameter isStub.
+	self assert: parameter class equals: FamixPythonParameter.
+	self assert: parameter parentBehaviouralEntity equals: lambda.
+	self assert: parameter hasDefaultValue.
+	self deny: parameter isListSplat.
+	self deny: parameter isDictionarySplat
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testLambdaDictionarySplatParameter [
+
+	| lambda parameter |
+	lambda := (self moduleNamed: 'moduleAtRoot14') lambdas at: 4.
+	parameter := self parameterNamed: 'lambda_parameter_dictionary_splat'.
+
+	self assert: lambda parameters size equals: 1.
+	self assert: lambda keywordSeparatorPosition equals: nil.
+	self assert: lambda positionalSeparatorPosition equals: nil.
+	self assertCollection: lambda parameters hasSameElements: { parameter }.
+	self assert: parameter name equals: 'lambda_parameter_dictionary_splat'.
+	self deny: parameter isStub.
+	self assert: parameter class equals: FamixPythonParameter.
+	self assert: parameter parentBehaviouralEntity equals: lambda.
+	self deny: parameter hasDefaultValue.
+	self deny: parameter isListSplat.
+	self assert: parameter isDictionarySplat
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testLambdaIdentifierParameter [
+
+	| lambda parameter |
+	lambda := (self moduleNamed: 'moduleAtRoot14') lambdas at: 1.
+	parameter := self parameterNamed: 'lambda_parameter_identifier'.
+
+	self assert: lambda parameters size equals: 1.
+	self assert: lambda keywordSeparatorPosition equals: nil.
+	self assert: lambda positionalSeparatorPosition equals: nil.
+	self assertCollection: lambda parameters hasSameElements: { parameter }.
+	self assert: parameter name equals: 'lambda_parameter_identifier'.
+	self deny: parameter isStub.
+	self assert: parameter class equals: FamixPythonParameter.
+	self assert: parameter parentBehaviouralEntity equals: lambda.
+	self deny: parameter hasDefaultValue.
+	self deny: parameter isListSplat.
+	self deny: parameter isDictionarySplat
 ]
 
 { #category : 'tests - lambdas' }
@@ -2485,7 +3269,8 @@ FamixPythonProject1Test >> testLambdaInAClass [
 
 	self assert: lambda class equals: FamixPythonLambda.
 	self assert: lambda signature equals: 'toto'.
-	self assert: lambda lambdaContainer equals: container
+	self assert: lambda lambdaContainer equals: container.
+	self deny: lambda isStub.
 ]
 
 { #category : 'tests - lambdas' }
@@ -2501,7 +3286,8 @@ FamixPythonProject1Test >> testLambdaInAFunction [
 
 	self assert: lambda class equals: FamixPythonLambda.
 	self assert: lambda signature equals: 'a'.
-	self assert: lambda lambdaContainer equals: container
+	self assert: lambda lambdaContainer equals: container.
+	self deny: lambda isStub
 ]
 
 { #category : 'tests - lambdas' }
@@ -2522,7 +3308,8 @@ FamixPythonProject1Test >> testLambdaInALambda [
 
 	self assert: lambda class equals: FamixPythonLambda.
 	self assert: lambda signature equals: 'y'.
-	self assert: lambda lambdaContainer equals: container
+	self assert: lambda lambdaContainer equals: container.
+	self deny: lambda isStub
 ]
 
 { #category : 'tests - lambdas' }
@@ -2538,7 +3325,8 @@ FamixPythonProject1Test >> testLambdaInAMethod [
 
 	self assert: lambda class equals: FamixPythonLambda.
 	self assert: lambda signature equals: 'tata'.
-	self assert: lambda lambdaContainer equals: container
+	self assert: lambda lambdaContainer equals: container.
+	self deny: lambda isStub
 ]
 
 { #category : 'tests - lambdas' }
@@ -2554,7 +3342,8 @@ FamixPythonProject1Test >> testLambdaInAModule [
 
 	self assert: lambda class equals: FamixPythonLambda.
 	self assert: lambda signature equals: 'a, b'.
-	self assert: lambda lambdaContainer equals: container
+	self assert: lambda lambdaContainer equals: container.
+	self deny: lambda isStub
 ]
 
 { #category : 'tests - lambdas' }
@@ -2562,19 +3351,90 @@ FamixPythonProject1Test >> testLambdaInAPackage [
 
 	| lambda container |
 	container := self packageNamed: 'packageWithLambdas'.
-	
+
 	self assert: container class equals: FamixPythonPackage.
 	self assert: container lambdas size equals: 1.
-	
+
 	lambda := container lambdas anyOne.
-	
+
 	self assert: lambda class equals: FamixPythonLambda.
 	self assert: lambda signature equals: 'a'.
-	self assert: lambda lambdaContainer equals: container
-	
-	
-	
-	
+	self assert: lambda lambdaContainer equals: container.
+	self deny: lambda isStub
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testLambdaKeywordSeparatorParameter [
+
+	| lambda |
+	lambda := (self moduleNamed: 'moduleAtRoot14') lambdas at: 5.
+
+	self assert: lambda keywordSeparatorPosition equals: 2.
+	self assert: lambda positionalSeparatorPosition equals: nil
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testLambdaListSplatParameter [
+
+	| lambda parameter |
+	lambda := (self moduleNamed: 'moduleAtRoot14') lambdas at: 3.
+	parameter := self parameterNamed: 'lambda_parameter_list_splat'.
+
+	self assert: lambda parameters size equals: 1.
+	self assert: lambda keywordSeparatorPosition equals: nil.
+	self assert: lambda positionalSeparatorPosition equals: nil.
+	self assertCollection: lambda parameters hasSameElements: { parameter }.
+	self assert: parameter name equals: 'lambda_parameter_list_splat'.
+	self deny: parameter isStub.
+	self assert: parameter class equals: FamixPythonParameter.
+	self assert: parameter parentBehaviouralEntity equals: lambda.
+	self deny: parameter hasDefaultValue.
+	self assert: parameter isListSplat.
+	self deny: parameter isDictionarySplat
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testLambdaParameters [
+
+	| lambda param1 param2 |
+	lambda := (self moduleNamed: 'moduleWithLambdas') lambdas anyOne.
+	param1 := lambda parameters first.
+	param2 := lambda parameters second.
+
+	self assert: lambda parameters size equals: 2.
+	self assertCollection: lambda parameters hasSameElements: {
+			param1.
+			param2 }.
+	self assert: param1 name equals: 'a'.
+	self assert: param2 name equals: 'b'.
+	self deny: param1 isStub.
+	self deny: param2 isStub.
+	self assert: param1 class equals: FamixPythonParameter.
+	self assert: param2 class equals: FamixPythonParameter.
+	self assert: param1 parentBehaviouralEntity equals: lambda.
+	self assert: param2 parentBehaviouralEntity equals: lambda.
+	self deny: param1 hasDefaultValue.
+	self deny: param2 hasDefaultValue
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testLambdaParametersSourceAnchor [
+
+	| param |
+	param := (self moduleNamed: 'moduleWithLambdas') lambdas anyOne parameters second.
+
+	self assert: param sourceAnchor isNotNil.
+	self assert: param sourceText equals: 'b'
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testLambdaPositionalSeparatorParameter [
+
+	| lambda |
+	lambda := (self moduleNamed: 'moduleAtRoot14') lambdas at: 6.
+
+	self assert: lambda keywordSeparatorPosition equals: nil.
+	self assert: lambda positionalSeparatorPosition equals: 2
 ]
 
 { #category : 'tests - lambdas' }
@@ -2600,7 +3460,8 @@ FamixPythonProject1Test >> testLambdaWithoutParameters [
 
 	self assert: lambda class equals: FamixPythonLambda.
 	self assert: lambda signature equals: ''.
-	self assert: lambda lambdaContainer equals: container
+	self assert: lambda lambdaContainer equals: container.
+	self deny: lambda isStub
 ]
 
 { #category : 'tests - invocations' }
@@ -2621,6 +3482,24 @@ FamixPythonProject1Test >> testLocalMethodInvocationFromMethod [
 ]
 
 { #category : 'tests - invocations' }
+FamixPythonProject1Test >> testLocalMethodInvocationOfStubMethodFromSuperclass [
+
+	| method method2 invocation |
+	method2 := self methodNamed: 'missing_super_method'.
+	method := self methodNamed: 'method_calling_missing_super'.
+
+	invocation := method2 incomingInvocations detect: [ :aReference | aReference sender = method ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: method.
+	self assert: invocation sender equals: method.
+	self assertCollection: invocation target hasSameElements: { method2 }.
+	self assert: invocation invokedEntity equals: method2.
+	self assert: (method outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = method2 ]).
+	self assert: method2 isStub
+]
+
+{ #category : 'tests - invocations' }
 FamixPythonProject1Test >> testLocalMethodInvocationSourceAnchor [
 
 	| method method2 invocation |
@@ -2634,6 +3513,28 @@ FamixPythonProject1Test >> testLocalMethodInvocationSourceAnchor [
 ]
 
 { #category : 'tests - local variables' }
+FamixPythonProject1Test >> testLocalVariableInDictionaryComprehension [
+
+	| variable |
+	variable := self localVariableNamed: 'localVariableInDictionaryComprehension'.
+
+	self assert: variable class equals: FamixPythonLocalVariable.
+	self assert: variable name equals: 'localVariableInDictionaryComprehension'.
+	self assert: variable parentBehaviouralEntity equals: (self moduleNamed: 'moduleAtRoot15').
+	self deny: variable isStub
+]
+
+{ #category : 'tests - local variables' }
+FamixPythonProject1Test >> testLocalVariableInDictionaryComprehensionSourceAnchor [
+
+	| variable |
+	variable := self localVariableNamed: 'localVariableInDictionaryComprehension'.
+
+	self assert: variable sourceAnchor isNotNil.
+	self assert: variable sourceText equals: 'localVariableInDictionaryComprehension'
+]
+
+{ #category : 'tests - local variables' }
 FamixPythonProject1Test >> testLocalVariableInFunctionSourceAnchor [
 
 	| variable |
@@ -2641,6 +3542,62 @@ FamixPythonProject1Test >> testLocalVariableInFunctionSourceAnchor [
 
 	self assert: variable sourceAnchor isNotNil.
 	self assert: variable sourceText equals: 'local_in_function2'
+]
+
+{ #category : 'tests - local variables' }
+FamixPythonProject1Test >> testLocalVariableInGeneratorExpression [
+
+	| variable |
+	variable := self localVariableNamed: 'localVarInGeneratorExpression'.
+
+	self assert: variable class equals: FamixPythonLocalVariable.
+	self assert: variable name equals: 'localVarInGeneratorExpression'.
+	self assert: variable parentBehaviouralEntity equals: (self moduleNamed: 'moduleAtRoot15').
+	self deny: variable isStub
+]
+
+{ #category : 'tests - local variables' }
+FamixPythonProject1Test >> testLocalVariableInGeneratorExpression2 [
+
+	| variable |
+	variable := self localVariableNamed: 'localVarInGeneratorExpression2'.
+
+	self assert: variable class equals: FamixPythonLocalVariable.
+	self assert: variable name equals: 'localVarInGeneratorExpression2'.
+	self assert: variable parentBehaviouralEntity equals: (self moduleNamed: 'moduleAtRoot15').
+	self deny: variable isStub
+]
+
+{ #category : 'tests - local variables' }
+FamixPythonProject1Test >> testLocalVariableInGeneratorExpressionSourceAnchor [
+
+	| variable |
+	variable := self localVariableNamed: 'localVarInGeneratorExpression'.
+
+	self assert: variable sourceAnchor isNotNil.
+	self assert: variable sourceText equals: 'localVarInGeneratorExpression'
+]
+
+{ #category : 'tests - local variables' }
+FamixPythonProject1Test >> testLocalVariableInListComprehension [
+
+	| variable |
+	variable := self localVariableNamed: 'localVarInListComprehension'.
+
+	self assert: variable class equals: FamixPythonLocalVariable.
+	self assert: variable name equals: 'localVarInListComprehension'.
+	self assert: variable parentBehaviouralEntity equals: (self moduleNamed: 'moduleAtRoot15').
+	self deny: variable isStub
+]
+
+{ #category : 'tests - local variables' }
+FamixPythonProject1Test >> testLocalVariableInListComprehensionSourceAnchor [
+
+	| variable |
+	variable := self localVariableNamed: 'localVarInListComprehension'.
+
+	self assert: variable sourceAnchor isNotNil.
+	self assert: variable sourceText equals: 'localVarInListComprehension'
 ]
 
 { #category : 'tests - local variables' }
@@ -2738,7 +3695,9 @@ FamixPythonProject1Test >> testMetaclass [
 	metaclass := self metaclassNamed: 'CustomMetaclass'.
 
 	self assert: metaclass class equals: FamixPythonMetaclass.
-	self assert: metaclass name equals: 'CustomMetaclass'
+	self assert: metaclass name equals: 'CustomMetaclass'.
+	self assert: metaclass typeContainer equals: (self moduleNamed: 'moduleAtRoot8').
+	self deny: metaclass isStub
 ]
 
 { #category : 'tests - metaclasses' }
@@ -2783,6 +3742,37 @@ FamixPythonProject1Test >> testMetaclassUsageSourceAnchor [
 
 	self assert: metaclassUsage sourceAnchor isNotNil.
 	self assert: metaclassUsage sourceText equals: 'metaclass=CustomMetaclass'
+]
+
+{ #category : 'tests - metaclasses' }
+FamixPythonProject1Test >> testMetaclassUsageWithImportedMetaclass [
+
+	| metaclass class metaclassUsage |
+	metaclass := self metaclassNamed: 'CustomMetaclass2'.
+	class := self classNamed: 'ClassUsingImportedMetaclass'.
+
+	metaclassUsage := class metaclassUsage.
+
+	self assert: metaclassUsage isNotNil.
+	self assert: metaclassUsage class equals: FamixPythonMetaclassUsage.
+	self assert: metaclassUsage source equals: class.
+	self assert: metaclassUsage user equals: class.
+	self assert: metaclassUsage target equals: metaclass.
+	self assert: metaclassUsage metaclass equals: metaclass.
+	self assert: (metaclass metaclassUsers anySatisfy: [ :aUsage | aUsage user = class ])
+]
+
+{ #category : 'tests - metaclasses' }
+FamixPythonProject1Test >> testMetaclassUsageWithImportedMetaclassSourceAnchor [
+
+	| metaclass class metaclassUsage |
+	metaclass := self metaclassNamed: 'CustomMetaclass2'.
+	class := self classNamed: 'ClassUsingImportedMetaclass'.
+
+	metaclassUsage := class metaclassUsage.
+
+	self assert: metaclassUsage sourceAnchor isNotNil.
+	self assert: metaclassUsage sourceText equals: 'metaclass=moduleAtRoot8.CustomMetaclass2'
 ]
 
 { #category : 'tests - from-import' }
@@ -2947,6 +3937,40 @@ FamixPythonProject1Test >> testMethodInvocationSourceAnchor [
 
 	self assert: invocation sourceAnchor isNotNil.
 	self assert: invocation sourceText equals: 'p1.printInfos()'
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testMethodParameters [
+
+	| method param1 param2 |
+	method := self methodNamed: 'set_tuples'.
+	param1 := method parameters first.
+	param2 := method parameters second.
+
+	self assert: method parameters size equals: 2.
+	self assertCollection: method parameters hasSameElements: {
+			param1.
+			param2 }.
+	self assert: param1 name equals: 'self'.
+	self assert: param2 name equals: 'tuple_attr'.
+	self assert: param1 isSelf.
+	self deny: param2 isSelf.
+	self deny: param1 isStub.
+	self deny: param2 isStub.
+	self assert: param1 class equals: FamixPythonParameter.
+	self assert: param2 class equals: FamixPythonParameter.
+	self assert: param1 parentBehaviouralEntity equals: method.
+	self assert: param2 parentBehaviouralEntity equals: method
+]
+
+{ #category : 'tests - parameters' }
+FamixPythonProject1Test >> testMethodParametersSourceAnchor [
+
+	| param |
+	param := (self methodNamed: 'set_tuples') parameters second.
+
+	self assert: param sourceAnchor isNotNil.
+	self assert: param sourceText equals: 'tuple_attr'
 ]
 
 { #category : 'tests - methods' }
@@ -3305,7 +4329,8 @@ FamixPythonProject1Test >> testModuleInRootPackage [
 	self assert: module class equals: FamixPythonModule.
 	self assert: module name equals: 'moduleInRootPackage'.
 	self deny: module isRoot.
-	self assert: module parentPackage equals: (self packageNamed: 'root')
+	self assert: module parentPackage equals: (self packageNamed: 'root').
+	self deny: module isStub
 ]
 
 { #category : 'tests - modules' }
@@ -3319,7 +4344,8 @@ FamixPythonProject1Test >> testModuleInSubPackage [
 	self assert: module class equals: FamixPythonModule.
 	self assert: module name equals: 'moduleInSubPackage1'.
 	self deny: module isRoot.
-	self assert: module parentPackage equals: (self packageNamed: 'subpackage1')
+	self assert: module parentPackage equals: (self packageNamed: 'subpackage1').
+	self deny: module isStub
 ]
 
 { #category : 'tests - from-import relative' }
@@ -3658,6 +4684,126 @@ In package
 
 	self assert: comment class equals: FamixPythonComment.
 	self assert: comment commentedEntity equals: (self packageNamed: 'NameOfSubpackageOrClass')
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testNamedExpressionInArgumentList [
+
+	| global module access |
+	global := self globalVariableNamed: 'namedExpressionVariableInArgumentList'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testNamedExpressionInIfCondition [
+
+	| global module access |
+	global := self globalVariableNamed: 'namedExpressionVariableInIfCondition'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testNamedExpressionInInterpolation [
+
+	| global module access |
+	global := self globalVariableNamed: 'namedExpressionVariableInInterpolation'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testNamedExpressionInParenthsizedExpression [
+
+	| global module access |
+	global := self globalVariableNamed: 'namedExpressionVariableInParenthesizedExpression'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testNamedExpressionInTuple [
+
+	| global module access |
+	global := self globalVariableNamed: 'namedExpressionVariableInTuple'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testNamedExpressionInWhileCondition [
+
+	| global module access |
+	global := self globalVariableNamed: 'namedExpressionVariableInWhileCondition'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := global incomingAccesses detect: [ :anAccess | anAccess accessor = module ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testNoAccessInInterpolationEscape [
+
+	self assert: (self model allGlobalVariables noneSatisfy: [ :variable | variable name = 'notAVariable' ])
 ]
 
 { #category : 'tests' }
@@ -4338,6 +5484,458 @@ FamixPythonProject1Test >> testReadAccessFromThiInsideOfAnInvocation [
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInANot [
+	"Regression test"
+
+	| global module access |
+	global := self globalVariableNamed: 'moduleAtRootVariable3'.
+	module := self moduleNamed: 'moduleAtRoot2'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInAssertStatement [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableToAccessInAssertStatement'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInBinaryOperator [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableToAccessInBinaryOperator'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInBooleanOperator [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableInBooleanOperator'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInComparisonOperator [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableToAccessInComparisonOperator'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInConcatenatedString [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableToAccessInConcatenatedString'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInDefaultParameter [
+
+	| global function access |
+	global := self globalVariableNamed: 'variableToAccessInDefaultParameter'.
+	function := self functionNamed: 'function_with_variable_accessed_in_default_parameter'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = function ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: function.
+	self assert: access accessor equals: function.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (function accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInDictionaryComprehension [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableToAccessInDictionaryComprehension'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInDictionaryComprehensionForInClause [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableToAccessInDictionaryComprehensionForInClause'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInDictionaryComprehensionIfClause [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableToAccessInDictionaryComprehensionIfClause'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInDictionarySplat [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableWithDictionaryToAccessInDictionarySplat'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInGeneratorExpression [
+
+	| global module accesses |
+	global := self localVariableNamed: 'localVarToAccessInGeneratorExpression'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	accesses := global incomingAccesses select: [ :anAccess | anAccess accessor = module ].
+
+	self assert: accesses size equals: 2
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInLambdaBody [
+
+	| global lambda access |
+	global := self globalVariableNamed: 'variableToAccessInLambdaBody'.
+	lambda := (self moduleNamed: 'moduleAtRoot13') lambdas at: 2.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = lambda ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: lambda.
+	self assert: access accessor equals: lambda.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (lambda accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInLambdaDefaultParameter [
+
+	| global lambda access |
+	global := self globalVariableNamed: 'variableToAccessInLambdaDefaultParameter'.
+	lambda := (self moduleNamed: 'moduleAtRoot13') lambdas anyOne.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = lambda ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: lambda.
+	self assert: access accessor equals: lambda.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (lambda accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInLisSplat [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableToAccessInLisSplat'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInList [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableToAccessInList'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInListComprehension [
+
+	| global module access |
+	global := self localVariableNamed: 'localVarToAccessInListComprehension'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInListComprehensionForInClause [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableToAccessInListComprehensionForInClause'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInListComprehensionIfClause [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableToAccessInListComprehensionIfClause'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInListSplat [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableToAccessInLisSplat'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInPair [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableToAccessInPair'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInTypedDefaultParameter [
+
+	| global function access |
+	self skip. 
+	self flag: #todo.
+	global := self globalVariableNamed: 'variableToAccessInTypedDefaultParameter'.
+	function := self functionNamed: 'function_with_variable_accessed_in_typed_default_parameter'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = function ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: function.
+	self assert: access accessor equals: function.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (function accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInUnaryOperator [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableInUnaryOperator'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessOfLocalInDictionaryComprehension [
+
+	| global module access |
+	global := self localVariableNamed: 'localVarToAccessInDictionaryComprehension'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testReadAccessSourceAnchor [
 
 	| global module access |
@@ -4604,7 +6202,8 @@ FamixPythonProject1Test >> testRootPackage [
 	
 	self assert: rootPackage class equals: FamixPythonPackage.
 	self assert: rootPackage name equals: 'src'.
-	self assert: rootPackage isRoot
+	self assert: rootPackage isRoot.
+	self deny: rootPackage isStub
 ]
 
 { #category : 'tests - shadowing' }
@@ -4663,6 +6262,7 @@ FamixPythonProject1Test >> testSimpleClass [
 
 	self assert: class class equals: FamixPythonClass.
 	self assert: class name equals: 'Person'.
+	self deny: class isStub.
 	self assert: class typeContainer equals: (self moduleNamed: 'moduleAtRoot2')
 ]
 
@@ -4691,6 +6291,7 @@ FamixPythonProject1Test >> testSimpleFunction [
 	self assert: function class equals: FamixPythonFunction.
 	self assert: function name equals: 'sort_list'.
 	self assert: function signature equals: 'sort_list(list1, list2)'.
+	self deny: function isStub.
 	self assert: function functionOwner equals: (self moduleNamed: 'moduleAtRoot')
 ]
 
@@ -4763,7 +6364,8 @@ FamixPythonProject1Test >> testSimpleLocalVariableInFunction [
 
 	self assert: variable class equals: FamixPythonLocalVariable.
 	self assert: variable name equals: 'local_in_function2'.
-	self assert: variable parentBehaviouralEntity equals: (self functionNamed: 'function_with_local_variables')
+	self assert: variable parentBehaviouralEntity equals: (self functionNamed: 'function_with_local_variables').
+	self deny: variable isStub
 ]
 
 { #category : 'tests - local variables' }
@@ -4774,7 +6376,8 @@ FamixPythonProject1Test >> testSimpleLocalVariableInLambda [
 
 	self assert: variable class equals: FamixPythonLocalVariable.
 	self assert: variable name equals: 'temporary_in_lambda'.
-	self assert: variable parentBehaviouralEntity equals: (self functionNamed: 'function_with_lambda_with_temporary') lambdas anyOne
+	self assert: variable parentBehaviouralEntity equals: (self functionNamed: 'function_with_lambda_with_temporary') lambdas anyOne.
+	self deny: variable isStub
 ]
 
 { #category : 'tests - local variables' }
@@ -4785,7 +6388,8 @@ FamixPythonProject1Test >> testSimpleLocalVariableInMethod [
 
 	self assert: variable class equals: FamixPythonLocalVariable.
 	self assert: variable name equals: 'local_in_method2'.
-	self assert: variable parentBehaviouralEntity equals: (self methodNamed: 'method_with_local_variables')
+	self assert: variable parentBehaviouralEntity equals: (self methodNamed: 'method_with_local_variables').
+	self deny: variable isStub
 ]
 
 { #category : 'tests - methods' }
@@ -4799,7 +6403,8 @@ FamixPythonProject1Test >> testSimpleMethod [
 	self assert: method class equals: FamixPythonMethod.
 	self assert: method name equals: 'printInfos'.
 	self assert: method signature equals: 'printInfos(self)'.
-	self assert: method parentType equals: (self classNamed: 'Person')
+	self assert: method parentType equals: (self classNamed: 'Person').
+	self deny: method isStub
 ]
 
 { #category : 'tests - modules' }
@@ -4867,9 +6472,9 @@ FamixPythonProject1Test >> testStubFunctionInvocationFromFromImportedModuleHasPa
 	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
 
 	self assert: function isStub.
-	self assert: function parentPackage equals: (self unknownEntityNamed: 'subpackage').
+	self assert: function parentPackage equals: (self unknownEntityNamed: 'module').
 	self assert: function parentPackage isStub.
-	self assert: function parentPackage parentPackage equals: (self packageNamed: 'package').
+	self assert: function parentPackage parentPackage equals: (self packageNamed: 'otherPackage').
 	self assert: function parentPackage parentPackage isStub
 ]
 
@@ -4952,7 +6557,28 @@ FamixPythonProject1Test >> testStubMetaclassUsage [
 	self assert: metaclassUsage metaclass equals: metaclass.
 	self assert: (metaclass metaclassUsers anySatisfy: [ :aUsage | aUsage user = class ]).
 	self assert: metaclass isStub.
-	self assert: metaclass name equals: 'StubMetaclass'
+	self assert: metaclass name equals: 'StubMetaclass'.
+	self assert: metaclass typeContainer name equals: 'subpackage'
+]
+
+{ #category : 'tests - metaclasses' }
+FamixPythonProject1Test >> testStubMetaclassUsage2 [
+
+	| metaclass class metaclassUsage |
+	metaclass := self metaclassNamed: 'StubMetaclass2'.
+	class := self classNamed: 'ClassWithStubMetaclass2'.
+
+	metaclassUsage := class metaclassUsage.
+
+	self assert: metaclassUsage isNotNil.
+	self assert: metaclassUsage class equals: FamixPythonMetaclassUsage.
+	self assert: metaclassUsage source equals: class.
+	self assert: metaclassUsage user equals: class.
+	self assert: metaclassUsage target equals: metaclass.
+	self assert: metaclassUsage metaclass equals: metaclass.
+	self assert: (metaclass metaclassUsers anySatisfy: [ :aUsage | aUsage user = class ]).
+	self assert: metaclass isStub.
+	self assert: metaclass name equals: 'StubMetaclass2'
 ]
 
 { #category : 'tests - packages' }

@@ -66,6 +66,13 @@ FamixPythonEntity >> isClass [
 ]
 
 { #category : 'testing' }
+FamixPythonEntity >> isComment [
+
+	<generated>
+	^ false
+]
+
+{ #category : 'testing' }
 FamixPythonEntity >> isFileAnchor [
 
 	<generated>

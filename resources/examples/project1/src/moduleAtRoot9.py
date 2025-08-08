@@ -1,3 +1,7 @@
+from __future__ import generator_stop
+from __future__ import annotations as annot
+
+
 class AbstractAnimal:
     name = ""
 
@@ -24,3 +28,5 @@ def function_with_lambda_referencing_class():
 print(function_referencing_class())
 print(AClassReferencingAClass().method_referencing_class())
 print(function_with_lambda_referencing_class()())
+print(generator_stop)
+print(annot)

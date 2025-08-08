@@ -5,6 +5,8 @@ from moduleAtRoot import sort_list
 from root.subpackage1.subsubpackage1 import Room
 from root.subpackage1.subsubpackage1 import return2
 
+shouldNotStopParsing = [True, False, None, 1, 1.4, ...]
+
 print(rootPackageVariable)
 print(moduleAtRootVariable)
 

@@ -1,0 +1,101 @@
+Extension { #name : 'FamixTSNodeWrapper' }
+
+{ #category : '*Famix-Python-Importer' }
+FamixTSNodeWrapper >> assignationNode [
+
+	(#( assignment augmented_assignment named_expression ) includes: self type) ifTrue: [ ^ self ].
+	^ self parent ifNotNil: [ self parent assignationNode ]
+]
+
+{ #category : '*Famix-Python-Importer' }
+FamixTSNodeWrapper >> isAccessOrReferenceNode [
+	"I should return true if an Identifier node represent an access or a reference."
+
+	(self parent type = #attribute and: [ self parent isInCall ]) ifTrue: [ ^ true ].
+
+	^ #( elif_clause list argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator expression_statement
+	     augmented_assignment unary_operator boolean_operator pair list_splat default_parameter dictionary_splat #if_clause #for_in_clause generator_expression
+	     list_comprehension dictionary_comprehension string_content interpolation subscript) includes: self parent type
+]
+
+{ #category : '*Famix-Python-Importer' }
+FamixTSNodeWrapper >> isInCall [
+
+	self parent type = #call ifTrue: [ ^ true ].
+
+	^ false
+]
+
+{ #category : '*Famix-Python-Importer' }
+FamixTSNodeWrapper >> isIsDirectFunctionInvocationOrInstanciation [
+	"If it's not in a function of a call we cannot match."
+
+	(self isInField: #function ofParentOfType: #call) ifFalse: [ ^ false ].
+
+	(self parent type = #call and: [ self parent _function = self ]) ifTrue: [ ^ true ].
+
+	self flag: #todo. "Manage other find of parenthesized_expressions that have more than just one identifier."
+	(self parent type = #parenthesized_expression and: [ self parent collectNamedChild = { self } ]) ifTrue: [ ^ true ].
+
+	"Manage [*function_to_invoke_in_list_splat(slice, indices[:-1], indices[1:])]"
+	self flag: #todo. "Maybe we have other cases of list splat in a function call"
+	(self parent type = #list_splat and: [ self parent collectNamedChild = { self } ]) ifTrue: [ ^ true ].
+
+	^ false
+]
+
+{ #category : '*Famix-Python-Importer' }
+FamixTSNodeWrapper >> isLeftSideOfAssignation [
+	"This method is used to find variables with write access but we have one exception, it's not a write access if we are in a subscript.
+	
+	data[curr_col] = data[curr_col].replace('[\$,]', '', regex=True)
+	
+	This should not produce a write access to #curr_col"
+
+	(self isInField: #subscript ofParentOfType: #subscript) ifTrue: [ ^ false ].
+
+	self parentsDo: [ :node |
+			(#( assignment augmented_assignment ) includes: node type) ifTrue: [ ^ node _left includesChild: self ].
+			node type = #named_expression ifTrue: [ ^ node _name = self ] ].
+	^ false
+]
+
+{ #category : '*Famix-Python-Importer' }
+FamixTSNodeWrapper >> isLocalVariableDeclaration [
+
+	"print(localVarInGeneratorExpression2 * localVarInGeneratorExpression2 for localVarInGeneratorExpression2 in range(5)) ==> When it's in the body, it can be a local variable declaration. But not in the other children."
+	(self isInField: #body ofParentOfType: #generator_expression) ifTrue: [ ^ true ].
+	
+	"[localVarInListComprehension for localVarInListComprehension in [4, 5] if localVarInListComprehension > 2]"
+	(self isInField: #body ofParentOfType: #list_comprehension) ifTrue: [ ^ true ].
+	
+	"{localVariableInDictionaryComprehension * localVariableInDictionaryComprehension: localVariableInDictionaryComprehension for localVariableInDictionaryComprehension in [4, 5] if localVariableInDictionaryComprehension > 10}"
+	(self isInField: #body ofParentOfType: #dictionary_comprehension) ifTrue: [ ^ true ].
+	
+	^ false
+]
+
+{ #category : '*Famix-Python-Importer' }
+FamixTSNodeWrapper >> isParameterDeclaration [
+
+	"def f(arg):"
+	self parent isParameterList ifTrue: [ ^ true ].
+	
+	"def f(*args):"
+	(self parent type = #list_splat_pattern and: [ self parent parent isParameterList ]) ifTrue: [ ^ true ].
+	
+	"def f(**kwarg):"
+	self parent type = #dictionary_splat_pattern ifTrue: [ ^ true ].
+
+	"In a default parameter, it represent the parameter if it's in the name field."
+	"def f(arg=3):"
+	(self parent type = #default_parameter and: [ self parent _name = self ]) ifTrue: [ ^ true ].
+
+	^ false
+]
+
+{ #category : '*Famix-Python-Importer' }
+FamixTSNodeWrapper >> isParameterList [
+
+	^ #( lambda_parameters parameters ) includes: self type
+]

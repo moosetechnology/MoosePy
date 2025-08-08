@@ -10,26 +10,27 @@ BaselineOfMoosePy >> baseline: spec [
 
 	<baseline>
 	spec for: #common do: [
-		self
-			gitBridge: spec;
-			pythonParser: spec;
-			symbolResolver: spec.
+			self
+				gitBridge: spec;
+				treeSitterFamixIntegration: spec.
 
-		spec
-			package: 'Famix-Python-Entities';
-			package: 'Famix-Python-Generator';
-			package: 'Famix-Python-Importer' with: [ spec requires: #( 'Famix-Python-Entities' 'PythonParser' 'SymbolResolver') ];
-			package: 'Famix-Python-Importer-Tests' with: [ spec requires: #( 'Famix-Python-Importer' 'GitBridge' ) ].
+			spec
+				package: 'Famix-Python-Entities';
+				package: 'Famix-Python-Generator';
+				package: 'Famix-Python-Tests' with: [ spec requires: #( 'Famix-Python-Entities' 'Famix-Python-Generator' ) ];
+				package: 'Famix-Python-Importer' with: [ spec requires: #( 'Famix-Python-Entities' 'TreeSitterFamixIntegration' ) ];
+				package: 'Famix-Python-Importer-Tests' with: [ spec requires: #( 'Famix-Python-Importer' 'GitBridge' ) ];
+				package: 'Famix-Python-IDE' with: [ spec requires: #( 'Famix-Python-Importer' ) ].
 
-		spec
-			group: 'Core' with: #( 'Famix-Python-Entities' 'Famix-Python-Importer' 'Famix-Python-Importer-Tests' );
-			group: 'Generator' with: #( 'Core' 'Famix-Python-Generator' ) ].
+			spec
+				group: 'Core' with: #( 'Famix-Python-Entities' 'Famix-Python-Importer' 'Famix-Python-Importer-Tests' 'Famix-Python-Tests' );
+				group: 'Generator' with: #( 'Core' 'Famix-Python-Generator' ) ].
 
 	spec for: #NeedsFamix do: [
-		spec baseline: 'Famix' with: [ spec repository: 'github://moosetechnology/Famix:development/src' ].
-		spec
-			package: 'Famix-Python-Entities' with: [ spec requires: #( Famix ) ];
-			package: 'Famix-Python-Generator' with: [ spec requires: #( Famix ) ] ]
+			spec baseline: 'Famix' with: [ spec repository: 'github://moosetechnology/Famix:development/src' ].
+			spec
+				package: 'Famix-Python-Entities' with: [ spec requires: #( Famix ) ];
+				package: 'Famix-Python-Generator' with: [ spec requires: #( Famix ) ] ]
 ]
 
 { #category : 'accessing' }
@@ -46,16 +47,7 @@ BaselineOfMoosePy >> gitBridge: spec [
 ]
 
 { #category : 'baselines' }
-BaselineOfMoosePy >> pythonParser: spec [
+BaselineOfMoosePy >> treeSitterFamixIntegration: spec [
 
-	spec baseline: 'PythonParser' with: [
-		spec
-			repository: 'github://j-brant/SmaCC:master/src';
-			loads: #( 'SmaCC_Python' 'SmaCC_Python_Tests' ) ]
-]
-
-{ #category : 'baselines' }
-BaselineOfMoosePy >> symbolResolver: spec [
-
-	spec baseline: 'SymbolResolver' with: [ spec repository: 'github://jecisc/SymbolResolver:main/src' ]
+	spec baseline: 'TreeSitterFamixIntegration' with: [ spec repository: 'github://moosetechnology/TreeSitterFamixIntegration:main/src' ]
 ]

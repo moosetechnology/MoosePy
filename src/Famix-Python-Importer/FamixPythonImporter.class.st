@@ -51,24 +51,15 @@ For the example above we could do:
 "
 Class {
 	#name : 'FamixPythonImporter',
-	#superclass : 'Object',
+	#superclass : 'FamixTSAbstractImporter',
 	#instVars : [
-		'visitor',
-		'errorReport',
 		'rootPackagePath',
 		'filesToIgnoreBlock'
 	],
-	#category : 'Famix-Python-Importer-Importer',
+	#category : 'Famix-Python-Importer-Core',
 	#package : 'Famix-Python-Importer',
-	#tag : 'Importer'
+	#tag : 'Core'
 }
-
-{ #category : 'api' }
-FamixPythonImporter class >> import: aFileName [
-
-	^self new
-		import: aFileName
-]
 
 { #category : 'api' }
 FamixPythonImporter class >> import: aFileName rootPackagePath: aString [
@@ -117,6 +108,12 @@ FamixPythonImporter class >> importReader [
 	(self import: '/Users/cyril/testPython/reader' asFileReference) inspect
 ]
 
+{ #category : 'accessing' }
+FamixPythonImporter >> commentVisitorClass [
+
+	^ FamixPythonCommentVisitor
+]
+
 { #category : 'api' }
 FamixPythonImporter >> determineSourceRootFolderFrom: fileReference [
 	"We decided in the parser to define a folder as the root of the project to be used as the base of relative imports. This folder will be the first package of the project. 
@@ -144,12 +141,6 @@ FamixPythonImporter >> determineSourceRootFolderFrom: fileReference [
 ]
 
 { #category : 'accessing' }
-FamixPythonImporter >> errorReport [
-
-	^ visitor errorReport
-]
-
-{ #category : 'accessing' }
 FamixPythonImporter >> filesToIgnoreBlock [
 
 	^ filesToIgnoreBlock
@@ -162,28 +153,27 @@ FamixPythonImporter >> filesToIgnoreBlock: anObject [
 ]
 
 { #category : 'api' }
-FamixPythonImporter >> import: aFileName [
+FamixPythonImporter >> import: aFileReference [
 
 	| fileReference |
-	visitor := FamixPythonImporterVisitor new.
-	fileReference := aFileName asFileReference.
+	fileReference := aFileReference asFileReference. "In case the user provided a file name instead of a file reference."
 
-	visitor model
-		name: fileReference basename;
-		rootFolder: (fileReference isFile
-				 ifTrue: [ fileReference parent ]
-				 ifFalse: [ aFileName ]). "If we parse a folder, it will be the root. If it's just a file, we consider that the root is its parent"
+	self initializeVisitorAndModelUsing: fileReference.
 
 	"If we parse a unique file, we do nothing. If we have a folder, we check what is the source root to start creating our packages."
 	fileReference isPythonFile ifFalse: [ fileReference := self determineSourceRootFolderFrom: fileReference ].
+
 	self importFileReference: fileReference.
 
 	visitor resolveUnresolvedSymbols.
 
 	self flag: #todo. "We should probably handle it another way in production."
 	self errorReport ifNotEmpty: [ self errorReport inspect ].
+	
+	"I'm adding some properties to help with the import. Cleaning up afterward."
+	self model entities do: #flush.
 
-	^ visitor model
+	^ self model
 ]
 
 { #category : 'api' }
@@ -197,30 +187,21 @@ FamixPythonImporter >> importFileReference: aFileReference [
 	"
 
 	aFileReference isDirectory ifTrue: [
-		(aFileReference allFiles anySatisfy: [ :file | file isPythonFile ]) ifTrue: [
-			| package |
-			package := visitor model newPackageNamed: aFileReference basename.
-			visitor hasCurrentEntity ifTrue: [ package parentPackage: visitor currentEntity ].
-			(visitor currentEntity: package) isMainEntity: true.
+			(aFileReference allFiles anySatisfy: [ :file | file isPythonFile ]) ifTrue: [
+					| package |
+					package := visitor model newPackageNamed: aFileReference basename.
+					visitor withCurrentEntityDo: [ :entity | package parentPackage: entity ].
+					visitor
+						useCurrentEntity: package
+						during: [ "If we have an __init__.py file, this is a package. To have it at the top of the context we need to parse it first so that the sub packages and modules go in it."
+								(aFileReference children sorted: [ :fileA :fileB | fileA isPythonPackageDeclaration or: [ fileB isPythonPackageDeclaration not ] ]) ifNotEmpty: [ :files |
+									files do: [ :child | self importFileReference: child ] ] ] ].
 
-			"If we have an __init__.py file, this is a package. To have it at the top of the context we need to parse it first so that the sub packages and modules go in it."
-			(aFileReference children sorted: [ :fileA :fileB | fileA isPythonPackageDeclaration or: [ fileB isPythonPackageDeclaration not ] ]) ifNotEmpty: [ :files |
-				files do: [ :child | self importFileReference: child ] ].
-			visitor popScope ].
-
-		^ self ].
+			^ self ].
 
 	aFileReference isPythonFile ifFalse: [ ^ self ].
 
-	self importPythonFile: aFileReference
-]
-
-{ #category : 'api' }
-FamixPythonImporter >> importPythonFile: aFileReference [
-
-	('Importing ' , aFileReference pathString) traceCr.
-	"(aFileReference basename = #'moduleWithImportsAndAliases.py') ifTrue: [ 1halt ]."
-	(PythonParser parseFileWithErrors: aFileReference) acceptVisitor: visitor
+	self importFile: aFileReference
 ]
 
 { #category : 'initialization' }
@@ -244,7 +225,13 @@ FamixPythonImporter >> rootPackagePath: anObject [
 ]
 
 { #category : 'accessing' }
-FamixPythonImporter >> visitor [
+FamixPythonImporter >> treeSitterLanguage [
 
-	^ visitor
+	^ TSLanguage python
+]
+
+{ #category : 'accessing' }
+FamixPythonImporter >> visitorClass [
+
+	^ FamixPythonVisitor
 ]

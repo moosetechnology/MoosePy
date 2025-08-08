@@ -3,9 +3,7 @@ Extension { #name : 'FamixTStructuralEntity' }
 { #category : '*Famix-Python-Importer' }
 FamixTStructuralEntity >> createAccessOrReferenceFrom: anEntity node: aNode [
 
-	^ anEntity mooseModel newAccess
-		  variable: self;
+	^ (aNode visitor createAccessTo: self isWrite: aNode isLeftSideOfAssignation from: aNode)
 		  accessor: anEntity;
-		  isWrite: (aNode isLeftSideOfAssignation);
 		  yourself
 ]
