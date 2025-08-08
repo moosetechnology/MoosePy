@@ -114,24 +114,26 @@ variableToAccessInLambdaBody = 3
 
 lambda: variableToAccessInLambdaBody + 5
 
-
 variableWithDictionaryToAccessInDictionarySplat = {"name": "Alice", "age": 30}
 extended = {**variableWithDictionaryToAccessInDictionarySplat, "location": "Paris"}
-
 
 variableToAccessInDictionaryComprehension = 3
 variableToAccessInDictionaryComprehensionForInClause = 10
 variableToAccessInDictionaryComprehensionIfClause = [4, 8, 15, 16, 23, 42]
 
 # Use 'multiplier' before the 'for', and 'threshold' after it
-result = {localVarToAccessInDictionaryComprehension * variableToAccessInDictionaryComprehension: localVarToAccessInDictionaryComprehension for localVarToAccessInDictionaryComprehension in variableToAccessInDictionaryComprehensionForInClause if localVarToAccessInDictionaryComprehension > variableToAccessInDictionaryComprehensionIfClause}
-
+result = {
+    localVarToAccessInDictionaryComprehension * variableToAccessInDictionaryComprehension: localVarToAccessInDictionaryComprehension
+    for localVarToAccessInDictionaryComprehension in variableToAccessInDictionaryComprehensionForInClause if
+    localVarToAccessInDictionaryComprehension > variableToAccessInDictionaryComprehensionIfClause}
 
 variableToAccessInListComprehensionIfClause = 10
 variableToAccessInListComprehensionForInClause = [4, 7, 11, 15, 3]
 
 # List comprehension accessing the global variable 'limit'
-large_numbers = [localVarToAccessInListComprehension for localVarToAccessInListComprehension in variableToAccessInListComprehensionForInClause if localVarToAccessInListComprehension > variableToAccessInListComprehensionIfClause]
+large_numbers = [localVarToAccessInListComprehension for localVarToAccessInListComprehension in
+                 variableToAccessInListComprehensionForInClause if
+                 localVarToAccessInListComprehension > variableToAccessInListComprehensionIfClause]
 
 variableToAccessInList = 5
 my_list = [1, 2, variableToAccessInList, 4]
@@ -143,11 +145,10 @@ print(localVarToAccessInGeneratorExpression for localVarToAccessInGeneratorExpre
 
 variableToAccessInConcatenatedString = "Hello"
 
-var = "To say:\n"\
-        f" ({variableToAccessInConcatenatedString})"
+var = "To say:\n" \
+      f" ({variableToAccessInConcatenatedString})"
 
 "String with escaped interpolation {{notAVariable}}"
-
 
 my_list = [1, 2, 3, 4, 5]
 
@@ -164,3 +165,12 @@ def function_to_invoke_in_parenthesized_expression():
 
 
 (function_to_invoke_in_parenthesized_expression)()
+
+
+def function_to_invoke_in_list_splat(indices):
+    return [slice(start, end) for start, end in zip(indices[:-1], indices[1:])]
+
+
+indices = [0, 2, 4, 6, 8]
+
+var = [*function_to_invoke_in_list_splat(slice, indices[:-1], indices[1:])]
