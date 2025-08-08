@@ -296,15 +296,9 @@ FamixPythonVisitor >> manageAccessOrReferencesFrom: anIdentifierNode [
 												 parentBehaviouralEntity: currentEntity;
 												 in: [ :var | self setSourceAnchor: var from: anIdentifierNode ];
 												 yourself ]
-									 ifFalse: [ "If we are the receiver of an invocation and we did not find the associated entity it's because it's an instance of a class or the namespace from the import. In that case we should create nothing so we give a null entity.""]"
-											 self flag: #todo.
-											 "aVariableExpression isInvocationOrInstantiationReceiver
-						 ifTrue: [ FamixPythonNilEntity ]
-						 ifFalse: [" "This can be a structural entity or a class"
-											 self ensureStubUnknownEntityNamed: unresolved identifier ] ];
+									 ifFalse: [ self ensureStubUnknownEntityNamed: unresolved identifier ] ];
 						 yourself)
-				foundAction: [ :entity :currentEntity | "See the comment in the notFoundReplacementEntity block to see why we do this."
-					entity isMooseEntity ifTrue: [ entity createAccessOrReferenceFrom: currentEntity node: anIdentifierNode ] ] ]
+				foundAction: [ :entity :currentEntity | entity createAccessOrReferenceFrom: currentEntity node: anIdentifierNode ] ]
 ]
 
 { #category : 'private' }
@@ -358,6 +352,7 @@ FamixPythonVisitor >> manageAttributeAsCallReceiver: aNode [
 					  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: (aNode parentOfType: #call) forResult: result in: currentEntity ] ].
 
 	"=> c.x()"
+	"In this case we need to visit the object to find for example accesses. We know there is something interesting since we escaped all other cases above."
 	self visit: aNode _object.
 	^ self
 		  resolve: ((FamixPythonMethodInvocationResolvable identifier: identifier receiver: receiverSource)
@@ -1395,7 +1390,7 @@ FamixPythonVisitor >> visitModule: aModuleNode [
 
 			self currentEntity: entity ].
 	
-	(fileReference basename = #'moduleAtRoot80.py') ifTrue: [ 1halt ].
+	(fileReference basename = #'moduleAtRoot111.py') ifTrue: [ 1halt ].
 	
 	self visitChildren: aModuleNode.
 

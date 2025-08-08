@@ -15,7 +15,7 @@ FamixTSNodeWrapper >> isAccessOrReferenceNode [
 
 	^ #( elif_clause list argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator expression_statement
 	     augmented_assignment unary_operator boolean_operator pair list_splat default_parameter dictionary_splat #if_clause #for_in_clause generator_expression
-	     list_comprehension dictionary_comprehension string_content interpolation) includes: self parent type
+	     list_comprehension dictionary_comprehension string_content interpolation subscript) includes: self parent type
 ]
 
 { #category : '*Famix-Python-Importer' }
@@ -46,11 +46,18 @@ FamixTSNodeWrapper >> isIsDirectFunctionInvocationOrInstanciation [
 
 { #category : '*Famix-Python-Importer' }
 FamixTSNodeWrapper >> isLeftSideOfAssignation [
+	"This method is used to find variables with write access but we have one exception, it's not a write access if we are in a subscript.
+	
+	data[curr_col] = data[curr_col].replace('[\$,]', '', regex=True)
+	
+	This should not produce a write access to #curr_col"
+
+	(self isInField: #subscript ofParentOfType: #subscript) ifTrue: [ ^ false ].
 
 	self parentsDo: [ :node |
-		(#( assignment augmented_assignment ) includes: node type) ifTrue: [ ^ node _left includesChild: self ].
-		node type = #named_expression ifTrue: [ ^ node _name = self ] ].
-^ false
+			(#( assignment augmented_assignment ) includes: node type) ifTrue: [ ^ node _left includesChild: self ].
+			node type = #named_expression ifTrue: [ ^ node _name = self ] ].
+	^ false
 ]
 
 { #category : '*Famix-Python-Importer' }
