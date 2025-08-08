@@ -25,7 +25,8 @@ FamixPythonInvocationOrInstantiationWithNamespaceResolvable >> import: anObject 
 { #category : 'resolution' }
 FamixPythonInvocationOrInstantiationWithNamespaceResolvable >> resolveInScope: aScope currentEntity: currentEntity [
 
-	import importedEntity name = identifier ifTrue: [ ^ self result: import importedEntity ].
+	((self expectedKinds anySatisfy: [ :kind | import importedEntity isOfType: kind ]) and: [ import importedEntity matchesName: identifier ]) ifTrue: [
+		^ self result: import importedEntity ].
 
 	^ (import importedEntity definedEntitiesNamed: identifier ofKinds: self expectedKinds) ifEmpty: [ SRNoResolutionPossible signal ] ifNotEmpty: [ :entities |
 			  | matchingEntities |

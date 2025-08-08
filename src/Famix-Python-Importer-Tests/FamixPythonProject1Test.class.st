@@ -3048,6 +3048,31 @@ FamixPythonProject1Test >> testInvocationOfMultipleStubFunctionsOfTheSameName [
 ]
 
 { #category : 'tests - invocations' }
+FamixPythonProject1Test >> testInvocationOfSameNameAsStubPackage [
+	"regression test
+	
+	```python
+	import time
+	regression_variable = time.time()
+	```
+	
+	In that case we resolvec `time()` as the Package time which is wrong"
+
+	| module function invocation |
+	function := self unknownEntityNamed: 'time'.
+	module := self moduleNamed: 'moduleWithStubs'.
+
+	invocation := function incomingInvocations detect: [ :aReference | aReference sender = module ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: module.
+	self assert: invocation sender equals: module.
+	self assertCollection: invocation target hasSameElements: { function }.
+	self assert: invocation invokedEntity equals: function.
+	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
+]
+
+{ #category : 'tests - invocations' }
 FamixPythonProject1Test >> testInvocationOfStubFunction [
 
 	| module function invocation |
