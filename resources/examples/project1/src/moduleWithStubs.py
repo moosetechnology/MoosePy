@@ -6,3 +6,6 @@ ypoints = numpy.array([3, 10])
 
 matplotlib.pyplot.plot(xpoints, ypoints)
 matplotlib.pyplot.show()
+
+import time
+regression_variable = time.time()
