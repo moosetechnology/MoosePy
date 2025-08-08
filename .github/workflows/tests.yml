@@ -15,7 +15,7 @@ jobs:
       - uses: hpi-swa/setup-smalltalkCI@v1
         id: smalltalkci
         with:
-          smalltalk-image: Moose64-12
+          smalltalk-image: Moose64-13
       - run: smalltalkci -s ${{ steps.smalltalkci.outputs.smalltalk-image }}
         shell: bash
         timeout-minutes: 15
