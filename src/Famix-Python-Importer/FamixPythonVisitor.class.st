@@ -1398,7 +1398,7 @@ FamixPythonVisitor >> visitModule: aModuleNode [
 
 			self currentEntity: entity ].
 	
-	(fileReference basename = #'moduleAtRoot100.py') ifTrue: [ 1halt ].
+	(fileReference basename = #'moduleWithStubkosdwkds.py') ifTrue: [ 1halt ].
 	
 	self visitChildren: aModuleNode.
 
