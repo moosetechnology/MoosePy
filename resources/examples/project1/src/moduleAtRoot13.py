@@ -157,3 +157,10 @@ def function_to_invoke_in_subscript_in_assignment():
 
 
 my_list[function_to_invoke_in_subscript_in_assignment()] = 10
+
+
+def function_to_invoke_in_parenthesized_expression():
+    return 3
+
+
+(function_to_invoke_in_parenthesized_expression)()
