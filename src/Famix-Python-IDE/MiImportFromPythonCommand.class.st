@@ -1,3 +1,6 @@
+"
+I'm a command to open a dialog allowing to import a file or a project in python.
+"
 Class {
 	#name : 'MiImportFromPythonCommand',
 	#superclass : 'MiImportCommand',
