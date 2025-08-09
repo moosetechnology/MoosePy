@@ -268,6 +268,15 @@ FamixPythonVisitor >> initialize [
 ]
 
 { #category : 'testing' }
+FamixPythonVisitor >> isLocalPrefixInClass: aString [
+	"Return true if the parameter is `self`, but in python this can be called another name."
+
+	^ [ (self currentEntityOfType: FamixPythonMethod) selfVariableName = aString ]
+		  on: SRNoCurrentEntityOfSpecificTypeAvailable
+		  do: [ false ]
+]
+
+{ #category : 'testing' }
 FamixPythonVisitor >> isMetaclassDefinition: aClassDefinitionNode [
 
 	^ aClassDefinitionNode _superclasses
@@ -315,8 +324,7 @@ FamixPythonVisitor >> manageAttributeAsCallReceiver: aNode [
 	receiverSource := aNode _object sourceText.
 
 	"=> self.x()"
-	self flag: #todo. "Can be something different than self..."
-	receiverSource = 'self' ifTrue: [
+	(self isLocalPrefixInClass: receiverSource) ifTrue: [
 			^ self
 				  resolve: ((SRLocalClassEntityResolvable identifier: identifier expectedKind: FamixTMethod)
 						   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one is a method from a missing superclass"
@@ -366,11 +374,10 @@ FamixPythonVisitor >> manageAttributeWriteAccessTo: aNode [
 
 	| variable pair |
 	pair := self attributeAsAssociation: aNode.
-	self flag: #todo. "Might not be self..."
-	pair key = 'self'
+	(self isLocalPrefixInClass: pair key)
 		ifTrue: [
 				| class |
-				class := self currentEntityOfType: FamixPythonClass.
+				class := self currentEntityOfType: FamixPythonType.
 				variable := (class childOfType: FamixTAttribute named: pair value) ifNil: [
 						            variable := (class createVariable: pair value)
 							                        isClassSide: false;
@@ -381,7 +388,7 @@ FamixPythonVisitor >> manageAttributeWriteAccessTo: aNode [
 				self flag: #todo.
 				^ self ].
 	(self createAccessTo: variable isWrite: true from: aNode assignationNode) accessor: self currentEntity.
-	
+
 	^ variable
 ]
 

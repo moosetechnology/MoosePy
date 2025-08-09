@@ -3512,6 +3512,23 @@ FamixPythonProject1Test >> testLocalMethodInvocationSourceAnchor [
 	self assert: invocation sourceText equals: 'self.get_name()'
 ]
 
+{ #category : 'tests - invocations' }
+FamixPythonProject1Test >> testLocalMethodInvocationWithOtherNameThanSelf [
+
+	| method method2 invocation |
+	method2 := self methodNamed: 'method_with_first_parameter_not_called_self'.
+	method := self methodNamed: 'method_invoking_local_method_without_parameter_called_self'.
+
+	invocation := method2 incomingInvocations detect: [ :aReference | aReference sender = method ].
+
+	self assert: invocation class equals: FamixPythonInvocation.
+	self assert: invocation source equals: method.
+	self assert: invocation sender equals: method.
+	self assertCollection: invocation target hasSameElements: { method2 }.
+	self assert: invocation invokedEntity equals: method2.
+	self assert: (method outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = method2 ])
+]
+
 { #category : 'tests - local variables' }
 FamixPythonProject1Test >> testLocalVariableInDictionaryComprehension [
 
@@ -3971,6 +3988,18 @@ FamixPythonProject1Test >> testMethodParametersSourceAnchor [
 
 	self assert: param sourceAnchor isNotNil.
 	self assert: param sourceText equals: 'tuple_attr'
+]
+
+{ #category : 'tests - methods' }
+FamixPythonProject1Test >> testMethodSelfVariableName [
+
+	| method |
+	method := self methodNamed: 'printInfos'.
+
+	self assert: method selfVariableName equals: 'self'.
+
+	method := self methodNamed: 'method_with_first_parameter_not_called_self'.
+	self assert: method selfVariableName equals: 'this'
 ]
 
 { #category : 'tests - methods' }
@@ -6917,6 +6946,44 @@ FamixPythonProject1Test >> testWriteAccessToIVar [
 	| ivar method access |
 	ivar := self attributeNamed: 'dog_name'.
 	method := (self classNamed: 'Dog') methods detect: #isConstructor.
+
+	access := ivar incomingAccesses detect: [ :anAccess | anAccess accessor = method ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: method.
+	self assert: access accessor equals: method.
+	self assert: access target equals: ivar.
+	self assert: access variable equals: ivar.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (method accesses anySatisfy: [ :anAccess | anAccess variable = ivar ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testWriteAccessToIVarOfMetaclass [
+
+	| ivar method access |
+	ivar := self attributeNamed: 'base'.
+	method := (self model entities detect: [ :entity | entity name = 'CustomMetaclass' ]) methods detect: #isConstructor.
+
+	access := ivar incomingAccesses detect: [ :anAccess | anAccess accessor = method ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: method.
+	self assert: access accessor equals: method.
+	self assert: access target equals: ivar.
+	self assert: access variable equals: ivar.
+	self assert: access isWrite.
+	self deny: access isRead.
+	self assert: (method accesses anySatisfy: [ :anAccess | anAccess variable = ivar ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testWriteAccessToIVarWithReceiverNotNamedSelf [
+
+	| ivar method access |
+	ivar := self attributeNamed: 'instance_variable_with_receiver_not_called_self'.
+	method := self methodNamed: 'method_with_first_parameter_not_called_self'.
 
 	access := ivar incomingAccesses detect: [ :anAccess | anAccess accessor = method ].
 

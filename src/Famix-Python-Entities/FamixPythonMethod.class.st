@@ -67,3 +67,12 @@ FamixPythonMethod class >> annotation [
 	<generated>
 	^ self
 ]
+
+{ #category : 'accessing' }
+FamixPythonMethod >> selfVariableName [
+
+	<FMProperty: #selfVariableName type: #String>
+	<derived>
+	<FMComment: 'Name of the first variable of the method representing the current instance (usually self)'>
+	^ self parameters first name
+]
