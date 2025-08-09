@@ -38,7 +38,7 @@ y = 2 * X - 5 + rnstate.randn(50)
 class CustomMetaclass2(type):
 
     def __init__(cls, name, bases, dct):
-        cls.base = 200
+        cls.base2 = 200
 
 
 for i in range(5):
