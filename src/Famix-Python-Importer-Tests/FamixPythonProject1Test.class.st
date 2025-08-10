@@ -3714,6 +3714,7 @@ FamixPythonProject1Test >> testMetaclass [
 	self assert: metaclass class equals: FamixPythonMetaclass.
 	self assert: metaclass name equals: 'CustomMetaclass'.
 	self assert: metaclass typeContainer equals: (self moduleNamed: 'moduleAtRoot8').
+	self assert: metaclass superclass name equals: 'type'.
 	self deny: metaclass isStub
 ]
 

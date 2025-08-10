@@ -3,9 +3,9 @@ I resolve invocations or instantiations in the form of `y.x()` when I'm sure  `y
 "
 Class {
 	#name : 'FamixPythonMethodInvocationResolvable',
-	#superclass : 'FamixPythonAbstractInvocationOrInstantiationResolvable',
+	#superclass : 'SRResolvable',
 	#instVars : [
-		'receiver'
+		'identifier'
 	],
 	#category : 'Famix-Python-Importer-SymbolResolution',
 	#package : 'Famix-Python-Importer',
@@ -13,28 +13,39 @@ Class {
 }
 
 { #category : 'instance creation' }
-FamixPythonMethodInvocationResolvable class >> identifier: aString receiver: anotherString [
+FamixPythonMethodInvocationResolvable class >> identifier: anIdentifierString [
 
-	^ (self identifier: aString)
-		  receiver: anotherString;
+	^ self new
+		  identifier: anIdentifierString;
 		  yourself
 ]
 
 { #category : 'accessing' }
-FamixPythonMethodInvocationResolvable >> receiver: anObject [
-	receiver := anObject
+FamixPythonMethodInvocationResolvable >> identifier [
+
+	^ identifier
+]
+
+{ #category : 'accessing' }
+FamixPythonMethodInvocationResolvable >> identifier: anObject [
+
+	identifier := anObject
 ]
 
 { #category : 'resolution' }
 FamixPythonMethodInvocationResolvable >> resolveInScope: aScope currentEntity: currentEntity [
 
-	| reacheableClasses |
-	reacheableClasses := aScope reachableEntities select: [ :entity | entity isOfType: FamixTClass ].
+	| reacheableClasses candidates |
+	reacheableClasses := aScope entity withAllParents flatCollect: [ :entity | entity reachableEntities select: #isClass ].
+	candidates := OrderedCollection new.
 
 	reacheableClasses do: [ :class |
+			self flag: #todo. "Should be #allMethods"
 			class methods
 				detect: [ :method | method name = identifier ]
-				ifFound: [ :method | ^ self result: method ] ].
+				ifFound: [ :method | candidates add: method ] ].
 
-	NotFound signal
+	candidates ifNotEmpty: [ ^ self result: candidates ].
+
+	SRNoResolutionPossible signal
 ]

@@ -363,7 +363,7 @@ FamixPythonVisitor >> manageAttributeAsCallReceiver: aNode [
 	"In this case we need to visit the object to find for example accesses. We know there is something interesting since we escaped all other cases above."
 	self visit: aNode _object.
 	^ self
-		  resolve: ((FamixPythonMethodInvocationResolvable identifier: identifier receiver: receiverSource)
+		  resolve: ((FamixPythonMethodInvocationResolvable identifier: identifier)
 				   notFoundReplacementEntity: [ :unresolved :currentEntity | self ensureStubMethodNamed: unresolved identifier ];
 				   yourself)
 		  foundAction: [ :result :currentEntity | self createInvocationOf: result from: currentEntity node: (aNode parentOfType: #call) ]
