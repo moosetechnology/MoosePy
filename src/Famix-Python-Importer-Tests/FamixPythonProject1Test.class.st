@@ -3175,6 +3175,20 @@ FamixPythonProject1Test >> testInvocationOfStubFunctionWithNamespace [
 	self assert: (module outgoingInvocations anySatisfy: [ :aReference | aReference invokedEntity = function ])
 ]
 
+{ #category : 'tests' }
+FamixPythonProject1Test >> testInvocationToUnknowEntityOfSameNameAsUnknowPackage [
+	"Regression test"
+
+	| unknowFunction |
+	unknowFunction := self model entities detect: [ :entity |
+		                  entity class = FamixPythonUnknownEntity and: [ entity name = 'random' and: [ entity parentPackage isNotNil ] ] ].
+
+	self assert: unknowFunction name equals: 'random'.
+	self assert: unknowFunction parentPackage name equals: 'random'.
+	self deny: unknowFunction identicalTo: unknowFunction parentPackage.
+	self assert: unknowFunction isStub
+]
+
 { #category : 'tests - invocations' }
 FamixPythonProject1Test >> testInvocationsThatCannotBeResolved [
 	"I created a file with a lot of invocations that cannot be resolved and we will ensure we do not create any invocation for them."

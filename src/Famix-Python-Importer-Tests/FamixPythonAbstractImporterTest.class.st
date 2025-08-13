@@ -95,5 +95,5 @@ FamixPythonAbstractImporterTest >> parameterNamed: aName [
 { #category : 'accessing' }
 FamixPythonAbstractImporterTest >> unknownEntityNamed: aName [
 
-	^ self model entities detect: [ :entity | entity class = FamixPythonUnknownEntity and: [ entity name = aName ] ]
+	^ self entityNamed: aName in: (self model entities select: [ :entity | entity class = FamixPythonUnknownEntity ])
 ]

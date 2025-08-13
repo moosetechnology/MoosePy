@@ -206,6 +206,17 @@ FamixPythonVisitor >> ensureStubUnknownEntityNamed: aString [
 ]
 
 { #category : 'ensure entity' }
+FamixPythonVisitor >> ensureStubUnknownEntityNamed: aString in: anEntity [
+
+	^ anEntity children
+		  detect: [ :child | child name = aString ]
+		  ifNone: [
+				  (model newUnknownEntityNamed: aString)
+					  parentPackage: anEntity;
+					  yourself ]
+]
+
+{ #category : 'ensure entity' }
 FamixPythonVisitor >> ensureSuperclassFor: aClassDefinitionNode [
 	"Visiting the children of the superclasses should create the superclass of the class definition. But, if there are none, this means we should inherit from object."
 
@@ -454,9 +465,8 @@ FamixPythonVisitor >> manageImport: anImport ofName: aName from: fromName alias:
 									 | package |
 									 package := self ensureStubPackagesFromPath: unresolvedImport path.
 
-									 (self ensureStubUnknownEntityNamed: unresolvedImport entityName)
-										 parentPackage: package;
-										 "This entity can be a package on a module."yourself ];
+									 "This entity can be a package on a module."
+									 self ensureStubUnknownEntityNamed: unresolvedImport entityName in: package ];
 							 yourself ])
 		foundAction: [ :entity :currentEntity | entity addIncomingImport: import ].
 
