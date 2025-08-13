@@ -7,3 +7,5 @@ ypoints = numpy.array([3, 40])
 matplotlib.pyplot.plot(xpoints, ypoints)
 
 moduleAtRootSpaceString = ' '
+
+numpy.random.random(50000)**2
