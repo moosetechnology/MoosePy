@@ -62,7 +62,15 @@ FamixPythonVisitor >> createAccessTo: variable isWrite: aBoolean from: anAssignm
 			call size > 1 ifTrue: [ 1 halt ].
 
 			call isEmpty ifFalse: [
-				variableDefinitionUseChain at: call first put: access mooseID ] ].
+					variableDefinitionUseChain
+						at: call first
+						ifPresent: [ :orderedCollec | orderedCollec add: access mooseID ]
+						ifAbsent: [
+								variableDefinitionUseChain
+									at: call first
+									put: (OrderedCollection with: access mooseID) ]
+
+					"variableDefinitionUseChain at: call first put: access mooseID" ] ].
 
 	self setSourceAnchor: access from: anAssignmentNode.
 	"In the case of an augmented assignment, we produce a read access on top of the write access"
@@ -113,7 +121,6 @@ FamixPythonVisitor >> createInheritanceFrom: anAttributeNode [
 FamixPythonVisitor >> createInvocationOf: target from: currentEntity node: aNode [
 
 	| invocation accessMooseId |
-
 	invocation := self model newInvocation
 		              sender: currentEntity;
 		              signature: aNode sourceText;
@@ -128,10 +135,11 @@ FamixPythonVisitor >> createInvocationOf: target from: currentEntity node: aNode
 		                 at: aNode
 		                 ifAbsent: [ nil ].
 	accessMooseId ifNotNil: [
-			| access |
-			access := self model allAccesses select: [ :a |
-				          a mooseID = accessMooseId ].
-			access first attributeAt: #invocked ifAbsentPut: invocation ].
+			accessMooseId do: [ :mooseId |
+					| access |
+					access := self model allAccesses select: [ :a |
+						          a mooseID = mooseId ].
+					access first attributeAt: #firstCall ifAbsentPut: invocation ] ].
 
 	^ invocation
 ]
