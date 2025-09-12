@@ -16,7 +16,8 @@ Class {
 	#name : 'FamixPythonVisitor',
 	#superclass : 'FamixTSAbstractVisitor',
 	#instVars : [
-		'importPaths'
+		'importPaths',
+		'variableDefinitionUseChain'
 	],
 	#category : 'Famix-Python-Importer-Core',
 	#package : 'Famix-Python-Importer',
@@ -53,9 +54,23 @@ FamixPythonVisitor >> createAccessTo: variable isWrite: aBoolean from: anAssignm
 		          isWrite: aBoolean;
 		          yourself.
 
+	aBoolean ifTrue: [
+			| call |
+			call := anAssignmentNode collectNamedChild select: [ :i |
+				        i type = #call ].
+			"Will need to handle that at some point"
+			call size > 1 ifTrue: [ 1 halt ].
+
+			call isEmpty ifFalse: [
+				variableDefinitionUseChain at: call first put: access mooseID ] ].
+
 	self setSourceAnchor: access from: anAssignmentNode.
 	"In the case of an augmented assignment, we produce a read access on top of the write access"
-	(aBoolean and: [ anAssignmentNode type = #augmented_assignment ]) ifTrue: [ variable createAccessOrReferenceFrom: self currentEntity node: anAssignmentNode ].
+	(aBoolean and: [ anAssignmentNode type = #augmented_assignment ])
+		ifTrue: [
+				variable
+					createAccessOrReferenceFrom: self currentEntity
+					node: anAssignmentNode ].
 
 	^ access
 ]
@@ -97,7 +112,8 @@ FamixPythonVisitor >> createInheritanceFrom: anAttributeNode [
 { #category : 'association creation' }
 FamixPythonVisitor >> createInvocationOf: target from: currentEntity node: aNode [
 
-	| invocation |
+	| invocation accessMooseId |
+
 	invocation := self model newInvocation
 		              sender: currentEntity;
 		              signature: aNode sourceText;
@@ -107,6 +123,16 @@ FamixPythonVisitor >> createInvocationOf: target from: currentEntity node: aNode
 		ifFalse: [ invocation invokedEntity: target ].
 
 	self setSourceAnchor: invocation from: aNode.
+
+	accessMooseId := variableDefinitionUseChain
+		                 at: aNode
+		                 ifAbsent: [ nil ].
+	accessMooseId ifNotNil: [
+			| access |
+			access := self model allAccesses select: [ :a |
+				          a mooseID = accessMooseId ].
+			access first attributeAt: #invocked ifAbsentPut: invocation ].
+
 	^ invocation
 ]
 
@@ -275,7 +301,8 @@ FamixPythonVisitor >> initialize [
 	self flag: #todo. "Manage classes in classes. Especially for example the symbol resolution of local methods."
 	self flag: #todo. "Add a test of a local method invocation, but the method comes from a stub superclass (I know I did not managed the stubs. It should fail first"
 	self flag: #todo. "Create local var in loops or conditions"
-	importPaths := IdentityDictionary new
+	importPaths := IdentityDictionary new.
+	variableDefinitionUseChain := IdentityDictionary new.
 ]
 
 { #category : 'testing' }
