@@ -17,6 +17,22 @@ FamixPythonProject1Test >> model [
 	^ FamixPythonProject1TestResource current model
 ]
 
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> test4AccessesToIrisDataset [
+	"Regression test
+"
+
+	| variable module accesses |
+	variable := self globalVariableNamed: 'iris_dataset'.
+	module := self moduleNamed: 'moduleAtRoot17'.
+
+	accesses := variable incomingAccesses select: [ :anAccess | anAccess accessor = module ].
+
+	self assert: accesses size equals: 4.
+	self assert: (accesses select: #isRead) size equals: 3.
+	self assert: (accesses select: #isWrite) size equals: 1
+]
+
 { #category : 'tests - unknown access or reference' }
 FamixPythonProject1Test >> testAccessOrReferenceToStubEntity [
 
