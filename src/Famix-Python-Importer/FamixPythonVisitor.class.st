@@ -359,7 +359,7 @@ FamixPythonVisitor >> manageAttributeAsCallReceiver: aNode [
 
 	"=> module.x() when module is an imported entity"
 	self currentEntity allEffectiveImports
-		detect: [ :import | (import propertyNamed: #importedEntityName) = receiverSource or: [ import alias = receiverSource ] ]
+		detect: [ :import | (import cacheAt: #importedEntityName) = receiverSource or: [ import alias = receiverSource ] ]
 		ifFound: [ :import |
 				^ self
 					  resolve: ((FamixPythonDependencyFromImportedEntityResolvable identifier: identifier import: import)
