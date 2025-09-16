@@ -15,8 +15,12 @@ FamixPythonInvocation >> fullyQualifiedPath [
 						            a sourceAnchor startPos > b sourceAnchor startPos ].
 
 					accesses := accesses select: [ :a |
-						            a sourceAnchor startPos < self sourceAnchor startPos
-							            and: [ a isWrite ] ].
+							            a sourceAnchor startPos
+							            < self sourceAnchor startPos
+							            &
+							            (a sourceAnchor endPos ~= self sourceAnchor endPos)
+								            and: [ a isWrite ] ].
+
 					classInstanciaton := accesses first
 						                     attributeAt: #firstCall
 						                     ifAbsent: [ 1 halt ].
