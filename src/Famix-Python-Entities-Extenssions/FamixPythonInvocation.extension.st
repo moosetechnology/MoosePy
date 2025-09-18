@@ -3,13 +3,16 @@ Extension { #name : 'FamixPythonInvocation' }
 { #category : '*Famix-Python-Entities-Extenssions' }
 FamixPythonInvocation >> fullyQualifiedPath [
 
-	| parentPath methodName |
+	| parentPath |
+	"Should handle case when function are not stub""If function are not stub we need to handle the calls inside that uses a parameter""	1halt."
 	parentPath := self parentsPackagePath.
 	parentPath ifNil: [
 			| var accesses classInstanciaton invokedFrom |
 			invokedFrom := self invokedFrom.
 			invokedFrom isEmpty ifFalse: [
 					var := self invokedFrom first variable.
+					var class = FamixPythonParameter ifTrue: [
+						^ 'cannotResolveParameter' ].
 					accesses := var incomingAccesses asOrderedCollection.
 					accesses := accesses sorted: [ :a :b |
 						            a sourceAnchor startPos > b sourceAnchor startPos ].
@@ -18,19 +21,20 @@ FamixPythonInvocation >> fullyQualifiedPath [
 							            a sourceAnchor startPos
 							            < self sourceAnchor startPos
 							            &
-							            (a sourceAnchor endPos ~= self sourceAnchor endPos)
+							            (a sourceAnchor endPos < self sourceAnchor endPos)
 								            and: [ a isWrite ] ].
 
 					classInstanciaton := accesses first
 						                     attributeAt: #firstCall
-						                     ifAbsent: [ 1 halt ].
+						                     ifAbsent: [ ^ 'cannotResolve' "1 halt" ].
 					parentPath := classInstanciaton fullyQualifiedPath ] ].
-
-	methodName := self candidates first name.
+	
+	"Si on a une declaration de cette fonction qui ne serait pas en stub"
+	self candidates first isStub ifFalse: [ parentPath := self candidates first functionOwner name ].
 	parentPath ifNil: [ parentPath := 'unknown' ].
 
 
-	^ parentPath , '.' , methodName
+	^ parentPath
 ]
 
 { #category : '*Famix-Python-Entities-Extenssions' }
