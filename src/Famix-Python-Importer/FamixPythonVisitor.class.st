@@ -131,6 +131,8 @@ FamixPythonVisitor >> createInvocationOf: target from: currentEntity node: aNode
 
 	self setSourceAnchor: invocation from: aNode.
 
+	"On regarde si il y a plusieurs identifier, si c'est le cas on ne tente pas de resoudre"
+	(aNode collectFieldNameOfNamedChild at: #function) collectFieldNameOfNamedChild size > 1 ifFalse: [ 
 	accessMooseId := variableDefinitionUseChain
 		                 at: aNode
 		                 ifAbsent: [ nil ].
@@ -140,6 +142,8 @@ FamixPythonVisitor >> createInvocationOf: target from: currentEntity node: aNode
 					access := self model allAccesses select: [ :a |
 						          a mooseID = mooseId ].
 					access first attributeAt: #firstCall ifAbsentPut: invocation ] ].
+].
+
 
 	^ invocation
 ]
