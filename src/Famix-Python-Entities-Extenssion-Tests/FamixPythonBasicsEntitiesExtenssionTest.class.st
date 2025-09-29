@@ -1,24 +1,24 @@
 Class {
-	#name : 'FamixPythonBasicEntitiesExtenssionTest',
+	#name : 'FamixPythonBasicsEntitiesExtenssionTest',
 	#superclass : 'FamixPythonAbstractEntitiesExtenssionTest',
 	#category : 'Famix-Python-Entities-Extenssion-Tests',
 	#package : 'Famix-Python-Entities-Extenssion-Tests'
 }
 
 { #category : 'accessing' }
-FamixPythonBasicEntitiesExtenssionTest class >> resources [
+FamixPythonBasicsEntitiesExtenssionTest class >> resources [
 
 	^ { FamixPythonBasicsTestResource }
 ]
 
 { #category : 'accessing' }
-FamixPythonBasicEntitiesExtenssionTest >> model [
+FamixPythonBasicsEntitiesExtenssionTest >> model [
 
 	^ FamixPythonBasicsTestResource current model
 ]
 
 { #category : 'asserting' }
-FamixPythonBasicEntitiesExtenssionTest >> testFilterwarningInvocationParentsPackageShouldBeWarning [
+FamixPythonBasicsEntitiesExtenssionTest >> testFilterwarningInvocationParentsPackageShouldBeWarning [
 
 	| invocation path |
 	invocation := self allInvocationWithFunctionNamed: 'filterwarnings'. 
@@ -29,7 +29,7 @@ FamixPythonBasicEntitiesExtenssionTest >> testFilterwarningInvocationParentsPack
 ]
 
 { #category : 'asserting' }
-FamixPythonBasicEntitiesExtenssionTest >> testFilterwarningInvocationPathShouldBeWarning [
+FamixPythonBasicsEntitiesExtenssionTest >> testFilterwarningInvocationPathShouldBeWarning [
 
 	| invocation path |
 	invocation := self allInvocationWithFunctionNamed: 'filterwarnings'. 
@@ -40,7 +40,7 @@ FamixPythonBasicEntitiesExtenssionTest >> testFilterwarningInvocationPathShouldB
 ]
 
 { #category : 'asserting' }
-FamixPythonBasicEntitiesExtenssionTest >> testFilterwarningShouldNotBeInvokedFromVariable [
+FamixPythonBasicsEntitiesExtenssionTest >> testFilterwarningShouldNotBeInvokedFromVariable [
 
 	| invocation var |
 	invocation := self allInvocationWithFunctionNamed: 'filterwarnings'. 
@@ -51,7 +51,7 @@ FamixPythonBasicEntitiesExtenssionTest >> testFilterwarningShouldNotBeInvokedFro
 ]
 
 { #category : 'asserting' }
-FamixPythonBasicEntitiesExtenssionTest >> testHeadInvocationParentsPackageShouldBeNil [
+FamixPythonBasicsEntitiesExtenssionTest >> testHeadInvocationParentsPackageShouldBeNil [
 
 	| invocation path1 path2 |
 	invocation := self allInvocationWithFunctionNamed: 'head'.
@@ -64,7 +64,7 @@ FamixPythonBasicEntitiesExtenssionTest >> testHeadInvocationParentsPackageShould
 ]
 
 { #category : 'asserting' }
-FamixPythonBasicEntitiesExtenssionTest >> testHeadInvocationPathShouldBePandas [
+FamixPythonBasicsEntitiesExtenssionTest >> testHeadInvocationPathShouldBePandas [
 
 	| invocation path1 path2 |
 	invocation := self allInvocationWithFunctionNamed: 'head'.
@@ -77,7 +77,7 @@ FamixPythonBasicEntitiesExtenssionTest >> testHeadInvocationPathShouldBePandas [
 ]
 
 { #category : 'asserting' }
-FamixPythonBasicEntitiesExtenssionTest >> testHeadShouldBeInvokedFromVariable [
+FamixPythonBasicsEntitiesExtenssionTest >> testHeadShouldBeInvokedFromVariable [
 
 	| invocation access1 var1 access2 var2 |
 	invocation := self allInvocationWithFunctionNamed: 'head'.
@@ -95,7 +95,7 @@ FamixPythonBasicEntitiesExtenssionTest >> testHeadShouldBeInvokedFromVariable [
 ]
 
 { #category : 'asserting' }
-FamixPythonBasicEntitiesExtenssionTest >> testInfoInvocationParentsPackageShouldBeNil [
+FamixPythonBasicsEntitiesExtenssionTest >> testInfoInvocationParentsPackageShouldBeNil [
 
 	| invocation path1 path2 |
 	invocation := self allInvocationWithFunctionNamed: 'info'.
@@ -108,7 +108,7 @@ FamixPythonBasicEntitiesExtenssionTest >> testInfoInvocationParentsPackageShould
 ]
 
 { #category : 'asserting' }
-FamixPythonBasicEntitiesExtenssionTest >> testInfoInvocationPathShouldBePandas [
+FamixPythonBasicsEntitiesExtenssionTest >> testInfoInvocationPathShouldBePandas [
 
 	| invocation path1 path2 |
 	invocation := self allInvocationWithFunctionNamed: 'info'.
@@ -121,13 +121,13 @@ FamixPythonBasicEntitiesExtenssionTest >> testInfoInvocationPathShouldBePandas [
 ]
 
 { #category : 'asserting' }
-FamixPythonBasicEntitiesExtenssionTest >> testModelShouldHave8Invocations [
+FamixPythonBasicsEntitiesExtenssionTest >> testModelShouldHave8Invocations [
 
 	self assert: (self model allInvocations size) equals: 8
 ]
 
 { #category : 'asserting' }
-FamixPythonBasicEntitiesExtenssionTest >> testPrintShouldBeABuiltInFunction [
+FamixPythonBasicsEntitiesExtenssionTest >> testPrintShouldBeABuiltInFunction [
 
 	| invocation path |
 	invocation := self allInvocationWithFunctionNamed: 'print'.
@@ -141,7 +141,7 @@ FamixPythonBasicEntitiesExtenssionTest >> testPrintShouldBeABuiltInFunction [
 ]
 
 { #category : 'asserting' }
-FamixPythonBasicEntitiesExtenssionTest >> testReadCsvInvocationParentPackageShouldBePandas [
+FamixPythonBasicsEntitiesExtenssionTest >> testReadCsvInvocationParentPackageShouldBePandas [
 
 	| invocation path1 path2 |
 	invocation := self allInvocationWithFunctionNamed: 'read_csv'.
@@ -154,7 +154,7 @@ FamixPythonBasicEntitiesExtenssionTest >> testReadCsvInvocationParentPackageShou
 ]
 
 { #category : 'asserting' }
-FamixPythonBasicEntitiesExtenssionTest >> testReadCsvInvocationPathShouldBePandas [
+FamixPythonBasicsEntitiesExtenssionTest >> testReadCsvInvocationPathShouldBePandas [
 
 	| invocation path1 path2 |
 	invocation := self allInvocationWithFunctionNamed: 'read_csv'.
@@ -167,7 +167,7 @@ FamixPythonBasicEntitiesExtenssionTest >> testReadCsvInvocationPathShouldBePanda
 ]
 
 { #category : 'asserting' }
-FamixPythonBasicEntitiesExtenssionTest >> testReadCsvShouldNotBeInvokedFromVariable [
+FamixPythonBasicsEntitiesExtenssionTest >> testReadCsvShouldNotBeInvokedFromVariable [
 
 	| invocation path1 path2 |
 	invocation := self allInvocationWithFunctionNamed: 'read_csv'.
