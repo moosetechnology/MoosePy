@@ -1,5 +1,6 @@
 "
-In those test we want some specific behaviors. We want no inference and a very restrive path resolution
+In those test we want some specific behaviors. We want no inference and a very restrictive path resolution.
+Only the class instanciation propagate the type.
 "
 Class {
 	#name : 'FamixPythonWIPEntitiesExtenssionTest',
@@ -85,7 +86,7 @@ FamixPythonWIPEntitiesExtenssionTest >> testHeadInvocationPathShouldNotBeSimilar
 
 	path1 := invocation first fullyQualifiedPath: false .
 	path2 := invocation second fullyQualifiedPath: false .
-	self assert: path1 ~= path2.
+	self assert: path1 equals: path2.
 	self assert: path2 equals: 'unknown' 
 ]
 
@@ -112,23 +113,59 @@ FamixPythonWIPEntitiesExtenssionTest >> testInfoInvocationPathShouldNotBeSimilar
 	self assert: invocations first invokedFrom first variable equals: (self globalVariableNamed: 'train_orj'). 
 	self assert: invocations second invokedFrom first variable equals: (self globalVariableNamed: 'train'). 
 
-	self assert: (invocations first fullyQualifiedPath: false) equals: 'pandas'.
+	self assert: (invocations first fullyQualifiedPath: false) equals: 'unknown'.
 	self assert: (invocations second fullyQualifiedPath: false) equals: 'unknown'.
 
 ]
 
 { #category : 'asserting' }
+FamixPythonWIPEntitiesExtenssionTest >> testInvocationOnAFunctionLocalVarShouldNotBeResolvable [
+
+	| invocation fqPaths |
+	invocation := self allInvocationWithFunctionNamed: 'mean'.
+	self assert: invocation size equals: 1.
+	
+	fqPaths := invocation collect: [ :i | i fullyQualifiedPath: false ].
+   	self assert: fqPaths size equals: 1.
+	self deny: (fqPaths anySatisfy: [ :v | v ~=  'unknown'  ]).
+]
+
+{ #category : 'asserting' }
+FamixPythonWIPEntitiesExtenssionTest >> testInvocationOnAFunctionParamShouldNotBeResolvable [
+
+	| invocation fqPaths |
+	invocation := self allInvocationWithFunctionNamed: 'inParamFunc'.
+	self assert: invocation size equals: 1.
+	
+	fqPaths := invocation collect: [ :i | i fullyQualifiedPath: false ].
+   	self assert: fqPaths size equals: 1.
+	self deny: (fqPaths anySatisfy: [ :v | v ~=  'dependOnParameterType'  ]).
+]
+
+{ #category : 'asserting' }
+FamixPythonWIPEntitiesExtenssionTest >> testLocalsShouldBeABuiltInFunction [
+
+	| invocations  fqPaths |
+	invocations := self allInvocationWithFunctionNamed: 'locals'.
+	self assert: invocations size equals: 1.
+
+
+	fqPaths := invocations collect: [ :i | i fullyQualifiedPath: false ].
+   	self assert: fqPaths size equals: 1.
+	self deny: (fqPaths anySatisfy: [ :v | v ~=  'builtIn'  ]).
+]
+
+{ #category : 'asserting' }
 FamixPythonWIPEntitiesExtenssionTest >> testPrintShouldBeABuiltInFunction [
 
-	| invocation path |
-	invocation := self allInvocationWithFunctionNamed: 'print'.
-	self assert: invocation size equals: 4.
+	| invocations  fqPaths |
+	invocations := self allInvocationWithFunctionNamed: 'print'.
+	self assert: invocations size equals: 5.
 
 
-	self assert: invocation first invokedFrom isEmpty.
-	path := invocation first parentsPackagePath.
-	self assert: path equals: 'built-in'.
-	self assert: invocation first fullyQualifiedPath equals: 'built-in'
+	fqPaths := invocations collect: [ :i | i fullyQualifiedPath: false ].
+   	self assert: fqPaths size equals: 5.
+	self deny: (fqPaths anySatisfy: [ :v | v ~=  'builtIn'  ]).
 ]
 
 { #category : 'asserting' }

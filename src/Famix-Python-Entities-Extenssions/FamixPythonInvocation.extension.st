@@ -51,7 +51,7 @@ FamixPythonInvocation >> fullyQualifiedPath: isInstanciation [
 			invokedFrom isEmpty ifFalse: [
 					var := self invokedFrom first variable.
 					var class = FamixPythonParameter ifTrue: [
-						^ 'cannotResolveParameter' ].
+						^ 'dependOnParameterType' ].
 					accesses := var incomingAccesses asOrderedCollection.
 					accesses := accesses sorted: [ :a :b |
 						            a sourceAnchor startPos > b sourceAnchor startPos ].
@@ -65,11 +65,12 @@ FamixPythonInvocation >> fullyQualifiedPath: isInstanciation [
 
 					classInstanciaton := accesses first
 						                     attributeAt: #firstCall
-						                     ifAbsent: [ ^ 'cannotResolve' "1 halt" ].
+						                     ifAbsent: [ ^ 'unknown' "1 halt" ].
 					parentPath := classInstanciaton fullyQualifiedPath: true ] ].
 	
 	"Si on a une declaration de cette fonction qui ne serait pas en stub"
 	self candidates first isStub ifFalse: [ isInstanciation ifFalse: [parentPath := self candidates first functionOwner name] ].
+	self candidates first isBuiltIn ifTrue: [ parentPath := 'builtIn' ].
 	parentPath ifNil: [ parentPath := 'unknown' ].
 	isInstanciation ifTrue: [self candidates first name first isUppercase ifTrue: [parentPath := parentPath , '.' , self candidates first name] ].
 
