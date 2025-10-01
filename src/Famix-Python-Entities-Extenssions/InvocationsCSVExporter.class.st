@@ -37,7 +37,7 @@ InvocationsCSVExporter >> export [
 
 	| invocations csvFile |
 	invocations := model allInvocations.
-	1halt.
+
 	csvFile := dest.
 
 	csvFile writeStreamDo: [ :stream |

@@ -62,14 +62,14 @@ FamixPythonInvocation >> fullyQualifiedPath: isInstanciation [
 							            &
 							            (a sourceAnchor endPos < self sourceAnchor endPos)
 								            and: [ a isWrite ] ].
-
+					accesses isEmpty ifTrue: [ "1halt." ^ 'unknown' ].
 					classInstanciaton := accesses first
 						                     attributeAt: #firstCall
 						                     ifAbsent: [ ^ 'unknown' "1 halt" ].
 					parentPath := classInstanciaton fullyQualifiedPath: true ] ].
 	
 	"Si on a une declaration de cette fonction qui ne serait pas en stub"
-	self candidates first isStub ifFalse: [ isInstanciation ifFalse: [parentPath := self candidates first functionOwner name] ].
+	self candidates first isStub ifFalse: [ isInstanciation ifFalse: [parentPath := self candidates first nonStubOwner ] ].
 	self candidates first isBuiltIn ifTrue: [ parentPath := 'builtIn' ].
 	parentPath ifNil: [ parentPath := 'unknown' ].
 	isInstanciation ifTrue: [self candidates first name first isUppercase ifTrue: [parentPath := parentPath , '.' , self candidates first name] ].

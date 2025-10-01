@@ -143,6 +143,19 @@ FamixPythonWIPEntitiesExtenssionTest >> testInvocationOnAFunctionParamShouldNotB
 ]
 
 { #category : 'asserting' }
+FamixPythonWIPEntitiesExtenssionTest >> testInvocationOnAnIteratorVarShouldBeUnknown [
+
+	| invocations  fqPaths |
+	invocations := self allInvocationWithFunctionNamed: 'startswith'.
+	self assert: invocations size equals: 1.
+
+	1halt.
+	fqPaths := invocations collect: [ :i | i fullyQualifiedPath: false ].
+   	self assert: fqPaths size equals: 1.
+	self deny: (fqPaths anySatisfy: [ :v | v ~=  'unknown'  ]).
+]
+
+{ #category : 'asserting' }
 FamixPythonWIPEntitiesExtenssionTest >> testLocalsShouldBeABuiltInFunction [
 
 	| invocations  fqPaths |
@@ -156,15 +169,27 @@ FamixPythonWIPEntitiesExtenssionTest >> testLocalsShouldBeABuiltInFunction [
 ]
 
 { #category : 'asserting' }
+FamixPythonWIPEntitiesExtenssionTest >> testNonStubClassInstanciationShouldBeResolvable [
+
+	| invocations  fqPaths |
+	invocations := self allInvocationWithFunctionNamed: '__init__'.
+	self assert: invocations size equals: 1.
+
+	fqPaths := invocations collect: [ :i | i fullyQualifiedPath: false ].
+   	self assert: fqPaths size equals: 1.
+	self deny: (fqPaths anySatisfy: [ :v | v ~=  'test.roc_auc_callback'  ]).
+]
+
+{ #category : 'asserting' }
 FamixPythonWIPEntitiesExtenssionTest >> testPrintShouldBeABuiltInFunction [
 
 	| invocations  fqPaths |
 	invocations := self allInvocationWithFunctionNamed: 'print'.
-	self assert: invocations size equals: 5.
+	self assert: invocations size equals: 6.
 
 
 	fqPaths := invocations collect: [ :i | i fullyQualifiedPath: false ].
-   	self assert: fqPaths size equals: 5.
+   	self assert: fqPaths size equals: 6.
 	self deny: (fqPaths anySatisfy: [ :v | v ~=  'builtIn'  ]).
 ]
 
