@@ -89,10 +89,11 @@ FamixPythonInvocation >> parentsPackagePath [
 
 	| toPrint current parent |
 	self flag: #TODO.
-	"If we have multiple candidates it will break"
-		1 haltIf: [ self candidates size > 1 ].
-	
-	current := self candidates first.
+	"This heuristic is very bad, we will need a better resolver. It doesn't work when a supe().__init__ is called and both the call and super class are not stub"
+		"1 haltIf: [ self candidates size > 1 ]."
+		
+	self candidates size > 1 ifTrue: [ current := (self candidates select: [ :c | c parentType = self sender parentType ]) first ]	
+	ifFalse: [current := self candidates first ].
 
 	toPrint := OrderedCollection new.
 
