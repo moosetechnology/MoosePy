@@ -230,6 +230,21 @@ class ClassWihtComments():
         return self.ivar_commented
 
 
+def function_with_comments_for_regression_test(a):
+    if a > 20:
+        # comment1
+        return 1
+
+    # comment2
+    elif a < 10:
+        # comment3
+        return 2
+
+    # comment4
+    else:
+        return 3
+
+
 class ClassUsingImportedMetaclass(metaclass=moduleAtRoot8.CustomMetaclass2):
     pass
 
