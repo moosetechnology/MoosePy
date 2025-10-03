@@ -24,11 +24,11 @@ FamixPythonAbstractImportResolvable >> findTargetEntityFor: aPath from: startEnt
 	possibleEntities := startEntities select: [ :possibleEntity | possibleEntity name = splittedPath first and: [ possibleEntity isStub not ] ].
 	splittedPath removeFirst.
 	[ splittedPath isNotEmpty ] whileTrue: [
-		| childName |
-		childName := splittedPath anyOne.
-		splittedPath removeFirst.
-		possibleEntities := possibleEntities flatCollect: [ :possibleEntity |
-			                    possibleEntity children select: [ :child | (child isPackage or: [ child isModule ]) and: [ child name = childName ] ] ] ].
+			| childName |
+			childName := splittedPath anyOne.
+			splittedPath removeFirst.
+			possibleEntities := possibleEntities flatCollect: [ :possibleEntity |
+				                    possibleEntity containedEntities select: [ :child | (child isPackage or: [ child isModule ]) and: [ child name = childName ] ] ] ].
 	possibleEntities ifEmpty: [ SRNoResolutionPossible signal ].
 
 	possibleEntities size = 1 ifFalse: [ self error: 'There should be only one possible entity to import.' ].

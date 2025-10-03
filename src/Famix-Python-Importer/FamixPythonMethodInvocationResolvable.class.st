@@ -36,7 +36,7 @@ FamixPythonMethodInvocationResolvable >> identifier: anObject [
 FamixPythonMethodInvocationResolvable >> resolveInScope: aScope currentEntity: currentEntity [
 
 	| reacheableClasses candidates |
-	reacheableClasses := aScope entity withAllParents flatCollect: [ :entity | entity reachableEntities select: #isClass ].
+	reacheableClasses := aScope entity withAllContainers flatCollect: [ :entity | entity reachableEntities select: #isClass ].
 	candidates := OrderedCollection new.
 
 	reacheableClasses do: [ :class |

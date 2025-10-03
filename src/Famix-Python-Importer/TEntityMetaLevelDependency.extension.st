@@ -4,7 +4,7 @@ Extension { #name : 'TEntityMetaLevelDependency' }
 TEntityMetaLevelDependency >> allEffectiveImports [
 	"Return all the imports effective in this entity."
 
-	^ self withAllParents flatCollect: [ :entity | entity query outgoing local dependenciesOfType: FamixPythonImport ]
+	^ self withAllContainers flatCollect: [ :entity | entity query outgoing local dependenciesOfType: FamixPythonImport ]
 ]
 
 { #category : '*Famix-Python-Importer' }

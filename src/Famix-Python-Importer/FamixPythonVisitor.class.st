@@ -36,7 +36,7 @@ FamixPythonVisitor >> checkShadowingOfName: aString during: aBlock [
 
 	| shadowedEntity newEntity |
 	self withCurrentEntityDo: [ :entity |
-			((entity query descendants ofType: FamixTShadowable) select: [ :child | child name = aString ]) ifNotEmpty: [ :entities |
+			((entity query containedEntities ofType: FamixTShadowable) select: [ :child | child name = aString ]) ifNotEmpty: [ :entities |
 				shadowedEntity := entities detectMax: [ :anEntity | anEntity sourceAnchor startPos ] ] ].
 
 	newEntity := aBlock value.
@@ -208,7 +208,7 @@ FamixPythonVisitor >> ensureStubUnknownEntityNamed: aString [
 { #category : 'ensure entity' }
 FamixPythonVisitor >> ensureStubUnknownEntityNamed: aString in: anEntity [
 
-	^ anEntity children
+	^ anEntity containedEntities
 		  detect: [ :child | child name = aString ]
 		  ifNone: [
 				  (model newUnknownEntityNamed: aString)
@@ -582,10 +582,8 @@ FamixPythonVisitor >> manageWriteAccessTo: aNode [
 	"I'm managing the write access to an identifier. I have an alternative for access to an attibute such as `instance.var = 3`. See #manageAttributeWriteAccessTo: for this."
 
 	| variable name |
-	name := aNode sourceText.
-
-	"If we have a variable of this name already, we should not recreate it. Except if this variable got shadowed! In that case, we should recreate it."
-	(self currentEntity query descendants ofType: FamixTStructuralEntity)
+	name := aNode sourceText. "If we have a variable of this name already, we should not recreate it. Except if this variable got shadowed! In that case, we should recreate it."
+	(self currentEntity query containedEntities ofType: FamixTStructuralEntity)
 		detect: [ :child | child name = name and: [ child isShadowable not or: [ child isShadowed not ] ] ]
 		ifFound: [ :var | variable := var ]
 		ifNone: [
@@ -1408,7 +1406,7 @@ FamixPythonVisitor >> visitModule: aModuleNode [
 
 				self currentEntity: entity ].
 
-		fileReference basename = #'moduleAtRoot111.py' ifTrue: [ 1 halt ].
+		fileReference basename = #'moduleAtRoot2ip.py' ifTrue: [ 1 halt ].
 
 		self visitChildren: aModuleNode.
 		

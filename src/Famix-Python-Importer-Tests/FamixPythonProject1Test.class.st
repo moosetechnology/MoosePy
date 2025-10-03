@@ -5270,7 +5270,7 @@ FamixPythonProject1Test >> testPackageWithoutInitFile [
 
 	self assert: rootPackage class equals: FamixPythonPackage.
 	self assert: rootPackage name equals: 'root4'.
-	self assert: (rootPackage query descendants ofType: FamixTModule) size equals: 2
+	self assert: (rootPackage query containedEntities ofType: FamixTModule) size equals: 2
 ]
 
 { #category : 'tests - packages' }
