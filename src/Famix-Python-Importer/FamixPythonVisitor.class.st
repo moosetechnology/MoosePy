@@ -1400,24 +1400,22 @@ FamixPythonVisitor >> visitModule: aModuleNode [
 
 	self setSourceAnchor: entity from: aModuleNode.
 
-	isPackageDeclaration ifFalse: [
-			self solver scopeIsEmpty ifFalse: [
-					self assert: self currentEntity isPackage.
-					entity parentPackage: self currentEntity ].
+	[
+		isPackageDeclaration ifFalse: [
+				self solver scopeIsEmpty ifFalse: [
+						self assert: self currentEntity isPackage.
+						entity parentPackage: self currentEntity ].
 
-			self currentEntity: entity ].
-	
-	(fileReference basename = #'moduleAtRoot111.py') ifTrue: [ 1halt ].
-	
-	self visitChildren: aModuleNode.
+				self currentEntity: entity ].
 
-	"Importing the comments of the file."
-	FamixPythonCommentVisitor visitor: self importCommentsOf: aModuleNode.
+		fileReference basename = #'moduleAtRoot111.py' ifTrue: [ 1 halt ].
 
-	"If we are in a package declaration we need to keep the package in the context for the modules in the package. The package will be pop later by the importer."
-	^ isPackageDeclaration
-		  ifTrue: [ self currentEntity ]
-		  ifFalse: [ self popScope ]
+		self visitChildren: aModuleNode.
+		
+		"Importing the comments of the file."
+		FamixPythonCommentVisitor visitor: self importCommentsOf: aModuleNode ] ensure: [
+			"We are poping the scope in an ensure in case we have an error happening outside the error report catching area."
+			isPackageDeclaration ifFalse: [ self popScope ] ]
 ]
 
 { #category : 'visiting - visitChildren' }
