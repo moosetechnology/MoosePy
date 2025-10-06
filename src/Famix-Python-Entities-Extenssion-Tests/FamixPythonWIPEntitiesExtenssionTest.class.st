@@ -41,6 +41,18 @@ FamixPythonWIPEntitiesExtenssionTest >> testAddInvocationShouldBeResolvable [
 ]
 
 { #category : 'asserting' }
+FamixPythonWIPEntitiesExtenssionTest >> testBatchNormalizationInvocationShouldBeResolvable [
+
+	| invocations fqPaths |
+	invocations := self allInvocationWithFunctionNamed: 'BatchNormalization'.
+	self assert: invocations size equals: 3.
+	
+	fqPaths := invocations collect: [ :i | i fullyQualifiedPath: false ].
+   	self assert: fqPaths size equals: 3.
+	self deny: (fqPaths anySatisfy: [ :v | v ~=  'keras.layers.BatchNormalization'  ]).
+]
+
+{ #category : 'asserting' }
 FamixPythonWIPEntitiesExtenssionTest >> testCompileInvocationShouldBeResolvable [
 
 	| invocations fqPaths |
@@ -62,6 +74,30 @@ FamixPythonWIPEntitiesExtenssionTest >> testDenseInvocationShouldBeResolvable [
 	fqPaths := invocations collect: [ :i | i fullyQualifiedPath: false ].
    	self assert: fqPaths size equals: 5.
 	self deny: (fqPaths anySatisfy: [ :v | v ~=  'keras.layers'  ]).
+]
+
+{ #category : 'asserting' }
+FamixPythonWIPEntitiesExtenssionTest >> testDropoutInvocationShouldBeResolvable [
+
+	| invocations fqPaths |
+	invocations := self allInvocationWithFunctionNamed: 'Dropout'.
+	self assert: invocations size equals: 4.
+	
+	fqPaths := invocations collect: [ :i | i fullyQualifiedPath: false ].
+   	self assert: fqPaths size equals: 4.
+	self deny: (fqPaths anySatisfy: [ :v | v ~=  'keras.layers.Dropout'  ]).
+]
+
+{ #category : 'asserting' }
+FamixPythonWIPEntitiesExtenssionTest >> testFitInvocationShouldBeResolvableAndNotPointToTheLocalFitMethod [
+
+	| invocations fqPaths |
+	invocations := self allInvocationWithFunctionNamed: 'fit'.
+	self assert: invocations size equals: 2.
+	
+	fqPaths := invocations collect: [ :i | i fullyQualifiedPath: false ].
+   	self assert: fqPaths size equals: 2.
+	self deny: (fqPaths anySatisfy: [ :v | v ~=  'keras.models.Sequential'  ]).
 ]
 
 { #category : 'asserting' }
@@ -119,14 +155,26 @@ FamixPythonWIPEntitiesExtenssionTest >> testInfoInvocationPathShouldNotBeSimilar
 ]
 
 { #category : 'asserting' }
-FamixPythonWIPEntitiesExtenssionTest >> testInvocationOnAFunctionLocalVarShouldNotBeResolvable [
+FamixPythonWIPEntitiesExtenssionTest >> testInvocationOfALocalFuncWithMultipleCandidates [
 
 	| invocation fqPaths |
-	invocation := self allInvocationWithFunctionNamed: 'mean'.
+	invocation := self allInvocationWithFunctionNamed: 'local_func'.
 	self assert: invocation size equals: 1.
 	
 	fqPaths := invocation collect: [ :i | i fullyQualifiedPath: false ].
    	self assert: fqPaths size equals: 1.
+	self deny: (fqPaths anySatisfy: [ :v | v ~=  'test'  ]).
+]
+
+{ #category : 'asserting' }
+FamixPythonWIPEntitiesExtenssionTest >> testInvocationOnAFunctionLocalVarShouldNotBeResolvable [
+
+	| invocation fqPaths |
+	invocation := self allInvocationWithFunctionNamed: 'mean'.
+	self assert: invocation size equals: 3.
+	
+	fqPaths := invocation collect: [ :i | i fullyQualifiedPath: false ].
+   	self assert: fqPaths size equals: 3.
 	self deny: (fqPaths anySatisfy: [ :v | v ~=  'unknown'  ]).
 ]
 
@@ -135,10 +183,10 @@ FamixPythonWIPEntitiesExtenssionTest >> testInvocationOnAFunctionParamShouldNotB
 
 	| invocation fqPaths |
 	invocation := self allInvocationWithFunctionNamed: 'inParamFunc'.
-	self assert: invocation size equals: 1.
+	self assert: invocation size equals: 3.
 	
 	fqPaths := invocation collect: [ :i | i fullyQualifiedPath: false ].
-   	self assert: fqPaths size equals: 1.
+   	self assert: fqPaths size equals: 3.
 	self deny: (fqPaths anySatisfy: [ :v | v ~=  'dependOnParameterType'  ]).
 ]
 
@@ -149,10 +197,30 @@ FamixPythonWIPEntitiesExtenssionTest >> testInvocationOnAnIteratorVarShouldBeUnk
 	invocations := self allInvocationWithFunctionNamed: 'startswith'.
 	self assert: invocations size equals: 1.
 
-	1halt.
 	fqPaths := invocations collect: [ :i | i fullyQualifiedPath: false ].
    	self assert: fqPaths size equals: 1.
 	self deny: (fqPaths anySatisfy: [ :v | v ~=  'unknown'  ]).
+]
+
+{ #category : 'asserting' }
+FamixPythonWIPEntitiesExtenssionTest >> testInvocationWithMultipleCandidatesOfDifferentsEntities [
+"
+This invocation is on a function having the same name as a method.
+Normally we know that the candidate can only be either the method either the function.
+
+inst_class.on_epoch_end() -> will only have the method in candidates.
+on_epoch_end() -> will only have the function in candidates.
+
+This does not work if we have static methods @staticmethod
+"
+
+	| invocation fqPaths |
+	invocation := self allInvocationWithFunctionNamed: 'on_epoch_end'.
+	self assert: invocation size equals: 1.
+	
+	fqPaths := invocation collect: [ :i | i fullyQualifiedPath: false ].
+   	self assert: fqPaths size equals: 1.
+	self deny: (fqPaths anySatisfy: [ :v | v ~=  'test'  ]).
 ]
 
 { #category : 'asserting' }
@@ -185,11 +253,11 @@ FamixPythonWIPEntitiesExtenssionTest >> testPrintShouldBeABuiltInFunction [
 
 	| invocations  fqPaths |
 	invocations := self allInvocationWithFunctionNamed: 'print'.
-	self assert: invocations size equals: 6.
+	self assert: invocations size equals: 8.
 
 
 	fqPaths := invocations collect: [ :i | i fullyQualifiedPath: false ].
-   	self assert: fqPaths size equals: 6.
+   	self assert: fqPaths size equals: 8.
 	self deny: (fqPaths anySatisfy: [ :v | v ~=  'builtIn'  ]).
 ]
 
