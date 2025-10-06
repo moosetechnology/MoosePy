@@ -77,6 +77,19 @@ FamixPythonWIPEntitiesExtenssionTest >> testDenseInvocationShouldBeResolvable [
 ]
 
 { #category : 'asserting' }
+FamixPythonWIPEntitiesExtenssionTest >> testDropInvocationOnParameterVariableShouldNotBeResolvable [
+
+	| invocations invocationInFunc fqPath |
+	invocations := self allInvocationWithFunctionNamed: 'drop'.
+	self assert: invocations size equals: 3.
+
+	invocationInFunc := invocations last.
+ 	fqPath := invocationInFunc fullyQualifiedPath: false .
+	self assert: fqPath equals: 'dependOnParameterType'
+
+]
+
+{ #category : 'asserting' }
 FamixPythonWIPEntitiesExtenssionTest >> testDropoutInvocationShouldBeResolvable [
 
 	| invocations fqPaths |

@@ -92,7 +92,15 @@ FamixPythonInvocation >> parentsPackagePath [
 	"This heuristic is very bad, we will need a better resolver. It doesn't work when a supe().__init__ is called and both the call and super class are not stub"
 		"1 haltIf: [ self candidates size > 1 ]."
 		
-	self candidates size > 1 ifTrue: [ current := (self candidates select: [ :c | c parentType = self sender parentType ]) first ]	
+	self candidates size > 1 ifTrue: [ 
+		
+	"First we check that all the candidates are same class entities, normally it should always be the case."	
+	(self candidates collect:[:c | c class]) asSet size > 1 ifTrue: [ self error: 'The candidates in this invocation are differents type of entities' ].	
+	
+	"current := (self candidates select: [ :c | c parentType = self sender parentType ]) first. "
+	current := self getInvokedCandidate.
+	
+	]	
 	ifFalse: [current := self candidates first ].
 
 	toPrint := OrderedCollection new.

@@ -47,3 +47,12 @@ FamixPythonInvocation class >> annotation [
 	<generated>
 	^ self
 ]
+
+{ #category : 'as yet unclassified' }
+FamixPythonInvocation >> getInvokedCandidate [
+
+	self candidates first class = FamixPythonMethod & self sender class
+	= FamixPythonMethod ifTrue: [ "In this case we will have problem if we have shadowing enties on the class or the method"
+			^ (self candidates select: [ :c |
+				   c parentType = self sender parentType ]) first ]
+]
