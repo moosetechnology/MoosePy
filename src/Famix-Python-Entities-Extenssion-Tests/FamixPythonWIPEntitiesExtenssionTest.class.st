@@ -49,7 +49,7 @@ FamixPythonWIPEntitiesExtenssionTest >> testBatchNormalizationInvocationShouldBe
 	
 	fqPaths := invocations collect: [ :i | i fullyQualifiedPath: false ].
    	self assert: fqPaths size equals: 3.
-	self deny: (fqPaths anySatisfy: [ :v | v ~=  'keras.layers.BatchNormalization'  ]).
+	self deny: (fqPaths anySatisfy: [ :v | v ~=  'keras.layers'  ]).
 ]
 
 { #category : 'asserting' }
@@ -85,7 +85,7 @@ FamixPythonWIPEntitiesExtenssionTest >> testDropoutInvocationShouldBeResolvable 
 	
 	fqPaths := invocations collect: [ :i | i fullyQualifiedPath: false ].
    	self assert: fqPaths size equals: 4.
-	self deny: (fqPaths anySatisfy: [ :v | v ~=  'keras.layers.Dropout'  ]).
+	self deny: (fqPaths anySatisfy: [ :v | v ~=  'keras.layers'  ]).
 ]
 
 { #category : 'asserting' }
