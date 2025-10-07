@@ -4,7 +4,7 @@ Extension { #name : 'TEntityMetaLevelDependency' }
 TEntityMetaLevelDependency >> libraryName [
 
 	| module toPrint current |
-	module := (self query ancestors ofAnyType: {
+	module := (self query containers ofAnyType: {
 			           FamixPythonPackage.
 			           FamixPythonModule.
 			           FamixPythonUnknownEntity }) anyOne.
@@ -12,9 +12,9 @@ TEntityMetaLevelDependency >> libraryName [
 	toPrint := OrderedCollection with: module.
 
 	current := module.
-	[ current parents isNotEmpty ] whileTrue: [
-		toPrint add: current parents anyOne.
-		current := toPrint last ].
+	[ current containers isNotEmpty ] whileTrue: [
+			toPrint add: current containers anyOne.
+			current := toPrint last ].
 
 	^ $. join: (toPrint reverse collect: #name)
 ]

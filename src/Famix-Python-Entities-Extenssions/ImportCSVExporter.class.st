@@ -47,7 +47,7 @@ ImportCSVExporter >> export [
 			csv fieldWriter: #object.
 
 			"En-têtes"
-			csv nextPut: #( 'fonction' 'FQP' 'source' ).
+			csv nextPut: #( 'imported entity' 'library name' 'source' ).
 
 			csv addObjectFields: {
 					[ :inv | inv importedEntity name asString ].
@@ -59,8 +59,10 @@ ImportCSVExporter >> export [
 
 { #category : 'as yet unclassified' }
 ImportCSVExporter >> loadModel [
-
- model := FamixPythonImporter import: source
+| importer |
+importer := FamixPythonImporter new.
+ model := importer import: source storeErrorsOn: ('/Users/mignard/Documents/work/invocationStudies/error_nb/errors.csv' asFileReference ).
+ 
 ]
 
 { #category : 'accessing' }

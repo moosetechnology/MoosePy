@@ -168,6 +168,19 @@ FamixPythonWIPEntitiesExtenssionTest >> testInfoInvocationPathShouldNotBeSimilar
 ]
 
 { #category : 'asserting' }
+FamixPythonWIPEntitiesExtenssionTest >> testInocationOnTheReturnOfALocalFunc [
+
+	| invocation fqPath |
+	invocation := self allInvocationWithFunctionNamed: 'methodWeShouldNotResolve'.
+	self assert: invocation size equals: 1.
+
+	
+ 	fqPath := invocation first fullyQualifiedPath: false .
+	self assert: fqPath equals: 'unknown'
+
+]
+
+{ #category : 'asserting' }
 FamixPythonWIPEntitiesExtenssionTest >> testInvocationOfALocalFuncWithMultipleCandidates [
 
 	| invocation fqPaths |
