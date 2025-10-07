@@ -87,7 +87,8 @@ def local_func(aParameter):
     return a
 
 
-local_func(X_train)
+return_of_local_func = local_func(X_train)
+return_of_local_func.methodWeShouldNotResolve()
 
 
 def on_epoch_end():
