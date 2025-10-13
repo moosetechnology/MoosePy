@@ -3205,6 +3205,21 @@ FamixPythonProject1Test >> testInvocationToUnknowEntityOfSameNameAsUnknowPackage
 	self assert: unknowFunction isStub
 ]
 
+{ #category : 'tests' }
+FamixPythonProject1Test >> testInvocationToUnknowEntityOfSameNameAsUnknowPackage2 [
+	"Regression test"
+
+	| unknowFunction |
+	"I get the one without children to have the bottom most entity of this name since it should be in an entity of the same name."
+	unknowFunction := self model entities detect: [ :entity |
+		                  entity class = FamixPythonUnknownEntity and: [ entity name = 'variable_scope' and: [ entity childEntities isEmpty ] ] ].
+
+	self assert: unknowFunction name equals: 'variable_scope'.
+	self assert: unknowFunction parentPackage name equals: 'variable_scope'.
+	self deny: unknowFunction identicalTo: unknowFunction parentPackage.
+	self assert: unknowFunction isStub
+]
+
 { #category : 'tests - invocations' }
 FamixPythonProject1Test >> testInvocationsThatCannotBeResolved [
 	"I created a file with a lot of invocations that cannot be resolved and we will ensure we do not create any invocation for them."
