@@ -2327,8 +2327,6 @@ FamixPythonProject1Test >> testFunctionSourceAnchor [
 FamixPythonProject1Test >> testFunctionTypedDefaultParameter [
 
 	| function parameter |
-	self skip.
-	self flag: #todo. "Manage assertions on types."
 	function := self functionNamed: 'function_with_typed_default_parameter'.
 	parameter := self parameterNamed: 'default_typed_parameter'.
 
@@ -2340,7 +2338,10 @@ FamixPythonProject1Test >> testFunctionTypedDefaultParameter [
 	self assert: parameter parentBehaviouralEntity equals: function.
 	self assert: parameter hasDefaultValue.
 	self deny: parameter isListSplat.
-	self deny: parameter isDictionarySplat
+	self deny: parameter isDictionarySplat.
+
+
+	self flag: #todo "Manage assertions on types."
 ]
 
 { #category : 'tests - parameters' }

@@ -1613,6 +1613,18 @@ FamixPythonVisitor >> visitTuplePattern: aNode [
 	^ self visitChildren: aNode
 ]
 
+{ #category : 'visiting' }
+FamixPythonVisitor >> visitTypedDefaultParameter: aNode [
+	"
+	TODO
+	"
+
+	self flag: #todo. "Manage typing"
+	(self visit: aNode _name) attributeAt: #hasDefaultValue put: true.
+	self visit: aNode _type.
+	self visit: aNode _value
+]
+
 { #category : 'visiting - visitChildren' }
 FamixPythonVisitor >> visitUnaryOperator: aNode [
 	"
