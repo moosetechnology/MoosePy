@@ -2346,8 +2346,23 @@ FamixPythonProject1Test >> testFunctionTypedDefaultParameter [
 { #category : 'tests - parameters' }
 FamixPythonProject1Test >> testFunctionTypedParameter [
 
-	self flag: #todo.
-	self skip
+	| function parameter |
+	function := self functionNamed: 'function_with_typed_parameter'.
+	parameter := self parameterNamed: 'typed_parameter'.
+
+	self assert: function parameters size equals: 1.
+	self assert: function keywordSeparatorPosition equals: nil.
+	self assert: function positionalSeparatorPosition equals: nil.
+	self assertCollection: function parameters hasSameElements: { parameter }.
+	self assert: parameter name equals: 'typed_parameter'.
+	self deny: parameter isStub.
+	self assert: parameter class equals: FamixPythonParameter.
+	self assert: parameter parentBehaviouralEntity equals: function.
+	self deny: parameter hasDefaultValue.
+	self deny: parameter isListSplat.
+	self deny: parameter isDictionarySplat.
+	
+	 self flag: #todo. "Add assertions on type because we currently only have assertions on the existance of the parameter."
 ]
 
 { #category : 'tests - functions' }
