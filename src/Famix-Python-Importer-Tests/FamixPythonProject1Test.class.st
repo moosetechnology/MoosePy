@@ -961,7 +961,7 @@ FamixPythonProject1Test >> testClassVariablesWithSameNameButDifferenClass [
 	variables := self model allAttributes select: [ :variable | variable name = 'furniture_color' ].
 
 	self assert: variables size equals: 2.
-	self assertCollection: (variables flatCollect: #parents) hasSameElements: {
+	self assertCollection: (variables flatCollect: #containers) hasSameElements: {
 			(self classNamed: 'Chair').
 			(self classNamed: 'Stool') }
 ]
@@ -2544,7 +2544,7 @@ FamixPythonProject1Test >> testGlobalVariablesWithTheSameNameButDifferentParents
 	globals := self model allGlobalVariables select: [ :variable | variable name = 'globalVariableWithCommonName' ].
 
 	self assert: globals size equals: 2.
-	self assertCollection: (globals flatCollect: #parents) hasSameElements: {
+	self assertCollection: (globals flatCollect: #containers) hasSameElements: {
 			(self moduleNamed: 'moduleAtRoot').
 			(self moduleNamed: 'moduleAtRoot2') }
 ]
@@ -2869,7 +2869,7 @@ FamixPythonProject1Test >> testInstanceVariablesWithSameNameButDifferenClass [
 	variables := self model allAttributes select: [ :variable | variable name = 'number_of_legs' ].
 
 	self assert: variables size equals: 2.
-	self assertCollection: (variables flatCollect: #parents) hasSameElements: {
+	self assertCollection: (variables flatCollect: #containers) hasSameElements: {
 			(self classNamed: 'Chair').
 			(self classNamed: 'Stool') }
 ]
@@ -3714,7 +3714,7 @@ FamixPythonProject1Test >> testLocalVariablesInFunctionWithTheSameNameButDiffere
 	variables := self model allLocalVariables select: [ :variable | variable name = 'local_in_function1' ].
 
 	self assert: variables size equals: 2.
-	self assertCollection: (variables flatCollect: #parents) hasSameElements: {
+	self assertCollection: (variables flatCollect: #containers) hasSameElements: {
 			(self functionNamed: 'function_with_local_variables').
 			(self functionNamed: 'function_with_local_variables2') }
 ]
@@ -3745,7 +3745,7 @@ FamixPythonProject1Test >> testLocalVariablesInMethodWithTheSameNameButDifferent
 	variables := self model allLocalVariables select: [ :variable | variable name = 'local_in_method1' ].
 
 	self assert: variables size equals: 2.
-	self assertCollection: (variables flatCollect: #parents) hasSameElements: {
+	self assertCollection: (variables flatCollect: #containers) hasSameElements: {
 			(self methodNamed: 'method_with_local_variables').
 			(self methodNamed: 'method_with_local_variables2') }
 ]

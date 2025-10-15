@@ -57,7 +57,7 @@ FamixPythonFromImportResolvable >> resolveInScope: aScope currentEntity: current
 							                possibleEntities := currentPackage containedEntities ]
 					                ifFalse: [ "If we have an absolute path we just start at the root."
 							                remainingPath := path.
-							                possibleEntities := currentEntity rootContainers flatCollect: #children ]. "We trim the path because we can have spaces after the dots in relativ paths."
+							                possibleEntities := currentEntity rootContainers flatCollect: #containedEntities ]. "We trim the path because we can have spaces after the dots in relativ paths."
 				                self findTargetEntityFor: remainingPath trim from: possibleEntities ]. "If we have an import all then we import the targeted module directly."
 	possibleEntities := entityName = '*'
 		                    ifTrue: [ { targetModule } ]
