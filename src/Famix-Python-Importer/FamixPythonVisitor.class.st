@@ -389,7 +389,8 @@ FamixPythonVisitor >> manageAttributeAsCallReceiver: aNode [
 						   expectedKind: {
 								   FamixPythonFunction.
 								   FamixPythonClass };
-						   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one can be a function or a class"
+						   notFoundReplacementEntity: [ :unresolved :currentEntity |
+								"This one can be a function or a class"
 								   (self ensureStubUnknownEntityNamed: unresolved identifier)
 									   parentPackage: import importedEntity;
 									   yourself ];
@@ -402,10 +403,7 @@ FamixPythonVisitor >> manageAttributeAsCallReceiver: aNode [
 		ifFound: [ :import |
 				^ self
 					  resolve: ((FamixPythonDependencyFromImportedEntityResolvable identifier: identifier import: import)
-							   notFoundReplacementEntity: [ :unresolved :currentEntity |
-									   (self ensureStubUnknownEntityNamed: unresolved identifier)
-										   parentPackage: unresolved import importedEntity;
-										   yourself ];
+							   notFoundReplacementEntity: [ :unresolved :currentEntity | self ensureStubUnknownEntityNamed: unresolved identifier in: unresolved import importedEntity ];
 							   yourself)
 					  foundAction: [ :result :currentEntity | self createAssociationsForFunctionCallNode: (aNode parentOfType: #call) forResult: result in: currentEntity ] ].
 
@@ -1652,6 +1650,18 @@ FamixPythonVisitor >> visitTuplePattern: aNode [
 	"
 	self flag: #todo. "Comment"
 	^ self visitChildren: aNode
+]
+
+{ #category : 'visiting' }
+FamixPythonVisitor >> visitTypedDefaultParameter: aNode [
+	"
+	TODO
+	"
+
+	self flag: #todo. "Manage typing"
+	(self visit: aNode _name) attributeAt: #hasDefaultValue put: true.
+	self visit: aNode _type.
+	self visit: aNode _value
 ]
 
 { #category : 'visiting - visitChildren' }

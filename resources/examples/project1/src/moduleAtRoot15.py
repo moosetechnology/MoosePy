@@ -1,4 +1,4 @@
-# Some examples of temporary variables usage. Note everything is here.
+# Some examples of temporary variables usage. Not everything is here.
 
 print(localVarInGeneratorExpression for localVarInGeneratorExpression in range(5))
 

@@ -90,7 +90,15 @@ FamixTSNodeWrapper >> isParameterDeclaration [
 	"In a default parameter, it represent the parameter if it's in the name field."
 	"def f(arg=3):"
 	(self parent type = #default_parameter and: [ self parent _name = self ]) ifTrue: [ ^ true ].
-
+	
+	"Typed parameter
+	def f(arg: int):"
+	(self parent type = #typed_parameter) ifTrue: [ ^ true].
+	
+	"Typed default parameter
+	def (arg: int = 5):"
+	(self parent type = #typed_default_parameter) ifTrue: [ ^true ].
+	
 	^ false
 ]
 
