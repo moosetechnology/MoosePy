@@ -54,7 +54,9 @@ Class {
 	#superclass : 'FamixTSAbstractImporter',
 	#instVars : [
 		'rootPackagePath',
-		'filesToIgnoreBlock'
+		'filesToIgnoreBlock',
+		'numberOfFilesToParse',
+		'numberOfParsedFiles'
 	],
 	#category : 'Famix-Python-Importer-Core',
 	#package : 'Famix-Python-Importer',
@@ -195,7 +197,7 @@ FamixPythonImporter >> importFileReference: aFileReference [
 						useCurrentEntity: package
 						during: [ "If we have an __init__.py file, this is a package. To have it at the top of the context we need to parse it first so that the sub packages and modules go in it."
 								(aFileReference children sorted: [ :fileA :fileB | fileA isPythonPackageDeclaration or: [ fileB isPythonPackageDeclaration not ] ]) ifNotEmpty: [ :files |
-									files do: [ :child | self importFileReference: child ] ] ] ].
+									files do: [ :child | (self filesToIgnoreBlock value: child) ifFalse: [ self importFileReference: child ] ] ] ] ].
 
 			^ self ].
 
