@@ -33,3 +33,13 @@ FamixPythonModel class >> importingContextClass [
 	<generated>
 	^ FamixPythonImportingContext
 ]
+
+{ #category : 'replication' }
+FamixPythonModel >> defaultDetectionConfiguration [
+
+	^ FamixRepConfiguration
+		  sourcesCleaner: FamixRepPythonCleaner new
+		  minimumNumberOfReplicas: 2
+		  ofLines: 10
+		  ofCharacters: 80
+]
