@@ -184,3 +184,5 @@ def variable_to_access_in_tuple_return():
 
 variableToAccessInKeywordArgumentCall = 42
 function_with_keyword_argument(1, arg1 = variableToAccessInKeywordArgumentCall)
+variableToAccessInKeywordArgumentCall = 42
+function_with_keyword_argument(1, arg1 = variableToAccessInKeywordArgumentCall)
