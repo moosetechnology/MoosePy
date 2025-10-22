@@ -181,3 +181,6 @@ aTuple = (1, 2, variableToAccessInTuple, 4)
 def variable_to_access_in_tuple_return():
     variableToAccessInTuple = 8
     return 0, variableToAccessInTuple
+
+variableToAccessInKeywordArgumentCall = 42
+function_with_keyword_argument(1, arg1 = variableToAccessInKeywordArgumentCall)
