@@ -174,3 +174,6 @@ def function_to_invoke_in_list_splat(indices):
 indices = [0, 2, 4, 6, 8]
 
 var = [*function_to_invoke_in_list_splat(slice, indices[:-1], indices[1:])]
+
+variableToAccessInKeywordArgumentCall = 42
+function_with_keyword_argument(1, arg1 = variableToAccessInKeywordArgumentCall)
