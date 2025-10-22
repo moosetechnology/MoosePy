@@ -5785,6 +5785,28 @@ FamixPythonProject1Test >> testReadAccessInDictionarySplat [
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInExpressionList [
+	"same as tuple but it becomes an expression_list node in some cases like in a return:
+	def func():
+		return a, b
+	 "
+	| local function access |
+	local := self localVariableNamed: 'variableToAccessInTuple'.
+	function := self functionNamed: 'variable_to_access_in_tuple_return'.
+
+	access := (local incomingAccesses select: [ :anAccess | anAccess accessor = function ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: function.
+	self assert: access accessor equals: function.
+	self assert: access target equals: local.
+	self assert: access variable equals: local.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (function accesses anySatisfy: [ :anAccess | anAccess variable = local ])
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testReadAccessInGeneratorExpression [
 
 	| global module accesses |
@@ -5953,6 +5975,25 @@ FamixPythonProject1Test >> testReadAccessInPair [
 
 	| global module access |
 	global := self globalVariableNamed: 'variableToAccessInPair'.
+	module := self moduleNamed: 'moduleAtRoot13'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: module.
+	self assert: access accessor equals: module.
+	self assert: access target equals: global.
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (module accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInTuple [
+
+	| global module access |
+	global := self globalVariableNamed: 'variableToAccessInTuple'.
 	module := self moduleNamed: 'moduleAtRoot13'.
 
 	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = module ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].

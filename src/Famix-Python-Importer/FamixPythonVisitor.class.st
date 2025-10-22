@@ -1029,6 +1029,12 @@ FamixPythonVisitor >> visitEscapeSequence: aNode [
 ]
 
 { #category : 'visiting - visitChildren' }
+FamixPythonVisitor >> visitExpressionList: aNode [
+
+	^ self visitChildren: aNode
+]
+
+{ #category : 'visiting - visitChildren' }
 FamixPythonVisitor >> visitExpressionStatement: aNode [
 
 	^ self visitChildren: aNode
