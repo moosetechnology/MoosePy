@@ -13,7 +13,7 @@ FamixTSNodeWrapper >> isAccessOrReferenceNode [
 
 	(self parent type = #attribute and: [ self parent isInCall ]) ifTrue: [ ^ true ].
 	
-	(self parent type = 'keyword_argument' and: [ self parent _value = self ]) ifTrue: [ ^ true ].
+	(self isInField: #value ofParentOfType: #keyword_argument) ifTrue: [ ^ true ].
 
 	^ #( elif_clause list argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator expression_statement
 	     augmented_assignment unary_operator boolean_operator pair list_splat default_parameter dictionary_splat #if_clause #for_in_clause generator_expression
