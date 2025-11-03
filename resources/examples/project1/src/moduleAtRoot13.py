@@ -174,3 +174,19 @@ def function_to_invoke_in_list_splat(indices):
 indices = [0, 2, 4, 6, 8]
 
 var = [*function_to_invoke_in_list_splat(slice, indices[:-1], indices[1:])]
+
+variableToAccessInTuple = 7
+aTuple = (1, 2, variableToAccessInTuple, 4)
+
+def variable_to_access_in_tuple_return():
+    variableToAccessInTuple = 8
+    return 0, variableToAccessInTuple
+
+def function_with_keyword_argument(arg0, arg1=10):
+    return arg0 + arg1
+
+variableToAccessInKeywordArgumentCall = 42
+function_with_keyword_argument(1, arg1 = variableToAccessInKeywordArgumentCall)
+
+variableToAccessInKeywordArgumentCallInParenthesis = 42 
+function_with_keyword_argument(1, arg1 = (variableToAccessInKeywordArgumentCallInParenthesis))
