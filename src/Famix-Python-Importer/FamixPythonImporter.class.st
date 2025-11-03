@@ -122,6 +122,12 @@ FamixPythonImporter >> computeFilesToParseFrom: fileReference [
 
 	| foldersToVisit |
 	filesToParse := OrderedCollection new.
+	
+	"If we get only one file, no need to iterate over any folder."
+	fileReference isPythonFile ifTrue: [
+			filesToParse add: fileReference.
+			^ filesToParse ].
+
 	foldersToVisit := { fileReference }.
 
 	[
