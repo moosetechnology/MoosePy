@@ -44,7 +44,6 @@
 | Name | Type | Default value | Comment |
 |---|
 | `isStub` | `Boolean` | false | Flag true if the entity attributes are incomplete, either because the entity is missing or not imported.|
-| `kind` | `String` | nil | Tag indicating a setter, getter, constant, constructor method|
 | `name` | `String` | nil | Basic name of the entity, not full reference.|
 | `signature` | `String` | nil | Signature of the message being sent|
 
@@ -52,8 +51,8 @@
 Class {
 	#name : 'FamixPythonMethod',
 	#superclass : 'FamixPythonContainerEntity',
-	#traits : 'FamixTHasKind + FamixTImportable + FamixTInvocable + FamixTMethod + FamixTWithAnnotationInstances + FamixTWithComments + FamixTWithFunctions + FamixTWithInvocations + FamixTWithLambdas',
-	#classTraits : 'FamixTHasKind classTrait + FamixTImportable classTrait + FamixTInvocable classTrait + FamixTMethod classTrait + FamixTWithAnnotationInstances classTrait + FamixTWithComments classTrait + FamixTWithFunctions classTrait + FamixTWithInvocations classTrait + FamixTWithLambdas classTrait',
+	#traits : 'FamixTImportable + FamixTInvocable + FamixTMethod + FamixTWithAnnotationInstances + FamixTWithComments + FamixTWithFunctions + FamixTWithInvocations + FamixTWithLambdas',
+	#classTraits : 'FamixTImportable classTrait + FamixTInvocable classTrait + FamixTMethod classTrait + FamixTWithAnnotationInstances classTrait + FamixTWithComments classTrait + FamixTWithFunctions classTrait + FamixTWithInvocations classTrait + FamixTWithLambdas classTrait',
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',
 	#tag : 'Entities'
@@ -66,6 +65,40 @@ FamixPythonMethod class >> annotation [
 	<package: #'Famix-Python-Entities'>
 	<generated>
 	^ self
+]
+
+{ #category : 'testing' }
+FamixPythonMethod >> isConstructor [
+
+	^ self name = '__init__'
+]
+
+{ #category : 'testing' }
+FamixPythonMethod >> isGetter [
+
+	<FMProperty: #isGetter type: #Boolean>
+	<derived>
+	<FMComment: 'True if the method is a getter of an attribute'>
+	| attributeName |
+	(self name beginsWith: 'get_') ifFalse: [ ^ false ].
+
+	attributeName := (self name withoutPrefix: 'get_') asLowercase.
+
+	^ self parentType attributes anySatisfy: [ :attribute | attributeName = attribute name asLowercase ]
+]
+
+{ #category : 'testing' }
+FamixPythonMethod >> isSetter [
+
+	<FMProperty: #isSetter type: #Boolean>
+	<derived>
+	<FMComment: 'True if the method is a setter on an attribute'>
+	| attributeName |
+	(self name beginsWith: 'set_') ifFalse: [ ^ false ].
+
+	attributeName := (self name withoutPrefix: 'set_') asLowercase.
+
+	^ self parentType attributes anySatisfy: [ :attribute | attributeName = attribute name asLowercase ]
 ]
 
 { #category : 'accessing' }

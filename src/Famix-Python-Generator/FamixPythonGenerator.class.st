@@ -164,7 +164,6 @@ FamixPythonGenerator >> defineHierarchy [
 	method --|> #TWithFunctions.
 	method --|> #TInvocable.
 	method --|> #TWithAnnotationInstances.
-	method --|> #THasKind.
 	method --|> #TWithLambdas.
 
 	module --|> containerEntity.

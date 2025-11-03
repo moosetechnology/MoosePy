@@ -261,7 +261,6 @@ FamixPythonVisitor >> getConstructorOf: aClass [
 		  detect: [ :method | method isConstructor ]
 		  ifNone: [
 				  (self createMethodNamed: '__init__')
-					  isConstructor: true;
 					  parentType: aClass;
 					  yourself ]
 ]
@@ -553,24 +552,6 @@ FamixPythonVisitor >> manageMethodDeclarationFrom: aMethodNode [
 		          signature: (aMethodNode completeSource copyFrom: aMethodNode _name startPosition to: aMethodNode _parameters endPosition);
 		          parentType: self currentEntity;
 		          yourself.
-
-	name = '__init__' ifTrue: [ method isConstructor: true ].
-
-	(name beginsWith: 'get_') ifTrue: [
-			self
-				resolve: ((SRIdentifierResolvable identifier: (name withoutPrefix: 'get_'))
-						 expectedKind: FamixPythonAttribute;
-						 yourself)
-				foundAction: [ :entity :currentEntity | method beGetter ]
-				ifNone: [ "We do nothing" ] ].
-
-	(name beginsWith: 'set_') ifTrue: [
-			self
-				resolve: ((SRIdentifierResolvable identifier: (name withoutPrefix: 'set_'))
-						 expectedKind: FamixPythonAttribute;
-						 yourself)
-				foundAction: [ :entity :currentEntity | method beSetter ]
-				ifNone: [ "We do nothing" ] ].
 
 	^ self setSourceAnchor: method from: aMethodNode
 ]
