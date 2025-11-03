@@ -87,7 +87,7 @@ FamixPythonImporterWithClassesTest >> testMethod [
 	| mth |
 	mth := (self classNamed: 'Player') methods detect: [ :m | m name = '__init__' ].
 	self assert: mth class equals: FamixPythonMethod.
-	self assert: mth parents anyOne name equals: 'Player'.
+	self assert: mth containers anyOne name equals: 'Player'.
 	self assert: mth name equals: '__init__'.
 	self assert: mth signature equals: '__init__(self, x, y, joystick_no)'
 ]
