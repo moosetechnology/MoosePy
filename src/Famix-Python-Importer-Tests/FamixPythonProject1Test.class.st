@@ -5570,6 +5570,25 @@ FamixPythonProject1Test >> testReadAccessInANot [
 ]
 
 { #category : 'tests - accesses' }
+FamixPythonProject1Test >> testReadAccessInArraySlice1 [
+
+	| global function access |
+	global := self globalVariableNamed: 'variableToAccessInArraySlice'.
+	function := self functionNamed: 'variable_to_access_in_array_slice_1'.
+
+	access := (global incomingAccesses select: [ :anAccess | anAccess accessor = function ]) detectMax: [ :anAccess | anAccess sourceAnchor startPos ].
+
+	self assert: access class equals: FamixPythonAccess.
+	self assert: access source equals: function.
+	self assert: access accessor equals: function.
+	self assert: (access target includes: global).
+	self assert: access variable equals: global.
+	self deny: access isWrite.
+	self assert: access isRead.
+	self assert: (function accesses anySatisfy: [ :anAccess | anAccess variable = global ])
+]
+
+{ #category : 'tests - accesses' }
 FamixPythonProject1Test >> testReadAccessInAssertStatement [
 
 	| global module access |
