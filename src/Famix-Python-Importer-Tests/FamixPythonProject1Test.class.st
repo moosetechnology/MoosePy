@@ -5764,7 +5764,7 @@ FamixPythonProject1Test >> testReadAccessInExpressionList [
 	self assert: access class equals: FamixPythonAccess.
 	self assert: access source equals: function.
 	self assert: access accessor equals: function.
-	self assert: access target equals: local.
+	self assert: (access target includes: local).
 	self assert: access variable equals: local.
 	self deny: access isWrite.
 	self assert: access isRead.
@@ -5795,7 +5795,7 @@ FamixPythonProject1Test >> testReadAccessInKeywordArgument [
 	self assert: access class equals: FamixPythonAccess.
 	self assert: access source equals: module.
 	self assert: access accessor equals: module.
-	self assert: access target equals: global.
+	self assert: (access target includes: global).
 	self assert: access variable equals: global.
 	self deny: access isWrite.
 	self assert: access isRead.
@@ -5814,7 +5814,7 @@ FamixPythonProject1Test >> testReadAccessInKeywordArgumentInParenthesis [
 	self assert: access class equals: FamixPythonAccess.
 	self assert: access source equals: module.
 	self assert: access accessor equals: module.
-	self assert: access target equals: global.
+	self assert: (access target includes: global).
 	self assert: access variable equals: global.
 	self deny: access isWrite.
 	self assert: access isRead.
@@ -5995,7 +5995,7 @@ FamixPythonProject1Test >> testReadAccessInTuple [
 	self assert: access class equals: FamixPythonAccess.
 	self assert: access source equals: module.
 	self assert: access accessor equals: module.
-	self assert: access target equals: global.
+	self assert: (access target includes: global).
 	self assert: access variable equals: global.
 	self deny: access isWrite.
 	self assert: access isRead.
