@@ -191,23 +191,17 @@ function_with_keyword_argument(1, arg1 = variableToAccessInKeywordArgumentCall)
 variableToAccessInKeywordArgumentCallInParenthesis = 42 
 function_with_keyword_argument(1, arg1 = (variableToAccessInKeywordArgumentCallInParenthesis))
 
+variableToAccessInArraySlice = 5
+arrayToBeAccessedInSlice = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 def variable_to_access_in_array_slice_1():
-    variableToAccessInArraySlice = 2
-    my_array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    return my_array[:variableToAccessInArraySlice]
+    return arrayToBeAccessedInSlice[:variableToAccessInArraySlice]
 
 def variable_to_access_in_array_slice_2():
-    variableToAccessInArraySlice = 5
-    my_array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    return my_array[1:variableToAccessInArraySlice]
+    return arrayToBeAccessedInSlice[1:variableToAccessInArraySlice]
 
 def variable_to_access_in_array_slice_3():
-    variableToAccessInArraySlice = 2
-    my_array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    return my_array[::variableToAccessInArraySlice]
+    return arrayToBeAccessedInSlice[::variableToAccessInArraySlice]
 
 def variable_to_access_in_array_slice_with_parentheses():
-    variableToAccessInArraySlice = 3
-    my_array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    return my_array[1:(variableToAccessInArraySlice)]
+    return arrayToBeAccessedInSlice[1:(variableToAccessInArraySlice)]
