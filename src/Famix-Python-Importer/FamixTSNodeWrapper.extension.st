@@ -12,12 +12,17 @@ FamixTSNodeWrapper >> isAccessOrReferenceNode [
 	"I should return true if an Identifier node represent an access or a reference."
 
 	(self parent type = #attribute and: [ self parent isInCall ]) ifTrue: [ ^ true ].
-	
+
 	(self isInField: #value ofParentOfType: #keyword_argument) ifTrue: [ ^ true ].
 
-	^ #( elif_clause list argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator expression_statement
-	     augmented_assignment unary_operator boolean_operator pair list_splat default_parameter dictionary_splat #if_clause #for_in_clause generator_expression
-	     list_comprehension dictionary_comprehension string_content interpolation subscript tuple expression_list) includes: self parent type
+	"this is for the case where a slice contains variable wrapped in parenthesis
+	e.g arr[1:(end)] or arr[1:(((end)))]"
+	(self parent type = #parenthesized_expression and: [ (self parentOfType: #slice) isNotNil ]) ifTrue: [ ^ true ].
+
+	^ #( elif_clause list argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator
+	     expression_statement augmented_assignment unary_operator boolean_operator pair list_splat default_parameter dictionary_splat
+	     #if_clause #for_in_clause generator_expression list_comprehension dictionary_comprehension string_content interpolation subscript
+	     tuple expression_list slice ) includes: self parent type
 ]
 
 { #category : '*Famix-Python-Importer' }

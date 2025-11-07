@@ -190,3 +190,18 @@ function_with_keyword_argument(1, arg1 = variableToAccessInKeywordArgumentCall)
 
 variableToAccessInKeywordArgumentCallInParenthesis = 42 
 function_with_keyword_argument(1, arg1 = (variableToAccessInKeywordArgumentCallInParenthesis))
+
+variableToAccessInArraySlice = 5
+arrayToBeAccessedInSlice = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+def variable_to_access_in_array_slice_1():
+    return arrayToBeAccessedInSlice[:variableToAccessInArraySlice]
+
+def variable_to_access_in_array_slice_2():
+    return arrayToBeAccessedInSlice[1:variableToAccessInArraySlice]
+
+def variable_to_access_in_array_slice_3():
+    return arrayToBeAccessedInSlice[::variableToAccessInArraySlice]
+
+def variable_to_access_in_array_slice_with_parentheses():
+    return arrayToBeAccessedInSlice[1:(variableToAccessInArraySlice)]

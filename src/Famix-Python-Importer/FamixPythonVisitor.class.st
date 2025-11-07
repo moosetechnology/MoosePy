@@ -1525,6 +1525,12 @@ FamixPythonVisitor >> visitReturnStatement: aNode [
 ]
 
 { #category : 'visiting - visitChildren' }
+FamixPythonVisitor >> visitSlice: aNode [
+
+	^ self visitChildren: aNode
+]
+
+{ #category : 'visiting - visitChildren' }
 FamixPythonVisitor >> visitString: aStringNode [
 	"
 	Children:
