@@ -33,3 +33,9 @@ FamixPythonComment class >> annotation [
 	<generated>
 	^ self
 ]
+
+{ #category : 'testing' }
+FamixPythonComment >> isDocString [
+
+	^ self sourceAnchor beginsWith: '"""'
+]
