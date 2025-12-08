@@ -117,18 +117,18 @@ FamixPythonImporter >> commentVisitorClass [
 ]
 
 { #category : 'api' }
-FamixPythonImporter >> computeFilesToParseFrom: fileReference [
+FamixPythonImporter >> computeFilesToParse [
 	"This method will gather the .py files to parse."
 
 	| foldersToVisit |
 	filesToParse := OrderedCollection new.
 	
 	"If we get only one file, no need to iterate over any folder."
-	fileReference isPythonFile ifTrue: [
-			filesToParse add: fileReference.
+	rootReference isPythonFile ifTrue: [
+			filesToParse add: rootReference .
 			^ filesToParse ].
 
-	foldersToVisit := { fileReference }.
+	foldersToVisit := { rootReference }.
 
 	[
 		foldersToVisit do: [ :folder |
@@ -138,7 +138,7 @@ FamixPythonImporter >> computeFilesToParseFrom: fileReference [
 ]
 
 { #category : 'api' }
-FamixPythonImporter >> determineSourceRootFolderFrom: fileReference [
+FamixPythonImporter >> determineSourceRootFolder [
 	"We decided in the parser to define a folder as the root of the project to be used as the base of relative imports. This folder will be the first package of the project. 
 	To find it we have two solutions:
 		- The user specified the rootPackagePath and we use this (see class comment)
@@ -148,7 +148,7 @@ FamixPythonImporter >> determineSourceRootFolderFrom: fileReference [
 		  ifNil: [ "Since we have all files to parse, we need to find the common parent.
 			To do that, I'l taking all parents of all files and I check the ones present everywhere. Then I'm using the one with the longest path."
 			  (((filesToParse collect: #allParents) reduce: [ :a :b | a intersection: b ]) sort: [ :file | file pathString size ] descending) first ]
-		  ifNotNil: [ :path | fileReference / path ]
+		  ifNotNil: [ :path | rootReference / path ]
 ]
 
 { #category : 'accessing' }
@@ -166,23 +166,7 @@ FamixPythonImporter >> filesToIgnoreBlock: anObject [
 { #category : 'api' }
 FamixPythonImporter >> import: aFileReference [
 
-	| fileReference |
-	fileReference := aFileReference asFileReference. "In case the user provided a file name instead of a file reference."
-
-	self initializeVisitorAndModelUsing: fileReference.
-	
-	"This will be useful for logs and determining the root folder"
-	self computeFilesToParseFrom: fileReference.
-
-	"If we parse a unique file, we do nothing. If we have a folder, we check what is the source root to start creating our packages."
-	fileReference isPythonFile ifFalse: [ fileReference := self determineSourceRootFolderFrom: fileReference ].
-
-	self importFileReference: fileReference.
-
-	visitor resolveUnresolvedPythonSymbols.
-
-	self flag: #todo. "We should probably handle it another way in production."
-	self errorReport ifNotEmpty: [ self errorReport inspect ].
+	super import: aFileReference.
 	
 	"I'm adding some properties to help with the import. Cleaning up afterward."
 	self model entities do: #flush.
@@ -234,6 +218,16 @@ FamixPythonImporter >> initialize [
 	super initialize.
 	filesToIgnoreBlock := [ :file | file basename = 'venv' or: [ file basename = 'setup.py' ] ].
 	numberOfParsedFiles := 0
+]
+
+{ #category : 'api' }
+FamixPythonImporter >> preparsingHook [
+	
+	"This will be useful for logs and determining the root folder"
+	self computeFilesToParse.
+
+	"If we parse a unique file, we do nothing. If we have a folder, we check what is the source root to start creating our packages."
+	rootReference isPythonFile ifFalse: [ rootReference := self determineSourceRootFolder ]
 ]
 
 { #category : 'accessing' }
