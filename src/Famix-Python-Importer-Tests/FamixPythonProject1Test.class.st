@@ -5,18 +5,6 @@ Class {
 	#package : 'Famix-Python-Importer-Tests'
 }
 
-{ #category : 'accessing' }
-FamixPythonProject1Test class >> resources [
-
-	^ { FamixPythonProject1TestResource }
-]
-
-{ #category : 'accessing' }
-FamixPythonProject1Test >> model [
-
-	^ FamixPythonProject1TestResource current model
-]
-
 { #category : 'tests - accesses' }
 FamixPythonProject1Test >> test4AccessesToIrisDataset [
 	"Regression test

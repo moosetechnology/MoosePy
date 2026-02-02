@@ -1,5 +1,5 @@
 
-resources/examples/project1/.idea/
+resources/examples/**/.idea/
 
 resources/examples/**/__pycache__/
 **/.DS_Store

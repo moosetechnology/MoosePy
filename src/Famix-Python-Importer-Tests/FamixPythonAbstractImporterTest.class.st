@@ -6,6 +6,15 @@ Class {
 }
 
 { #category : 'accessing' }
+FamixPythonAbstractImporterTest class >> resources [
+
+	^ self environment
+		  at: ((self name withoutSuffix: 'Test') , 'Resource') asSymbol
+		  ifPresent: [ :class | { class } ]
+		  ifAbsent: [ {  } ]
+]
+
+{ #category : 'accessing' }
 FamixPythonAbstractImporterTest >> attributeNamed: aName [
 
 	^ self entityNamed: aName in: self model allAttributes
@@ -64,7 +73,8 @@ FamixPythonAbstractImporterTest >> methodNamed: aName [
 
 { #category : 'accessing' }
 FamixPythonAbstractImporterTest >> model [
-	self subclassResponsibility
+
+	^ self class resources anyOne current model
 ]
 
 { #category : 'running' }
