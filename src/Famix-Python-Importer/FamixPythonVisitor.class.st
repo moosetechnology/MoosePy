@@ -1117,7 +1117,7 @@ FamixPythonVisitor >> visitIdentifier: anIdentifierNode [
 	anIdentifierNode isParameterDeclaration ifTrue: [ ^ self createParameterFrom: anIdentifierNode ].
 
 	"In a class definition signature, this represent the declaration of a superclass."
-	anIdentifierNode parent parent type = #class_definition ifTrue: [ ^ self manageInheritanceDeclaredBy: anIdentifierNode ].
+	(anIdentifierNode isInField: #superclasses ofParentOfType: #class_definition) ifTrue: [ ^ self manageInheritanceDeclaredBy: anIdentifierNode ].
 
 	"For example function(1) or print(name) or (function)(1)"
 	anIdentifierNode isIsDirectFunctionInvocationOrInstanciation ifTrue: [ ^ self manageDirectFunctionInvocationOnInstanciation: anIdentifierNode ].
