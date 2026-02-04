@@ -20,7 +20,7 @@ FamixTSNodeWrapper >> isAccessOrReferenceNode [
 	(self parent type = #parenthesized_expression and: [ (self parentOfType: #slice) isNotNil ]) ifTrue: [ ^ true ].
 
 	^ #( elif_clause list argument_list return_statement lambda if_statement comparison_operator binary_operator assignment not_operator
-	     expression_statement augmented_assignment unary_operator boolean_operator pair list_splat default_parameter dictionary_splat
+	     block augmented_assignment unary_operator boolean_operator pair list_splat default_parameter dictionary_splat
 	     #if_clause #for_in_clause generator_expression list_comprehension dictionary_comprehension string_content interpolation subscript
 	     tuple expression_list slice ) includes: self parent type
 ]
