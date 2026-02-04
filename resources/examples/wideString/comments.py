@@ -1,18 +1,15 @@
 # File containing comments
 
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+# Comment with wide string ぁ
 
 # 🚀 Demo: fetch the titles of the top‑5 trending GitHub repos
 # 🎯 Goal: showcase HTTP requests, JSON handling, and simple formatting
 # 📦 Uses only the Python standard library – no extra packages needed
 
 import json
-import sys
 from urllib.request import Request, urlopen
 
 
-# Comment with wide string ぁ
 def fetch_trending(limit: int = 5):
     """
     Query GitHub’s public search API for the most‑starred repos.
@@ -39,6 +36,7 @@ def fetch_trending(limit: int = 5):
     ]
     return repos
 
+
 def commentMain():
     # 🧩 Run the fetch and pretty‑print the result
     repos = fetch_trending()
@@ -54,6 +52,7 @@ def commentMain():
 
     # ✅ Finished – you can now extend or integrate this logic elsewhere
     # 💡 Tip: wrap the request in a try/except block for production robustness
+
 
 if __name__ == "__main__":
     # 💡 Entry‑point guard – keeps imports clean when used as a module
