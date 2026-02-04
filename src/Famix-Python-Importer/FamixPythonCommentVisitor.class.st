@@ -16,7 +16,8 @@ FamixPythonCommentVisitor >> visitNode: aTSNode [
 
 	aTSNode type = #comment ifTrue: [ self addSingleLineCommentNode: aTSNode ].
 
-	(aTSNode type = #string and: [ aTSNode parent type = #expression_statement ]) ifTrue: [ self addMultilineCommentNode: aTSNode ].
+	(aTSNode type = #string and: [ "Later we could optimize to not read the full source text but add a #beginsWith: on TSNode."
+		 aTSNode sourceText beginsWith: '"""' ]) ifTrue: [ self addMultilineCommentNode: aTSNode ].
 
 	super visitNode: aTSNode
 ]
