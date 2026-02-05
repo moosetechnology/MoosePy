@@ -336,7 +336,7 @@ FamixPythonVisitor >> manageAttributeAsCallReceiver: aNode [
 	"=> self.x()"
 	(self isLocalPrefixInClass: receiverSource) ifTrue: [
 			^ self
-				  resolve: ((SRLocalClassEntityResolvable identifier: identifier expectedKind: FamixTMethod)
+				  resolve: ((SRLocalClassEntityResolvable identifier: identifier expectedKind: FamixPythonMethod)
 						   notFoundReplacementEntity: [ :unresolved :currentEntity | "This one is a method from a missing superclass"
 							   self ensureStubMethodNamed: unresolved identifier ];
 						   yourself)
@@ -386,7 +386,7 @@ FamixPythonVisitor >> manageAttributeWriteAccessTo: aNode [
 		ifTrue: [
 				| class |
 				class := self currentEntityOfType: FamixPythonType.
-				variable := (class childOfType: FamixTAttribute named: pair value) ifNil: [
+				variable := (class childOfType: FamixPythonAttribute named: pair value) ifNil: [
 						            variable := (class createVariable: pair value)
 							                        isClassSide: false;
 							                        yourself.
@@ -697,7 +697,7 @@ FamixPythonVisitor >> visitAttribute: anAttributeNode [
 		ifTrue: [
 				| class |
 				class := self currentEntityOfType: FamixPythonClass.
-				variable := (class childOfType: FamixTAttribute named: name) ifNil: [
+				variable := (class childOfType: FamixPythonAttribute named: name) ifNil: [
 						            variable := (class createVariable: name)
 							                        isClassSide: false;
 							                        yourself.

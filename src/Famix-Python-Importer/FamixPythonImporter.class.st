@@ -107,7 +107,7 @@ FamixPythonImporter class >> importPreferentialSampling [
 FamixPythonImporter class >> importReader [
 
 	<script>
-	(self import: '/Users/cyril/testPython/reader' asFileReference) inspect
+	[ (self import: '/Users/cyril/testPython/reader' asFileReference) inspect ] spy
 ]
 
 { #category : 'accessing' }
