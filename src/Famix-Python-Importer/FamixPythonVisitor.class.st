@@ -382,16 +382,19 @@ FamixPythonVisitor >> manageAttributeWriteAccessTo: aNode [
 
 	| variable pair |
 	pair := self attributeAsAssociation: aNode.
+
 	(self isLocalPrefixInClass: pair key)
 		ifTrue: [
 				| class |
-				class := self currentEntityOfType: FamixPythonType.
-				variable := (class childOfType: FamixPythonAttribute named: pair value) ifNil: [
-						            variable := (class createVariable: pair value)
-							                        isClassSide: false;
-							                        yourself.
-						            self setSourceAnchor: variable from: aNode.
-						            variable ] ]
+				class := self currentEntityOfType: FamixPythonClass.
+				variable := class attributes
+					            detect: [ :attribute | attribute name = pair value ]
+					            ifNone: [
+							            variable := (class createVariable: pair value)
+								                        isClassSide: false;
+								                        yourself.
+							            self setSourceAnchor: variable from: aNode.
+							            variable ] ]
 		ifFalse: [
 				self flag: #todo.
 				^ self ].
