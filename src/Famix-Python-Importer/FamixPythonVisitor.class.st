@@ -697,7 +697,7 @@ FamixPythonVisitor >> visitAttribute: anAttributeNode [
 		ifTrue: [
 				| class |
 				class := self currentEntityOfType: FamixPythonClass.
-				variable := (class childOfType: FamixPythonAttribute named: name) ifNil: [
+				variable := class attributes detect: [ :attribute | attribute name = name ] ifNone: [
 						            variable := (class createVariable: name)
 							                        isClassSide: false;
 							                        yourself.
