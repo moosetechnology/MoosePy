@@ -32,6 +32,13 @@ FamixPythonImportingContext >> importAttribute [
 ]
 
 { #category : 'importing' }
+FamixPythonImportingContext >> importBytesFileAnchor [
+
+	<generated>
+	^ self importConcreteEntity: (self class fm3ClassNamed: #BytesFileAnchor)
+]
+
+{ #category : 'importing' }
 FamixPythonImportingContext >> importClass [
 
 	<generated>
@@ -71,13 +78,6 @@ FamixPythonImportingContext >> importImport [
 
 	<generated>
 	^ self importAssociation: (self class fm3ClassNamed: #Import)
-]
-
-{ #category : 'importing' }
-FamixPythonImportingContext >> importIndexedFileAnchor [
-
-	<generated>
-	^ self importConcreteEntity: (self class fm3ClassNamed: #IndexedFileAnchor)
 ]
 
 { #category : 'importing' }
@@ -214,6 +214,13 @@ FamixPythonImportingContext >> shouldImportAttribute [
 ]
 
 { #category : 'testing' }
+FamixPythonImportingContext >> shouldImportBytesFileAnchor [
+
+	<generated>
+	^ self shouldImport: #BytesFileAnchor
+]
+
+{ #category : 'testing' }
 FamixPythonImportingContext >> shouldImportClass [
 
 	<generated>
@@ -253,13 +260,6 @@ FamixPythonImportingContext >> shouldImportImport [
 
 	<generated>
 	^ self shouldImport: #Import
-]
-
-{ #category : 'testing' }
-FamixPythonImportingContext >> shouldImportIndexedFileAnchor [
-
-	<generated>
-	^ self shouldImport: #IndexedFileAnchor
 ]
 
 { #category : 'testing' }

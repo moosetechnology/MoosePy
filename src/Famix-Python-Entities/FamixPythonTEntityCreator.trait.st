@@ -42,6 +42,13 @@ FamixPythonTEntityCreator >> newAttributeNamed: aName [
 ]
 
 { #category : 'entity creation' }
+FamixPythonTEntityCreator >> newBytesFileAnchor [
+
+	<generated>
+	^ self add: FamixPythonBytesFileAnchor new
+]
+
+{ #category : 'entity creation' }
 FamixPythonTEntityCreator >> newClass [
 
 	<generated>
@@ -109,13 +116,6 @@ FamixPythonTEntityCreator >> newImport [
 
 	<generated>
 	^ self add: FamixPythonImport new
-]
-
-{ #category : 'entity creation' }
-FamixPythonTEntityCreator >> newIndexedFileAnchor [
-
-	<generated>
-	^ self add: FamixPythonIndexedFileAnchor new
 ]
 
 { #category : 'entity creation' }

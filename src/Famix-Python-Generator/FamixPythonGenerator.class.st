@@ -19,13 +19,13 @@ Class {
 		'inheritance',
 		'function',
 		'module',
-		'indexedFileAnchor',
 		'globalVariable',
 		'unknowAccessOrReference',
 		'lambda',
 		'unknownEntity',
 		'metaclass',
-		'metaclassUsage'
+		'metaclassUsage',
+		'bytesFileAnchor'
 	],
 	#category : 'Famix-Python-Generator',
 	#package : 'Famix-Python-Generator'
@@ -50,13 +50,13 @@ FamixPythonGenerator >> defineClasses [
 
 	access := builder newClassNamed: #Access.
 	attribute := builder newClassNamed: #Attribute.
+	bytesFileAnchor := builder newClassNamed: #BytesFileAnchor.
 	class := builder newClassNamed: #Class.
 	containerEntity := builder newAbstractClassNamed: #ContainerEntity.
 	function := builder newClassNamed: #Function.
 	globalVariable := builder newClassNamed: #GlobalVariable.
 	implicitVariable := builder newClassNamed: #ImplicitVariable.
 	import := builder newClassNamed: #Import.
-	indexedFileAnchor := builder newClassNamed: #IndexedFileAnchor.
 	inheritance := builder newClassNamed: #Inheritance.
 	invocation := builder newClassNamed: #Invocation.
 	lambda := builder newClassNamed: #Lambda.
@@ -86,6 +86,9 @@ FamixPythonGenerator >> defineHierarchy [
 	attribute --|> #TInvocationsReceiver.
 	attribute --|> #TWithComments.
 	attribute --|> #TCanBeClassSide.
+
+	bytesFileAnchor --|> sourceAnchor.
+	bytesFileAnchor --|> #TBytesFileAnchor.
 
 	class --|> type.
 	class --|> #TClass.
@@ -136,9 +139,6 @@ FamixPythonGenerator >> defineHierarchy [
 	implicitVariable --|> #TInvocationsReceiver.
 
 	import --|> #TImport.
-
-	indexedFileAnchor --|> sourceAnchor.
-	indexedFileAnchor --|> #TIndexedFileNavigation.
 
 	inheritance --|> #TInheritance.
 

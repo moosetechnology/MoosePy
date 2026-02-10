@@ -6,25 +6,25 @@
 |---|
 | `correspondingFile` | `FamixTFile` | nil | File associated to this source anchor|
 | `encoding` | `String` | nil | A string representing the encoding of a file|
-| `endPos` | `Number` | nil | Stop position in the source|
+| `endByte` | `Number` | nil | Stop position in the source in number of bytes|
 | `fileName` | `String` | nil | Name of the source file|
-| `startPos` | `Number` | nil | Start position in the source|
+| `startByte` | `Number` | nil | Start position in the source in number of bytes|
 
 "
 Class {
-	#name : 'FamixPythonIndexedFileAnchor',
+	#name : 'FamixPythonBytesFileAnchor',
 	#superclass : 'FamixPythonSourceAnchor',
-	#traits : 'FamixTIndexedFileNavigation',
-	#classTraits : 'FamixTIndexedFileNavigation classTrait',
+	#traits : 'FamixTBytesFileAnchor',
+	#classTraits : 'FamixTBytesFileAnchor classTrait',
 	#category : 'Famix-Python-Entities-Entities',
 	#package : 'Famix-Python-Entities',
 	#tag : 'Entities'
 }
 
 { #category : 'meta' }
-FamixPythonIndexedFileAnchor class >> annotation [
+FamixPythonBytesFileAnchor class >> annotation [
 
-	<FMClass: #IndexedFileAnchor super: #FamixPythonSourceAnchor>
+	<FMClass: #BytesFileAnchor super: #FamixPythonSourceAnchor>
 	<package: #'Famix-Python-Entities'>
 	<generated>
 	^ self

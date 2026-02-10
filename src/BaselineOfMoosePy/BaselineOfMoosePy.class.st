@@ -49,5 +49,5 @@ BaselineOfMoosePy >> gitBridge: spec [
 { #category : 'baselines' }
 BaselineOfMoosePy >> treeSitterFamixIntegration: spec [
 
-	spec baseline: 'TreeSitterFamixIntegration' with: [ spec repository: 'github://moosetechnology/TreeSitterFamixIntegration:main/src' ]
+	spec baseline: 'TreeSitterFamixIntegration' with: [ spec repository: 'github://moosetechnology/TreeSitterFamixIntegration:v2.x.x/src' ]
 ]
